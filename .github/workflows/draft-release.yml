@@ -25,7 +25,7 @@ jobs:
         run: |
           git show-ref --verify "refs/tags/$RELEASE_TAG"
           python -c "import json,os; assert os.environ['RELEASE_TAG'].removeprefix('v') == json.load(open('plugin.json'))['version']"
-      - run: python -m pip install ".[dev,mcp,science,registry]" wheel
+      - run: python -m pip install ".[dev,mcp,science,registry]" wheel "setuptools>=68"
       - run: python scripts/check_release_tests.py
       - run: python scripts/build_marketplace.py --check --package
       - run: python -m pip wheel . --no-deps --no-build-isolation --wheel-dir dist

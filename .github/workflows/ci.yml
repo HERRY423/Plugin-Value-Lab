@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - run: python -m pip install ".[dev,mcp,science,registry]" wheel
+      - run: python -m pip install ".[dev,mcp,science,registry]" wheel "setuptools>=68"
       - run: python scripts/build_marketplace.py --check
       - run: python scripts/check_release_tests.py
       - run: python scripts/validate_agent_plugin.py
