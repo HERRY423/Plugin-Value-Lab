@@ -1,18 +1,40 @@
 # 安装 Plugin Value Lab
 
-版本：0.5.0。面向截图中的桌面端“添加插件市场”，支持本地目录；同一目录结构上传到你自己的 Git 仓库后，也可以作为 Git 来源。本地安装不代表已发布 Release；远程来源应填写你实际可访问的仓库地址。
+版本：0.5.0。以下以用户在 Codex 桌面端成功安装的 GitHub 市场配置为主。2026-09-23 已核对 Git 来源、`main` 引用、插件启用状态，并在该任务中实调全部 6 个默认 MCP 工具。[实测记录](INSTALLED-ACCEPTANCE-20260923.zh-CN.md)。
 
 ## 按截图添加
 
-解压市场包或进入你的实际源码目录后，在宿主中进入“插件 → 添加 → 添加插件市场”，填写：
+在 Codex 桌面端进入“插件 → 添加 → 添加插件市场”，填写：
 
 | 字段 | 填写内容 |
 | --- | --- |
-| 来源 | 包含 `.agents/plugins/marketplace.json` 的市场根目录绝对路径 |
-| Git 引用 | 留空（本地文件夹不需要） |
-| 稀疏路径 | 留空 |
+| 来源 | `HERRY423/Plugin-Value-Lab` |
+| Git 引用 | `main` |
+| 稀疏路径 | **留空**；灰色的 `plugins/codex` 是提示，不是要填写的值 |
 
-点击“添加市场”，找到 **Plugin Value Lab**，点击安装并启用。市场名为 `plugin-value-lab-marketplace`。添加市场只是添加目录，仍需要安装其中的插件。新建一个对话后，请求“这项任务现有能力够不够，什么时候需要插件？”或“比较这个插件相对基线的收益”。
+完整 Git URL `https://github.com/HERRY423/Plugin-Value-Lab.git` 也可作为来源；已安装配置将来源保存为这个 URL。`main` 是本次成功安装采用的分支；希望固定已发布版本时，可改用 `v0.5.0`，但这不是本次用户安装所用的引用。
+
+1. 点击“添加市场”。市场名为 `plugin-value-lab-marketplace`。
+2. 回到插件列表搜索 **Plugin Value Lab**，打开后点击**安装并启用**。插件标识为 `plugin-value-lab@plugin-value-lab-marketplace`。
+3. 新建一个任务，通过 `@` 选择 **Plugin Value Lab**。若当前任务尚未加载插件，关闭后重新打开 Codex，再新建任务。
+4. 发送：“调用 example_value_suite，再用 validate_value_suite 校验返回的方案；不要启动模型评测。”应返回 `real_observations: 0` 和 `valid: true`。文字判据的校准警告仍会保留。
+
+**添加市场、安装插件、启用插件、工具可调用是不同步骤。** 只添加市场后，插件不会自动出现在“已安装”里。`main` 后续可以变化，核对安装缓存中的实际版本，不要仅凭分支名推断版本。
+
+## 已添加市场但没有显示
+
+先确认没有只筛选“已安装”，再搜索插件名称并安装。如果仍未列出，可在已配置该市场的同一 Codex 环境中执行：
+
+```powershell
+codex plugin marketplace upgrade plugin-value-lab-marketplace
+codex plugin add plugin-value-lab@plugin-value-lab-marketplace
+```
+
+第一条刷新已配置的 Git 市场，第二条安装其中的插件。随后重新打开 Codex 并新建任务。这是按本机 CLI 帮助核对的排查方式；不代表用户成功安装时一定执行过这些命令。若本机 `codex plugin --help` 不提供这些命令，请使用桌面端的市场刷新和安装入口。
+
+## 本地文件夹安装（备用）
+
+也可选择包含 `.agents/plugins/marketplace.json` 的市场根目录绝对路径作为来源，Git 引用与稀疏路径均留空，然后安装并启用插件。
 
 给其他用户时，发送 `plugin-value-lab-marketplace-0.5.0.zip`，请对方先解压，在“来源”填写解压得到的 **plugin-value-lab-marketplace 文件夹的绝对路径**。应选择含 `.agents/plugins/marketplace.json` 的市场根目录；不要选 ZIP 文件、JSON 文件或里面的 `plugins/plugin-value-lab` 子目录。这个压缩包可以在任意目录解压，不依赖开发电脑的路径。
 
@@ -38,9 +60,9 @@ python scripts/value_lab.py doctor
 
 新版服务直接运行插件自身的脚本，不再依赖开发目录或提前安装 `value_lab` 包。复制到宿主缓存目录后仍从该副本加载代码。不要在安装缓存里编辑源码，更新应从市场的新版本重新安装。
 
-## 使用 Git 来源
+## 市场目录结构
 
-把完整市场结构放到你拥有的仓库根目录，保留隐藏目录和插件子目录：
+公开仓库已经包含完整市场，无需自行创建仓库或先下载 ZIP。维护自己的镜像时，保留隐藏目录和插件子目录：
 
 ```text
 repository/

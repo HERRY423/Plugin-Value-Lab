@@ -6,6 +6,20 @@ Help plugin authors locate failures in paired runs and prepare a fair retest aft
 
 Version **0.5.0**. Independent-unit scientific recomputation is now available: [design, methods and limits](docs/REPLICATE-VERIFICATION.zh-CN.md). Paired evaluation supplies the measurements; the durable assets are domain scenarios, actual studies and independent contributions. External adoption and authenticated independent reviews are not yet established.
 
+## Install in Codex desktop
+
+Open **Plugins → Add → Add plugin marketplace** and use the configuration verified in a successful installation:
+
+| Field | Value |
+| --- | --- |
+| Source | `HERRY423/Plugin-Value-Lab` |
+| Git reference | `main` |
+| Sparse paths | **Leave empty**; do not enter the gray `plugins/codex` placeholder |
+
+After adding the marketplace, search for **Plugin Value Lab**, then **install and enable** it. Adding a marketplace does not install its plugins. Start a new task, select Plugin Value Lab with `@`, and ask: “Call example_value_suite, then validate the suite. Do not start a model evaluation.”
+
+All six default MCP tools were called from the installed 0.5.0 plugin on 2026-09-23; scientific artifact checks and relocated offline replay also passed. [Acceptance scope and results](docs/INSTALLED-ACCEPTANCE-20260923.zh-CN.md) · [Installation and troubleshooting](docs/INSTALL.md). Python 3.11+ and a compatible MCP SDK are required for MCP; an already working environment needs no reinstall.
+
 ## First useful result: an author repair checklist
 
 Use existing paired records to locate execution failures, unresolved evidence and failed criteria in both arms. The usage card now includes an evidence-linked improvement queue and a full retest plan preserving cases, thresholds and negative controls. The workbench displays the same checklist and can copy the frozen protocol for the next study. You do not need to register a study or publish a score.

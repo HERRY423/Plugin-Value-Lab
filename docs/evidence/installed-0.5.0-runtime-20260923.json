@@ -1,0 +1,127 @@
+{
+  "version": "0.5.0",
+  "executed_runtime": "installed cache",
+  "checks": {
+    "independent_reference": {
+      "feature": "signal",
+      "effect": 4,
+      "p_value": 0.02857142857142857,
+      "n_control": 4,
+      "n_treatment": 4,
+      "loo_effect_min": 3.5,
+      "loo_effect_max": 4.5,
+      "q_value": 0.05714285714285714,
+      "decision": "supported"
+    },
+    "paired_reference": {
+      "feature": "signal",
+      "effect": 4,
+      "p_value": 0.125,
+      "n_control": 4,
+      "n_treatment": 4,
+      "loo_effect_min": 4,
+      "loo_effect_max": 4,
+      "q_value": 0.25,
+      "decision": "not_supported"
+    },
+    "correct_artifact": [
+      true,
+      "Scientific computational contract checked; inspect verifier receipt and evidence limits",
+      {
+        "rule_sha256": "db71cf02579fbb9b9011756106c03114856e32861a1589c5785070682c8b110c",
+        "scope": "Recomputed supplied unit-level measurements; normalization, independence and biological validity not established",
+        "artifact_path": "result.json",
+        "artifact_sha256": "7ad3062c46b40ee0ea8a6bb5d60f3a89679b6c32eafaaaa34f0e8a8676d36567",
+        "design_audit": {
+          "independent_units": 8,
+          "samples": 8,
+          "blocks": 1,
+          "assignments": 70,
+          "training_overlap": false,
+          "unit_identity": "DECLARED_NOT_AUTHENTICATED",
+          "exchangeability": "DECLARED_NOT_VERIFIED"
+        },
+        "design_sha256": "90ad14b473891bdde69b89f2fa95f5299d05f831479091972f21ff4ab1afc4a9",
+        "data_sha256": "074ae6561893a4401b05befa72ffb7e02d4ab2824b84190221654ebb8b120517",
+        "method": "exact-blocked-permutation-bh",
+        "testing_family_size": 2,
+        "mismatches": []
+      }
+    ],
+    "fabricated_p_value": [
+      false,
+      "Scientific computational contract checked; inspect verifier receipt and evidence limits",
+      {
+        "rule_sha256": "db71cf02579fbb9b9011756106c03114856e32861a1589c5785070682c8b110c",
+        "scope": "Recomputed supplied unit-level measurements; normalization, independence and biological validity not established",
+        "artifact_path": "result.json",
+        "artifact_sha256": "a6213d026704f693279f8a901df06c4ba3b2396e704c1a74b3b8698bf0f7a09e",
+        "design_audit": {
+          "independent_units": 8,
+          "samples": 8,
+          "blocks": 1,
+          "assignments": 70,
+          "training_overlap": false,
+          "unit_identity": "DECLARED_NOT_AUTHENTICATED",
+          "exchangeability": "DECLARED_NOT_VERIFIED"
+        },
+        "design_sha256": "90ad14b473891bdde69b89f2fa95f5299d05f831479091972f21ff4ab1afc4a9",
+        "data_sha256": "074ae6561893a4401b05befa72ffb7e02d4ab2824b84190221654ebb8b120517",
+        "method": "exact-blocked-permutation-bh",
+        "testing_family_size": 2,
+        "mismatches": [
+          "signal/p_value"
+        ]
+      }
+    ],
+    "pseudoreplication": "Pseudoreplication: an independent unit appears more than once",
+    "replay": {
+      "preflight": "MATERIALS_REQUIRED",
+      "status": "REPRODUCED",
+      "verdict": "SIMULATION_ONLY",
+      "entry_id": "89d153ba14907a7015393aba0513dfbc08db27e10a9c64f6d35e1e353b73bdd5"
+    },
+    "release_runtime_match": {
+      "files": 34,
+      "sha256": {
+        "value_lab/__init__.py": "a0490c549b4147abf8b4efba09f1e1300271d728279327fe9c80d651dcb2b891",
+        "value_lab/artifacts.py": "2ccd532d8d8f8b53b8fc1cfa60c70c344811baeeb45bd5cd6c4805b38dfca092",
+        "value_lab/claude_collection.py": "e7a6fd2e518a99451d247deec143c9c8ce5be1eedca30b161f9d18cc13c4a495",
+        "value_lab/cli.py": "8cdf9d775e45f932227a710f5a16b0226b72e03786ecc07d0f01ced4cf8c7642",
+        "value_lab/codex.py": "a0211f82acfb5baaa174f6c1bbc254d4203634bcb2f23f04f87ceb65debd8b1c",
+        "value_lab/comparison.py": "b43705c64432a9362b75d2d942d0fd1a94ee323bf4a775eff3e0e3c979906579",
+        "value_lab/core.py": "764e4e5c51289423843a71da04e5022c0018b10d72799017399feb505698c51b",
+        "value_lab/corpus.py": "29006d2dba39f7ef361bfac4e71e72b3a0fe666f6ee86ae46ec6526e37f14b8c",
+        "value_lab/costs.py": "5ce6700eaf5f2ea1b2c1ad0fc4e1220e36e5eba36b68f164773470007cc6a134",
+        "value_lab/exchange.py": "5845d0f1ab393d07c6231e632430ebd20d1a73bbc6ab6d912d27402859a74286",
+        "value_lab/execution.py": "2561b766c3486ccbae2f9fc8b56eadc580fd0b18b1019ce5fa131886de79618d",
+        "value_lab/hosts.py": "62cd50ff3ee060af6c3e72ae97fa869ecb156a876169060816f20dd66d695fd4",
+        "value_lab/longitudinal.py": "69b5da70fda225add03ea5b1c675923c9c668b18b67e69aecb8cb7dbcf134436",
+        "value_lab/methodology.py": "42f18f3c84b72485e9451a451686d8fe5b4dad70e746949678536da5a5b0170d",
+        "value_lab/native.py": "9aa60229414be5854a60b0ca1f3268ebd7f211dc23c9f9968923fcf363281a58",
+        "value_lab/processes.py": "f4267b3470b99df0ff7a33bb8c7884552ca633eae46c90fcc889971c9b0808d0",
+        "value_lab/publication.py": "6ed81963918de5ca779cb7d40f6c89f0730ae40c96c20d830589335ce23e9b14",
+        "value_lab/registry.py": "d3beb29539e998a06469b69deb8d21c60cd35514675ce16782134352b69d0e3b",
+        "value_lab/replay.py": "a43bb4e103c5eec7c64608a8453e28d10cd860da5eab419aabbd83d3e1d0073b",
+        "value_lab/replicates.py": "6d3cae591ddd3f43ee84bfea738201eb55f6dffb49e7bb051b909fd26206967c",
+        "value_lab/report.py": "a9b398a009cf524accc31718a86a3f369f8dfec973687a0c889b0f88ae489885",
+        "value_lab/research.py": "698a8d5ea4e6043eeab0f0ad9d7cb5145f98178cf742d0221522a238c7c61991",
+        "value_lab/review.py": "6b579249d8ddacfc0b86eced6ea715fe6011d1d6878c95556d878b93afb18f05",
+        "value_lab/review_policy.py": "41e1e2b10847788f9e8f21a83d90c67ef34b1f60aa6d85608dae882fe190688e",
+        "value_lab/scenarios.py": "0dbf8471ce8bf885e7116b4f05ffb2550e7a472edaa87fd2a84016411b015784",
+        "value_lab/science.py": "8365560b84f10e63b2cb0925a723ab578ad6768b081399a763492cf83935aa0c",
+        "value_lab/scoring.py": "a2b7256439c7ab777a1cfcbe273562bfd08c3e871ebd3ea8b77678e5ede3df0d",
+        "value_lab/server.py": "f01ac5d36bac4c09d30bf8ec52a75c7f0a39fd7635e5a24a3fa52fdf90aa5997",
+        "value_lab/signatures.py": "0ee041792dbea620083c00c362e37478f73d07ad7b60ebecba2e4b0d1d10c424",
+        "value_lab/team_record.py": "5cd9f6849d9faff92e93d719bc02e4436a36e70ca8b7bd9453a38a42e9869138",
+        "value_lab/usage.py": "5f5c9307dbd160b875fca7db8bbd5259504a0deed4daa3cbf490586dfbb9e132",
+        "value_lab/value_metrics.py": "f8eaeecf7a684263b3cb52a0e677a5fedf97b56df3078c3a59b4b4ad2f1ae010",
+        "value_lab/workbench.py": "d69341c66b116335f85bdbf88f18e04c64eb052b57ca89c0283479ab750fca08",
+        "value_lab/workflow.py": "f53839804c512d9905c4adef7b449a5dee1b68c4eda360bc7cefb9577837853f"
+      }
+    }
+  },
+  "model_evaluation_calls": 0,
+  "scientific_validity": "NOT_ESTABLISHED",
+  "scope": "Software behavior on synthetic fixtures; not measured user benefit"
+}

@@ -8,6 +8,20 @@ Compare plugin runs, locate failures and retest repairs under matched conditions
 
 当前版本 **0.5.0**。新增[独立样本科研推断重算](docs/REPLICATE-VERIFICATION.zh-CN.md)：检查供体单位、批次与配对，重算效应、精确检验和完整多重校正。配对评分提供测量能力，长期积累的是领域任务、实测账本和外部贡献。目前没有认证独立复核，也未建立外部采用。
 
+## 在 Codex 桌面端安装
+
+进入“插件 → 添加 → 添加插件市场”，按已成功安装的配置填写：
+
+| 字段 | 填写内容 |
+| --- | --- |
+| 来源 | `HERRY423/Plugin-Value-Lab` |
+| Git 引用 | `main` |
+| 稀疏路径 | **留空**，不要填灰色示例 `plugins/codex` |
+
+点击“添加市场”后，在插件列表搜索 **Plugin Value Lab**，再点击**安装并启用**。添加市场不会自动安装插件。新建任务，通过 `@` 选择 Plugin Value Lab，发送：“调用 example_value_suite，再校验方案；不要启动模型评测。”
+
+2026-09-23 已在实际安装的 0.5.0 缓存上调用全部 6 个默认 MCP 工具，并完成科研产物检查和离线回放。[实测记录与边界](docs/INSTALLED-ACCEPTANCE-20260923.zh-CN.md) · [完整安装与故障排查](docs/INSTALL.zh-CN.md)。核心功能需要 Python 3.11+；MCP 需要兼容 SDK，已有环境无需重复安装。
+
 ## 先交付一份可用的作者改进清单
 
 已有记录可直接生成逐任务、逐组、逐次运行的失败与未知清单，并保留完整任务、阈值和负面对照来准备复测。工作台同步展示清单，提供复制原方案、比较两轮研究的入口。**无需加入登记处、公开排名或申请认证。**
