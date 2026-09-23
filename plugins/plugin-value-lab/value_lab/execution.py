@@ -13,7 +13,6 @@ import os
 from pathlib import Path
 import re
 import shutil
-import signal
 import subprocess
 import threading
 import time
@@ -339,15 +338,8 @@ class Engine:
 
     @staticmethod
     def terminate(process):
-        if process.poll() is not None:
-            return
-        if os.name == "nt":
-            result = subprocess.run([str(Path(os.environ.get("SystemRoot", "C:/Windows")) / "System32/taskkill.exe"),
-                                    "/PID", str(process.pid), "/T", "/F"], capture_output=True, timeout=15)
-            if result.returncode and process.poll() is None:
-                raise RuntimeError("无法确认整个执行进程树已停止；状态和费用待人工核对")
-        else:
-            os.killpg(process.pid, signal.SIGKILL)
+        from .processes import terminate_tree
+        terminate_tree(process)
 
     def stop(self, job):
         with self.mutex:
@@ -378,6 +370,8 @@ class Engine:
                     stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr, shell=False,
                     start_new_session=os.name != "nt",
                     creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0)
+                from .processes import bind_tree
+                bind_tree(process)
                 with self.mutex:
                     self.processes[job] = process
                     self.event(path, "process_started", pid=process.pid)
@@ -399,6 +393,12 @@ class Engine:
                 except Exception:
                     outcome = "interrupted"
         finally:
+            if process is not None:
+                try:
+                    from .processes import close_tree
+                    close_tree(process)
+                except Exception as exc:
+                    outcome, error = "interrupted", "Process cleanup unconfirmed: " + str(exc)
             with self.mutex:
                 state = read(path / "state.json")
                 state.update(status=outcome, finished_at=now(), exit_code=exit_code, error=error,

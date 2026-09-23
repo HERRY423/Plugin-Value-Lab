@@ -76,5 +76,48 @@ class CLITests(unittest.TestCase):
             self.assertEqual(duplicate.returncode, 2)
 
 
+    def test_registry_revision_review_export_and_pinned_verification(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            study, registry = root / "study", root / "registry"
+            self.assertEqual(self.run_cli("demo", "--output", study).returncode, 0)
+            metadata = {"observed_at": "2026-09-23T12:00:00Z",
+                "authors": [{"id": "synthetic-author", "organization": "synthetic-lab"}],
+                "plugin_sha256": "a" * 64, "limitations": "Unit test only; no research observations"}
+            (root / "metadata.json").write_text(json.dumps(metadata))
+            def add(*extra):
+                return self.run_cli("registry-add", study, "--metadata", root / "metadata.json", "--registry", registry, *extra)
+            first = add()
+            self.assertEqual(first.returncode, 0, first.stderr)
+            eid = json.loads(first.stdout)["entry_id"]
+            (study / "cost-ledger.json").write_text(json.dumps({"schema_version": 1,
+                "coverage": {k: "included" for k in ("judge", "setup", "retry", "other")}, "entries": []}))
+            self.assertEqual(add("--parent", eid).returncode, 2)
+            revision = add("--parent", eid, "--revision-reason", "Synthetic test: supply cost coverage")
+            self.assertEqual(revision.returncode, 0, revision.stderr)
+            new_id = json.loads(revision.stdout)["entry_id"]
+            review = {"entry_id": eid, "reviewer": "synthetic-reviewer", "organization": "synthetic-lab",
+                "relationship": "collaborator", "conflicts": [], "verdict": "dispute", "rationale": "Synthetic test dissent",
+                "reviewed_at": "2026-09-23T13:00:00Z", "evidence": [{"reference": "test-fixture-only", "sha256": "b" * 64}],
+                "replication_entry_id": None}
+            (root / "review.json").write_text(json.dumps(review))
+            result = self.run_cli("registry-review", root / "review.json", "--registry", registry)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            packet = root / "packet"
+            exported = self.run_cli("registry-export", new_id, "--registry", registry, "--output", packet, "--with-reviews")
+            self.assertEqual(exported.returncode, 0, exported.stderr)
+            receipt = json.loads(exported.stdout)
+            checked = self.run_cli("registry-verify", packet, "--expected-id", receipt["packet_id"])
+            self.assertEqual(checked.returncode, 0, checked.stderr)
+            self.assertEqual(json.loads(checked.stdout)["review_status"], "ANCESTOR_DISPUTED")
+            replayed = self.run_cli("registry-replay", packet)
+            self.assertEqual(replayed.returncode, 0, replayed.stderr)
+            self.assertEqual(json.loads(replayed.stdout)["scientific_replication"], "NOT_ESTABLISHED")
+            self.assertEqual(self.run_cli("registry-verify", packet, "--expected-id", "f" * 64).returncode, 2)
+            viewed = self.run_cli("registry-view", "--registry", registry, "--output", root / "view")
+            self.assertEqual(viewed.returncode, 0, viewed.stderr)
+            self.assertEqual(json.loads(viewed.stdout)["counts"]["study_lineages"], 1)
+
+
 if __name__ == "__main__":
     unittest.main()

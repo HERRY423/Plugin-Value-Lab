@@ -26,7 +26,7 @@ def catalog(root=ROOT):
 def claude_catalog():
     return {"name": MARKET, "owner": {"name": "Local developer"},
             "plugins": [{"name": NAME, "source": f"./plugins/{NAME}",
-                         "description": "Task-first plugin guidance and matched value assessment."}]}
+                         "description": "Measure and register the marginal value of scientific agent plugins under matched conditions."}]}
 
 
 def sync(root=ROOT, check=False):

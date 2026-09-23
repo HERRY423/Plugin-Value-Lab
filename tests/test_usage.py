@@ -11,6 +11,7 @@ from value_lab.usage import build_usage_card, write_usage_card
 class UsageCardTests(unittest.TestCase):
     def setUp(self):
         self.suite = demo_suite()
+        self.suite["policy"]["require_cost_saving"] = True
         self.suite["evidence_type"] = "local"
         self.records = demo_records(self.suite)
         # This deliberate fixture relabelling exists ONLY in these unit tests.
@@ -26,7 +27,8 @@ class UsageCardTests(unittest.TestCase):
             record["suite_sha256"] = digest
 
     def card(self):
-        return build_usage_card(self.suite, self.records, self.lock)
+        book = {"schema_version": 1, "coverage": {k: "included" for k in ("judge", "setup", "retry", "other")}, "entries": []}
+        return build_usage_card(self.suite, self.records, self.lock, book)
 
     @staticmethod
     def ids(items):

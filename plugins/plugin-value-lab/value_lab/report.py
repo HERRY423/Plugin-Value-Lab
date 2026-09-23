@@ -238,6 +238,21 @@ def _cost_detail_html(report):
     return '<section class="panel full"><h2>完整成本分析</h2><table class="cost-table"><thead><tr><th>指标</th><th>未启用插件</th><th>启用插件</th></tr></thead><tbody>' + "".join(rows) + '</tbody></table><p>覆盖声明完整：' + _escape(costs["complete_category_coverage"]) + '。未知项不填零；原生整批估计不重复加入成本。</p><details><summary>分类明细、计数和人工时薪敏感性</summary><pre>' + _escape(costs) + '</pre></details></section>'
 
 
+def _corpus_error_html(report):
+    sources = [report[k] for k in ("corpus_errors", "scientific_errors") if report.get(k)]
+    if not sources:
+        return ""
+    labels = {"development": "开发集", "heldout": "留出集", "unspecified": "未指定", "unsupported_acceptance": "放行不足证据", "over_refusal": "误拒合理分析"}
+    rows = []
+    for metric in [m for source in sources for m in source["metrics"]]:
+        cells = (labels.get(metric["split"], metric["split"]), _ARM_LABELS[metric["arm"]], labels[metric["metric"]],
+                 metric["planned"], metric["errors"], metric["unknown"], _score(metric["rate"]),
+                 _score(metric["lower_bound"]) + " — " + _score(metric["upper_bound"]))
+        rows.append("<tr>" + "".join("<td>" + _escape(c) + "</td>" for c in cells) + "</tr>")
+    heads = "".join("<th>" + h + "</th>" for h in ("集合", "条件", "错误类型", "计划数", "错误数", "未知数", "错误率", "缺失上下界"))
+    return '<section class="panel full"><h2>双向错误：证据放行与合理分析误拒</h2><p>越低越好。存在未知时不报告完整错误率；缺失上下界不是置信区间。结果正确性单独评分，留出集未暴露与科学有效性尚未核验。</p><div class="table-wrap"><table><thead><tr>' + heads + '</tr></thead><tbody>' + ''.join(rows) + '</tbody></table></div></section>'
+
+
 def _render_html(report: dict[str, Any]) -> str:
     summary = _mapping(report.get("summary"))
     plugin = _mapping(report.get("plugin"))
@@ -301,6 +316,7 @@ def _render_html(report: dict[str, Any]) -> str:
 <section class="panel full"><h2>结论能支持到哪里</h2>{_fact_block(report.get("claim_limits"), empty="未提供特定结论范围。仅凭本报告，不能认定外部收益或科学有效性。")}<p class="muted small">方案锁用于一致性核验，不构成独立见证的预注册。来源标为外部也不自动表示独立评审、因果归因或科学认证。</p></section>
 <section class="panel full"><details><summary>来源与评估记录</summary><h3>来源信息</h3>{_fact_block(report.get("provenance"), empty="未提供来源信息。")}<h3 style="margin-top:22px">完整评估记录</h3><p class="muted small">保留全部字段，以便复核报告摘要和新增评估字段。</p><pre>{html.escape(raw_json, quote=True)}</pre></details></section>
 {_cost_detail_html(report)}
+{_corpus_error_html(report)}
 <footer class="footer"><span>离线报告 · 无外部脚本、字体或网络请求</span><span><a href="report.json">完整 JSON</a> · <a href="report.md">Markdown 报告</a></span></footer>
 </main><script>{_SCRIPT}</script></body></html>'''
 
@@ -330,6 +346,15 @@ def _render_markdown(report: dict[str, Any]) -> str:
         lines += [f"原生总估算费用：{_money(summary.get('native_total_estimated_cost_usd'))}。覆盖文件中的运行与裁判，不能拆作单臂费用。", ""]
     if summary.get("cost_unit"):
         lines += ["成本汇总口径：" + _markdown(summary["cost_unit"]), ""]
+    for field in ("corpus_errors", "scientific_errors"):
+        if not report.get(field):
+            continue
+        lines += ["## 双向错误", "", "错误率越低越好；含未知结果时完整率保持未知，上下界不是置信区间。", "",
+                  "| 集合 | 条件 | 错误类型 | 计划数 | 错误数 | 未知数 | 错误率 | 缺失上下界 |",
+                  "| --- | --- | --- | ---: | ---: | ---: | ---: | --- |"]
+        for m in report[field]["metrics"]:
+            lines.append("| " + " | ".join(_markdown(x) for x in (m["split"], m["arm"], m["metric"], m["planned"], m["errors"], m["unknown"], _score(m["rate"]), _score(m["lower_bound"]) + " — " + _score(m["upper_bound"]))) + " |")
+        lines += [""]
     for title, value, empty in [
         ("阻断项", report.get("blockers"), "未记录阻断项；仍需结合完整性与结论边界判断。"),
         ("需要关注", report.get("warnings"), "未记录额外提示。"),

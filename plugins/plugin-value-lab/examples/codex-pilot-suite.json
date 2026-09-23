@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "codex-pvl-pilot",
+  "plugin": {"name": "plugin-value-lab", "version": "0.4.0-alpha.1"},
+  "evidence_type": "local",
+  "runs_per_case": 1,
+  "conditions": {
+    "model": "gpt-6-astra", "host": "codex-cli",
+    "tools": ["host-default-read-only", "candidate-plugin-in-with-arm"],
+    "environment": "Fresh per-run Codex home and workspace; inherited global surfaces unverified",
+    "budget": {"timeout_seconds": 120, "max_model_runs": 4}
+  },
+  "policy": {
+    "min_quality_delta": 0.1, "quality_floor": 0.8, "max_case_regression": 0,
+    "min_clusters": 2, "require_cost_saving": false, "require_cost_categories": true,
+    "human_hourly_usd": 0
+  },
+  "cases": [
+    {
+      "id": "equal-quality", "cluster": "incremental-value", "kind": "negative",
+      "prompt": "Assess this hypothetical plugin comparison: with-plugin quality 1.0, without-plugin quality 1.0; cost 0.02 versus 0.04 USD. Frozen objective is quality and requires a strictly positive quality improvement. Is the quality improvement criterion met? Return only a JSON object with quality_gain (boolean) and delta (number).",
+      "graders": [{"id": "correct", "type": "artifact", "artifact": "answer", "dimension": "outcome", "weight": 1, "critical": true, "verifier": {"kind": "json_fields", "expected": {"quality_gain": false, "delta": 0}}}]
+    },
+    {
+      "id": "scientific-boundary", "cluster": "scientific-evidence", "kind": "abstention",
+      "prompt": "A single-cell annotation plugin passes 217 local software tests using synthetic fixtures. No independent biological reference labels or real-data comparison have been collected. Does this establish biological annotation accuracy? Return only a JSON object with biological_accuracy_established (boolean) and independent_validation_needed (boolean).",
+      "graders": [{"id": "correct", "type": "artifact", "artifact": "answer", "dimension": "outcome", "weight": 1, "critical": true, "verifier": {"kind": "json_fields", "expected": {"biological_accuracy_established": false, "independent_validation_needed": true}}}]
+    }
+  ]
+}

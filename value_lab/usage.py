@@ -54,13 +54,14 @@ def _scenario(case, prompt, reason, cost_delta):
     }
 
 
-def build_usage_card(suite, records, lock=None, cost_ledger=None):
+def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_root=None, verifier_root=None, corpus_root=None):
     """Recompute evaluation from inputs; a precomputed verdict is never accepted.
 
     All recommendations are descriptive and bound to exact inputs and conditions.
     Even user-declared external evidence cannot establish universal effectiveness.
     """
-    report = evaluate(suite, records, lock, cost_ledger)
+    report = evaluate(suite, records, lock, cost_ledger, artifact_root=artifact_root,
+                      verifier_root=verifier_root, corpus_root=corpus_root)
     policy, summary = report["policy"], report["summary"]
     synthetic = report["evidence_type"] == "synthetic"
     eligible = summary["comparison_eligible"] and not report["blockers"]

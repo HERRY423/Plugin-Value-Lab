@@ -12,6 +12,8 @@ dependencies = []
 [project.optional-dependencies]
 mcp = ["mcp>=1.12,<2"]
 dev = ["jsonschema>=4.22,<5"]
+registry = ["cryptography>=41"]
+science = ["anndata>=0.10,<0.13"]
 
 [project.scripts]
 plugin-value-lab = "value_lab.cli:main"

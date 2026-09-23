@@ -1,9 +1,105 @@
 {
   "schema_version": 1,
   "version": "0.4.0-alpha.1",
-  "verification_date": "2026-09-22",
-  "scope": "Local engineering acceptance of research context diagnosis, installed skill/tool surfaces, revision and resource constraints, plus existing value evaluation. Synthetic browser data only; no live model evaluation or research benefit study.",
+  "verification_date": "2026-09-23",
+  "scope": "Real single-host RNA-seq audit pilot with six scheduled native sessions (five completed, one retained API error), immutable registration revision and portable offline replay; verdict insufficient. No independent review, biological benefit or GA.",
   "current_revision": {
+    "name": "cost-heldout-gates-and-real-native-audit-closure",
+    "version_changed": false,
+    "native_model_sessions": 7,
+    "main_protocol_sessions": 6,
+    "model_calls": null,
+    "model_calls_note": "Seven native CLI sessions including one earlier failed protocol; exact provider request count including internal continuations is not asserted.",
+    "human_research_observations": 0,
+    "external_messages": 0,
+    "full_suite": "340 passed; 0 failures/errors/skips",
+    "preview": "work/live-rnaseq-pilot/registry-view/index.html",
+    "receipt": "work/live-rnaseq-pilot/closure-receipt.json",
+    "native_host_install": "Read-only candidate loaded via plugin-dir in three WITH sessions; Value Lab installed cache not updated"
+  },
+  "runtime": {
+    "python": "3.13.9",
+    "claude_cli": "2.1.278",
+    "codex_cli": "0.155.0-alpha.2.6"
+  },
+  "tests": {
+    "command": "python -B scripts/check_release_tests.py",
+    "run": 340,
+    "runtime_seconds": 53.593,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "model_calls": 0,
+    "receipt": "work/live-rnaseq-pilot/final-tests.log",
+    "note": "Software tests use fixtures; actual native sessions are separately recorded."
+  },
+  "checks": {
+    "cost_gate": "Efficiency and cost-saving verdicts require explicit complete supplemental coverage",
+    "heldout_gate": "Heldout outcomes independently satisfy frozen objective, floors, critical outcomes and regression gates",
+    "release_gate": "No skipped/zero tests; registry dependencies installed in both CI and draft release",
+    "native_collection": "Six original session/input/plugin/event/answer receipts verified; three WITH Skill invocations, zero target-plugin baseline exposures",
+    "collection_success": "Five completed, one output-token API error retained; two complete pairs",
+    "recovery": "Explicit known-terminal prefix continuation; only unstarted planned suffix, no session replay",
+    "registry_replay": "REPRODUCED; failed JSON diagnostics are path-stable; old assessment snapshot retained",
+    "isolated_wheel": "30 runtime modules match source; outside-source real-study replay REPRODUCED",
+    "static_analysis": "Ruff F passed for changed runtime, tests and preparation/release scripts",
+    "marketplace_mirror": "Final manifest and archive receipts in work/live-rnaseq-pilot/distribution.json",
+    "hosted_ci": "NOT_RUN",
+    "public_deployment": "NOT_DONE"
+  },
+  "native_model_evaluations_executed": 7,
+  "external_studies_executed": 0,
+  "human_research_observations": 0,
+  "scientific_authorization": "NONE",
+  "external_validation": "NOT_ESTABLISHED",
+  "known_limits": [
+    "Main protocol is fully observed but not fully successful: one infrastructure failure, two complete pairs; verdict INSUFFICIENT_EVIDENCE.",
+    "One public source and one task family, development only, with disclosed injected error controls; no heldout generalization or biological validation.",
+    "A public skill-only profile was tested; no full upstream plugin adoption, author participation or real-user benefit is established.",
+    "Native metadata and local hashes are not independent provider/model-weight attestation or an OS security sandbox.",
+    "The failed session emitted a synthetic API-error model placeholder; conservative mismatch diagnostic is retained, not evidence of an actual provider model switch.",
+    "US$0.03843408 is a published peak-rate token estimate across seven sessions; settlement and complete setup/human/retry/judge overhead remain unknown.",
+    "Native custom-model USD pricing is unknown; dollar and turn flags may overshoot while requests are in flight.",
+    "No independent human review, research benefit study, cross-host study, installed-cache update, hosted CI, public release or GA was completed.",
+    "Existing CellTypePilot PBMC protocol, broader host adapters and clinical/scientific validation remain unexecuted."
+  ],
+  "previous_installation_evidence": {
+    "version": "0.4.0-alpha.1",
+    "scope": "Prior scoring/comparison/cost revision and packages preserved in work/before-research-extension"
+  },
+  "external_reference": "https://code.claude.com/docs/en/plugin-evals",
+  "external_service_usage": {
+    "agentmuxer_paid_invocations": [],
+    "agentmuxer_confirmed_paid_usd": 0,
+    "native_provider": "DeepSeek via existing Claude Code configuration",
+    "native_sessions": 7,
+    "provider_peak_estimate_usd": 0.03843408,
+    "confirmed_paid_usd": null,
+    "settled_cost_usd": null,
+    "note": "Six user-authorized revised-protocol sessions plus one earlier budget-aborted session. No external messages or publication. Native USD uses unknown custom-model pricing; estimates are recomputed from frozen public provider rates; settlement and full overhead remain unknown."
+  },
+  "distribution": {
+    "published": false,
+    "version_changed": false,
+    "installed_cache_current": false,
+    "verification_receipt": "work/live-rnaseq-pilot/distribution.json",
+    "prior_artifacts_preserved": "work/live-rnaseq-pilot/before-dist"
+  },
+  "unversioned_revision": "cost-heldout-gates-and-real-native-audit-closure",
+  "research_behavior_evals": {
+    "authored_cases": 4,
+    "path": "evals/research",
+    "executed_cases": 0,
+    "judge_calls": 0,
+    "benefit_established": false
+  },
+  "research_example": {
+    "context": "examples/research/synthetic-context.json",
+    "local_plan": "work/research-demo-final/RESEARCH.md",
+    "evidence_type": "synthetic",
+    "real_research_observations": 0
+  },
+  "previous_revision": {
     "name": "research-followup-and-team-usage-record",
     "checked": "Research followup tracing, immutable team card revisions, CLI entry points, workbench followup and team-record routes passed focused local tests; no real study was run.",
     "focused_tests": "65 research, usage, CLI and team-record tests; 2 focused workbench HTTP route tests; and 9 distribution tests passed in separate runs. Both new browser scripts passed JavaScript syntax checks.",
@@ -11,21 +107,11 @@
     "model_calls": 0,
     "human_research_observations": 0
   },
-  "runtime": {
-    "python": "3.13.9",
-    "claude_cli": "2.1.278"
+  "previous_wheel": {
+    "filename": "plugin_value_lab-0.4.0a1-py3-none-any.whl",
+    "sha256": "99557dea6ea961dd4bb54ce51e31f9c2b66b8f51f688afa632be8e247b039a54"
   },
-  "tests": {
-    "command": "python -m unittest discover -s tests -q",
-    "note": "Current unversioned research/team-record extension, run with process control available; no live model or human study.",
-    "run": 217,
-    "failures": 0,
-    "errors": 0,
-    "skipped": 0,
-    "model_calls": 0,
-    "research_engine_and_adversarial": 39
-  },
-  "checks": {
+  "previous_checks": {
     "agent_plugins_1_0_0": "passed offline schema and package validation",
     "codex_manifest": "passed",
     "assess_value_skill": "passed",
@@ -53,65 +139,295 @@
     "research_handoff": "passed minimal capability-only proposal, no automatic transmission/installation; redaction still requires host review",
     "browser_research": "passed task validation, ten unknown dimensions without fabricated directions, synthetic example, rival/stop signals, evidence display, draft retention, zero budget, revision, context import and Agent prompt",
     "research_followup": "passed declared-result validation and affected-direction tracing; completion and dependent unlocking stay false",
-    "team_usage_record": "passed recomputed cards, explicit team decisions, revision history, research-context comparison, digest checks, CLI and local workbench routes"
+    "team_usage_record": "passed recomputed cards, explicit team decisions, revision history, research-context comparison, digest checks, CLI and local workbench routes",
+    "codex_native_local_install": "passed local marketplace add and plugin add in a fresh unauthenticated CODEX_HOME; no model calls",
+    "artifact_verifiers": "DE BH arithmetic; IDs and exact labels; h5ad structure; typed JSON; pinned executable code, timeout/crash/malformed response and stale-byte failures",
+    "windows_process_lifetime": "Windows Job Object cancellation, timeout and cleanup; original restricted-context execution failures fixed",
+    "codex_collection": "synthetic subprocess integration only: counterbalanced arms, distinct sessions, raw outputs, no invented provenance or costs, stop on infrastructure failure, credential cleanup and no retry"
   },
-  "wheel": {
-    "filename": "plugin_value_lab-0.4.0a1-py3-none-any.whl",
-    "sha256": "99557dea6ea961dd4bb54ce51e31f9c2b66b8f51f688afa632be8e247b039a54"
-  },
-  "live_workbench": {
+  "previous_live_workbench": {
     "url": "http://127.0.0.1:8766",
     "evidence_directory": "work/workbench-live",
     "prepared_study_id": "dc1a87aed54f452b9c6f69c028677de2",
     "prepared_study_executed": false
   },
-  "native_model_evaluations_executed": 0,
-  "external_studies_executed": 0,
-  "human_research_observations": 0,
-  "scientific_authorization": "NONE",
-  "external_validation": "NOT_ESTABLISHED",
-  "known_limits": [
-    "Only Claude native backend; read-only tools and mocked MCP. No Codex execution adapter.",
-    "Actual paid Claude evaluation remains unexecuted in acceptance; account/model access not verified.",
-    "Native aggregate evidence remains diagnostic: per-run sessions, load receipts, complete cost allocation and human review are not fabricated.",
-    "Workstation interruption has no automatic continuation; unknown process/charge state blocks new paid starts.",
-    "Native cost is list-price estimate, may overrun in-flight and is not settled spending.",
-    "Local single-user service and byte hashes are not independent execution attestation.",
-    "Fresh desktop model conversation and public distribution not verified.",
-    "Comparison is descriptive; combined plugin/model changes cannot support single-factor attribution.",
-    "Cost coverage and settled labels are user declarations, not independent invoice verification; unknown categories prevent full-cost claims.",
-    "Research semantic reasoning is performed by the host Agent; deterministic local validation cannot establish source truth, novelty, exhaustive gaps or scientific validity. Skill auto-selection in a fresh desktop model conversation remains unverified."
+  "wheel": {
+    "filename": "plugin_value_lab-0.4.0a1-py3-none-any.whl",
+    "path": "work/live-rnaseq-pilot/wheel/plugin_value_lab-0.4.0a1-py3-none-any.whl",
+    "sha256": "c41b3de95ca45352f0d478711639f0331d6e278ae0764a3d17d05ade96ff34aa",
+    "receipt": "work/live-rnaseq-pilot/isolated-replay.json"
+  },
+  "acceptance_history": [
+    {
+      "current_revision": {
+        "name": "artifact-verification-and-codex-collection",
+        "version_changed": false,
+        "checked": "Full local tests and isolated native Codex marketplace installation. Authenticated model collection not authorized by automatic approval review.",
+        "model_calls": 0,
+        "human_research_observations": 0,
+        "native_install_receipt": "work/codex-install-unified/receipt.json",
+        "pilot_prepared": "work/codex-pilot-20260923",
+        "pilot_execution": "BLOCKED_BY_APPROVAL_REVIEW",
+        "approval_reason": "Sending plugin code to an external model provider and account costs require explicit authorization.",
+        "full_suite": "261 passed; acceptance source hashes stable",
+        "pilot_ready_for_authorization": "work/codex-pilot-unified"
+      },
+      "tests": {
+        "command": "python -m unittest discover -s tests -q",
+        "note": "Manufactured fixtures only; actual subprocesses and h5ad fixture bytes exercise software contracts, not real model or biological observations.",
+        "run": 261,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "model_calls": 0,
+        "research_engine_and_adversarial": 39,
+        "source_snapshot": "work/artifact-acceptance-source.json",
+        "log": "work/artifact-acceptance-tests.log"
+      },
+      "checks": {
+        "full_local_suite": "261 passed; tested source hashes match final runtime",
+        "artifact_verifiers": "passed BH, probability, exact label, h5ad fixture, typed JSON, missing/changed bytes, pinned code, malformed/crashed/timed-out executable checks",
+        "codex_collection": "passed synthetic subprocess integration, fresh sessions, frozen identical inputs, no retry, infrastructure stop, unknown provenance and costs, credential cleanup",
+        "windows_process_lifetime": "passed restricted-context cancellation and timeout tests using owned Job Objects",
+        "codex_native_local_install": "passed local native install; 41 runtime/skill/manifest files matched final source; no auth or model calls",
+        "agent_plugin_schema": "passed offline schema validation; version unchanged",
+        "workflow_yaml": "both GitHub workflow YAML files parsed locally; hosted runs unexecuted",
+        "ruff_new_modules": "passed F checks on new artifact/Codex/exchange/process modules and tests",
+        "isolated_wheel": "passed outside source tree: demo, routing, usage card, workbench, research context; no models",
+        "marketplace_mirror": "final byte sync and archive hash validation performed by scripts/build_marketplace.py",
+        "registry_cli_end_to_end": "passed 11 local CLI invocations: corpus, frozen synthetic study, registry add/view/export/verify/replay; answer key excluded, missing key blocks replay; zero actual model calls or reviewers",
+        "registry_cli_receipt": "work/unified-cli-acceptance/receipt.json"
+      },
+      "distribution": {
+        "marketplace_archive": "dist/plugin-value-lab-marketplace-0.4.0-alpha.1.zip",
+        "portable_archive": "dist/plugin-value-lab-agent-plugins-0.4.0-alpha.1.zip",
+        "published": false,
+        "installation_receipt": "work/codex-install-unified/receipt.json",
+        "final_repack_changes_after_install": "Verification metadata and acceptance documentation only; runtime, skills and manifests byte-matched final source"
+      },
+      "wheel": {
+        "filename": "plugin_value_lab-0.4.0a1-py3-none-any.whl",
+        "sha256": "12b8310b8ce8a111cd4d69d9bf8109fe8f3c35e3ba60f33ed84040b462d96348"
+      }
+    },
+    {
+      "current_revision": {
+        "name": "registry-evidence-revisions-and-review-packets",
+        "version_changed": false,
+        "model_calls": 0,
+        "human_research_observations": 0,
+        "full_suite": "271 passed; 0 failures/errors/skips",
+        "preview": "work/registry-refinement-preview/view/index.html",
+        "review_packet_receipt": "work/registry-refinement-preview/receipt.json",
+        "native_host_install": "Not revalidated or updated in this revision"
+      },
+      "tests": {
+        "command": "python -m unittest discover -s tests -q",
+        "run": 271,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "registry_and_corpus": 34,
+        "cli": 5,
+        "model_calls": 0,
+        "source_snapshot": "work/registry-refinement-source.json",
+        "note": "Synthetic fixtures only; full suite runtime 41.837 seconds. Check_registry separately executed. No independent scientific or host-adoption claims."
+      },
+      "checks": {
+        "full_local_suite": "271 passed",
+        "registry_revision": "Missing artifact/key/cost supplements; frozen identity; no-op and reordered duplicates; inherited dissent; symmetric session reuse",
+        "review_handoff": "Direct and ancestor dissent retained; standalone expected digest; tamper/missing checks; review snapshot replay",
+        "cli": "5 tests passed, including complete revision-review-export-verify-replay flow",
+        "static_analysis": "Ruff F checks passed for changed registry and tests plus acceptance script",
+        "isolated_wheel": "22 Python runtime modules byte-matched source; isolated import and review packet replay passed",
+        "environment_limit": "Restricted process could not read the isolated install directory; verified with directory read access",
+        "native_host_install": "NOT_REVALIDATED",
+        "hosted_ci": "NOT_RUN",
+        "marketplace_mirror": "Byte-identical source mirror; both offline archive member hashes checked",
+        "review_packet_schema": "Draft 2020-12 schema checked against generated review packet"
+      },
+      "distribution": {
+        "marketplace_archive": "dist/plugin-value-lab-marketplace-0.4.0-alpha.1.zip",
+        "portable_archive": "dist/plugin-value-lab-agent-plugins-0.4.0-alpha.1.zip",
+        "published": false,
+        "installed_cache_current": false,
+        "prior_artifacts_preserved": "work/before-registry-refinement"
+      },
+      "wheel": {
+        "filename": "plugin_value_lab-0.4.0a1-py3-none-any.whl",
+        "sha256": "71d48ac3f995eff35d41e1430ba9e850f141df2d23f7413229ee91b69f3c2188"
+      },
+      "known_limits": [
+        "Codex adapter and local native installation verified; actual authenticated Codex collection blocked by approval review. No actual cross-host study exists.",
+        "Actual paid Claude evaluation remains unexecuted in acceptance; account/model access not verified.",
+        "Native aggregate evidence remains diagnostic: per-run sessions, load receipts, complete cost allocation and human review are not fabricated.",
+        "Workstation interruption has no automatic continuation; unknown process/charge state blocks new paid starts.",
+        "Native cost is list-price estimate, may overrun in-flight and is not settled spending.",
+        "Local single-user service and byte hashes are not independent execution attestation.",
+        "Fresh desktop model conversation and public distribution not verified.",
+        "Comparison is descriptive; combined plugin/model changes cannot support single-factor attribution.",
+        "Cost coverage and settled labels are user declarations, not independent invoice verification; unknown categories prevent full-cost claims.",
+        "Research semantic reasoning is performed by the host Agent; deterministic local validation cannot establish source truth, novelty, exhaustive gaps or scientific validity. Skill auto-selection in a fresh desktop model conversation remains unverified.",
+        "Artifact checks establish computational contracts only. h5ad requires anndata; trusted Python verifiers are not a security sandbox.",
+        "Codex CLI has no enforced dollar cap; run/time limits do not guarantee spend. Actual plugin loading, observed conditions, human time and settled costs remain unknown.",
+        "GitHub CI and draft-release workflows added locally, not executed remotely; no tag/version/release published."
+      ]
+    },
+    {
+      "current_revision": {
+        "name": "scientific-graders-and-scorer-only-scenario-packs",
+        "version_changed": false,
+        "model_calls": 0,
+        "human_research_observations": 0,
+        "full_suite": "294 passed; 0 failures/errors/skips",
+        "preview": "work/scientific-validation-final/report/report.html",
+        "receipt": "work/scientific-validation-final/receipt.json",
+        "native_host_install": "Not updated or revalidated in this revision"
+      },
+      "tests": {
+        "command": "python -m unittest discover -s tests -q",
+        "run": 294,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "science_and_scenarios": 23,
+        "runtime_seconds": 53.382,
+        "source_snapshot": "work/scientific-validation-source.json",
+        "model_calls": 0,
+        "note": "Synthetic and adversarial software fixtures; includes native exporter rejection, CLI staging, registry export/replay, denominator preservation and mocked container transport. No live Docker success is claimed."
+      },
+      "checks": {
+        "full_local_suite": "294 passed",
+        "static_analysis": "Ruff F passed for changed runtime modules, tests and acceptance script; node syntax passed for changed UI scripts",
+        "scenario_pack": "CLI/runtime/schema validation; scorer commitments; family splits; allowlisted staging; leakage/tamper rejection",
+        "scientific_graders": "Schema typing, exact entity alignment, ARI/NMI, numeric tolerances, Pearson degeneracy, abstention dual errors, receipt binding, sandbox absence and mocked cleanup",
+        "registry_replay": "Synthetic scientific study registered, exported without private scorer files, replayed with separately supplied scorers",
+        "isolated_wheel": "24 runtime Python modules byte-matched source; outside-source import, staging and replay passed",
+        "agent_plugin_schema": "Agent Plugins 1.0.0 offline schema validated",
+        "hardcoded_checkout_paths": "No C:/Test or C:\\Test match in public README/manifests/scripts/docs/workflows/runtime source",
+        "marketplace_mirror": "Final source mirror and offline member-hash checks performed by build_marketplace.py",
+        "live_docker_isolation": "NOT_VERIFIED: local daemon unavailable",
+        "native_host_install": "NOT_REVALIDATED",
+        "hosted_ci": "NOT_RUN"
+      },
+      "distribution": {
+        "marketplace_archive": "dist/plugin-value-lab-marketplace-0.4.0-alpha.1.zip",
+        "portable_archive": "dist/plugin-value-lab-agent-plugins-0.4.0-alpha.1.zip",
+        "published": false,
+        "installed_cache_current": false,
+        "prior_artifacts_preserved": "work/before-phase2",
+        "verification_receipt": "work/phase2-distribution.json"
+      },
+      "wheel": {
+        "filename": "plugin_value_lab-0.4.0a1-py3-none-any.whl",
+        "sha256": "e4d0952cf4456b5004a5633d014945e0eda813221e126c2949ee1b794f38d110",
+        "receipt": "work/scientific-validation-isolated.json"
+      },
+      "known_limits": [
+        "No real CellTypePilot PBMC paired sessions or expert-reviewed PBMC truth pack were collected.",
+        "Claude native exporter refuses scientific artifact/scenario graders; a validated native artifact collector and host filesystem confinement remain outstanding.",
+        "Docker daemon unavailable locally. Resource/security flags and failure/cleanup behavior were tested with fixtures; actual deployed isolation is unverified.",
+        "Backend identity verifies a separately trusted collector assertion bound to session/output; it does not authenticate a collector or generate evidence from model text.",
+        "Agent-visible staging excludes declared scorer bytes but does not detect prior exposure, related-donor leakage, hidden encoded labels or wider host filesystem access.",
+        "ARI/NMI measure clustering agreement, not correct biological label names. Schema/numeric checks do not establish task validity.",
+        "Container output is monitored with a polling threshold, not a hard host-disk quota; reviewed verifier code and trusted image remain required.",
+        "Unknown costs, failed/missing runs and declared reviewer identities retain existing evidence ceilings.",
+        "Research planning and team records are experimental extensions, not evidence of plugin benefit.",
+        "No current installed-cache update, hosted CI run, public release, version bump or DOI deposit was performed.",
+        "No actual cross-host matched observations were collected. Host matrix preparation is a design, not execution evidence.",
+        "Gemini and OpenCode execution adapters are not implemented. OpenCode local version/help preflight does not establish authentication or plugin loading.",
+        "Codex collection receipts authenticate local consistency only; observed plugin loading, model identity and settled costs are not synthesized.",
+        "Signing uses local operator-enrolled keys. Human expertise, identity and independence need out-of-band enrollment; cryptographic validity is not scientific validity.",
+        "Positive public cards require exact signed non-author review and heldout declarations; declarations cannot prove lack of hidden exposure or donor leakage.",
+        "Regression alerts are descriptive snapshot comparisons, not significance tests, causal conclusions or automatic notifications.",
+        "Static snapshots are prepared locally. No hosting, external reviewers, external plugin participation or invitation sending occurred.",
+        "Gemini/OpenCode candidate CLI documentation and external plugin candidate sources were researched; no paid catalog offering was invoked."
+      ]
+    },
+    {
+      "scope": "Local phase-two engineering acceptance: matched host designs, Codex collection consistency, signed static registry, version-bound non-author review policy and descriptive longitudinal alerts. No real model study, independent review or public deployment.",
+      "current_revision": {
+        "name": "phase2-signed-registry-and-matched-hosts",
+        "version_changed": false,
+        "model_calls": 0,
+        "human_research_observations": 0,
+        "external_messages": 0,
+        "full_suite": "322 passed; 0 failures/errors/skips",
+        "preview": "work/phase2-final/site/index.html",
+        "receipt": "work/phase2-final/receipt.json",
+        "native_host_install": "Not updated or revalidated in this revision"
+      },
+      "tests": {
+        "command": "python -m unittest discover -s tests -q",
+        "run": 322,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "phase2": 25,
+        "codex": 13,
+        "runtime_seconds": 65.266,
+        "source_snapshot": "work/phase2-source.json",
+        "model_calls": 0,
+        "note": "Synthetic and adversarial policy fixtures, including signed review CLI roundtrip. Manufactured people and manual records are not scientific observations."
+      },
+      "checks": {
+        "full_local_suite": "322 passed",
+        "static_analysis": "Ruff F passed for all runtime modules, phase2/Codex tests and phase2 acceptance script; no-cache mode",
+        "signatures": "Ed25519 domain/hash/key tamper, trust policy change and pinned snapshot substitution rejected",
+        "review_policy": "Unsigned, untrusted, revoked, mismatched, author/same-organization, disputed, predating and stale-revision reviews cannot qualify",
+        "public_registry": "Three synthetic cards, zero positive listings, exact file hashes, signed snapshot chain, no private key file",
+        "longitudinal": "Matched cohort selection, same-version plugin content and model-version drift; simultaneous axes/session reuse blocked",
+        "codex_collection": "Rehashed schedule manipulation and native log tampering rejected; malformed/missing session/completion fails closed",
+        "isolated_wheel": "29 runtime Python modules byte-matched source; outside-source snapshot verification and three synthetic study replays passed",
+        "opencode_preflight": "1.18.29 version/help only, isolated temporary XDG configuration, no model execution",
+        "gemini_preflight": "Not found in PATH",
+        "marketplace_mirror": "See work/phase2-distribution.json for final mirror and archive byte validation",
+        "native_host_install": "NOT_REVALIDATED",
+        "hosted_ci": "NOT_RUN",
+        "public_deployment": "NOT_DONE"
+      },
+      "distribution": {
+        "marketplace_archive": "dist/plugin-value-lab-marketplace-0.4.0-alpha.1.zip",
+        "portable_archive": "dist/plugin-value-lab-agent-plugins-0.4.0-alpha.1.zip",
+        "published": false,
+        "installed_cache_current": false,
+        "prior_artifacts_preserved": "work/before-phase2",
+        "verification_receipt": "work/phase2-distribution.json"
+      },
+      "wheel": {
+        "filename": "plugin_value_lab-0.4.0a1-py3-none-any.whl",
+        "sha256": "d0a6022418990cb2cf0a899405dbca18571efba720e5a04dd0ce7b018883008d",
+        "receipt": "work/phase2-isolated.json"
+      },
+      "known_limits": [
+        "No real CellTypePilot PBMC paired sessions or expert-reviewed PBMC truth pack were collected.",
+        "Claude native exporter refuses scientific artifact/scenario graders; a validated native artifact collector and host filesystem confinement remain outstanding.",
+        "Docker daemon unavailable locally. Resource/security flags and failure/cleanup behavior were tested with fixtures; actual deployed isolation is unverified.",
+        "Backend identity verifies a separately trusted collector assertion bound to session/output; it does not authenticate a collector or generate evidence from model text.",
+        "Agent-visible staging excludes declared scorer bytes but does not detect prior exposure, related-donor leakage, hidden encoded labels or wider host filesystem access.",
+        "ARI/NMI measure clustering agreement, not correct biological label names. Schema/numeric checks do not establish task validity.",
+        "Container output is monitored with a polling threshold, not a hard host-disk quota; reviewed verifier code and trusted image remain required.",
+        "Unknown costs, failed/missing runs and declared reviewer identities retain existing evidence ceilings.",
+        "Research planning and team records are experimental extensions, not evidence of plugin benefit.",
+        "No current installed-cache update, hosted CI run, public release, version bump or DOI deposit was performed.",
+        "No actual cross-host matched observations were collected. Host matrix preparation is a design, not execution evidence.",
+        "Gemini and OpenCode execution adapters are not implemented. OpenCode local version/help preflight does not establish authentication or plugin loading.",
+        "Codex collection receipts authenticate local consistency only; observed plugin loading, model identity and settled costs are not synthesized.",
+        "Signing uses local operator-enrolled keys. Human expertise, identity and independence need out-of-band enrollment; cryptographic validity is not scientific validity.",
+        "Positive public cards require exact signed non-author review and heldout declarations; declarations cannot prove lack of hidden exposure or donor leakage.",
+        "Regression alerts are descriptive snapshot comparisons, not significance tests, causal conclusions or automatic notifications.",
+        "Static snapshots are prepared locally. No hosting, external reviewers, external plugin participation or invitation sending occurred.",
+        "Gemini/OpenCode candidate CLI documentation and external plugin candidate sources were researched; no paid catalog offering was invoked."
+      ]
+    }
   ],
-  "previous_installation_evidence": {
-    "version": "0.4.0-alpha.1",
-    "scope": "Prior scoring/comparison/cost revision and packages preserved in work/before-research-extension"
-  },
-  "external_reference": "https://code.claude.com/docs/en/plugin-evals",
-  "external_service_usage": {
-    "agentmuxer_paid_invocations": [],
-    "confirmed_paid_usd": 0,
-    "unsettled_invocations": [],
-    "note": "Free capability discovery and native official Claude documentation access only. No paid offering, model eval or research experiment."
-  },
-  "distribution": {
-    "marketplace_archive": "dist/plugin-value-lab-marketplace-0.4.0-alpha.1.zip",
-    "portable_archive": "dist/plugin-value-lab-agent-plugins-0.4.0-alpha.1.zip",
-    "published": false,
-    "installation_receipt": "work/research-install/receipt.json",
-    "final_repack_changes_after_install": "Verification metadata only; runtime and skill bytes matched current source"
-  },
-  "unversioned_revision": "research-followup-and-team-usage-record",
-  "research_behavior_evals": {
-    "authored_cases": 4,
-    "path": "evals/research",
-    "executed_cases": 0,
-    "judge_calls": 0,
-    "benefit_established": false
-  },
-  "research_example": {
-    "context": "examples/research/synthetic-context.json",
-    "local_plan": "work/research-demo-final/RESEARCH.md",
-    "evidence_type": "synthetic",
-    "real_research_observations": 0
+  "native_evaluation_unit": "Native CLI sessions, not independent studies or provider API request count",
+  "native_pilot": {
+    "entry_id": "0cbac9dbb7d89ff43027e37de5a39536b033744b84e2f244557e5251105cf261",
+    "provider_peak_estimate_usd": 0.038434079999999995,
+    "settled_cost_usd": null,
+    "catalog_paid_calls": 0,
+    "replay": "REPRODUCED",
+    "report": "docs/NATIVE-PILOT-20260923.zh-CN.md"
   }
 }

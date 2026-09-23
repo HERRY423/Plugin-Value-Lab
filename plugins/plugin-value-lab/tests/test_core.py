@@ -44,11 +44,24 @@ class CoreTests(unittest.TestCase):
             record["suite_sha256"] = digest
         for i in range(0, len(self.records), 2):
             self.records[i + 1]["output"] = self.records[i]["output"]
-        self.assertEqual(self.report()["verdict"], "PROMISING_LOCAL_SIGNAL")
+        book = {"schema_version": 1, "coverage": {k: "included" for k in ("judge", "setup", "retry", "other")}, "entries": []}
+        self.assertEqual(evaluate(self.suite, self.records, self.lock, book)["verdict"], "PROMISING_LOCAL_SIGNAL")
         for record in self.records:
             if record["arm"] == "with":
                 record["cost"]["model_usd"] = 10
-        self.assertEqual(self.report()["verdict"], "NO_DEMONSTRATED_GAIN")
+        self.assertEqual(evaluate(self.suite, self.records, self.lock, book)["verdict"], "NO_DEMONSTRATED_GAIN")
+
+    def test_cost_dependent_verdict_requires_full_coverage_even_without_explicit_flag(self):
+        for changes in ({"objective": "efficiency"}, {"require_cost_saving": True}):
+            suite = copy.deepcopy(self.suite)
+            suite["policy"].update(changes)
+            records = demo_records(suite)
+            for r in records:
+                r["source"] = "manual"
+            result = evaluate(suite, records, {"suite_sha256": suite_digest(suite)})
+            self.assertEqual(result["verdict"], "INSUFFICIENT_EVIDENCE")
+            self.assertFalse(result["cost_analysis"]["saving_claim_eligible"])
+            self.assertTrue(any("Cost-dependent" in b for b in result["blockers"]))
 
     def test_missing_baseline_is_not_zero(self):
         self.records = [r for r in self.records if r["arm"] == "with"]

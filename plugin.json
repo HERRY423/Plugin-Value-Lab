@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "plugin-value-lab",
   "version": "0.4.0-alpha.1",
-  "description": "Research-gap diagnosis from task and background, feasible next investigations, and evidence-bounded plugin value assessment.",
+  "description": "Measure and register the marginal value of scientific agent plugins under matched conditions.",
   "author": {
     "name": "Local developer"
   },
@@ -11,23 +11,22 @@
     "task-fit",
     "paired-comparison",
     "research",
-    "research-directions",
+    "scientific-validation",
     "evidence-gaps"
   ],
   "extensions": {
     "com.openai": {
       "interface": {
         "displayName": "Plugin Value Lab",
-        "shortDescription": "Find research gaps, plan next tests, and assess plugin value.",
-        "longDescription": "Help the host Agent reason from research tasks and evidence, challenge rival explanations, plan feasible next tests, and compare researcher revisions. Use Plugin Management for genuine capability gaps and matched evaluations for plugin value. No automatic data scanning, model runs or installations.",
+        "shortDescription": "Measure scientific plugin value under matched conditions.",
+        "longDescription": "Measure and register the marginal value of scientific agent plugins under matched conditions. Verify outcome artifacts and retain both unsafe acceptance and over-refusal. Research planning and team records are experimental extensions.",
         "developerName": "Local developer",
         "category": "Productivity",
         "capabilities": [],
         "defaultPrompt": [
-          "结合我的研究任务与背景，找出遗漏方向、替代解释和最值得先做的验证。",
-          "完成这个任务，现有能力够不够，什么时候才需要插件？",
-          "这个插件怎样用才值得？帮我设计一个小规模公平比较。",
-          "把已有评估记录整理成说明何时用、何时不用的使用卡。"
+          "比较这个插件相对无插件基线是否有实际增益。",
+          "用可执行验证器检查评估产物，保留失败和缺失证据。",
+          "把已有评估记录整理成有适用范围的使用卡。"
         ]
       }
     }

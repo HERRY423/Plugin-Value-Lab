@@ -1,4 +1,7 @@
-"""Deterministic, paired evaluation. No model calls and no external I/O.
+"""Deterministic paired evaluation. No model calls.
+
+Default object-only evaluation performs no file I/O. Explicit artifact/verifier
+roots opt into local file inspection and reviewed executable verification.
 
 A hash binds bytes, not authenticity. All decisions here are descriptive and
 conditional on the submitted protocol, observations and declared costs.
@@ -16,6 +19,9 @@ from pathlib import Path
 from statistics import mean
 
 from . import __version__
+
+FILE_GRADERS = {"artifact", "executable", "artifact_schema", "numeric_tolerance",
+                "abstention_correct", "over_refusal", "backend_identity", "exec"}
 
 
 class ValidationError(ValueError):
@@ -154,8 +160,22 @@ def validate_suite(suite):
             grade_ids.add(g["id"])
             if g.get("dimension") not in ("outcome", "process"):
                 raise ValidationError("grader.dimension must be outcome or process")
-            if g.get("type") not in ("contains", "not_contains", "json_equals", "human"):
+            if g.get("type") not in FILE_GRADERS | {"contains", "not_contains", "json_equals", "human", "sealed", "scenario"}:
                 raise ValidationError("Unsupported grader type")
+            if g["type"] == "scenario":
+                from .scenarios import validate_scenario_grader
+                validate_scenario_grader(g)
+                if g["verifier"]["case_id"] != case["id"]:
+                    raise ValidationError("Scenario grader must bind its case")
+            if g["type"] == "sealed":
+                from .corpus import validate_grader
+                validate_grader(g)
+                if (g["verifier"]["case_id"] != case["id"] or
+                        suite.get("corpus") != {k: g["verifier"][k] for k in ("release_sha256", "truth_sha256")}):
+                    raise ValidationError("Sealed grader must bind its case and suite corpus")
+            if g["type"] in FILE_GRADERS:
+                from .artifacts import validate_verifier
+                validate_verifier(g)
             if g["type"] in ("contains", "not_contains"):
                 _text(g.get("value"), "grader.value")
             if g["type"] == "json_equals":
@@ -203,6 +223,8 @@ def _stamp(value):
 def _grade(g, record):
     """Return pass/fail/unknown plus rationale; imported grades never imply human review."""
     kind = g["type"]
+    if kind in FILE_GRADERS | {"sealed", "scenario"}:
+        return None, "Artifact verification requires an explicit local evidence root"
     if kind == "human":
         review = record.get("reviews", {}).get(g["id"], {})
         if (type(review.get("passed")) is bool and
@@ -250,17 +272,32 @@ def _bootstrap(cases, seed=20260922):
             "caution": "Exploratory interval, unstable with few families; family independence is declared, not verified. No causal test."}
 
 
-def evaluate(suite, records, lock=None, cost_ledger=None):
+def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None, verifier_root=None, corpus_root=None):
     validate_suite(suite)
     if not isinstance(records, list) or any(not isinstance(x, dict) for x in records):
         raise ValidationError("records must be a list of objects")
     digest = suite_digest(suite)
     blockers, warnings = [], []
+    corpus_errors = None
+    corpus_material = None
+    if suite.get("corpus") is not None:
+        if corpus_root is None:
+            blockers.append("Sealed corpus answer key not supplied")
+        else:
+            from .corpus import error_rates, load_material
+            try:
+                corpus_material = load_material(corpus_root)
+                corpus_errors = error_rates(suite, records, corpus_root, corpus_material)
+            except (ValidationError, OSError) as exc:
+                blockers.append(f"Corpus binding failed: {exc}")
     from .costs import allocation, analyze_costs
     cost_plan = allocation(suite, cost_ledger)
     blockers.extend(cost_plan["issues"])
-    if suite["policy"].get("require_cost_categories") and not cost_plan["coverage_complete"]:
-        blockers.append("Protocol requires explicit judge/setup/retry/other cost coverage")
+    cost_required = (suite["policy"].get("require_cost_categories") or
+                     suite["policy"]["require_cost_saving"] or
+                     suite["policy"].get("objective") == "efficiency")
+    if cost_required and not cost_plan["coverage_complete"]:
+        blockers.append("Cost-dependent verdict requires explicit judge/setup/retry/other cost coverage")
     if not isinstance(lock, dict) or lock.get("suite_sha256") != digest:
         blockers.append("Protocol lock absent or changed: freeze and retain the exact suite before observation")
     expected = {(c["id"], rep, arm) for c in suite["cases"]
@@ -268,7 +305,9 @@ def evaluate(suite, records, lock=None, cost_ledger=None):
     indexed = {}
     sessions = set()
     all_intervals = defaultdict(list)
-    synthetic = suite["evidence_type"] == "synthetic"
+    synthetic = suite["evidence_type"] == "synthetic" or any(
+        g["type"] == "scenario" and g["verifier"]["evidence_type"] == "synthetic"
+        for c in suite["cases"] for g in c["graders"])
     for index, record in enumerate(records):
         case_id, repetition, arm = record.get("case_id"), record.get("repetition"), record.get("arm")
         if not isinstance(case_id, str) or type(repetition) is not int or not isinstance(arm, str):
@@ -284,7 +323,7 @@ def evaluate(suite, records, lock=None, cost_ledger=None):
         issues = []
         if record.get("source") == "synthetic":
             synthetic = True
-        if record.get("source") not in ("synthetic", "manual", "claude"):
+        if record.get("source") not in ("synthetic", "manual", "claude", "codex"):
             issues.append("Source unknown")
         if record.get("suite_sha256") != digest:
             issues.append("Suite digest mismatch or missing")
@@ -395,10 +434,27 @@ def evaluate(suite, records, lock=None, cost_ledger=None):
                 earned = total_weight = 0.0
                 unresolved = False
                 for g in case["graders"]:
-                    passed, rationale = _grade(g, record)
+                    verification = None
+                    if g["type"] == "sealed":
+                        from .corpus import grade_sealed
+                        passed, rationale, verification = grade_sealed(g, record, corpus_root, corpus_material)
+                        if verification.get("corpus_evidence_type") == "synthetic":
+                            synthetic = True
+                    elif g["type"] == "scenario":
+                        from .scenarios import grade_scenario
+                        passed, rationale, verification = grade_scenario(g, record, artifact_root, verifier_root)
+                    elif g["type"] in FILE_GRADERS:
+                        from .artifacts import grade_artifact
+                        passed, rationale, verification = grade_artifact(g, record, artifact_root, verifier_root)
+                    else:
+                        passed, rationale = _grade(g, record)
                     scored = g["dimension"] == "outcome"
+                    if not scored and g["critical"] and g["type"] in FILE_GRADERS | {"scenario"} and passed is not True:
+                        issues.append(f"Critical verification {g['id']} failed or is unresolved")
                     grades.append({"id": g["id"], "passed": passed, "rationale": rationale,
                                    "scored": scored, "critical": g["critical"], "weight": g["weight"]})
+                    if verification is not None:
+                        grades[-1]["verification"] = verification
                     if scored:
                         total_weight += g["weight"]
                         if passed is None and record.get("status") == "completed":
@@ -501,6 +557,11 @@ def evaluate(suite, records, lock=None, cost_ledger=None):
         "provenance": {"suite_sha256": digest, "records_sha256": suite_digest(records), "cost_ledger_sha256": suite_digest(cost_ledger) if cost_ledger is not None else None,
                        "engine": f"plugin-value-lab/{__version__}", "local_lock": lock,
                        "hash_scope": "Byte consistency only; no proof of execution, authorship, or preregistration time"}}
+    if suite.get("corpus") is not None:
+        report["corpus_errors"] = corpus_errors
+    if any(g["type"] in ("scenario", "abstention_correct", "over_refusal") for c in suite["cases"] for g in c["graders"]):
+        from .scenarios import decision_metrics
+        report["scientific_errors"] = decision_metrics(suite, records, verifier_root, artifact_root)
     return report
 
 
@@ -513,7 +574,7 @@ def demo_suite():
             "conditions": {"model": "SIMULATED-NO-MODEL", "host": "offline-tutorial", "tools": [],
                            "environment": "synthetic-fixture-v1", "budget": {"max_turns": 10}},
             "policy": {"min_quality_delta": 0.1, "quality_floor": 0.8, "max_case_regression": 0,
-                       "min_clusters": 3, "require_cost_saving": True, "human_hourly_usd": 60},
+                       "min_clusters": 3, "require_cost_saving": False, "human_hourly_usd": 60},
             "cases": [
                 {"id": "structured-delivery", "cluster": "delivery", "kind": "task",
                  "prompt": "Deliver a task result with a source reference and explicit limitations.",

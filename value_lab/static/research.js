@@ -15,7 +15,7 @@
   const stateLabels = {proposed:"待讨论",accepted:"已采纳（提交者声明）",deferred:"暂缓",rejected:"已拒绝"};
   const view=el("article");view.id="research-workbench";view.hidden=true;
   $("detail").after(view);
-  view.append(el("p","从“是否有用”走向“下一步该研究什么”","eyebrow"),el("h2","研究方向诊断"),
+  view.append(el("p","实验性扩展 · 不提供插件实测增益","eyebrow"),el("h2","研究方向诊断（实验性扩展）"),
     el("p","围绕研究问题找出缺口、竞争解释和最小验证路径。先把背景与证据整理清楚，再交给已安装插件的 Agent 做情境分析；研究者可以检查、修改并比较每次建议。","muted"),
     el("p","本页执行可解释的结构检查与计划排序，不调用模型、不阅读外部文献。深度分析由宿主 Agent 根据你的材料完成；这里的建议与证据状态均不等于科学结论。","panel"));
   const form=el("form");form.id="research-form";view.append(form);
@@ -192,7 +192,7 @@
     followupResult.append(button("下载复核记录",()=>download("research-followup.json",checked)));
   })),followupResult);view.append(followup);
 
-  const nav=button("研究方向诊断",()=>{selected=null;current=null;$("setup").hidden=true;$("detail").hidden=true;$("comparison").hidden=true;view.hidden=false;notice();question.focus();});nav.id="research-nav";$("compare-nav").after(nav);
+  const nav=button("研究方向诊断（实验性）",()=>{selected=null;current=null;$("setup").hidden=true;$("detail").hidden=true;$("comparison").hidden=true;view.hidden=false;notice();question.focus();});nav.id="research-nav";$("compare-nav").after(nav);
   for(const id of ["new","compare-nav"]){const target=$(id),original=target.onclick;target.onclick=function(event){view.hidden=true;return original.call(this,event);};}
   const priorOpen=openStudy;openStudy=async function(id){view.hidden=true;await priorOpen(id);};
 })();

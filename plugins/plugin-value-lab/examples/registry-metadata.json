@@ -1,0 +1,6 @@
+{
+  "observed_at": "2026-09-22T12:00:00Z",
+  "authors": [{"id": "REPLACE_WITH_REAL_AUTHOR", "organization": "REPLACE_WITH_REAL_ORGANIZATION"}],
+  "plugin_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "limitations": "TEMPLATE ONLY. Replace every field from actual records, including the observed time and plugin content hash."
+}

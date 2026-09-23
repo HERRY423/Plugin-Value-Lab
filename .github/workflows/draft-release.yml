@@ -1,0 +1,35 @@
+name: Prepare a draft for an existing version tag
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag matching the manifest version, optionally prefixed with v
+        required: true
+        type: string
+permissions:
+  contents: write
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_TAG: ${{ inputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Check existing tag and version
+        run: |
+          git show-ref --verify "refs/tags/$RELEASE_TAG"
+          python -c "import json,os; assert os.environ['RELEASE_TAG'].removeprefix('v') == json.load(open('plugin.json'))['version']"
+      - run: python -m pip install ".[dev,mcp,science,registry]" wheel
+      - run: python scripts/check_release_tests.py
+      - run: python scripts/build_marketplace.py --check --package
+      - run: python -m pip wheel . --no-deps --no-build-isolation --wheel-dir dist
+      - name: Create reviewable draft; never publish automatically
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$RELEASE_TAG" dist/* --verify-tag --draft --title "Plugin Value Lab $RELEASE_TAG" --notes-file docs/RELEASE-NOTES.md

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "files"
+  ],
+  "properties": {
+    "format": {
+      "const": "pvl-study-bundle-1"
+    },
+    "files": {
+      "type": "object",
+      "required": [
+        "suite.json",
+        "runs.jsonl",
+        "protocol.lock.json",
+        "metadata.json",
+        "report.json",
+        "usage-card.json",
+        "registration.json"
+      ],
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      }
+    }
+  }
+}

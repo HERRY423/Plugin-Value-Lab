@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pvl:scenario-pack:1",
+  "title": "PVL proposed Scenario Pack",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "id", "evidence_type", "sources", "scenarios"],
+  "properties": {
+    "format": {"const": "pvl-scenario-pack-1"},
+    "id": {"$ref": "#/$defs/id"},
+    "evidence_type": {"enum": ["synthetic", "local", "external"]},
+    "sources": {
+      "type": "array", "minItems": 1,
+      "items": {"type": "object", "additionalProperties": false,
+        "required": ["url", "license", "provenance"],
+        "properties": {"url": {"type": "string", "minLength": 1}, "license": {"type": "string", "minLength": 1}, "provenance": {"type": "string", "minLength": 1}}}
+    },
+    "scenarios": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["type", "id", "family", "split", "prompt", "inputs", "outputs", "scorer"],
+        "properties": {
+          "type": {"const": "AgentVisibleScenario"},
+          "id": {"$ref": "#/$defs/id"},
+          "family": {"type": "string", "minLength": 1},
+          "split": {"enum": ["development", "heldout"]},
+          "prompt": {"type": "string", "minLength": 1},
+          "inputs": {"type": "object", "additionalProperties": {"$ref": "#/$defs/hash"}},
+          "outputs": {"type": "object", "minProperties": 1, "propertyNames": {"$ref": "#/$defs/id"}, "additionalProperties": {"type": "string", "minLength": 1}},
+          "scorer": {"$ref": "#/$defs/reference"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,99}$"},
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "reference": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"],
+      "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/hash"}}}
+  },
+  "$comment": "Runtime validation additionally enforces relative confined paths, unique case IDs/prompts, family split isolation, reference bytes, output identity, and no identical public/scorer-only bytes."
+}

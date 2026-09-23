@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "entry_id",
+    "reviewer",
+    "organization",
+    "relationship",
+    "conflicts",
+    "verdict",
+    "rationale",
+    "reviewed_at",
+    "evidence",
+    "replication_entry_id"
+  ],
+  "properties": {
+    "protocol": {
+      "type": "object", "additionalProperties": false,
+      "required": ["version", "role", "plugin_version", "plugin_sha256", "suite_sha256", "disagreements", "false_refusals"],
+      "properties": {
+        "version": {"const": "pvl-independent-review-1"},
+        "role": {"enum": ["domain_reviewer", "reproducer"]},
+        "plugin_version": {"type": "string", "minLength": 1},
+        "plugin_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "suite_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "disagreements": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "false_refusals": {"type": "array", "items": {
+          "type": "object", "additionalProperties": false, "required": ["case_id", "arm", "repetition", "note"],
+          "properties": {"case_id": {"type": "string", "minLength": 1}, "arm": {"enum": ["with", "without"]},
+                         "repetition": {"type": "integer", "minimum": 1}, "note": {"type": "string", "minLength": 1}}
+        }}
+      }
+    },
+    "signature": {
+      "type": "object", "additionalProperties": false,
+      "required": ["algorithm", "context", "key_id", "public_key", "payload_sha256", "value"],
+      "properties": {"algorithm": {"const": "Ed25519"}, "context": {"const": "pvl-review-1"},
+        "key_id": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "payload_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "public_key": {"type": "string"}, "value": {"type": "string"}}
+    },
+    "entry_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "reviewer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "organization": {
+      "type": "string",
+      "minLength": 1
+    },
+    "relationship": {
+      "enum": [
+        "author",
+        "collaborator",
+        "independent",
+        "unknown"
+      ]
+    },
+    "conflicts": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "verdict": {
+      "enum": [
+        "support",
+        "dispute",
+        "inconclusive"
+      ]
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reference",
+          "sha256"
+        ],
+        "properties": {
+          "reference": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    },
+    "replication_entry_id": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}

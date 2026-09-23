@@ -108,6 +108,10 @@ class CostTests(unittest.TestCase):
         self.assertGreater(costs["arms"]["with"]["known_subtotal_usd"], 0)
 
     def test_additional_cost_enters_core_gates_and_usage_card(self):
+        self.s["policy"]["require_cost_saving"] = True
+        self.lock["suite_sha256"] = suite_digest(self.s)
+        for record in self.r:
+            record["suite_sha256"] = suite_digest(self.s)
         base = self.report(ledger())
         book = ledger([expense(amount_usd=900)])
         book["coverage"]["judge"] = "itemized"

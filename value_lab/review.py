@@ -7,7 +7,7 @@ import random
 import secrets
 from pathlib import Path
 
-from .core import ValidationError, load_json, suite_digest, validate_suite, write_json
+from .core import ValidationError, suite_digest, validate_suite, write_json
 
 
 def review_pack(suite, records, output_dir):

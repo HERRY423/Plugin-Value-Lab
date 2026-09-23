@@ -1,7 +1,7 @@
 {
   "name": "plugin-value-lab",
   "version": "0.4.0-alpha.1",
-  "description": "Research-gap diagnosis from task and background, feasible next investigations, and evidence-bounded plugin value assessment.",
+  "description": "Measure and register the marginal value of scientific agent plugins under matched conditions.",
   "author": {
     "name": "Local developer"
   },
@@ -12,7 +12,7 @@
     "baseline",
     "quality",
     "cost",
-    "research-directions",
+    "scientific-validation",
     "evidence-gaps"
   ]
 }

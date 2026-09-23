@@ -7,7 +7,7 @@
     {
       "name": "plugin-value-lab",
       "source": "./plugins/plugin-value-lab",
-      "description": "Task-first plugin guidance and matched value assessment."
+      "description": "Measure and register the marginal value of scientific agent plugins under matched conditions."
     }
   ]
 }

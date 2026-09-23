@@ -2,7 +2,7 @@
 // Explicit local team decisions; no score can silently become adoption.
 (()=>{
   const view=el("article");view.id="team-workbench";view.hidden=true;$("detail").after(view);
-  view.append(el("h2","团队使用记录"),el("p","把一次使用卡与研究背景、团队决定保存为新修订。旧卡片和决定保留；条件变化时提示重新评估。所有内容仅存本机。","muted"));
+  view.append(el("h2","团队使用记录（实验性扩展）"),el("p","把一次使用卡与研究背景、团队决定保存为新修订。旧卡片和决定保留；条件变化时提示重新评估。所有内容仅存本机。团队决定不等于实测增益。","muted"));
   const study=field(view,"从哪项评估生成当前使用卡","select","");study.id="team-study";
   const previous=field(view,"接续哪份团队记录（首轮选新记录）","select","");previous.id="team-previous";
   const grid=el("div",undefined,"research-grid");view.append(grid);
@@ -13,7 +13,7 @@
   const upload=field(view,"从研究方向诊断载入上下文文件","input","");upload.type="file";upload.accept=".json,application/json";
   upload.onchange=()=>action(async()=>{if(upload.files?.[0])context.value=await upload.files[0].text();});
   const result=el("div");result.id="team-result";view.append(button("保存为下一版团队记录",()=>action(save)),result);
-  const nav=button("团队使用记录",()=>action(async()=>{
+  const nav=button("团队使用记录（实验性）",()=>action(async()=>{
     selected=null;current=null;$("setup").hidden=true;$("detail").hidden=true;$("comparison").hidden=true;$("research-workbench").hidden=true;
     view.hidden=false;await refresh();notice();
   }));nav.id="team-nav";$("research-nav").after(nav);

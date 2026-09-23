@@ -43,7 +43,8 @@ def local_fixture():
 
 
 def run_fixture(suite, records):
-    return evaluate(suite, records, {"suite_sha256": suite_digest(suite)})
+    book = {"schema_version": 1, "coverage": {k: "included" for k in ("judge", "setup", "retry", "other")}, "entries": []}
+    return evaluate(suite, records, {"suite_sha256": suite_digest(suite)}, book)
 
 
 def rebind(suite, records):

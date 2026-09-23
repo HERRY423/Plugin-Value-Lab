@@ -8,8 +8,8 @@ def create_server():
     except ImportError as exc:
         raise ValidationError('MCP SDK missing from this Python. Install with the host Python: python -m pip install "mcp==1.28.1"; then restart the plugin connection. See docs/INSTALL.zh-CN.md.') from exc
     mcp = FastMCP("Plugin Value Lab", instructions=(
-        "Diagnose research gaps from task/background and evaluate plugin incremental value using matched observations. "
-        "For research directions, first reason from authorized sources using the research-directions skill, then validate the structured context. All tools are local and read-only. "
+        "Measure and register the marginal value of scientific agent plugins under matched conditions. "
+        "Research directions are an experimental extension outside the measurement core. When requested, reason from authorized sources using the research-directions skill, then validate the structured context. All tools are local and read-only. "
         "No tool runs a model, certifies external value or publishes results. Synthetic data remain synthetic."
     ), log_level="ERROR")
 

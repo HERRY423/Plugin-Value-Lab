@@ -5,10 +5,10 @@ import re
 
 
 def validate_rules(case):
-    from .core import ValidationError, suite_digest
+    from .core import FILE_GRADERS, ValidationError, suite_digest
     seen = set()
     for g in case["graders"]:
-        allowed = {"id", "type", "dimension", "weight", "critical", "examples", "value", "path", "rubric"}
+        allowed = {"id", "type", "dimension", "weight", "critical", "examples", "value", "path", "rubric", "artifact", "verifier"}
         unknown = set(g) - allowed
         if unknown:
             raise ValidationError(f"{case['id']}/{g['id']}: 不支持的评分字段 {sorted(unknown)}")
@@ -19,11 +19,13 @@ def validate_rules(case):
                 suite_digest(g["value"])
             except (ValueError, TypeError) as exc:
                 raise ValidationError("JSON 目标必须是有限的 JSON 值") from exc
-        signature = suite_digest({k: g[k] for k in ("type", "dimension", "path", "value", "rubric") if k in g})
+        signature = suite_digest({k: g[k] for k in ("type", "dimension", "path", "value", "rubric", "artifact", "verifier") if k in g})
         if signature in seen:
             raise ValidationError(f"{case['id']}: 重复评分规则会重复加权")
         seen.add(signature)
         if "examples" in g:
+            if g["type"] in FILE_GRADERS | {"sealed", "scenario"}:
+                raise ValidationError("Artifact calibration requires files; text examples cannot validate artifacts")
             examples = g["examples"]
             if not isinstance(examples, list):
                 raise ValidationError("评分校准样例必须是列表")
@@ -68,6 +70,8 @@ def inspect_rules(suite, samples=None):
         rules = []
         total = sum(g["weight"] for g in case["graders"] if g["dimension"] == "outcome")
         for g in case["graders"]:
+            if g["type"] in ("artifact", "executable", "sealed"):
+                warnings.append(f"{case['id']}/{g['id']}: Requires collected artifact bytes; text-only previews remain unresolved")
             if g["critical"] and g["dimension"] == "process":
                 warnings.append(f"{case['id']}/{g['id']}: 关键过程规则不计入质量，只限制该案例的使用建议；不能替代关键结果门槛")
             if g["type"] == "json_equals":

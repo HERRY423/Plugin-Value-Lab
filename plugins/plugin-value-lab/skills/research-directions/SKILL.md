@@ -1,9 +1,9 @@
 ---
 name: research-directions
-description: Analyze a research question and its authorized background to identify missing evidence, rival explanations, methodological bottlenecks, and feasible next investigations. Use when the user asks what is missing, where to go next, or how new evidence changes a research plan; use assess-value for measured plugin comparisons.
+description: Experimental extension for analyzing a research question and its authorized background to identify evidence gaps and feasible investigations. Use only for research planning requests; use assess-value for measured scientific plugin comparisons.
 ---
 
-# Diagnose research directions
+# Diagnose research directions (experimental extension)
 
 Help the researcher decide what is worth learning next and what would change that decision. Build the analysis from the actual question, materials, and constraints; a generic checklist or a list of fashionable methods is not a completed diagnosis. Installation makes this skill available for host selection; it does not start a background analysis, monitor files, or contact services.
 

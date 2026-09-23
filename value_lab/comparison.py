@@ -13,7 +13,7 @@ def _difference(before, after, prefix=""):
     return []
 
 
-def compare_studies(before, after):
+def compare_studies(before, after, *, artifact_roots=None, verifier_root=None):
     """Input objects contain suite, records, lock; optional cost_ledger and context.
 
     Context is observed by the caller (snapshot hash / CLI version), not inferred
@@ -25,7 +25,11 @@ def compare_studies(before, after):
         if any(k not in study for k in ("suite", "records", "lock")):
             raise ValidationError("比较输入缺少方案、记录或冻结锁")
     a, b = before["suite"], after["suite"]
-    reports = [evaluate(s["suite"], s["records"], s["lock"], s.get("cost_ledger")) for s in (before, after)]
+    roots = artifact_roots if artifact_roots is not None else (None, None)
+    if not isinstance(roots, (tuple, list)) or len(roots) != 2:
+        raise ValidationError("Provide one artifact root for each study")
+    reports = [evaluate(s["suite"], s["records"], s["lock"], s.get("cost_ledger"), artifact_root=root, verifier_root=verifier_root)
+               for s, root in zip((before, after), roots)]
     contexts = [s.get("context") or {} for s in (before, after)]
     if any(not isinstance(c, dict) for c in contexts):
         raise ValidationError("比较上下文必须是对象")
