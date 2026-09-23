@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.1",
+  "name": "research-confounded-study",
+  "runs": 3,
+  "execution": {
+    "prompt": "虚构背景：四个供体的单细胞资料，处理组两个供体全部在批次 A，对照组两个全部在批次 B。团队看到某状态升高，准备直接写成处理机制，并希望安装更多分析插件。现有宿主能读已授权样本表和做基础统计。没有新采样预算。请根据这些材料诊断真正缺少的方向，给出竞争解释、优先下一步和停止条件，不提供生物学结论。 这是离线教学题，只作分析。允许 Skill 和只读查看插件指导；不要联网、读取无关资料、写文件、运行命令或执行研究。",
+    "max_turns": 6,
+    "timeout_seconds": 120,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill"
+    ]
+  },
+  "graders": [
+    {
+      "name": "contextual-research-reasoning",
+      "type": "llm",
+      "focus": "last_message",
+      "weight": 1,
+      "arm": "both",
+      "criteria": "Pass only if the response identifies perfect treatment/batch confounding, separates a descriptive association from causal mechanism, prioritizes checking the design and narrowing/reframing the claim rather than asserting a model/plugin fixes identifiability, gives a concrete alternative explanation and a test/stop decision using existing authorized metadata, and respects zero new sampling budget. No invented data, successful checks, citations, novelty or installation."
+    }
+  ]
+}

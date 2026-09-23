@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "type": "plugin_use_plan",
+  "route": "USE_NATIVE",
+  "owner": "built_in",
+  "headline": "直接用现有原生能力完成任务",
+  "task_summary": "教学场景：把已经提供的会议文字整理成三条待办。",
+  "reasons": [
+    "当前任务已被现有能力覆盖，无需新增插件或先做评估。"
+  ],
+  "steps": [
+    {
+      "owner": "built_in",
+      "action": "complete_task",
+      "purpose": "完成用户任务，检查实际结果是否满足要求。"
+    }
+  ],
+  "handoff": {
+    "kind": "none",
+    "status": "PROPOSED_NOT_EXECUTED",
+    "execute": false
+  },
+  "evidence_status": "VALUE_NOT_ASSESSED",
+  "observations": {
+    "native_fit": "sufficient",
+    "connected_fit": "unknown",
+    "selected_plugin": null,
+    "connection_observation_fresh": false,
+    "ready_for_routing": false,
+    "basis": "Supplied host observations; not independently verified by this planner"
+  },
+  "comparison": {
+    "goal": "quality",
+    "baseline_data_access": "unknown",
+    "quality_comparison_ready": false,
+    "access_is_not_reasoning_gain": true
+  },
+  "limitations": [
+    "任务适配和连接状态来自提交的上下文；规划器没有实时搜索、连接或改变账户。",
+    "已连接不等于有增益；未做价值评估也不妨碍完成已授权的普通任务。",
+    "交接只携带公开能力关键词、明确插件引用与所请求的管理动作；私有任务说明和资料保留在本地。",
+    "推荐只表示下一步；权限变更、卸载和任何外部副作用仍须符合用户的具体请求。"
+  ]
+}

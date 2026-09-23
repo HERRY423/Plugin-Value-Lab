@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "suite_sha256": "c4727c53139b2051495e911dea84e923fcda5f25e0cf1496fe2da9e5632fad42",
+  "frozen_at": "2026-09-22T13:26:41.713459+00:00",
+  "expected_runs": 18,
+  "attestation": "LOCAL_CONSISTENCY_ONLY"
+}

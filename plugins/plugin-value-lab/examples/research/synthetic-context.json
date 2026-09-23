@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "evidence_type": "synthetic",
+  "task": {
+    "question": "模拟示例：一种细胞状态是否与处理反应相关，下一步应优先补什么？",
+    "background": "完全虚构的演示：单批次样本的探索分析提示状态差异，但尚未排除供体构成与测量偏差。没有真实患者、实验或研究观察。",
+    "decision": "决定先追加探索测量，还是先用现有数据排查混杂。",
+    "domain": "模拟单细胞研究"
+  },
+  "evidence": [
+    {
+      "id": "demo-pattern",
+      "summary": "虚构线索：探索聚类中看到状态比例不同。",
+      "source": "synthetic demonstration; no dataset",
+      "status": "hypothesis"
+    },
+    {
+      "id": "demo-design",
+      "summary": "演示设定：处理组与批次及供体构成可能重合。",
+      "source": "synthetic design assumption",
+      "status": "hypothesis"
+    }
+  ],
+  "dimensions": {
+    "question": {
+      "status": "partial",
+      "rationale": "示例问题尚未定义效应量和决策阈值。",
+      "evidence_ids": []
+    },
+    "design": {
+      "status": "missing",
+      "rationale": "演示设定缺少能区分处理与供体或批次的对照。",
+      "evidence_ids": [
+        "demo-design"
+      ]
+    },
+    "measurement": {
+      "status": "unknown",
+      "rationale": "RNA 状态能否代表拟研究功能尚未建立。",
+      "evidence_ids": [
+        "demo-pattern"
+      ]
+    }
+  },
+  "directions": [
+    {
+      "id": "check-confounding",
+      "title": "先判定处理效应是否可识别",
+      "gap": "处理与供体及批次可能无法区分。",
+      "kind": "method",
+      "dimension": "design",
+      "why_now": "低成本的设计核对可能避免在不可识别设计上追加复杂分析。",
+      "evidence_ids": [
+        "demo-design"
+      ],
+      "alternative_explanation": "状态比例差异由供体组成或批次产生。",
+      "next_test": "在授权元数据上检查处理、供体、批次交叉表；预先写明不可识别条件。",
+      "success_signal": "存在独立重复和可区分的处理比较；明确比较单位。",
+      "stop_signal": "处理完全与批次或供体混杂，则停止因果解释并重新设计。",
+      "depends_on": [],
+      "impact": 5,
+      "uncertainty": 5,
+      "effort": 1,
+      "cost_usd": 0,
+      "hours": 1,
+      "status": "proposed"
+    },
+    {
+      "id": "orthogonal-measure",
+      "title": "设计能够挑战细胞状态解释的正交测量",
+      "gap": "转录状态与目标功能之间缺少直接测量。",
+      "kind": "evidence",
+      "dimension": "measurement",
+      "why_now": "先明确什么观察会推翻首选解释，再决定是否值得新增测量。",
+      "evidence_ids": [
+        "demo-pattern"
+      ],
+      "alternative_explanation": "转录变化是压力或技术过程，而非目标功能改变。",
+      "next_test": "在可识别设计基础上，提出与目标功能直接相关的测量和阴性对照；先询价。",
+      "success_signal": "预先规定的正交指标与状态假设一致，且对照排除主要替代解释。",
+      "stop_signal": "正交指标不支持目标功能，或费用与样本要求超出约束。",
+      "depends_on": [
+        "check-confounding"
+      ],
+      "impact": 5,
+      "uncertainty": 4,
+      "effort": 4,
+      "cost_usd": null,
+      "hours": null,
+      "status": "proposed"
+    },
+    {
+      "id": "find-metadata-reader",
+      "title": "核对现有工具是否能读取授权元数据",
+      "gap": "示例中尚未核实可用的本地元数据读取能力。",
+      "kind": "capability",
+      "dimension": "resources",
+      "why_now": "仅在现有能力不足时寻找额外工具。",
+      "evidence_ids": [],
+      "alternative_explanation": "已有原生读取能力足够，无需安装插件。",
+      "next_test": "先检查现有工具和文件格式适配度，再决定是否搜索。",
+      "success_signal": "能按权限读取必要字段并保留来源。",
+      "stop_signal": "现有工具已经足够，或缺少数据授权。",
+      "depends_on": [],
+      "impact": 2,
+      "uncertainty": 2,
+      "effort": 1,
+      "cost_usd": 0,
+      "hours": 0.5,
+      "capability_query": "local tabular metadata inspection",
+      "status": "proposed"
+    }
+  ],
+  "constraints": {
+    "budget_usd": 100,
+    "hours_available": 4,
+    "max_next_actions": 3
+  },
+  "revision_note": "纯模拟输入，用于检查诊断与资源约束；不是科研结果。"
+}

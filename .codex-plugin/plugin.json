@@ -1,0 +1,38 @@
+{
+  "name": "plugin-value-lab",
+  "version": "0.4.0-alpha.1",
+  "description": "Research-gap diagnosis from task and background, feasible next investigations, and evidence-bounded plugin value assessment.",
+  "author": {
+    "name": "Local developer"
+  },
+  "skills": "./skills/",
+  "mcpServers": {
+    "plugin-value-lab": {
+      "command": "python",
+      "args": [
+        "-B",
+        "${PLUGIN_ROOT}/scripts/value_lab.py",
+        "serve"
+      ],
+      "env": {
+        "PYTHONUTF8": "1",
+        "PYTHONIOENCODING": "utf-8",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      }
+    }
+  },
+  "interface": {
+    "displayName": "Plugin Value Lab",
+    "shortDescription": "Find research gaps, plan next tests, and assess plugin value.",
+    "longDescription": "Help the host Agent reason from research tasks and evidence, challenge rival explanations, plan feasible next tests, and compare researcher revisions. Use Plugin Management for genuine capability gaps and matched evaluations for plugin value. No automatic data scanning, model runs or installations.",
+    "developerName": "Local developer",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": [
+      "结合我的研究任务与背景，找出遗漏方向、替代解释和最值得先做的验证。",
+      "完成这个任务，现有能力够不够，什么时候才需要插件？",
+      "这个插件怎样用才值得？帮我设计一个小规模公平比较。",
+      "把已有评估记录整理成一张说明何时用、何时不用的使用卡。"
+    ]
+  }
+}

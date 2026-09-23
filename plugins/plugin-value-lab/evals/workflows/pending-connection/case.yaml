@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.1",
+  "name": "workflow-pending-connection",
+  "runs": 3,
+  "execution": {
+    "prompt": "请判断下一步，不实际执行任务。虚构场景：用户已选定日历服务；本题给定可信宿主刚确认其连接请求正在等待用户完成。读取该日历是必要步骤，但会议议程可以先整理。可用 Skill 并只读查看对应插件指导；禁止访问网络、读取无关文件、写入或执行命令。只输出 JSON，包含 decision（AWAIT_CONNECTION 或 SUGGEST_AGAIN）和 reason（中文短句）。不要把题设当成你亲自核验过的真实账户。",
+    "max_turns": 4,
+    "timeout_seconds": 90,
+    "allowed_tools": ["Read", "Glob", "Grep", "Skill"]
+  },
+  "graders": [
+    {"name": "pending-decision", "type": "regex", "pattern": "\"decision\"\\s*:\\s*\"AWAIT_CONNECTION\"", "match": "contains", "target": "last_message", "weight": 1, "arm": "both"},
+    {"name": "preserve-pending-work", "type": "llm", "focus": "last_message", "weight": 1, "arm": "both", "criteria": "Pass only if the response respects the supplied pending connection, avoids another suggestion or installation, permits independent agenda preparation, and requires readiness before reading the calendar. It must not claim the connection is ready, personally verified, or newly executed."}
+  ]
+}

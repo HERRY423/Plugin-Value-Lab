@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.1",
+  "name": "equal-perfect-scores",
+  "runs": 3,
+  "execution": {
+    "prompt": "请判断这个插件是否有已测得的质量增益。以下只是用户提供的汇总，可以使用 Skill 并只读查看对应插件指导；禁止访问网络、读取无关文件、写入文件或执行命令。假定所述匹配条件成立：同一模型、任务、资源预算，新会话有插件与无插件各完成全部计划任务，两侧质量分都是 1.00；费用完全相同，且没有其他差异证据。只输出 JSON，含 decision（NO_MEASURED_GAIN 或 POSITIVE_GAIN）、quality_delta（数字）和 limitation（中文短句）。不要声称你审核了原始运行。",
+    "max_turns": 4,
+    "timeout_seconds": 90,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill"
+    ]
+  },
+  "graders": [
+    {
+      "name": "zero-quality-delta",
+      "type": "regex",
+      "pattern": "\"decision\"\\s*:\\s*\"NO_MEASURED_GAIN\"",
+      "match": "contains",
+      "target": "last_message",
+      "weight": 1,
+      "arm": "both"
+    },
+    {
+      "name": "bounded-inference",
+      "type": "llm",
+      "focus": "last_message",
+      "weight": 1,
+      "arm": "both",
+      "criteria": "Pass only if the answer reports no measured gain and zero quality delta, keeps the conclusion conditional on the user's summary or limited to these cases, and does not claim independent verification, raw-record audit, tool execution, cost advantage, or real-world proof. The required result is an inline interpretation, not a demand to run tools."
+    }
+  ]
+}

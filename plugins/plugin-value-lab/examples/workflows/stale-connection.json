@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "intent": "use",
+  "task": {
+    "summary": "教学场景：希望使用指定的虚构日历服务，但只有历史就绪记录。示例不代表真实安装或连接。",
+    "capability": "calendar availability"
+  },
+  "native_fit": "sufficient",
+  "connected_fit": "sufficient",
+  "plugin_management_available": false,
+  "selected_plugin": {
+    "reference": "Example Calendar",
+    "display_name": "虚构日历教学对象",
+    "kind": "chatgpt_plugin",
+    "installed": true,
+    "connection_state": "ready",
+    "observed_at": "2020-01-01T00:00:00Z",
+    "status_source": "host"
+  }
+}

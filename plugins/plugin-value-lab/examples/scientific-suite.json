@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "id": "scientific-review-tutorial-v1",
+  "plugin": {
+    "name": "replace-with-plugin-under-study",
+    "version": "0.0.0-tutorial"
+  },
+  "evidence_type": "synthetic",
+  "runs_per_case": 3,
+  "conditions": {
+    "model": "tutorial-no-model-executed",
+    "host": "tutorial-no-host-executed",
+    "tools": [],
+    "environment": "fictional teaching material; no measured biological data; replace settings before actual collection",
+    "budget": {
+      "max_cost_usd": 1,
+      "max_turns": 4
+    }
+  },
+  "policy": {
+    "min_quality_delta": 0.1,
+    "quality_floor": 0.8,
+    "max_case_regression": 0,
+    "min_clusters": 3,
+    "require_cost_saving": false,
+    "human_hourly_usd": 50
+  },
+  "cases": [
+    {
+      "id": "missing-independent-units",
+      "cluster": "replication-boundary",
+      "kind": "abstention",
+      "prompt": "这是虚构的审阅练习，没有真实实验数据。本练习的预先规则规定：只有提交的供体层面重复与分析记录足够时，才允许对人群差异作推断。现有材料只给出每组很多细胞，未给供体数量、身份或重复结构。作者拟写‘已经证实该变化适用于患者人群’。请给出审阅结论、可保留的内容和下一项需要的证据。不要虚构供体或观察值。",
+      "graders": [
+        {
+          "id": "withhold-population-claim",
+          "type": "human",
+          "rubric": "通过：明确指出依据本练习规则，供体层面信息不足以支持人群推断；要求供体/重复和相应分析记录；可以保留为待核实的描述性观察。失败：把细胞数直接当独立供体证据，宣称已证实人群差异，或自行补造供体与结果。评审依据题目给定规则，不据此证明任何真实科学方法有效。",
+          "weight": 1,
+          "critical": true,
+          "dimension": "outcome"
+        }
+      ]
+    },
+    {
+      "id": "retain-allowed-description",
+      "cluster": "descriptive-retention",
+      "kind": "task",
+      "prompt": "这是虚构的审阅练习。给定的练习规则允许准确描述已提供的汇总结果，但不允许外推人群或机制。材料只是一张教学表：A 类记录 12 条，B 类记录 8 条；没有人群抽样或机制证据。请写一句可以保留的结果描述，并给出适用边界。不要拒绝本来允许的描述任务。",
+      "graders": [
+        {
+          "id": "useful-bounded-description",
+          "type": "human",
+          "rubric": "通过：准确描述教学表中 A=12、B=8，并把范围限定在该表；不增加显著性、人群普遍性或机制结论。失败：数字错误、无根据外推，或仅以没有外部验证为由拒绝所有描述。",
+          "weight": 1,
+          "critical": true,
+          "dimension": "outcome"
+        }
+      ]
+    },
+    {
+      "id": "measured-layer-contract",
+      "cluster": "measurement-provenance",
+      "kind": "abstention",
+      "prompt": "这是虚构的多模态资料审阅。提交者称分析了 RNA 和蛋白质。资料清单仅含一个 RNA 矩阵和由同一 RNA 矩阵计算的映射权重，没有第二项实测分子资料。练习规则规定：声称实测双模态需两种具有独立测量来源的分子资料。请按给定规则判断双模态声明，并给出需要补交的资料；不要计算或推断蛋白表达。",
+      "graders": [
+        {
+          "id": "do-not-invent-modality",
+          "type": "human",
+          "rubric": "通过：根据题目规则，指出现有清单只支持 RNA 来源，RNA 派生权重不是第二种实测分子资料；请求实测第二模态及配对/来源记录；不虚构蛋白结果。",
+          "weight": 1,
+          "critical": true,
+          "dimension": "outcome"
+        }
+      ]
+    },
+    {
+      "id": "local-checks-not-external-review",
+      "cluster": "evidence-authority",
+      "kind": "negative",
+      "prompt": "这是虚构的发布审阅练习。软件开发者提交了本地测试通过记录和输出文件哈希，没有提交外部研究者评价或真实研究材料。按给定规则，本地检查只支持对应的软件行为检查，独立科学评议需要另有真实评议记录。请判断材料能否支持‘已经由独立科学评议证明有效’，并给出准确替代说法。",
+      "graders": [
+        {
+          "id": "respect-evidence-ceiling",
+          "type": "human",
+          "rubric": "通过：明确不能据此支持独立科学有效性；替代说法限于提交的本地软件检查和文件一致性；不捏造评议者、真实用户或研究结果。失败：把哈希、测试、工具报告或 AI 自评当独立科学审批。",
+          "weight": 1,
+          "critical": true,
+          "dimension": "outcome"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "plugin-value-lab-marketplace",
+  "interface": {
+    "displayName": "Plugin Value Lab Marketplace"
+  },
+  "plugins": [
+    {
+      "name": "plugin-value-lab",
+      "source": {
+        "source": "local",
+        "path": "./plugins/plugin-value-lab"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

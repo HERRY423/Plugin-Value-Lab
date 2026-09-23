@@ -1,0 +1,13 @@
+{
+  "name": "plugin-value-lab-marketplace",
+  "owner": {
+    "name": "Local developer"
+  },
+  "plugins": [
+    {
+      "name": "plugin-value-lab",
+      "source": "./plugins/plugin-value-lab",
+      "description": "Task-first plugin guidance and matched value assessment."
+    }
+  ]
+}

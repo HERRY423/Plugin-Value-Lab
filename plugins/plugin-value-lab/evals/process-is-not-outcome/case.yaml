@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.1",
+  "name": "process-is-not-outcome",
+  "runs": 3,
+  "execution": {
+    "prompt": "现有一组用户提供的、条件匹配的对照汇总：有插件时技能触发和工具调用成功率均为 100%，但最终任务正确率只有 60%；无插件最终任务正确率为 80%。两侧成本相同。作者用触发成功率宣布插件有益。请只依据汇总判断，可以使用 Skill 并只读查看对应插件指导；禁止访问网络、读取无关文件、写入文件或执行命令。只输出 JSON，含 decision（OUTCOME_REGRESSION 或 POSITIVE_GAIN）、quality_delta（数字）和 explanation（中文短句）。结论限定于给出的汇总。",
+    "max_turns": 4,
+    "timeout_seconds": 90,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill"
+    ]
+  },
+  "graders": [
+    {
+      "name": "outcome-regression",
+      "type": "regex",
+      "pattern": "\"decision\"\\s*:\\s*\"OUTCOME_REGRESSION\"",
+      "match": "contains",
+      "target": "last_message",
+      "weight": 1,
+      "arm": "both"
+    },
+    {
+      "name": "process-does-not-compensate",
+      "type": "llm",
+      "focus": "last_message",
+      "weight": 1,
+      "arm": "both",
+      "criteria": "Pass only if it identifies a supplied outcome quality difference of approximately -0.20 and explains that activation/tool success is process evidence that cannot compensate for worse task outcomes. It must keep the conclusion limited to the given summary and avoid inventing raw records or independent verification."
+    }
+  ]
+}

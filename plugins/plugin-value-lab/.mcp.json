@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "plugin-value-lab": {
+      "command": "python",
+      "args": ["-B", "${CLAUDE_PLUGIN_ROOT}/scripts/value_lab.py", "serve"],
+      "env": {"PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8", "PYTHONDONTWRITEBYTECODE": "1"}
+    }
+  }
+}

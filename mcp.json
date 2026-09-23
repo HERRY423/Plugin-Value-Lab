@@ -1,0 +1,12 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "plugin-value-lab": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["-B", "${PLUGIN_ROOT}/scripts/value_lab.py", "serve"],
+      "cwd": "./",
+      "env": {"PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8", "PYTHONDONTWRITEBYTECODE": "1"}
+    }
+  }
+}

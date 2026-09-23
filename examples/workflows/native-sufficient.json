@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "intent": "choose",
+  "task": {
+    "summary": "教学场景：把已经提供的会议文字整理成三条待办。",
+    "capability": "summarize supplied text"
+  },
+  "native_fit": "sufficient",
+  "connected_fit": "unknown",
+  "plugin_management_available": false,
+  "selected_plugin": null
+}

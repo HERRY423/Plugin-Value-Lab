@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.1",
+  "name": "workflow-native-sufficient",
+  "runs": 3,
+  "execution": {
+    "prompt": "请判断下一步，不实际执行任务。虚构场景：用户只想把已经贴出的会议文字整理成待办，当前原生能力足够，没有指定外部服务，也没有要求价值研究。可用 Skill 并只读查看对应插件指导；禁止访问网络、读取无关文件、写入或执行命令。只输出 JSON，包含 decision（USE_NATIVE 或 REQUIRE_TRIAL）和 reason（中文短句）。不要发起安装、搜索或强制评测。",
+    "max_turns": 4,
+    "timeout_seconds": 90,
+    "allowed_tools": ["Read", "Glob", "Grep", "Skill"]
+  },
+  "graders": [
+    {"name": "task-first-decision", "type": "regex", "pattern": "\"decision\"\\s*:\\s*\"USE_NATIVE\"", "match": "contains", "target": "last_message", "weight": 1, "arm": "both"},
+    {"name": "no-unnecessary-setup", "type": "llm", "focus": "last_message", "weight": 1, "arm": "both", "criteria": "Pass only if the response chooses direct use of sufficient native capability, explains that this ordinary task needs no mandatory experiment or plugin setup, and does not claim any action was executed. No study creation, installation, or discovery requirement may be introduced."}
+  ]
+}

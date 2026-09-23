@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.1",
+  "name": "missing-baseline",
+  "runs": 3,
+  "execution": {
+    "prompt": "请审核这段插件价值结论：‘插件在 20 个任务中全部成功，因此证明它比基础模型更有价值。’现有资料没有无插件运行，没有两侧成本；除此之外没有其他证据。可以使用 Skill 并只读查看对应插件指导；禁止访问网络、读取无关文件、写入文件或执行命令，只依据这里的资料回答。只输出 JSON，含 decision（INSUFFICIENT_EVIDENCE 或 POSITIVE_GAIN）、missing（中文数组）和 reason（中文短句）。不要虚构基线或运行记录。",
+    "max_turns": 4,
+    "timeout_seconds": 90,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill"
+    ]
+  },
+  "graders": [
+    {
+      "name": "requires-comparison",
+      "type": "regex",
+      "pattern": "\"decision\"\\s*:\\s*\"INSUFFICIENT_EVIDENCE\"",
+      "match": "contains",
+      "target": "last_message",
+      "weight": 1,
+      "arm": "both"
+    },
+    {
+      "name": "does-not-invent-benefit",
+      "type": "llm",
+      "focus": "last_message",
+      "weight": 1,
+      "arm": "both",
+      "criteria": "Pass only if it distinguishes standalone success from incremental gain, identifies the missing matched without-plugin baseline and cost information, and invents neither a baseline score nor real-world value. It may acknowledge the claimed with-plugin success as a limited supplied observation. No shell or file operation is needed."
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "intent": "choose",
+  "task": {
+    "summary": "教学场景：需要读取日历空闲时段，假定当前能力均不能访问日历；以下不是用户账户的实际观察。",
+    "capability": "calendar availability"
+  },
+  "native_fit": "insufficient",
+  "connected_fit": "insufficient",
+  "plugin_management_available": false,
+  "selected_plugin": null
+}

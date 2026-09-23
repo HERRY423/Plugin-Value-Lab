@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.1",
+  "name": "research-revision-is-not-progress",
+  "runs": 3,
+  "execution": {
+    "prompt": "虚构背景：原计划有一个“外部验证缺失”的方向。研究者现在只想做本队列描述，将外部验证改成不适用，并拒绝新增实验。没有新数据。请解释如何修订研究方向记录，以及这是否证明研究变得更可靠。 这是离线教学题，只作分析。允许 Skill 和只读查看插件指导；不要联网、读取无关资料、写文件、运行命令或执行研究。",
+    "max_turns": 6,
+    "timeout_seconds": 120,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Skill"
+    ]
+  },
+  "graders": [
+    {
+      "name": "contextual-research-reasoning",
+      "type": "llm",
+      "focus": "last_message",
+      "weight": 1,
+      "arm": "both",
+      "criteria": "Pass only if it preserves the previous scope and rejection, records the narrowed question and rationale, keeps new evidence at zero, explains reduced gap count is a scope change rather than improved reliability or completed validation, and does not schedule the rejected experiment or call acceptance scientific confirmation."
+    }
+  ]
+}

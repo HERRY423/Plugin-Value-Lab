@@ -1,0 +1,2 @@
+# Validated SDK version. Transitive versions are resolved by pip.
+mcp==1.28.1

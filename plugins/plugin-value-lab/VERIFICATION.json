@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "version": "0.4.0-alpha.1",
+  "verification_date": "2026-09-22",
+  "scope": "Local engineering acceptance of research context diagnosis, installed skill/tool surfaces, revision and resource constraints, plus existing value evaluation. Synthetic browser data only; no live model evaluation or research benefit study.",
+  "current_revision": {
+    "name": "research-followup-and-team-usage-record",
+    "checked": "Research followup tracing, immutable team card revisions, CLI entry points, workbench followup and team-record routes passed focused local tests; no real study was run.",
+    "focused_tests": "65 research, usage, CLI and team-record tests; 2 focused workbench HTTP route tests; and 9 distribution tests passed in separate runs. Both new browser scripts passed JavaScript syntax checks.",
+    "full_suite": "217 local tests passed with process control available. A prior restricted-shell run had 2 cancellation/deadline failures and 2 cleanup errors because Windows process-tree termination was denied; the unrestricted rerun resolved those environment-specific failures.",
+    "model_calls": 0,
+    "human_research_observations": 0
+  },
+  "runtime": {
+    "python": "3.13.9",
+    "claude_cli": "2.1.278"
+  },
+  "tests": {
+    "command": "python -m unittest discover -s tests -q",
+    "note": "Current unversioned research/team-record extension, run with process control available; no live model or human study.",
+    "run": 217,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "model_calls": 0,
+    "research_engine_and_adversarial": 39
+  },
+  "checks": {
+    "agent_plugins_1_0_0": "passed offline schema and package validation",
+    "codex_manifest": "passed",
+    "assess_value_skill": "passed",
+    "browser_synthetic_demo": "passed: SIMULATION_ONLY, reports, usage card and evidence visible",
+    "browser_real_preparation": "passed: form to frozen four-run plan, actual Claude version/help checks; not started",
+    "execution_adapter": "tested using manufactured Python subprocess output, not live Claude execution",
+    "cancellation_and_timeout": "passed outside restrictive test sandbox; process-tree denial remains interrupted/unknown",
+    "http": "Host, Origin, token, download and traversal tests passed",
+    "isolated_wheel": "passed final wheel outside source tree: research context/plan, demo, routing, usage card, static assets and server",
+    "marketplace_mirror": "passed byte-for-byte; marketplace and portable archive member hashes checked",
+    "current_desktop_account_changed": false,
+    "isolated_codex_install": "passed current same-version revision in work/research-install/codex-home; current desktop account unchanged",
+    "installed_cached_mcp": "passed initialize/list/calls including research_direction_advisor; seven tools and three skill files; no model calls",
+    "browser_scoring": "passed multi-rule trial scoring and rejection of duplicate rules; no model call",
+    "browser_comparison": "passed two-study synthetic comparison; missing fingerprints and reused fixture sessions surfaced",
+    "browser_cost_revision": "passed coverage declaration and immutable new analysis with original records retained",
+    "browser_live_workbench": "passed latest research diagnosis entry on port 8766; prior studies retained",
+    "scoring_validation": "passed contradiction, duplicate, calibration, strict JSON, weights and critical-rule checks",
+    "comparison": "passed plugin/model/combined changes, task and policy compatibility, provenance and cost-basis gates",
+    "cost_analysis": "passed partial/unknown costs, included vs additional, shared allocation, failed-run spend, raw human intervals, revisions and sensitivity",
+    "installed_runtime_files_matched": 24,
+    "research_skill": "passed UTF8 skill validation; three packaged skill files present in isolated install; fresh desktop model selection unverified",
+    "research_diagnosis": "passed evidence references, coverage limits, contradictions, cycles, budget and time caps, unknown/zero amounts, decimal boundaries and immutable export",
+    "research_revision": "passed source/question/scope changes; accepted is not completed and reduced gap counts are not verified closure",
+    "research_handoff": "passed minimal capability-only proposal, no automatic transmission/installation; redaction still requires host review",
+    "browser_research": "passed task validation, ten unknown dimensions without fabricated directions, synthetic example, rival/stop signals, evidence display, draft retention, zero budget, revision, context import and Agent prompt",
+    "research_followup": "passed declared-result validation and affected-direction tracing; completion and dependent unlocking stay false",
+    "team_usage_record": "passed recomputed cards, explicit team decisions, revision history, research-context comparison, digest checks, CLI and local workbench routes"
+  },
+  "wheel": {
+    "filename": "plugin_value_lab-0.4.0a1-py3-none-any.whl",
+    "sha256": "99557dea6ea961dd4bb54ce51e31f9c2b66b8f51f688afa632be8e247b039a54"
+  },
+  "live_workbench": {
+    "url": "http://127.0.0.1:8766",
+    "evidence_directory": "work/workbench-live",
+    "prepared_study_id": "dc1a87aed54f452b9c6f69c028677de2",
+    "prepared_study_executed": false
+  },
+  "native_model_evaluations_executed": 0,
+  "external_studies_executed": 0,
+  "human_research_observations": 0,
+  "scientific_authorization": "NONE",
+  "external_validation": "NOT_ESTABLISHED",
+  "known_limits": [
+    "Only Claude native backend; read-only tools and mocked MCP. No Codex execution adapter.",
+    "Actual paid Claude evaluation remains unexecuted in acceptance; account/model access not verified.",
+    "Native aggregate evidence remains diagnostic: per-run sessions, load receipts, complete cost allocation and human review are not fabricated.",
+    "Workstation interruption has no automatic continuation; unknown process/charge state blocks new paid starts.",
+    "Native cost is list-price estimate, may overrun in-flight and is not settled spending.",
+    "Local single-user service and byte hashes are not independent execution attestation.",
+    "Fresh desktop model conversation and public distribution not verified.",
+    "Comparison is descriptive; combined plugin/model changes cannot support single-factor attribution.",
+    "Cost coverage and settled labels are user declarations, not independent invoice verification; unknown categories prevent full-cost claims.",
+    "Research semantic reasoning is performed by the host Agent; deterministic local validation cannot establish source truth, novelty, exhaustive gaps or scientific validity. Skill auto-selection in a fresh desktop model conversation remains unverified."
+  ],
+  "previous_installation_evidence": {
+    "version": "0.4.0-alpha.1",
+    "scope": "Prior scoring/comparison/cost revision and packages preserved in work/before-research-extension"
+  },
+  "external_reference": "https://code.claude.com/docs/en/plugin-evals",
+  "external_service_usage": {
+    "agentmuxer_paid_invocations": [],
+    "confirmed_paid_usd": 0,
+    "unsettled_invocations": [],
+    "note": "Free capability discovery and native official Claude documentation access only. No paid offering, model eval or research experiment."
+  },
+  "distribution": {
+    "marketplace_archive": "dist/plugin-value-lab-marketplace-0.4.0-alpha.1.zip",
+    "portable_archive": "dist/plugin-value-lab-agent-plugins-0.4.0-alpha.1.zip",
+    "published": false,
+    "installation_receipt": "work/research-install/receipt.json",
+    "final_repack_changes_after_install": "Verification metadata only; runtime and skill bytes matched current source"
+  },
+  "unversioned_revision": "research-followup-and-team-usage-record",
+  "research_behavior_evals": {
+    "authored_cases": 4,
+    "path": "evals/research",
+    "executed_cases": 0,
+    "judge_calls": 0,
+    "benefit_established": false
+  },
+  "research_example": {
+    "context": "examples/research/synthetic-context.json",
+    "local_plan": "work/research-demo-final/RESEARCH.md",
+    "evidence_type": "synthetic",
+    "real_research_observations": 0
+  }
+}

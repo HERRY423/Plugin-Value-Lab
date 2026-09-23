@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "type": "plugin_usage_card",
+  "plugin": {
+    "name": "example-plugin",
+    "version": "0.0.0-demo"
+  },
+  "study_id": "tutorial-value-study",
+  "verdict": "SIMULATION_ONLY",
+  "status": "TRIAL_GUIDANCE_ONLY",
+  "scope": {
+    "plugin": {
+      "name": "example-plugin",
+      "version": "0.0.0-demo"
+    },
+    "suite_sha256": "c4727c53139b2051495e911dea84e923fcda5f25e0cf1496fe2da9e5632fad42",
+    "records_sha256": "a70687cbbc3fc226677b4bb2ebfb114dcb3f57630ed335ca6d14973a90a4eb77",
+    "conditions_sha256": "eb9bd8566defb2dc67fee1852aa7d39c2d8a1034d43f3b6ee95b0c483265c5ec",
+    "conditions": {
+      "model": "SIMULATED-NO-MODEL",
+      "host": "offline-tutorial",
+      "tools": [],
+      "environment": "synthetic-fixture-v1",
+      "budget": {
+        "max_turns": 10
+      }
+    },
+    "case_ids": [
+      "structured-delivery",
+      "unrelated-request",
+      "insufficient-science"
+    ],
+    "objective": "quality",
+    "policy": {
+      "min_quality_delta": 0.1,
+      "quality_floor": 0.8,
+      "max_case_regression": 0,
+      "min_clusters": 3,
+      "require_cost_saving": true,
+      "human_hourly_usd": 60
+    },
+    "decision_scope": "仅限本次提交的具体任务及固定条件；不会自动外推到同类或新任务。"
+  },
+  "use_when": [],
+  "prefer_baseline_when": [],
+  "investigate": [
+    {
+      "case_id": "structured-delivery",
+      "prompt": "Deliver a task result with a source reference and explicit limitations.",
+      "reason": "包含合成演示，不能转化为实际使用建议。",
+      "quality_delta": 0.8333333333333334,
+      "cost_delta_usd": -0.9899999999999998,
+      "with_score": 1.0,
+      "without_score": 0.16666666666666666,
+      "run_counts": {
+        "planned_runs": 6,
+        "observed_runs": 6,
+        "failed_runs": 0,
+        "missing_runs": 0,
+        "skipped_runs": 0,
+        "runs_with_issues": 0
+      }
+    },
+    {
+      "case_id": "unrelated-request",
+      "prompt": "What is 2 + 2? Give only the number.",
+      "reason": "包含合成演示，不能转化为实际使用建议。",
+      "quality_delta": 0.0,
+      "cost_delta_usd": -0.9899999999999998,
+      "with_score": 1.0,
+      "without_score": 1.0,
+      "run_counts": {
+        "planned_runs": 6,
+        "observed_runs": 6,
+        "failed_runs": 0,
+        "missing_runs": 0,
+        "skipped_runs": 0,
+        "runs_with_issues": 0
+      }
+    },
+    {
+      "case_id": "insufficient-science",
+      "prompt": "Do passing local software tests prove clinical effectiveness? Explain the evidence limit.",
+      "reason": "包含合成演示，不能转化为实际使用建议。",
+      "quality_delta": 0.6666666666666667,
+      "cost_delta_usd": -0.9899999999999998,
+      "with_score": 1.0,
+      "without_score": 0.3333333333333333,
+      "run_counts": {
+        "planned_runs": 6,
+        "observed_runs": 6,
+        "failed_runs": 0,
+        "missing_runs": 0,
+        "skipped_runs": 0,
+        "runs_with_issues": 0
+      }
+    }
+  ],
+  "next_steps": [
+    "先冻结真实任务、两组相同的授权输入及比较条件，再收集真实运行和完整成本。",
+    "合成案例只用于演练记录和判读流程。",
+    "安装、连接、权限或卸载需求交由宿主及 Plugin Management 处理；本卡不授予任何变更权限。"
+  ],
+  "refresh_when": [
+    "插件版本、配置、权限或依赖变化时重新核验。",
+    "模型、宿主、工具、运行环境或资源预算变化时重新核验。",
+    "任务、输入数据、数据访问范围、评分标准或质量与效率目标变化时重新比较。",
+    "出现新的失败、回退、人工纠正或成本证据时复核；此清单不创建定时监控。"
+  ],
+  "source": {
+    "evidence_type": "synthetic",
+    "evidence_level": "SIMULATION_ONLY",
+    "evaluation_recomputed": true,
+    "comparison_eligible": true,
+    "measured_verdict": "PROMISING_LOCAL_SIGNAL",
+    "provenance": {
+      "suite_sha256": "c4727c53139b2051495e911dea84e923fcda5f25e0cf1496fe2da9e5632fad42",
+      "records_sha256": "a70687cbbc3fc226677b4bb2ebfb114dcb3f57630ed335ca6d14973a90a4eb77",
+      "engine": "plugin-value-lab/0.2.0-alpha.1",
+      "local_lock": {
+        "schema_version": 1,
+        "suite_sha256": "c4727c53139b2051495e911dea84e923fcda5f25e0cf1496fe2da9e5632fad42",
+        "frozen_at": "2026-09-22T13:26:41.713459+00:00",
+        "expected_runs": 18,
+        "attestation": "LOCAL_CONSISTENCY_ONLY"
+      },
+      "hash_scope": "Byte consistency only; no proof of execution, authorship, or preregistration time"
+    },
+    "summary": {
+      "with_score": 1.0,
+      "without_score": 0.5,
+      "quality_delta": 0.5,
+      "expected_runs": 18,
+      "observed_runs": 18,
+      "submitted_records": 18,
+      "complete_pairs": 9,
+      "clusters": 3,
+      "cost_delta_usd": -0.9899999999999998,
+      "with_cost_usd": 1.02,
+      "without_cost_usd": 2.01,
+      "cost_unit": "mean per planned arm execution; positive delta costs more",
+      "quality_gate_met": true,
+      "cost_gate_met": true,
+      "objective": "quality",
+      "critical_failures": [],
+      "comparison_eligible": true
+    },
+    "run_counts": {
+      "planned_runs": 18,
+      "observed_runs": 18,
+      "failed_runs": 0,
+      "missing_runs": 0,
+      "skipped_runs": 0,
+      "runs_with_issues": 0
+    },
+    "blockers": [],
+    "warnings": [
+      "Costs must include retries, model judges, setup, correction and review allocated consistently; omitted categories cannot be inferred"
+    ],
+    "claim_limits": {
+      "causal_benefit": "NOT_ESTABLISHED",
+      "external_validation": "NOT_ESTABLISHED",
+      "scientific_authorization": "NONE",
+      "independence": "DECLARED_NOT_VERIFIED",
+      "decision_scope": "Descriptive within the frozen submitted task suite only",
+      "human_time": "Declared timer records; authenticity not independently verified",
+      "costs": "Submitted USD values; estimates are not settled charges"
+    },
+    "authenticity_verified": false
+  },
+  "limitations": [
+    "使用卡是观察范围内的临时参考，不是插件的通用质量认证或长期有效承诺。",
+    "来源、外部参与者、任务独立性与人工计时均为提交者声明；程序重算和哈希不证明数据真实性、实际执行或独立验证。",
+    "本地增益信号不建立因果收益、外部适用性或科学与临床有效性；科研结论仍需领域证据和研究者判断。",
+    "成本来自提交记录及人工费率折算；均值按每个案例每组的计划运行计算，估算费用不等于已结算支出。",
+    "基线足够的观察不构成自动停用、卸载、扩权或修改其他插件的授权。",
+    "原始任务文字保留在本地卡片中；向他人分享前应由用户检查其中的私有资料。"
+  ]
+}
