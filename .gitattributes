@@ -1,0 +1,2 @@
+# Preserve frozen file hashes and byte-identical marketplace copies on every OS.
+* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

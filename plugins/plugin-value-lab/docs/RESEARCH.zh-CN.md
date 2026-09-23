@@ -1,10 +1,12 @@
 # 研究方向诊断：从背景材料到下一步可检验的决定
 
+默认关闭。CLI 需在子命令前添加 `--enable-extensions`；工作台与 MCP 也使用该启动开关。研究技能已移至 `extensions/research-directions/SKILL.md`，不再自动发现。见[范围与启用说明](STRUCTURAL-RISKS.zh-CN.md)。
+
 > 实验性扩展：整理研究推理，不提供插件边际价值的实测证据。核心流程是科研场景、匹配对照、产物验证与价值登记。
 
-这项能力帮助研究者回答：“我现在真正缺少什么？哪一步最值得先做？看到什么结果后应该改变方向？”它把插件的作用从评估一次执行的好坏，扩展到研究开始前和研究过程中的问题诊断。版本仍为 `0.4.0-alpha.1`。
+这项能力帮助研究者回答：“我现在真正缺少什么？哪一步最值得先做？看到什么结果后应该改变方向？”它把插件的作用从评估一次执行的好坏，扩展到研究开始前和研究过程中的问题诊断。此扩展保留在 0.5.0 中，仍须显式启用。
 
-它由两部分共同完成：宿主 Agent 阅读已授权材料、进行领域推理并形成方向；本地工具校验提交对象、整理证据与依赖、显示资源限制和修订差异。本地程序不调用模型，也不会仅根据关键词生成科学见解。安装后技能可被宿主选用；安装动作本身不会启动分析、监控文件或检索文献。
+它由两部分共同完成：宿主 Agent 阅读已授权材料、进行领域推理并形成方向；本地工具校验提交对象、整理证据与依赖、显示资源限制和修订差异。本地程序不调用模型，也不会仅根据关键词生成科学见解。显式启用并选用扩展技能后，宿主才可使用该流程；安装动作本身不会启动分析、监控文件或检索文献。
 
 [Claude Code Plugin evals 官方文档](https://code.claude.com/docs/en/plugin-evals) 描述的重点是评估套件、评分、回归检查和无插件基线。本功能增加的是“该研究下一步应该理解什么、补什么证据”的工作流程；这是一项产品范围上的补充，不表示 Claude 的其他工具或生态没有研究辅助能力。
 
@@ -109,8 +111,8 @@ MCP 工具名为 `research_direction_advisor`，支持 `action="diagnose"`、`"e
 从插件根目录运行，或将脚本换成实际绝对路径：
 
 ```powershell
-python scripts/value_lab.py research-plan .\context.json --output .\work\research-plan
-python scripts/value_lab.py research-compare .\before-context.json .\after-context.json --output .\work\research-comparison.json
+python scripts/value_lab.py --enable-extensions research-plan .\context.json --output .\work\research-plan
+python scripts/value_lab.py --enable-extensions research-compare .\before-context.json .\after-context.json --output .\work\research-comparison.json
 ```
 
 第一条校验并整理已经写入上下文的分析，在尚不存在或空的输出目录写入 `research-plan.json` 和 `RESEARCH.md`；已有非空目录不会被覆盖。第二条比较两份提交的上下文，写入指定比较文件。它们不自动检索文献、不运行实验、不安装插件、不扣款，也不替研究者作出批准。
@@ -118,7 +120,7 @@ python scripts/value_lab.py research-compare .\before-context.json .\after-conte
 当一项提议的检查有了新结果，单独保存一份 `update.json`，包含 `direction_id`、`result`、`source`、`signal` 和 `interpretation`。`signal` 只能是 `supports_favored`、`supports_rival`、`inconclusive` 或 `conflicting`；这是提交者的初步判断。运行：
 
 ```powershell
-python scripts/value_lab.py research-followup .\context.json .\update.json --output .\work\followup-1.json
+python scripts/value_lab.py --enable-extensions research-followup .\context.json .\update.json --output .\work\followup-1.json
 ```
 
 结果列出该方向、依赖它的下游方向及共享依据的方向，供研究者逐项重新审视。它不会修改原上下文、确认实验成功或解锁依赖。研究者确认后，再另存修订的上下文并用 `research-compare` 比较。工作台“有了新结果”提供相同的本地检查入口。

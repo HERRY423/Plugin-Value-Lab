@@ -319,14 +319,27 @@ def verify_collection(directory):
     suite = load_json(root / "suite.json")
     if suite_digest(suite) != plan["suite_sha256"] or plan["schedule"] != schedule(suite):
         raise ValidationError("Collection plan no longer matches suite")
+    if (load_json(root / "protocol.lock.json").get("suite_sha256") != plan["suite_sha256"] or
+            load_json(root / "execution-started.json").get("plan_sha256") != digest(root / "plan.json")):
+        raise ValidationError("Executed plan or protocol lock changed")
+    if hashes(root / "plugin") != plan["plugin_files"]:
+        raise ValidationError("Collected plugin snapshot changed")
+    for name, expected in plan.get("input_files", {}).items():
+        if digest(confined(root / "inputs", name)) != expected:
+            raise ValidationError("Collected input snapshot changed")
     records = load_records(root / "runs.jsonl")
     if len(records) > len(plan["schedule"]):
         raise ValidationError("More collected runs than planned")
+    sessions = set()
     for i, record in enumerate(records):
         ref = record.get("collection_receipt")
         if not isinstance(ref, dict) or set(ref) != {"path", "sha256"}:
             raise ValidationError("Run lacks a collection receipt")
         path = confined(root, ref["path"])
+        planned = plan["schedule"][i]
+        run_dir = root / "runs" / f"{i + 1:04d}-{planned['case_id']}-{planned['arm']}"
+        if path != run_dir / "collection-receipt.json":
+            raise ValidationError("Collection receipt does not identify the planned run directory")
         if digest(path) != ref["sha256"]:
             raise ValidationError("Collection receipt changed")
         receipt = load_json(path)
@@ -342,6 +355,49 @@ def verify_collection(directory):
         for artifact in record["artifacts"].values():
             if digest(confined(root, artifact["path"])) != artifact["sha256"]:
                 raise ValidationError("Collected output changed")
+        if (record.get("source") != "codex" or record.get("suite_sha256") != plan["suite_sha256"] or
+                record.get("requested_conditions") != suite["conditions"]):
+            raise ValidationError("Record source or requested conditions changed")
+        # The native event schema does not observe these fields. A later human
+        # supplement must be a separate reviewed revision, never a silent edit.
+        if record.get("conditions") is not None or record.get("plugin_loaded") is not None:
+            raise ValidationError("Unobserved model/plugin identity was promoted from requested settings")
+        if record.get("cost") != {"model_usd": None, "tool_usd": None, "human_minutes": None, "basis": "estimate"} or record.get("human_intervals") is not None:
+            raise ValidationError("Unknown native costs or human time were silently replaced")
+        required_issues = ["CLI requested settings do not independently establish observed model/tools/conditions",
+                           "Plugin installation is not proof of actual model-side loading or uncontaminated baseline"]
+        if record.get("import_issues") != required_issues:
+            raise ValidationError("Native evidence limitations changed")
+        case = next(c for c in suite["cases"] if c["id"] == planned["case_id"])
+        if record["input_sha256"] != case.get("inputs", {}):
+            raise ValidationError("Run input contract differs from frozen case")
+        for name, expected in case.get("inputs", {}).items():
+            if digest(confined(run_dir / "workspace", name)) != expected:
+                raise ValidationError("Executed workspace input changed")
+        if (run_dir / "home/auth.json").exists():
+            raise ValidationError("Temporary credential copy was not removed")
+        if "receipt.json" in receipt["files"]:
+            native = parse_events(run_dir / "events.jsonl")
+            process = load_json(run_dir / "receipt.json")
+            expected_status = "timeout" if process["timed_out"] else "completed" if process["exit_code"] == 0 and native["completed"] else "error"
+            for field, expected in (("output", native["output"]), ("session_id", native["session_id"]),
+                                    ("token_usage", native["usage"]), ("status", expected_status),
+                                    ("duration_seconds", process["duration_seconds"])):
+                if suite_digest(record.get(field)) != suite_digest(expected):
+                    raise ValidationError("Record differs from native execution evidence: " + field)
+            if process["source_sha256"] != (digest(run_dir / "events.jsonl") if (run_dir / "events.jsonl").exists() else None):
+                raise ValidationError("Native event commitment changed")
+            if native["session_id"] in sessions:
+                raise ValidationError("Native session reused")
+            if native["session_id"] is not None:
+                sessions.add(native["session_id"])
+            answer = record["artifacts"].get("answer")
+            if native["output"] is not None and (not answer or confined(root, answer["path"]).read_text(encoding="utf-8") != native["output"]):
+                raise ValidationError("Scored answer differs from native output")
+            if (run_dir / "prompt.txt").read_text(encoding="utf-8") != case["prompt"]:
+                raise ValidationError("Executed prompt changed")
+        elif record.get("output") is not None or record.get("session_id") is not None or record.get("status") != "error":
+            raise ValidationError("Installation failure cannot supply a successful model result")
     return {"status": "LOCAL_BYTES_CONSISTENT", "records": len(records), "planned": len(plan["schedule"]),
             "missing": len(plan["schedule"]) - len(records), "complete": len(records) == len(plan["schedule"]),
             "observed_identity_authenticated": False, "benefit_established": False}

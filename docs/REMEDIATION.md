@@ -1,5 +1,7 @@
 # Screenshot remediation — versions unchanged
 
+本页下方是较早修复的历史记录；其中零真实运行和旧测试数量不代表当前状态。三个结构性风险的最新处理见[本次记录](STRUCTURAL-RISKS.zh-CN.md)，当前验收见 `VERIFICATION.json`。本页所述历史修复未增加版本；当前 0.5.0 的验收见 `VERIFICATION.json`。
+
 This revision keeps the product at `0.4.0-alpha.1` and the Python package at `0.4.0a1`.
 
 | Screenshot issue | Implemented change | Remaining evidence gap |
@@ -8,7 +10,7 @@ This revision keeps the product at `0.4.0-alpha.1` and the Python package at `0.
 | Only four simple graders | DE-table/BH, per-cell label, h5ad and typed JSON artifact checks; pinned Python executable verifier; CLI evaluation and usage/comparison integration | Computational contracts do not establish biological validity; reference quality and independent scientific review remain external requirements. |
 | Product identity drift | Evaluation-focused English/Chinese README and plugin manifests; research and team records moved to optional supporting workflows | Existing auxiliary capabilities are retained for compatibility. |
 | Claude-only execution | Codex CLI prepare/run adapter with frozen inputs, isolated per-run homes/workspaces, raw JSONL events, sessions, outputs, failure retention and unknown-cost handling | No completed Codex model evaluation or cross-host study yet. Requested configuration and installation do not prove actual model/plugin loading. |
-| Arena overlap | Explicit decision-layer versus host-layer boundary and hash-bound `link-decision-evidence` command | User requested no Arena repository work. Its actual schema/integration has not been verified; no score pooling or compatibility claim. |
+| Arena reference | Epistemic Plugin Arena is explicitly a future outlook; current evidence boundaries stand independently. `link-decision-evidence` remains generic. | No established external Arena project, integration or compatibility is claimed. |
 | Distribution/engineering | Portable installation instructions, bilingual entry docs, Windows/Linux Python 3.11/3.13 CI, manual existing-tag draft release workflow, distribution inventory includes LICENSE | Hosted CI and GitHub Release have not been run/published. Workflows are ready for review; no version, tag or public release was created. |
 
 ## Local acceptance

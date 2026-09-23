@@ -1,0 +1,14 @@
+{
+  "design": {
+    "path": "independent-design.json",
+    "sha256": "90ad14b473891bdde69b89f2fa95f5299d05f831479091972f21ff4ab1afc4a9"
+  },
+  "data": {
+    "path": "independent-measurements.csv",
+    "sha256": "074ae6561893a4401b05befa72ffb7e02d4ab2824b84190221654ebb8b120517"
+  },
+  "alpha": 0.1,
+  "minimum_effect": 1,
+  "absolute": 1e-10,
+  "relative": 1e-10
+}

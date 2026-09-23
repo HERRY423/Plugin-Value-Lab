@@ -23,6 +23,11 @@ def contrast(left, right, suites, *, axis):
         raise ValidationError("Contrast axis must be host, plugin or model")
     a, b = suites[left["entry_id"]], suites[right["entry_id"]]
     reasons = []
+    if axis == "host":
+        for suite in (a, b):
+            for field in ("host_version", "model_version"):
+                if not isinstance(suite["conditions"].get(field), str) or not suite["conditions"][field].strip():
+                    reasons.append("Cross-host comparison requires explicit observed host and model versions, not aliases alone")
     if suite_digest(_basis(a)) != suite_digest(_basis(b)):
         reasons.append("Task, input, truth, policy, repeats or evidence type changed")
     if a["plugin"]["name"] != b["plugin"]["name"]:

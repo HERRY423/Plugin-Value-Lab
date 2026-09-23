@@ -18,7 +18,7 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
                 available = await session.list_tools()
                 self.assertEqual({t.name for t in available.tools}, {"validate_value_suite", "evaluate_plugin_value",
                                                                    "inspect_claude_eval", "example_value_suite",
-                                                                   "plan_plugin_use", "build_plugin_usage_card", "research_direction_advisor"})
+                                                                   "plan_plugin_use", "build_plugin_usage_card"})
                 result = await session.call_tool("example_value_suite", {})
                 self.assertFalse(result.isError)
                 import json
@@ -40,6 +40,19 @@ class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(card_data["use_when"], [])
                 bad = await session.call_tool("validate_value_suite", {"suite": {"schema_version": 2}})
                 self.assertTrue(bad.isError)
+                disabled = await session.call_tool("research_direction_advisor", {"action": "example"})
+                self.assertTrue(disabled.isError)
+
+    async def test_extensions_require_explicit_opt_in(self):
+        from mcp import ClientSession, StdioServerParameters
+        from mcp.client.stdio import stdio_client
+        import json
+        root = Path(__file__).resolve().parents[1]
+        params = StdioServerParameters(command=sys.executable, args=[str(root / "scripts/value_lab.py"), "--enable-extensions", "serve"])
+        async with stdio_client(params) as streams:
+            async with ClientSession(*streams) as session:
+                await session.initialize()
+                self.assertEqual(len((await session.list_tools()).tools), 7)
                 example = await session.call_tool("research_direction_advisor", {"action": "example"})
                 self.assertFalse(example.isError)
                 research_context = json.loads(example.content[0].text)

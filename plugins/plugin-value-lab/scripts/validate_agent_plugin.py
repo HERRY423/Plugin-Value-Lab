@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import re
 import sys
+import tomllib
 
 SCHEMAS = Path(__file__).resolve().parents[1] / "schemas/agent-plugins/1.0.0"
 
@@ -27,6 +28,13 @@ def validate(root):
         Draft202012Validator.check_schema(schema)
         Draft202012Validator(schema).validate(objects[name])
     manifest, mcp = objects["plugin"], objects["mcp"]
+    package_version = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+    python_version = re.sub(r"-alpha\.", "a", manifest["version"])
+    python_version = re.sub(r"-beta\.", "b", python_version)
+    python_version = re.sub(r"-rc\.", "rc", python_version)
+    runtime = (root / "value_lab/__init__.py").read_text(encoding="utf-8")
+    if package_version != python_version or not re.search(r'^__version__ = "' + re.escape(manifest["version"]) + r'"$', runtime, re.M):
+        raise ValueError("Python package/runtime and plugin version drift")
     skills = []
     for directory in sorted((root / "skills").iterdir()):
         path = directory / "SKILL.md"
@@ -43,8 +51,8 @@ def validate(root):
         if not re.search(r"^description: .+", front[1], re.M):
             raise ValueError("Skill description missing")
         skills.append(directory.name)
-    if set(skills) != {"assess-value", "use-plugin-well", "research-directions"}:
-        raise ValueError("Expected evaluation, plugin-use and research-directions skills")
+    if set(skills) != {"assess-value", "use-plugin-well"}:
+        raise ValueError("Expected only evaluation and plugin-use skills in default discovery")
     for server in mcp["mcpServers"].values():
         if server["type"] != "stdio":
             raise ValueError("This release expects local stdio only")
@@ -58,7 +66,7 @@ def validate(root):
         if not launcher.is_file() or not launcher.resolve().is_relative_to(root):
             raise ValueError("Bundled launcher missing or outside plugin root")
     # Validate every bundled path, including links not seen during fixed discovery.
-    for directory in ("skills", "scripts", "value_lab", "com.openai"):
+    for directory in ("skills", "extensions", "scripts", "value_lab", "com.openai"):
         for path in (root / directory).rglob("*"):
             if not path.resolve().is_relative_to(root):
                 raise ValueError(f"Path escapes plugin root: {path}")

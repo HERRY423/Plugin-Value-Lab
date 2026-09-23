@@ -17,7 +17,7 @@ async def check(receipt):
     assert manifest["name"] == installed["name"] == "plugin-value-lab"
     assert manifest["version"] == installed["version"]
     skills = sorted(path.parent.name for path in (root / "skills").glob("*/SKILL.md"))
-    assert skills == ["assess-value", "research-directions", "use-plugin-well"]
+    assert skills == ["assess-value", "use-plugin-well"]
     config = json.loads((root / "mcp.json").read_text(encoding="utf-8"))["mcpServers"]["plugin-value-lab"]
     command = shutil.which(config["command"]) or config["command"]
     args = [arg.replace("${PLUGIN_ROOT}", str(root)) for arg in config["args"]]
@@ -30,7 +30,8 @@ async def check(receipt):
             await session.initialize()
             tools = await session.list_tools()
             names = sorted(tool.name for tool in tools.tools)
-            assert len(names) == 7
+            assert len(names) == 6
+            assert "research_direction_advisor" not in names
             example = await session.call_tool("example_value_suite", {})
             assert not example.isError
             assert json.loads(example.content[0].text)["real_observations"] == 0
@@ -39,11 +40,6 @@ async def check(receipt):
                 "native_fit": "sufficient", "plugin_management_available": False}})
             assert not planned.isError
             assert json.loads(planned.content[0].text)["route"] == "USE_NATIVE"
-            example_context = await session.call_tool("research_direction_advisor", {"action": "example"})
-            assert not example_context.isError
-            diagnosis = await session.call_tool("research_direction_advisor", {"action": "diagnose", "context": json.loads(example_context.content[0].text)})
-            assert not diagnosis.isError
-            assert json.loads(diagnosis.content[0].text)["status"] == "RESEARCH_DIAGNOSIS_ONLY"
     return {"installed_version": manifest["version"], "cached_launcher": str(root / "scripts/value_lab.py"),
             "manifest_sha256": hashlib.sha256((root / "plugin.json").read_bytes()).hexdigest(),
             "tools": names, "skill_files": skills, "mcp_initialize_list_and_calls": "passed", "cached_cli_version": "passed",

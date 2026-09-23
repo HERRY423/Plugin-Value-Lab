@@ -1,40 +1,40 @@
 # Plugin Value Lab
 
-在匹配条件下，测量并登记科研 Agent 插件的边际价值。
+帮助插件作者从配对运行中定位问题，修复后进行公平复测。
 
-Measure and register the marginal value of scientific agent plugins under matched conditions.
+Compare plugin runs, locate failures and retest repairs under matched conditions.
 
 [English](README.md) · [安装](docs/INSTALL.zh-CN.md) · [本次修复状态](docs/REMEDIATION.md)
 
-版本保持 **0.4.0-alpha.1**。配对评分提供测量能力，长期积累的是领域任务、实测账本和外部贡献。目前没有认证独立复核，也未建立外部采用。
+当前版本 **0.5.0**。新增[独立样本科研推断重算](docs/REPLICATE-VERIFICATION.zh-CN.md)：检查供体单位、批次与配对，重算效应、精确检验和完整多重校正。配对评分提供测量能力，长期积累的是领域任务、实测账本和外部贡献。目前没有认证独立复核，也未建立外部采用。
 
-## 开始积累四类资产
+## 先交付一份可用的作者改进清单
 
-[阶段二已增加](docs/PHASE2.md)：跨宿主方案矩阵、Codex 采集凭据核验、可比条件下的 Δ 差异与纵向下降提醒、非作者签名复核门槛，以及只读签名网页快照。外部候选和未发送的邀请草稿见[试点接入](docs/EXTERNAL-PILOT-INTAKE.md)。这不代表已经完成真实跨宿主研究或公开部署。
+已有记录可直接生成逐任务、逐组、逐次运行的失败与未知清单，并保留完整任务、阈值和负面对照来准备复测。工作台同步展示清单，提供复制原方案、比较两轮研究的入口。**无需加入登记处、公开排名或申请认证。**
 
-- **场景语料**：8 个可执行合成案例、4 个任务族，开发/留出按任务族分隔，答案独立保管；公开种子不是保密 benchmark。
-- **价值账本**：按插件、版本与内容摘要、模型、宿主和时间保留研究快照，同时报告“放行不足证据”和“误拒合理分析”。
-- **交换协议**：研究包可导出、核验并离线重算；供其他插件作者采用，尚不称为行业标准。
-- **复核记录**：真实评审绑定具体快照，保留利益冲突、异议与复现实验链接，自报身份不升级为独立认证。
+作者价值仍是假设：是否减少准备和人工修正负担，需要真实对照计时与反馈。下一阶段只推进一个自愿外部作者的窄任务修复循环；证据未建立前，不继续扩张研究规划、团队协作或平台功能。见[三个结构性风险的处理与验收边界](docs/STRUCTURAL-RISKS.zh-CN.md)。
 
-使用 `corpus-seed`、`registry-add`、`registry-view`、`registry-review` 等本地入口。完整命令、模板和证据边界见[登记表与选用协议](docs/REGISTRY.zh-CN.md)。这些入口不启动模型、不发布结果。
+## 登记处是可选本地账本
 
-补证可用 `registry-add --parent ... --revision-reason ...` 保存新修订，旧版和异议继续保留；修订数量不充当新增实测。交接时用 `registry-export --with-reviews` 携带复核快照，再用 `registry-verify --expected-id ...` 核对单独保存的摘要。
+保留原始研究、负面与失败、补证修订、异议和可重算研究包。现在页面及 JSON 明确显示“空白 / 仅合成 / 本地试点 / 自报外部提交待核验”阶段，始终标为**暂定交换格式**，不自动升级成可信证据层。补证修订不增加独立样本；哈希、签名和自报身份不证明采用。
+
+[登记流程](docs/REGISTRY.zh-CN.md)可在确有保存或交接需求时使用。本地诊断不依赖外部网络已经建成。
 
 ## 先跑通本地流程
 
 新增[科研验证器与场景包](docs/SCIENTIFIC-VALIDATION.md)：结构、数值、弃答双向错误、后端身份和容器执行检查均接入离线评分；[CellTypePilot 首个真实研究协议](docs/CELLTYPEPILOT-PILOT.md)仍待数据与宿主采集条件就绪。
 
-`research-directions` 与 `team-card` 保留为实验性扩展，不属于核心科研价值测量能力。
+研究建议与团队记录默认关闭；CLI、MCP、工作台均需显式添加 `--enable-extensions` 启动。研究技能移至 `extensions/`，退出默认发现；默认保留 6 个 MCP 工具和 2 个技能，兼容源码与旧记录保留。
 
 需要 Python 3.11+。在实际源码或解压后的插件目录运行，无需固定安装路径：
 
 ```sh
 python scripts/value_lab.py doctor
 python scripts/value_lab.py demo --output work/demo-1
+python scripts/value_lab.py usage-card work/demo-1/suite.json work/demo-1/runs.jsonl --lock work/demo-1/protocol.lock.json --output work/author-card
 ```
 
-打开生成的 `work/demo-1/report.html`。演示明确标记为模拟，不调用模型。
+打开 `work/author-card/USAGE.md` 查看改进清单，`work/demo-1/report.html` 查看原始评分。演示明确标记为模拟，不调用模型。
 
 真实评估应先冻结方案，再收集两组独立会话的原始记录：
 
@@ -51,6 +51,8 @@ python scripts/value_lab.py evaluate suite.json runs.jsonl --lock protocol.lock.
 
 ## 两种执行入口
 
+[跨宿主、科研验证与可回放证据的严谨性](docs/RIGOR.zh-CN.md)：统一原生采集核验、完整检验基因集合、预设双向错误上限，以及不执行评分器的重放预检与环境核对。它们已经接入评估和登记流程，真实跨宿主收益仍须实际研究建立。
+
 - Claude：`python scripts/value_lab.py workbench` 启动本地工作台，准备后授权一次原生执行。
 - Codex：`prepare-codex` 冻结，`run-codex` 执行；保存独立会话、原始事件、输出、安装记录和 token 用量。[执行说明](docs/CODEX.md)。
 
@@ -60,7 +62,11 @@ python scripts/value_lab.py evaluate suite.json runs.jsonl --lock protocol.lock.
 
 以 [VERIFICATION.json](VERIFICATION.json) 和 [修复记录](docs/REMEDIATION.md) 为准。本地测试使用构造数据；真实模型调用、真实研究与独立验证分别记录。审批未放行的执行不会算成已运行。
 
-Arena 等离线决策评测属于决策层，Value Lab 属于宿主运行层。新增 `link-decision-evidence` 可保留两层材料的引用与摘要，不合并分数，也不要求安装另一个仓库。[职责边界](docs/EVIDENCE-LAYERS.md)。
+报告新增任务成功率提升、挽救失败与引入失败、普通任务与弃答分层、节省人工时间及每次成功的完整成本。样本量规划按独立任务族计算；成本类别齐全与结算引用分开核验。[正向价值指标与验证设计](docs/VALUE-METRICS.zh-CN.md)。
+
+## 后续展望：Epistemic Plugin Arena
+
+**Epistemic Plugin Arena 是后续研究与产品构想**，不作为已经存在的外部项目、当前依赖或已集成基准。未来若形成公开规范、实现与验证材料，可探索离线行动选择评估与真实宿主结果的互补。当前 `link-decision-evidence` 只是通用材料引用与摘要绑定工具，不能证明 Arena 集成，也不合并两层分数。[当前边界与未来条件](docs/EVIDENCE-LAYERS.md)。
 
 ## 深入使用
 

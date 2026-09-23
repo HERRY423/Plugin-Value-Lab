@@ -57,7 +57,7 @@ def doctor():
             "optional_mcp_available": importlib.util.find_spec("mcp") is not None,
             "claude_executable": claude, "claude_version": version,
             "codex_executable": codex, "codex_version": codex_version,
-            "artifact_verifiers": ["json_fields", "de_table", "labels", "h5ad", "executable", "artifact_schema", "numeric_tolerance", "abstention_correct", "over_refusal", "backend_identity", "exec", "scenario"],
+            "artifact_verifiers": ["json_fields", "de_table", "labels", "h5ad", "executable", "artifact_schema", "numeric_tolerance", "abstention_correct", "over_refusal", "backend_identity", "exec", "scenario", "replicate_effect"],
             "optional_h5ad_available": importlib.util.find_spec("anndata") is not None,
             "native_eval_executed": False, "host_plugin_installation_verified": False,
             "notes": ["Core, reports and review packets use only the Python standard library.",
@@ -65,7 +65,10 @@ def doctor():
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Plugin Value Lab — evidence-bounded paired evaluation")
+    extension_parser = argparse.ArgumentParser(add_help=False)
+    extension_parser.add_argument("--enable-extensions", action="store_true", help="Opt into research and team workflows; place before the command")
+    extension_options, _ = extension_parser.parse_known_args(argv)
+    parser = argparse.ArgumentParser(description="Plugin Value Lab — paired evaluation, diagnosis and retest", parents=[extension_parser])
     parser.add_argument("--version", action="version", version=__version__)
     subs = parser.add_subparsers(dest="command", required=True)
     for name in ("init", "demo"):
@@ -88,6 +91,10 @@ def main(argv=None):
     p.add_argument("pack")
     p.add_argument("--inputs")
     p.add_argument("--scorers")
+    p = subs.add_parser("replicate-reference", help="Recompute a bounded scientific reference from frozen independent-unit data; no model calls")
+    p.add_argument("spec", help="replicate_effect verifier specification JSON")
+    p.add_argument("--verifiers", required=True)
+    p.add_argument("--output", required=True, help="New empty directory for reference.json and design-audit.json")
     p = subs.add_parser("scenario-prepare", help="Prepare a suite with opaque private scorer commitments")
     p.add_argument("pack")
     p.add_argument("--template", required=True)
@@ -149,6 +156,13 @@ def main(argv=None):
     p.add_argument("bundle")
     p.add_argument("--corpus")
     p.add_argument("--verifiers")
+    p.add_argument("--expected-id", help="Pin the separately retained study/packet identity before any verifier execution")
+    p.add_argument("--require-same-environment", action="store_true")
+    p = subs.add_parser("registry-replay-plan", help="Inspect replay dependencies and environment without executing scorers")
+    p.add_argument("bundle")
+    p.add_argument("--corpus")
+    p.add_argument("--verifiers")
+    p.add_argument("--expected-id")
     p = subs.add_parser("check-rules")
     p.add_argument("suite")
     p.add_argument("--samples")
@@ -201,6 +215,8 @@ def main(argv=None):
     p.add_argument("--auth-home", required=True)
     p = subs.add_parser("verify-codex-collection", help="Verify native collection receipt and artifact bytes without model calls")
     p.add_argument("study")
+    p = subs.add_parser("verify-host-study", help="Verify either supported native collector under one evidence contract")
+    p.add_argument("study")
     p = subs.add_parser("link-decision-evidence", help="Bind an offline decision benchmark to a host study without promoting its evidence")
     p.add_argument("study")
     p.add_argument("artifact")
@@ -229,27 +245,28 @@ def main(argv=None):
     p.add_argument("--artifacts")
     p.add_argument("--verifiers")
     p.add_argument("--output", required=True)
-    p = subs.add_parser("research-plan", help="Validate research gaps and plan evidence-linked next tests")
-    p.add_argument("context")
-    p.add_argument("--output", required=True)
-    p = subs.add_parser("research-example", help="Emit a synthetic research context; no observations")
-    p = subs.add_parser("research-compare", help="Compare research context revisions, not scientific truth")
-    p.add_argument("before")
-    p.add_argument("after")
-    p.add_argument("--output", required=True)
-    p = subs.add_parser("research-followup", help="Locate directions to revisit after a submitted result")
-    p.add_argument("context")
-    p.add_argument("update")
-    p.add_argument("--output", required=True)
-    p = subs.add_parser("team-card", help="Create a new immutable team usage-card revision")
-    p.add_argument("suite")
-    p.add_argument("records")
-    p.add_argument("--lock")
-    p.add_argument("--cost-ledger")
-    p.add_argument("--decision", required=True, help="JSON with actor, choice and rationale")
-    p.add_argument("--research", help="Current research context JSON")
-    p.add_argument("--previous", help="Previous team record JSON; omit for the first revision")
-    p.add_argument("--output", required=True)
+    if extension_options.enable_extensions:
+        p = subs.add_parser("research-plan", help="Validate research gaps and plan evidence-linked next tests")
+        p.add_argument("context")
+        p.add_argument("--output", required=True)
+        p = subs.add_parser("research-example", help="Emit a synthetic research context; no observations")
+        p = subs.add_parser("research-compare", help="Compare research context revisions, not scientific truth")
+        p.add_argument("before")
+        p.add_argument("after")
+        p.add_argument("--output", required=True)
+        p = subs.add_parser("research-followup", help="Locate directions to revisit after a submitted result")
+        p.add_argument("context")
+        p.add_argument("update")
+        p.add_argument("--output", required=True)
+        p = subs.add_parser("team-card", help="Create a new immutable team usage-card revision")
+        p.add_argument("suite")
+        p.add_argument("records")
+        p.add_argument("--lock")
+        p.add_argument("--cost-ledger")
+        p.add_argument("--decision", required=True, help="JSON with actor, choice and rationale")
+        p.add_argument("--research", help="Current research context JSON")
+        p.add_argument("--previous", help="Previous team record JSON; omit for the first revision")
+        p.add_argument("--output", required=True)
     subs.add_parser("doctor")
     subs.add_parser("serve")
     p = subs.add_parser("workbench")
@@ -289,6 +306,17 @@ def main(argv=None):
                    "blocker_count": len(report["blockers"])})
             if args.gate:
                 return 0 if report["verdict"] == "PROMISING_LOCAL_SIGNAL" else (2 if report["verdict"] in ("SIMULATION_ONLY", "INSUFFICIENT_EVIDENCE") else 1)
+        elif args.command == "replicate-reference":
+            from .replicates import recompute, validate_spec
+            from .science import read_reference, reference_json
+            spec = load_json(args.spec)
+            validate_spec(spec)
+            result, audit = recompute(reference_json(args.verifiers, spec["design"]), read_reference(args.verifiers, spec["data"]), spec)
+            out = _new_directory(args.output)
+            write_json(out / "reference.json", result)
+            write_json(out / "design-audit.json", audit)
+            _emit({"output": str(out), "design_audit": audit, "model_calls": 0,
+                   "scope": "Computational reference only; preserve separately from heldout agent inputs"})
         elif args.command == "scenario-validate":
             from .scenarios import validate_pack
             _emit(validate_pack(load_json(args.pack), args.inputs, args.scorers))
@@ -355,9 +383,15 @@ def main(argv=None):
             _emit(verify_submission(args.bundle, args.expected_id))
         elif args.command == "registry-replay":
             from .registry import replay_bundle
-            replay = replay_bundle(args.bundle, corpus_root=args.corpus, verifier_root=args.verifiers)
+            replay = replay_bundle(args.bundle, corpus_root=args.corpus, verifier_root=args.verifiers,
+                                   expected_id=args.expected_id, require_same_environment=args.require_same_environment)
             _emit(replay)
             return 0 if replay["status"] == "REPRODUCED" else 2
+        elif args.command == "registry-replay-plan":
+            from .replay import plan_replay
+            plan = plan_replay(args.bundle, corpus_root=args.corpus, verifier_root=args.verifiers, expected_id=args.expected_id)
+            _emit(plan)
+            return 0 if plan["status"] == "MATERIALS_READY" else 2
         elif args.command == "export-claude":
             from .native import export_claude
             _emit(export_claude(load_json(args.suite), args.output, args.plugin))
@@ -395,6 +429,9 @@ def main(argv=None):
         elif args.command == "verify-codex-collection":
             from .codex import verify_collection
             _emit(verify_collection(args.study))
+        elif args.command == "verify-host-study":
+            from .hosts import verify_host_study
+            _emit(verify_host_study(args.study))
         elif args.command == "link-decision-evidence":
             from .exchange import link_evidence
             if Path(args.output).exists():
@@ -424,7 +461,7 @@ def main(argv=None):
             _emit({"status": card["status"], "verdict": card["verdict"], "files": write_usage_card(card, args.output)})
         elif args.command == "serve":
             from .server import serve
-            serve()
+            serve(enable_extensions=args.enable_extensions)
         elif args.command == "research-plan":
             from .research import diagnose_research, write_research
             plan = diagnose_research(load_json(args.context))
@@ -457,7 +494,7 @@ def main(argv=None):
                    "external_actions": 0})
         elif args.command == "workbench":
             from .workbench import serve as workbench
-            workbench(args.data, args.port, args.claude)
+            workbench(args.data, args.port, args.claude, enable_extensions=args.enable_extensions)
         elif args.command == "check-rules":
             from .scoring import inspect_rules
             result = inspect_rules(load_json(args.suite), load_json(args.samples) if args.samples else None)

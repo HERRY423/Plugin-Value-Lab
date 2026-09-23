@@ -9,7 +9,7 @@ import tempfile
 
 from .artifacts import confined, grade_artifact, validate_verifier
 from .core import ValidationError, _identifier, _text, suite_digest, validate_suite, write_json
-from .science import KINDS, keys, read_reference, reference, reference_json
+from .science import KINDS, REFERENCE_FIELDS, keys, read_reference, reference, reference_json
 
 
 def validate_pack(pack, input_root=None, scorer_root=None):
@@ -69,11 +69,14 @@ def validate_pack(pack, input_root=None, scorer_root=None):
             for grader in private["graders"]:
                 if grader["artifact"] not in case["outputs"]:
                     raise ValidationError("Scorer references an undeclared output")
-                for field in ("truth", "program"):
+                for field in REFERENCE_FIELDS:
                     ref = grader["verifier"].get(field)
                     if ref is not None:
                         read_reference(scorer_root, ref)
-                        private_hashes.add(ref["sha256"])
+                        # Design and measurements may be the task's public inputs.
+                        # Answers, executable scorers and decision truth remain private.
+                        if field not in ("design", "data"):
+                            private_hashes.add(ref["sha256"])
     if private_hashes & public_hashes:
         raise ValidationError("Scorer-only bytes also supplied as agent inputs")
     return {"pack_sha256": suite_digest(pack), "cases": len(ids), "families": len(families),
@@ -201,17 +204,21 @@ def decision_metrics(suite, records, scorer_root, artifact_root):
                     unavailable.append({"case_id": case["id"], "reason": str(exc)})
             else:
                 rules.append(g)
-        for rule in rules:
-            if rule["type"] not in ("abstention_correct", "over_refusal"):
+        for kind in ("abstention_correct", "over_refusal"):
+            matching_rules = [rule for rule in rules if rule["type"] == kind]
+            if not matching_rules:
                 continue
-            metric = "unsupported_acceptance" if rule["type"] == "abstention_correct" else "over_refusal"
+            if len(matching_rules) != 1:
+                unavailable.append({"case_id": case["id"], "reason": "Ambiguous repeated decision metric: " + kind})
+            rule = matching_rules[0]
+            metric = "unsupported_acceptance" if kind == "abstention_correct" else "over_refusal"
             for arm in ("with", "without"):
                 group = groups.setdefault((case.get("split", "unspecified"), arm, metric), {"planned": 0, "errors": 0, "unknown": 0})
                 for rep in range(1, suite["runs_per_case"] + 1):
                     group["planned"] += 1
                     matches = indexed.get((case["id"], arm, rep), [])
                     error = None
-                    if len(matches) == 1 and matches[0].get("status") == "completed":
+                    if len(matching_rules) == 1 and len(matches) == 1 and matches[0].get("status") == "completed":
                         _, _, checked = grade_artifact(rule, matches[0], artifact_root, scorer_root)
                         error = checked.get("error")
                     group["unknown"] += error is None

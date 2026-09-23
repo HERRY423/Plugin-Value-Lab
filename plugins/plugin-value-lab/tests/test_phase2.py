@@ -100,6 +100,10 @@ class PhaseTwoTests(unittest.TestCase):
         add_review(self.registry, review)
         result = self.publish()
         self.assertEqual(result["positive_cards"], 0)
+        bootstrap = load_json(self.root / "site/index.json")["payload"]["bootstrap"]
+        self.assertFalse(bootstrap["trusted_evidence_layer"])
+        self.assertEqual(bootstrap["interchange_status"], "PROVISIONAL_LOCAL_FORMAT")
+        self.assertIn("暂定交换格式", (self.root / "site/index.html").read_text(encoding="utf-8"))
         card = load_json(self.root / "site/cards" / (eid + ".json"))["payload"]
         self.assertEqual(card["status"], "PENDING_REVIEW")
 
@@ -227,6 +231,13 @@ class PhaseTwoTests(unittest.TestCase):
     def test_host_plus_model_change_is_not_host_effect(self):
         self.study()
         self.study("other", host="claude-code", model="another")
+        result = analyze_registry(self.registry)["host_contrasts"][0]
+        self.assertEqual(result["status"], "NOT_COMPARABLE")
+        self.assertIsNone(result["plugin_gain_change"])
+
+    def test_matching_aliases_without_model_versions_are_not_cross_host_evidence(self):
+        self.study(change=lambda s: s["conditions"].pop("model_version"))
+        self.study("other", host="claude-code", change=lambda s: s["conditions"].pop("model_version"))
         result = analyze_registry(self.registry)["host_contrasts"][0]
         self.assertEqual(result["status"], "NOT_COMPARABLE")
         self.assertIsNone(result["plugin_gain_change"])

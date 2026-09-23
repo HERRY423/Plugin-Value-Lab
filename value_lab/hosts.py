@@ -7,9 +7,36 @@ from .core import ValidationError, freeze, suite_digest, validate_suite, write_j
 
 
 HOSTS = {"codex-cli": "CODEX_ADAPTER_AVAILABLE",
-         "claude-code": "NATIVE_TEXT_EVAL_ONLY_SCIENTIFIC_COLLECTOR_REQUIRED",
+         "claude-code": "READ_ONLY_NATIVE_COLLECTOR_AVAILABLE",
          "gemini-cli": "EXECUTION_ADAPTER_NOT_IMPLEMENTED",
          "opencode": "EXECUTION_ADAPTER_NOT_IMPLEMENTED"}
+
+
+def verify_host_study(directory):
+    """One offline receipt shape for both collectors; no inference of identity."""
+    from .core import load_json, load_records
+    from .artifacts import sha
+    root = Path(directory).resolve()
+    suite, plan = load_json(root / "suite.json"), load_json(root / "plan.json")
+    host = suite["conditions"]["host"]
+    if host == "codex-cli" and plan.get("backend") == host:
+        from .codex import verify_collection
+    elif host == "claude-code" and plan.get("format") == "pvl-claude-collection-1":
+        from .claude_collection import verify_collection
+    else:
+        raise ValidationError("No matching native collector contract for this host")
+    verification = verify_collection(root)
+    records = load_records(root / "runs.jsonl")
+    planned = len(plan["schedule"])
+    return {"format": "pvl-host-evidence-1", "host": host, "verification": verification,
+            "suite_sha256": suite_digest(suite), "plan_sha256": sha(root / "plan.json"),
+            "records_sha256": suite_digest(records), "plugin_files_sha256": suite_digest(plan["plugin_files"]),
+            "planned_runs": planned, "recorded_runs": len(records), "schedule_fully_observed": len(records) == planned,
+            "successful_runs": sum(r["status"] == "completed" for r in records),
+            "observed_condition_records": sum(r.get("conditions") is not None for r in records),
+            "observed_plugin_state_records": sum(type(r.get("plugin_loaded")) is bool for r in records),
+            "provider_identity_authenticated": False, "model_calls": 0,
+            "scope": "Local native archive consistency only; observation coverage is not authenticated identity, quality or benefit"}
 
 
 def prepare_matrix(template, hosts, output):

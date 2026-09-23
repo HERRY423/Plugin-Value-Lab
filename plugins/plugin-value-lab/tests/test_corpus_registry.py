@@ -161,6 +161,46 @@ class CorpusTests(unittest.TestCase):
 
 
 class RegistryTests(unittest.TestCase):
+    def test_empty_and_synthetic_registry_never_become_a_trusted_standard(self):
+        empty = registry_view(self.registry)["bootstrap"]
+        self.assertEqual(empty["stage"], "EMPTY")
+        study = self.study()
+        first = register_study(study, self.meta, self.registry)
+        status = registry_view(self.registry)["bootstrap"]
+        self.assertEqual(status["stage"], "SYNTHETIC_ONLY")
+        self.assertEqual(status["synthetic_lineages"], 1)
+        self.assertFalse(status["trusted_evidence_layer"])
+        self.assertEqual(status["interchange_status"], "PROVISIONAL_LOCAL_FORMAT")
+        self.assertIsNone(status["independent_samples"])
+        records = [json.loads(s) for s in (study / "runs.jsonl").read_text().splitlines()]
+        records[0]["output"] += " Changed fixture evidence"
+        self.write_records(study, records)
+        register_study(study, self.meta, self.registry, parent=first["entry_id"], revision_reason="Fixture revision")
+        self.assertEqual(registry_view(self.registry)["bootstrap"]["synthetic_lineages"], 1)
+
+    def test_declared_external_records_are_not_adoption_or_independence(self):
+        study = self.study(synthetic=False)
+        register_study(study, self.meta, self.registry)
+        self.assertEqual(registry_view(self.registry)["bootstrap"]["stage"], "LOCAL_PILOT")
+        study2 = self.study("external", synthetic=False, session_prefix="external")
+        suite = load_json(study2 / "suite.json")
+        suite["evidence_type"] = "external"
+        write_json(study2 / "suite.json", suite)
+        write_json(study2 / "protocol.lock.json", {"suite_sha256": suite_digest(suite)})
+        records = [json.loads(s) for s in (study2 / "runs.jsonl").read_text().splitlines()]
+        for record in records:
+            record["suite_sha256"] = suite_digest(suite)
+        self.write_records(study2, records)
+        register_study(study2, self.meta, self.registry)
+        status = registry_view(self.registry)["bootstrap"]
+        self.assertEqual(status["stage"], "EXTERNAL_SUBMISSIONS_UNVERIFIED")
+        self.assertEqual(status["declared_external_lineages"], 1)
+        self.assertFalse(status["trusted_evidence_layer"])
+        self.assertEqual(status["external_adoption"], "NOT_ESTABLISHED")
+        view = self.root / "view"
+        write_view(self.registry, view)
+        self.assertIn("暂定交换格式", (view / "index.html").read_text(encoding="utf-8"))
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)

@@ -1,0 +1,17 @@
+sample,feature,value
+control0,signal,0
+control0,null,0
+control1,signal,1
+control1,null,1
+control2,signal,2
+control2,null,2
+control3,signal,3
+control3,null,3
+treated0,signal,4
+treated0,null,0
+treated1,signal,5
+treated1,null,1
+treated2,signal,6
+treated2,null,2
+treated3,signal,7
+treated3,null,3

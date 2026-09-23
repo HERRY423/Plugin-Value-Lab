@@ -32,7 +32,7 @@ class DistributionTests(unittest.TestCase):
     def test_official_schemas_and_fixed_discovery(self):
         result = validate(self.root)
         self.assertTrue(result["valid"])
-        self.assertEqual(len(result["skills"]), 3)
+        self.assertEqual(len(result["skills"]), 2)
         self.assertFalse((self.root / ".codex-plugin").exists())
         self.assertFalse((self.root / ".mcp.json").exists())
 
@@ -66,6 +66,19 @@ class DistributionTests(unittest.TestCase):
         self.assertTrue(all(name.split("/")[0] not in ("work", "dist", "plugins", "build") for name in paths))
         self.assertFalse(any("__pycache__" in name for name in paths))
 
+    def test_python_package_version_drift_rejected(self):
+        path = self.root / "pyproject.toml"
+        import tomllib
+        current = tomllib.loads(path.read_text())["project"]["version"]
+        path.write_text(path.read_text().replace('version = "' + current + '"', 'version = "99.0.0"'), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "version drift"):
+            validate(self.root)
+
+    def test_runtime_version_drift_rejected(self):
+        (self.root / "value_lab/__init__.py").write_text('__version__ = "99.0.0"\n', encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "version drift"):
+            validate(self.root)
+
     @unittest.skipUnless((ROOT / ".codex-plugin/plugin.json").exists(), "Legacy overlays are omitted from the portable archive")
     def test_claude_and_codex_use_their_own_root_variable(self):
         claude = json.loads((ROOT / ".mcp.json").read_text(encoding="utf-8"))
@@ -94,7 +107,7 @@ class RelocatedMCPTests(unittest.IsolatedAsyncioTestCase):
                 async with ClientSession(*streams) as session:
                     await session.initialize()
                     listed = await session.list_tools()
-                    self.assertEqual(len(listed.tools), 7)
+                    self.assertEqual(len(listed.tools), 6)
                     response = await session.call_tool("example_value_suite", {})
                     self.assertFalse(response.isError)
                     self.assertEqual(json.loads(response.content[0].text)["real_observations"], 0)

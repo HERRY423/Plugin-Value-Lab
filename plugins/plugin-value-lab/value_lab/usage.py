@@ -54,6 +54,54 @@ def _scenario(case, prompt, reason, cost_delta):
     }
 
 
+def _improvement_plan(suite, report):
+    """Locate actionable diagnostics without calling them proven plugin defects.
+
+    Includes BOTH arms and unknown outcomes. Priorities reflect triage order,
+    never estimated benefit or causal attribution. No new scoring policy.
+    """
+    queue = []
+    cases = {case["id"]: case for case in suite["cases"]}
+    for case in report["cases"]:
+        for run in case["runs"]:
+            ref = {"case_id": case["id"], "arm": run["arm"], "repetition": run["repetition"]}
+            if run["status"] != "completed":
+                queue.append({**ref, "priority": 0, "kind": "execution", "status": run["status"],
+                    "evidence": run.get("error") or run["issues"] or run["status"],
+                    "action": "核对原始会话、加载记录与执行错误；保留失败，在新研究中复测，不覆盖原运行。"})
+            if run["issues"]:
+                queue.append({**ref, "priority": 0, "kind": "evidence", "evidence": run["issues"],
+                    "action": "先补核来源、配对条件、成本或复核缺口；证据阻断不能直接归因于插件实现。"})
+            for grade in run["grades"]:
+                if run["status"] != "completed" or grade["passed"] is True or not grade["scored"]:
+                    continue
+                rule = next(g for g in cases[case["id"]]["graders"] if g["id"] == grade["id"])
+                queue.append({**ref, "priority": 1 if grade["critical"] else 2,
+                    "kind": "outcome", "criterion_id": grade["id"], "criterion_type": rule["type"],
+                    "passed": grade["passed"], "critical": grade["critical"], "evidence": grade["rationale"],
+                    "action": "对照冻结判据检查实际产物；修复相关行为后同时复测正确处理和不应拒绝的任务。"
+                        if grade["passed"] is False else "结果尚未知：补齐产物或真实人工复核，不把未知当作已证实缺陷。"})
+    queue.sort(key=lambda item: (item["priority"], item["case_id"], item["arm"], item["repetition"]))
+    return {
+        "status": "SIMULATION_ONLY" if report["evidence_type"] == "synthetic" else "DIAGNOSTIC_ONLY",
+        "registration_required": False, "publication_required": False,
+        "suite_sha256": report["provenance"]["suite_sha256"],
+        "records_sha256": report["provenance"]["records_sha256"],
+        "queue": queue, "study_blockers": list(report["blockers"]),
+        "next_experiment": {
+            "case_ids": [case["id"] for case in suite["cases"]],
+            "planned_runs": len(suite["cases"]) * suite["runs_per_case"] * 2,
+            "runs_per_case_per_arm": suite["runs_per_case"],
+            "conditions": copy.deepcopy(suite["conditions"]), "policy": copy.deepcopy(report["policy"]),
+            "action": "一次只改待测插件的一个行为，记录内容摘要；无需改版本号。冻结新研究，重跑完整的两组任务，再用 compare-studies 检查可比性与回退。",
+            "preserve": "保留原研究、失败、负面与未知结果；修复用例后的重测仅是开发集诊断，泛化需新的未暴露任务。",
+            "estimated_cost_usd": None, "estimated_human_minutes": None,
+            "execution_authorized": False,
+        },
+        "value_hypothesis": "让作者定位并复现问题、减少下一次试验准备和人工修正；尚未测量这些收益。",
+    }
+
+
 def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_root=None, verifier_root=None, corpus_root=None):
     """Recompute evaluation from inputs; a precomputed verdict is never accepted.
 
@@ -176,6 +224,7 @@ def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_ro
             "decision_scope": "仅限本次提交的具体任务及固定条件；不会自动外推到同类或新任务。",
         },
         "use_when": use_when, "prefer_baseline_when": prefer_baseline,
+        "improvement_plan": _improvement_plan(suite, report),
         "investigate": investigate, "next_steps": next_steps,
         "refresh_when": [
             "插件版本、配置、权限或依赖变化时重新核验。",
@@ -246,6 +295,16 @@ def _render_markdown(card):
                       f"运行计数：{_markdown(item['run_counts'])}", ""]
         if not card[key]:
             lines += [empty, ""]
+    if plan := card.get("improvement_plan"):
+        lines += ["## 作者改进清单", "", "可直接本地使用，无需登记或公开评分。以下是诊断线索，不是已证实的因果缺陷。", "",
+                  f"状态：{_markdown(plan['status'])}", ""]
+        for item in plan["queue"]:
+            lines += [f"- {_markdown(item['case_id'])} / {_markdown(item['arm'])} / 第 {item['repetition']} 次 / {_markdown(item.get('criterion_id', item['kind']))}：{_markdown(item['evidence'])} {_markdown(item['action'])}"]
+        if not plan["queue"]:
+            lines += ["未定位到逐项失败；这不代表已有增益。仍需检查整项研究阻断和成本。"]
+        trial = plan["next_experiment"]
+        lines += ["", "### 修复后的复测", "", _markdown(trial["action"]), "", _markdown(trial["preserve"]), "",
+                  f"完整复测：{trial['planned_runs']} 次计划运行；案例：{_markdown(trial['case_ids'])}。费用与人工耗时尚未知；不会自动执行。", ""]
     for title, items in [("接下来怎么做", card["next_steps"]), ("何时重新核验", card["refresh_when"]),
                          ("证据阻断", source["blockers"]), ("需要关注", source["warnings"]),
                          ("限制", card["limitations"])]:

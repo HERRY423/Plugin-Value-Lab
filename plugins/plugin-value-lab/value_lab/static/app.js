@@ -15,6 +15,7 @@ const number=x=>typeof x==="number"?x.toFixed(3):"待采集";
 async function openStudy(id){if(selected!==id){$("consent").checked=false;$("start").disabled=true;}selected=id;$("setup").hidden=true;$("detail").hidden=false;await render();await listing();}
 async function render(){if(!selected)return;const requested=selected;const data=await api(`/api/studies/${requested}`);if(selected!==requested)return;current=data;const s=data.state;$("detail-title").textContent=s.plugin.name;$("status").textContent=statuses[s.status]||s.status;$("detail-subtitle").textContent=`${s.mode==="synthetic"?"模拟数据 · 没有真实模型调用":"Claude 原生对照执行"} · ${s.created_at.slice(0,19).replace("T"," ")} · ${s.plugin.version}`;$("metrics").replaceChildren();metric(s.planned_runs,"计划执行：任务 × 重复 × 两组");metric(s.estimated_cost_usd==null?"未知":`$${s.estimated_cost_usd.toFixed(4)}`,"原生估计费用 · 非结算账单");metric(verdicts[s.latest_verdict||s.verdict]||"等待执行","价值评估结论");const frozen=data["frozen.json"];const showLaunch=s.status==="frozen";$("launch").hidden=!showLaunch;$("stop").hidden=!['running','stopping'].includes(s.status);$("stop").disabled=s.status==="stopping";if(showLaunch){$("launch-summary").textContent=`将执行 ${s.planned_runs} 次 Agent 会话，模型 ${data.suite.conditions.model}，费用估计上限 $${s.estimated_ceiling_usd}。不自动重试、不发布报告；MCP 为模拟环境，不能代表真实服务连接的效果。`;$("plan").textContent=JSON.stringify({suite:data.suite,command:frozen.command,excluded_paths:data["snapshot.json"].excluded_paths,plugin_files:Object.keys(data["snapshot.json"].files)},null,2);}
 $("result").replaceChildren();if(s.error)$("result").append(el("p",s.error,"panel"));if(s.mode==="synthetic")$("result").append(el("p","这是模拟示例，用于体验流程。分数、输出、时间与费用均不代表真实插件表现。","panel"));const report=data.analysis?.report||data["report/report.json"];const native=data["native-diagnostic/report.json"];if(report){$("result").append(el("h3","结果与证据缺口"));const panel=el("div",undefined,"panel");panel.append(el("strong",verdicts[report.verdict]||report.verdict));panel.append(el("p",`已记录 ${report.summary.observed_runs} / ${report.summary.expected_runs} 次；可比较配对 ${report.summary.complete_pairs}。`));if(s.mode!=="synthetic")panel.append(el("p","启动回执与原生结果已纳入证据。原生汇总未能建立逐次会话、插件实际加载、完整成本及人工审阅记录，工作台保留这些缺口，不把预期条件补写成观察。"));$("result").append(panel);const table=el("table");const tr=el("tr");for(const text of ["任务","有插件","无插件","差值"]){tr.append(el("th",text));}table.append(tr);for(const c of (native||report).cases){const row=el("tr");for(const value of [c.id,number(c.with_score),number(c.without_score),number(c.delta)])row.append(el("td",value));table.append(row);}$("result").append(table);if(native)$("result").append(el("p","上表为原生诊断分数；未提供的无插件均分不从差值反推。完整缺口见评估报告。","small"));const details=el("details");details.append(el("summary",`查看 ${report.blockers.length} 项证据缺口`),el("pre",report.blockers.join("\n")));$("result").append(details);}
+renderImprovement(data);
 if(data.integrity){$("result").append(el("p",data.integrity.mismatches.length?"证据文件已改变："+data.integrity.mismatches.join(", "):"证据文件哈希一致；仅证明本地字节一致性。",data.integrity.mismatches.length?"panel":"small"));}
 $("files").replaceChildren();for(const file of data.files.filter(x=>!x.startsWith("export/")||x.startsWith("export/native-results/"))){const a=el("a",file);a.href=`/api/studies/${s.id}/files/${file.split("/").map(encodeURIComponent).join("/")}`;a.download=file.split("/").at(-1);$("files").append(a);}let logs=[];for(const file of ['stdout.log','stderr.log'])if(data.files.includes(file)){const response=await fetch(`/api/studies/${s.id}/files/${file}`);if(response.ok)logs.push(`${file}\n${(await response.text()).slice(-14000)}`);}$("logs").textContent=logs.join("\n\n")||(s.mode==="synthetic"?"模拟生成完成。真实模型调用：0。":"尚未执行。");}
 $("new").onclick=()=>{selected=null;current=null;$("setup").hidden=false;$("detail").hidden=true;$("consent").checked=false;$("start").disabled=true;notice();listing().catch(e=>notice(e.message));};
@@ -26,3 +27,20 @@ $("stop").onclick=()=>action(async()=>{await api(`/api/studies/${selected}/stop`
 addCase();addCase({kind:"negative"});
 (async()=>{try{const config=await api("/api/bootstrap");token=config.token;$("data-dir").textContent="证据目录："+config.data_directory;await listing();}catch(e){notice(e.message);}})();
 setInterval(async()=>{if(busy||!current||!['running','stopping'].includes(current.state.status))return;try{await render();await listing();}catch(e){notice(e.message);}},2000);
+
+function renderImprovement(data) {
+  const plan=(data.analysis?.card||data["usage-card/card.json"])?.improvement_plan;
+  if(!plan)return;
+  const panel=el("section");panel.id="improvement-plan";
+  panel.append(el("h3","作者改进清单"),el("p","无需登记或公开排名。以下线索帮助定位下一次修改，不直接证明插件缺陷或收益。","muted"));
+  if(plan.status==="SIMULATION_ONLY")panel.append(el("p","模拟清单：没有观察到真实缺陷或收益。","panel"));
+  if(!plan.queue.length)panel.append(el("p","没有逐项失败线索；仍需核对整体证据、基线是否足够及成本。"));
+  for(const item of plan.queue){
+    const row=el("details");
+    row.append(el("summary",`${item.case_id} · ${item.arm==="with"?"有插件":"无插件"} · 第 ${item.repetition} 次 · ${item.criterion_id||item.kind}`),
+      el("p",typeof item.evidence==="string"?item.evidence:JSON.stringify(item.evidence)),el("p",item.action));panel.append(row);
+  }
+  panel.append(el("h4","修复后的复测"),el("p",plan.next_experiment.action),el("p",plan.next_experiment.preserve,"small"),
+    el("p",`完整复测计划 ${plan.next_experiment.planned_runs} 次；费用及人工耗时未知。使用上方“以此方案准备版本 / 模型对照”保留任务与判据，准备后再授权执行。`,"small"));
+  $("result").append(panel);
+}

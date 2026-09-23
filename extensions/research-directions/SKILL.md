@@ -43,7 +43,7 @@ For a genuine capability gap, first use a sufficient native capability or an alr
 When available, call `research_direction_advisor(action="diagnose", context=...)` to validate and organize the context. Its `example` action supplies a teaching context, never observations from this user. For a local artifact, resolve the plugin root from this skill's actual location and run:
 
 ```text
-python scripts/value_lab.py research-plan <context.json> --output <new-directory>
+python scripts/value_lab.py --enable-extensions research-plan <context.json> --output <new-directory>
 ```
 
 This writes `research-plan.json` and `RESEARCH.md` to an absent or empty directory. Call only tools exposed by the host. Use absolute paths when outside the plugin root. If the tool is unavailable, still complete the authorized reasoning and clearly label it as an unvalidated draft; do not pretend a local validation ran.
@@ -57,7 +57,7 @@ When the researcher corrects a source, rejects a hypothesis, changes the questio
 Revisit directions downstream of changed evidence and dependencies, including directions that should now be withdrawn. Compare versions using `research_direction_advisor(action="compare", before=..., after=...)` or:
 
 ```text
-python scripts/value_lab.py research-compare <before-context.json> <after-context.json> --output <comparison.json>
+python scripts/value_lab.py --enable-extensions research-compare <before-context.json> <after-context.json> --output <comparison.json>
 ```
 
 Explain why priorities or limits changed and what disagreement remains. A structural difference shows which supplied records changed; it does not prove learning, research progress, or improved outcomes. If the user asks whether this workflow or another plugin actually helps, route to [assess-value](../assess-value/SKILL.md) for a separate matched evaluation.

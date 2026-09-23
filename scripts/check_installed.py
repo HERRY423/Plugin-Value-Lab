@@ -32,6 +32,7 @@ def main():
         assert "workbench-ready" in workbench_check.stdout
         result = subprocess.run([sys.executable, "-m", "value_lab.cli", "demo", "--output", str(directory / "demo")],
                                 cwd=directory, env=env, capture_output=True, text=True, encoding="utf-8", check=True)
+        assert json.loads(result.stdout)["verdict"] == "SIMULATION_ONLY"
         report = json.loads((directory / "demo" / "report.json").read_text(encoding="utf-8"))
         assert report["verdict"] == "SIMULATION_ONLY"
         assert report["summary"]["expected_runs"] == 18
@@ -47,11 +48,11 @@ def main():
                                "--output", str(directory / "card")], cwd=directory, env=env, capture_output=True,
                                text=True, encoding="utf-8", check=True)
         assert json.loads(card.stdout)["status"] == "TRIAL_GUIDANCE_ONLY"
-        research_example = subprocess.run([sys.executable, "-m", "value_lab.cli", "research-example"],
+        research_example = subprocess.run([sys.executable, "-m", "value_lab.cli", "--enable-extensions", "research-example"],
             cwd=directory, env=env, capture_output=True, text=True, encoding="utf-8", check=True)
         context_path = directory / "research-context.json"
         context_path.write_text(research_example.stdout, encoding="utf-8")
-        research = subprocess.run([sys.executable, "-m", "value_lab.cli", "research-plan", str(context_path),
+        research = subprocess.run([sys.executable, "-m", "value_lab.cli", "--enable-extensions", "research-plan", str(context_path),
             "--output", str(directory / "research")], cwd=directory, env=env, capture_output=True,
             text=True, encoding="utf-8", check=True)
         assert json.loads(research.stdout)["status"] == "RESEARCH_DIAGNOSIS_ONLY"

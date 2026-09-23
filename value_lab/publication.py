@@ -106,10 +106,10 @@ def _split_results(entry, report, suite):
     return result
 
 
-def _html(cards, analysis):
+def _html(cards, analysis, bootstrap):
     esc = lambda v: html.escape("未知" if v is None else str(v), quote=True)
     status = {"REVIEWED_LOCAL_SIGNAL": "已复核的局部信号", "PENDING_REVIEW": "正向展示待复核", "OBSERVATION_ONLY": "仅展示观察"}
-    body = []
+    body = ['<section><h2>冷启动状态：' + esc(bootstrap["label"]) + '</h2><p>本地证据账本 · 暂定交换格式；尚未建立可信证据层。</p><p>' + esc(bootstrap["next_milestone"]) + '</p></section>']
     for card in cards:
         summary = card["summary"]
         body.append('<article><div class="tag">' + esc(status[card["status"]]) + '</div><h2>' + esc(card["plugin"]["name"]) + '</h2><p>'
@@ -142,7 +142,7 @@ def build_public(registry, output, key, trust, declarations=None, previous=None)
         cards.append(_card(row, path, report, load_json(path / "suite.json"), trust, declarations.get(path.name)))
     analysis = analyze_registry(registry, view)
     previous_id = verify_public(previous, trust)["snapshot_sha256"] if previous is not None else None
-    page = _html(cards, analysis)
+    page = _html(cards, analysis, view["bootstrap"])
     output = Path(output).resolve()
     registry = Path(registry).resolve()
     if output.exists() or output.is_relative_to(registry) or registry.is_relative_to(output):
@@ -157,7 +157,7 @@ def build_public(registry, output, key, trust, declarations=None, previous=None)
         index = {"format": "pvl-public-index-1", "generated_at": datetime.now(timezone.utc).isoformat(),
                  "previous_snapshot_sha256": previous_id, "trust_policy_sha256": suite_digest(trust),
                  "files": {p.relative_to(stage).as_posix(): sha(p) for p in sorted(stage.rglob("*")) if p.is_file()},
-                 "cards": [c["entry_id"] for c in cards], "analysis": analysis,
+                 "cards": [c["entry_id"] for c in cards], "analysis": analysis, "bootstrap": view["bootstrap"],
                  "positive_cards": sum(c["positive_listing_eligible"] for c in cards),
                  "online_publication": False, "scientific_authorization": "NONE"}
         write_json(stage / "index.json", {"payload": index, "signature": sign(index, key, "pvl-public-index-1")})

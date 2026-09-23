@@ -9,7 +9,7 @@ Help the user decide what the plugin adds, for which tasks, and at what cost. A 
 
 ## Choose the useful mode
 
-- For identifying missing research evidence, rival explanations, or promising next investigations from a research question and background, use [research-directions](../research-directions/SKILL.md). Its planning judgments do not establish measured plugin benefit.
+- Keep the default workflow to paired measurement, diagnosis and retesting. Research direction planning is a disabled experimental extension, available only when explicitly requested and enabled; see [scope and opt-in](../../docs/STRUCTURAL-RISKS.zh-CN.md).
 - For choosing an available capability or explaining how to use a plugin, use [use-plugin-well](../use-plugin-well/SKILL.md). Do not require a study for an ordinary one-time task. Discovery, connection, dependencies, and requested account management belong to Plugin Management or the host, not this evaluator.
 - For an inline comparison or a conceptual question, reason directly from the supplied facts. Do not require shell access or create a study just to explain an obvious result. Identify missing evidence and qualify the conclusion; an aggregate supplied in chat is not an audited run ledger.
 - For a new evaluation, build and freeze a suite before collecting fresh runs. Use the CLI and the [protocol](../../docs/PROTOCOL.zh-CN.md).
@@ -17,6 +17,8 @@ Help the user decide what the plugin adds, for which tasks, and at what cost. A 
 - For product design and the meaning of different value claims, read the [design rationale](../../docs/DESIGN.zh-CN.md).
 
 ## Comparisons that answer the question
+
+For an author repairing a plugin, generate a usage card from the submitted suite, records, lock and available artifact/cost roots. Its `improvement_plan` locates failed or unknown criteria in both arms and preserves the full frozen case set for retesting. Show the most actionable evidence before proposing another run. Execution failures are not proven plugin defects. No registry entry, public score or certification is required. Never claim the checklist saves time without real comparative human timing and cost evidence. Preserve all failures and negative results; use a new study and plugin content hash for the repair, without requiring a version bump.
 
 For rubric calibration, version/model comparisons and detailed costs, read [ANALYSIS.zh-CN.md](../../docs/ANALYSIS.zh-CN.md). Use `check-rules` or `validate_value_suite(..., samples=...)` before freezing; sample grading is not study evidence. Workbench “以此方案准备版本 / 模型对照” copies the protocol, not observations. Compare existing studies in the workbench or with `compare-studies BEFORE AFTER --output JSON`; preserve task/rule/condition changes and never attribute a simultaneous plugin/model change to one factor. For supplemental costs, pass the same `cost_ledger` to evaluation and usage-card generation. Workbench cost revisions preserve original artifacts and bind the new report to source hashes. Do not claim complete costs from a known subtotal, price an unknown token count, double-add native batch estimates, or convert estimated charges into settled bills.
 
@@ -61,6 +63,10 @@ For real human assessment, use `review-pack <suite.json> <runs.jsonl> --output <
 
 ## Costs, uncertainty, and reports
 
+For the rigor workflow see [RIGOR.zh-CN.md](../../docs/RIGOR.zh-CN.md). `verify-host-study` checks either supported native collection offline; registration of a recognized native archive rechecks it and requires the actual plugin inventory digest. Cross-host contrasts require explicit model/host versions, not matching aliases alone. For DE tables, freeze an independent `testing_family` reference to detect selective gene reporting before BH verification. Optional `policy.decision_error_limits` must constrain both unsupported acceptance and over-refusal; unknown rates block and WITH-arm violations prevent a positive signal. A critical process check must pass but contributes no outcome credit.
+
+Before replaying an exported study, use `registry-replay-plan BUNDLE --expected-id RETAINED_ID` with separately provided scorer/corpus roots as needed. Preflight never executes verifier code. `registry-replay --expected-id RETAINED_ID --require-same-environment` checks identity and rejects missing/different runtime inventory before scoring. Private scoring material is not automatically exported. Reproducing the same incomplete report is not a complete validation: inspect `assessment_complete`, original verdict, runtime differences and scientific limitations. Never treat a native-verification summary as a replacement for the original native archive.
+
 Keep model charges, tool charges, human work, and wall-clock duration distinct. Human work comes from raw time intervals, with overlap checks. Null costs are unknown, not zero. Native reported dollar amounts can be estimates, not settled invoices. A declared zero human interval list is not independently observed zero effort. Use the user's stated hourly valuation for an explicit cost conversion; do not invent revenue, willingness to pay, or clinical savings.
 
 Use the evaluator's recorded decision rules, case regressions, critical outcome failures, completeness checks, and cluster uncertainty together. Do not override a failed gate because the overall average looks attractive. A small or selected local suite supports a narrow local signal, not a population-wide benefit claim. Synthetic evidence stays a simulation even if every apparent comparison is positive.
@@ -72,6 +78,8 @@ Deliver the report and explain: outcome difference, cost difference or missingne
 To turn completed records into future task guidance, use `build_plugin_usage_card` when actually available, or `usage-card <suite.json> <runs.jsonl> --lock <lock.json> --output <new-directory>`. It recomputes the assessment and binds the result to those records, plugin/version, model, host, tools, environment, and budget. It must not recommend use from synthetic evidence, blocked comparisons, or regressions; unsupported tasks remain investigation or trial guidance. A baseline-sufficient case is not authorization to disable or remove a plugin. A score never authorizes broader permissions. Check the usage card's scope again after inputs or conditions change; no monitor is created automatically.
 
 ## Scientific examples
+
+For independent-unit scientific results, use the 0.5.0 `replicate_effect` contract and `replicate-reference` command described in `docs/REPLICATE-VERIFICATION.zh-CN.md`. Freeze units, blocks or pairs, all features, training-unit exclusions, exchangeability justification and thresholds before candidate evaluation. This verifier recomputes prepared unit measurements; it does not normalize raw counts or authenticate donors. Correct non-significant findings pass. Keep reference answers out of heldout agent inputs.
 
 When supplementing a registered study, preserve the frozen suite, observation time, authors and plugin identity; use `registry-add --parent <entry-id> --revision-reason <actual-change>`. Count its lineage once, keep superseded snapshots and surface ancestor dissent. A new protocol requires a new study. For review handoffs use `registry-export --with-reviews`, retain the returned packet ID separately, and verify with `registry-verify --expected-id`. Ordinary study exports omit reviews and cannot establish absence of dissent. A reproduced calculation does not resolve disputes or authenticate reviewers.
 

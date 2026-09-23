@@ -228,6 +228,48 @@ _SCRIPT = """
 """
 
 
+def _value_rows(report):
+    value = report.get("value_metrics")
+    if not value:
+        return []
+    rows = []
+    for label, item in [("全部任务成功率", value["success"])] + [(name, value["by_kind"][key]) for name, key in
+            (("普通任务成功率", "task"), ("负对照成功率", "negative"), ("应弃答任务成功率", "abstention"))]:
+        rows.append((label, _score(item["arms"]["without"]["rate"]), _score(item["arms"]["with"]["rate"]), _delta(item["success_rate_delta"])))
+    for label, key, delta_key, formatter in (
+        ("单次人工分钟（运行计时）", "human_minutes_per_run", "human_minutes_saved_per_run", _measurement),
+        ("单次经过秒数", "mean_duration_seconds", "duration_seconds_saved_per_run", _measurement),
+        ("每次成功成本（含失败开销）", "cost_per_success_usd", "cost_per_success_saved_usd", _money)):
+        rows.append((label, formatter(value["arms"]["without"][key]), formatter(value["arms"]["with"][key]),
+                     "节省 " + formatter(value[delta_key])))
+    return rows
+
+
+def _measurement(value):
+    number = _number(value)
+    return "未知" if number is None else f"{number:.2f}"
+
+
+def _value_notes(report):
+    value = report["value_metrics"]
+    success, plan = value["success"], value["power_plan"]
+    status = {"SIMULATION_ONLY": "模拟演示", "DESCRIPTIVE_LOCAL": "局部描述性结果", "INCOMPLETE_OR_CONFOUNDED": "证据不全或条件混杂"}[value["status"]]
+    return [f"指标状态：{status}。当前支持正向局部结论：{_text(value['benefit_claim_eligible'])}；不代表统计学证明。",
+            f"计划配对 {success['planned_pairs']}；挽救失败 {success['rescued']}；引入失败 {success['harmed']}；未知配对 {success['unknown_pairs']}。每 100 次净新增成功：{_measurement(success['net_additional_successes_per_100'])}。",
+            f"挽救率（基线失败为分母）：{_score(success['rescue_rate'])}；损害率（基线成功为分母）：{_score(success['harm_rate'])}。",
+            f"任务族均权质量差：{_delta(value['families']['equal_weight_quality_delta'])}；改善 {value['families']['improved']} 族，退步 {value['families']['regressed']} 族。",
+            f"样本量规划：已有 {plan['planned_families']} 个任务族，目标 {_text(plan['required_families'])}，还需 {_text(plan['additional_families'])}。这是前瞻近似规划，不是事后功效或显著性检验；重复运行不增加独立任务族数。",
+            "成功须完成任务、达到冻结质量底线并通过全部关键检查；缺失保留在计划分母。人工分钟仅含运行计时，额外设置与复核投入计入完整成本。",
+            "成本证据：" + report["cost_analysis"]["cash_evidence"]["status"] + "。结算引用仍由提交者提供，不能认证账单真实性；人工折算不是现金结算。"]
+
+
+def _value_html(report):
+    if not report.get("value_metrics"):
+        return ""
+    rows = "".join("<tr>" + "".join("<td>" + _escape(cell) + "</td>" for cell in row) + "</tr>" for row in _value_rows(report))
+    return '<section class="panel full"><h2>插件带来了什么收益</h2><div class="table-wrap"><table class="cost-table"><thead><tr><th>指标</th><th>未启用</th><th>启用</th><th>变化</th></tr></thead><tbody>' + rows + '</tbody></table></div>' + _bullet_list(_value_notes(report), empty="") + '</section>'
+
+
 def _cost_detail_html(report):
     costs = report.get("cost_analysis")
     if not costs:
@@ -307,6 +349,7 @@ def _render_html(report: dict[str, Any]) -> str:
 </section>
 <div class="grid"><section class="panel"><h2>{quality_heading}</h2>{_bar(without_label, summary.get("without_score"), "without")}{_bar(with_label, summary.get("with_score"), "with")}<p class="muted small">{score_note}</p></section>
 <section class="panel"><h2>成本与投入</h2><table class="cost-table"><tbody><tr><td>未启用插件</td><td>{_escape(_money(summary.get("without_cost_usd")))}</td></tr><tr><td>启用插件</td><td>{_escape(_money(summary.get("with_cost_usd")))}</td></tr><tr><td>差值</td><td class="{cost_tone}">{_escape(_money(summary.get("cost_delta_usd"), signed=True))}</td></tr>{native_cost_row}</tbody></table><p class="muted small">{cost_unit_note}</p><p class="muted small">金额以评估输入和成本折算规则为准。模型、工具或人工记录缺失时，不把缺失值记为零。{native_cost_note}估算金额不等于已结算费用。</p></section></div>
+{_value_html(report)}
 <div class="grid"><section class="panel"><h2>阻止结论成立的条件</h2>{_bullet_list(report.get("blockers"), empty="未记录阻断项；仍需结合完整性和结论边界判断。")}</section>
 <section class="panel"><h2>需要关注</h2>{_bullet_list(report.get("warnings"), empty="未记录额外提示。")}</section></div>
 <section class="panel full"><div class="section-top"><h2>逐案例证据</h2><span class="muted small">显示 <span id="visible-count" aria-live="polite">{len(cases)}</span> / {len(cases)} 个案例</span></div>
@@ -314,6 +357,7 @@ def _render_html(report: dict[str, Any]) -> str:
 <div class="table-wrap"><table class="cases-table"><thead><tr><th scope="col">案例 / 类型</th><th scope="col">任务簇</th><th scope="col">{table_without}</th><th scope="col">{table_with}</th><th scope="col">{table_delta}</th><th scope="col">记录状态</th></tr></thead>{case_rows}</table></div><p class="empty" id="filter-empty"{'' if not cases else ' hidden'}>当前筛选下没有案例。</p><p class="muted small">“存在回退”表示案例差值为负，是否触及停止阈值由评估方案决定。失败和缺失记录始终保留。</p></section>
 <div class="grid"><section class="panel"><h2>不确定性</h2>{_fact_block(report.get("uncertainty"), empty="未提供区间或不确定性估计。")}</section><section class="panel"><h2>排除与未纳入项</h2>{_fact_block(exclusions, empty="未提供单独的排除汇总；请同时检查阻断项和逐次运行记录。")}</section></div>
 <section class="panel full"><h2>结论能支持到哪里</h2>{_fact_block(report.get("claim_limits"), empty="未提供特定结论范围。仅凭本报告，不能认定外部收益或科学有效性。")}<p class="muted small">方案锁用于一致性核验，不构成独立见证的预注册。来源标为外部也不自动表示独立评审、因果归因或科学认证。</p></section>
+{('<section class="panel full"><h2>预设双向错误上限</h2>' + _fact_block(report.get('methodology'), empty='未设置') + '</section>') if report.get('methodology', {}).get('limits') is not None else ''}
 <section class="panel full"><details><summary>来源与评估记录</summary><h3>来源信息</h3>{_fact_block(report.get("provenance"), empty="未提供来源信息。")}<h3 style="margin-top:22px">完整评估记录</h3><p class="muted small">保留全部字段，以便复核报告摘要和新增评估字段。</p><pre>{html.escape(raw_json, quote=True)}</pre></details></section>
 {_cost_detail_html(report)}
 {_corpus_error_html(report)}
@@ -346,6 +390,10 @@ def _render_markdown(report: dict[str, Any]) -> str:
         lines += [f"原生总估算费用：{_money(summary.get('native_total_estimated_cost_usd'))}。覆盖文件中的运行与裁判，不能拆作单臂费用。", ""]
     if summary.get("cost_unit"):
         lines += ["成本汇总口径：" + _markdown(summary["cost_unit"]), ""]
+    if report.get("value_metrics"):
+        lines += ["## 插件带来了什么收益", "", "| 指标 | 未启用 | 启用 | 变化 |", "| --- | ---: | ---: | ---: |"]
+        lines += ["| " + " | ".join(_markdown(cell) for cell in row) + " |" for row in _value_rows(report)]
+        lines += [""] + ["- " + _markdown(note) for note in _value_notes(report)] + [""]
     for field in ("corpus_errors", "scientific_errors"):
         if not report.get(field):
             continue
@@ -356,6 +404,7 @@ def _render_markdown(report: dict[str, Any]) -> str:
             lines.append("| " + " | ".join(_markdown(x) for x in (m["split"], m["arm"], m["metric"], m["planned"], m["errors"], m["unknown"], _score(m["rate"]), _score(m["lower_bound"]) + " — " + _score(m["upper_bound"]))) + " |")
         lines += [""]
     for title, value, empty in [
+        ("方法约束与双向错误上限", report.get("methodology"), "未配置额外双向错误上限；普通评分和完整性门槛仍然适用。"),
         ("阻断项", report.get("blockers"), "未记录阻断项；仍需结合完整性与结论边界判断。"),
         ("需要关注", report.get("warnings"), "未记录额外提示。"),
         ("不确定性", report.get("uncertainty"), "未提供区间或不确定性估计。"),

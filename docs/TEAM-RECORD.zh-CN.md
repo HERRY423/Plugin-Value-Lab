@@ -1,5 +1,7 @@
 # 团队使用记录
 
+默认关闭。CLI 需在子命令前添加 `--enable-extensions`；工作台与 MCP 也使用该启动开关。研究技能已移至 `extensions/research-directions/SKILL.md`，不再自动发现。见[范围与启用说明](STRUCTURAL-RISKS.zh-CN.md)。
+
 > 实验性扩展：团队决定和采用记录不能替代科研插件边际价值的实测证据。
 
 `usage-card` 是一次评测的条件性参考；`team-card` 将连续评测、研究背景和团队选择组成可复查的修订史。每轮都从方案和原始运行记录重新计算使用卡，不接受预先写好的“获益结论”。历史保留在新目录，旧版不会被覆盖。
@@ -17,7 +19,7 @@
 `choice` 可为 `undecided`、`trial`、`keep`、`pause`、`retire`。姓名及授权均是提交者声明；程序不会从高分推断采用。若已形成研究方向上下文，可一起绑定：
 
 ```powershell
-python scripts/value_lab.py team-card .\study\suite.json .\study\runs.jsonl --lock .\study\protocol.lock.json --decision .\decision.json --research .\research-context.json --output .\team\revision-1
+python scripts/value_lab.py --enable-extensions team-card .\study\suite.json .\study\runs.jsonl --lock .\study\protocol.lock.json --decision .\decision.json --research .\research-context.json --output .\team\revision-1
 ```
 
 研究上下文可省略；若评测有追加成本账本，使用 `--cost-ledger`。生成 `record.json`（完整历史）和 `TEAM.md`（当前状态与修订摘要）。模拟证据仍只能生成演示级使用卡。
@@ -27,7 +29,7 @@ python scripts/value_lab.py team-card .\study\suite.json .\study\runs.jsonl --lo
 保留上轮目录。新证据、新方案或团队选择产生后，运行：
 
 ```powershell
-python scripts/value_lab.py team-card .\new-study\suite.json .\new-study\runs.jsonl --lock .\new-study\protocol.lock.json --decision .\new-decision.json --research .\revised-context.json --previous .\team\revision-1\record.json --output .\team\revision-2
+python scripts/value_lab.py --enable-extensions team-card .\new-study\suite.json .\new-study\runs.jsonl --lock .\new-study\protocol.lock.json --decision .\new-decision.json --research .\revised-context.json --previous .\team\revision-1\record.json --output .\team\revision-2
 ```
 
 新记录会保留旧使用卡和决定，标出条件、任务、研究上下文和运行证据的变化。研究上下文变化时附带结构性方向比较，旧建议标为需要重评；它不声称研究有进展或缺口已关闭。后续省略 `--research` 时沿用上轮上下文，避免无意中切断研究范围。需要改变研究任务时应显式提供新的上下文并审阅可比性。

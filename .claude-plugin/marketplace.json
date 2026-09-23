@@ -7,7 +7,7 @@
     {
       "name": "plugin-value-lab",
       "source": "./plugins/plugin-value-lab",
-      "description": "Measure and register the marginal value of scientific agent plugins under matched conditions."
+      "description": "Compare plugin runs, locate failures and retest repairs under matched conditions."
     }
   ]
 }

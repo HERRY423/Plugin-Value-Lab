@@ -111,6 +111,22 @@ class NativeCollectionTests(unittest.TestCase):
         self.assertFalse(result["schedule_fully_observed"])
         self.assertFalse(result["complete"])
 
+    def test_unified_host_contract_keeps_partial_claude_coverage_explicit(self):
+        from value_lab.hosts import verify_host_study
+        from value_lab.core import load_json
+        self.suite["conditions"]["host"] = "claude-code"
+        root, _, _ = self.fixture_collection()
+        plan = load_json(root / "plan.json")
+        plan["format"] = "pvl-claude-collection-1"
+        write_json(root / "plan.json", plan)
+        write_json(root / "execution-started.json", {"plan_sha256": sha(root / "plan.json")})
+        result = verify_host_study(root)
+        self.assertEqual(result["format"], "pvl-host-evidence-1")
+        self.assertEqual(result["recorded_runs"], 1)
+        self.assertEqual(result["planned_runs"], 6)
+        self.assertFalse(result["schedule_fully_observed"])
+        self.assertFalse(result["provider_identity_authenticated"])
+
     def test_offline_verifier_rejects_status_rewrite(self):
         root, _, record = self.fixture_collection()
         record["status"] = "timeout"

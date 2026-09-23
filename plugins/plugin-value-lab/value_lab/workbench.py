@@ -13,7 +13,7 @@ from .core import ValidationError, _constant, _unique_object
 from .execution import Engine, safe_file
 
 
-def create_server(engine, port=8766):
+def create_server(engine, port=8766, *, enable_extensions=False):
     token = secrets.token_urlsafe(32)
     static = Path(__file__).with_name("static")
 
@@ -53,9 +53,12 @@ def create_server(engine, port=8766):
             try:
                 self.trusted()
                 path = unquote(urlsplit(self.path).path)
+                if not enable_extensions and (path.startswith(("/api/research", "/api/team-records")) or path in ("/research.js", "/team.js")):
+                    return self.send(404, {"error": "Experimental extensions are disabled"})
                 if path == "/api/bootstrap":
                     return self.send(200, {"token": token, "data_directory": str(engine.root),
-                        "backend": "Claude native eval", "real_model_calls_on_page_load": 0})
+                        "backend": "Claude native eval", "real_model_calls_on_page_load": 0,
+                        "extensions_enabled": enable_extensions})
                 if path == "/api/studies":
                     return self.send(200, engine.list())
                 if path == "/api/research/example":
@@ -92,7 +95,10 @@ def create_server(engine, port=8766):
                                       "/style.css": ("style.css", "text/css"), "/analysis.js": ("analysis.js", "text/javascript"),
                                       "/research.js": ("research.js", "text/javascript"),
                                       "/team.js": ("team.js", "text/javascript")}[path]
-                    return self.send(200, (static / filename).read_bytes(), mime + "; charset=utf-8")
+                    content = (static / filename).read_bytes()
+                    if path == "/" and enable_extensions:
+                        content = content.replace(b"</head>", b'<script src="/research.js" defer></script><script src="/team.js" defer></script></head>')
+                    return self.send(200, content, mime + "; charset=utf-8")
                 self.send(404, {"error": "Not found"})
             except (ValidationError, OSError, ValueError) as exc:
                 self.send(400, {"error": str(exc)})
@@ -110,7 +116,9 @@ def create_server(engine, port=8766):
                 data = json.loads(self.rfile.read(length), parse_constant=_constant, object_pairs_hook=_unique_object)
                 if not isinstance(data, dict):
                     raise ValidationError("Object required")
-                path = urlsplit(self.path).path
+                path = unquote(urlsplit(self.path).path)
+                if not enable_extensions and path.startswith(("/api/research", "/api/team-records")):
+                    return self.send(404, {"error": "Experimental extensions are disabled"})
                 if path == "/api/studies":
                     return self.send(201, engine.prepare(data))
                 if path == "/api/rules/check":
@@ -156,10 +164,10 @@ def create_server(engine, port=8766):
     return server
 
 
-def serve(data_directory, port=8766, claude=None):
+def serve(data_directory, port=8766, claude=None, *, enable_extensions=False):
     engine = Engine(data_directory, claude)
     try:
-        server = create_server(engine, port)
+        server = create_server(engine, port, enable_extensions=enable_extensions)
         print(f"Plugin Value Lab: http://127.0.0.1:{server.server_port}", flush=True)
         print(f"Local evidence: {engine.root}; opening the page does not call a model.", flush=True)
         try:
@@ -177,5 +185,6 @@ if __name__ == "__main__":
     parser.add_argument("--data", default="work/workbench")
     parser.add_argument("--port", type=int, default=8766)
     parser.add_argument("--claude")
+    parser.add_argument("--enable-extensions", action="store_true")
     args = parser.parse_args()
-    serve(args.data, args.port, args.claude)
+    serve(args.data, args.port, args.claude, enable_extensions=args.enable_extensions)

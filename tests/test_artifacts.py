@@ -9,6 +9,22 @@ from value_lab.core import ValidationError, demo_suite, demo_records, evaluate, 
 
 
 class ArtifactTests(unittest.TestCase):
+    def test_frozen_testing_family_rejects_selective_reporting_even_with_correct_bh(self):
+        from value_lab.core import write_json
+        truth = self.root / "scorer"
+        truth.mkdir()
+        write_json(truth / "family.json", {"ids": ["a", "b", "c", "d"]})
+        self.rule["verifier"]["testing_family"] = {"path": "family.json", "sha256": sha(truth / "family.json")}
+        record = self.record("gene,p,q,effect\na,0.01,0.03,2\nb,0.04,0.06,-1\nc,0.2,0.2,0")
+        self.assertFalse(self.grade(record, truth)[0])
+        record = self.record("gene,p,q,effect\na,0.01,0.04,2\nb,0.04,0.08,-1\nc,0.2,0.2666666666666667,0\nd,0.9,0.9,0")
+        passed, _, receipt = self.grade(record, truth)
+        self.assertTrue(passed)
+        self.assertEqual(receipt["testing_family_scope"], "FROZEN_REFERENCE")
+        self.assertIsNone(self.grade(record)[0])
+        write_json(truth / "family.json", {"ids": ["a", "b", "c"]})
+        self.assertIsNone(self.grade(record, truth)[0])
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)

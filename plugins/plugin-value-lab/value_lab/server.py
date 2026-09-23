@@ -2,14 +2,14 @@
 from .core import ValidationError, demo_suite, evaluate, suite_digest, validate_suite
 
 
-def create_server():
+def create_server(*, enable_extensions=False):
     try:
         from mcp.server.fastmcp import FastMCP
     except ImportError as exc:
         raise ValidationError('MCP SDK missing from this Python. Install with the host Python: python -m pip install "mcp==1.28.1"; then restart the plugin connection. See docs/INSTALL.zh-CN.md.') from exc
     mcp = FastMCP("Plugin Value Lab", instructions=(
-        "Measure and register the marginal value of scientific agent plugins under matched conditions. "
-        "Research directions are an experimental extension outside the measurement core. When requested, reason from authorized sources using the research-directions skill, then validate the structured context. All tools are local and read-only. "
+        "Compare paired runs, locate failures and plan a bounded repair/retest for plugin authors. Registration is optional. "
+        "All tools are local and read-only. "
         "No tool runs a model, certifies external value or publishes results. Synthetic data remain synthetic."
     ), log_level="ERROR")
 
@@ -49,7 +49,6 @@ def create_server():
         from .usage import build_usage_card
         return build_usage_card(suite, records, lock, cost_ledger)
 
-    @mcp.tool()
     def research_direction_advisor(action: str, context: dict | None = None,
                                    before: dict | None = None, after: dict | None = None) -> dict:
         """Diagnose task-specific research gaps and rank evidence-linked next tests supplied by the host Agent.
@@ -68,8 +67,10 @@ def create_server():
             return compare_research(before, after)
         raise ValidationError("Use example without inputs, diagnose with context, or compare with before and after")
 
+    if enable_extensions:
+        mcp.tool()(research_direction_advisor)
     return mcp
 
 
-def serve():
-    create_server().run(transport="stdio")
+def serve(*, enable_extensions=False):
+    create_server(enable_extensions=enable_extensions).run(transport="stdio")

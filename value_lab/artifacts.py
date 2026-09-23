@@ -14,7 +14,7 @@ import tempfile
 
 from .core import ValidationError, load_json, suite_digest
 
-KINDS = {"artifact", "executable", "artifact_schema", "numeric_tolerance", "abstention_correct", "over_refusal", "backend_identity", "exec"}
+KINDS = {"artifact", "executable", "artifact_schema", "numeric_tolerance", "abstention_correct", "over_refusal", "backend_identity", "exec", "replicate_effect"}
 MAX_BYTES = 64 * 1024 * 1024
 
 
@@ -70,8 +70,12 @@ def validate_verifier(g):
         "labels": {"kind", "id_column", "label_column", "expected"},
         "h5ad": {"kind", "n_obs", "n_vars", "obs_columns", "var_names_unique"},
     }
-    if kind not in fields or set(spec) != fields[kind]:
+    optional = {"testing_family"} if kind == "de_table" else set()
+    if kind not in fields or set(spec) - optional != fields[kind]:
         raise ValidationError("Unsupported or incomplete artifact verifier contract")
+    if "testing_family" in spec:
+        from .science import reference
+        reference(spec["testing_family"])
     if kind in ("json_fields", "labels") and (not isinstance(spec["expected"], dict) or not spec["expected"]):
         raise ValidationError("Expected values must be a nonempty mapping")
     if kind == "json_fields" and any(not isinstance(k, str) or not k or any(not p for p in k.split(".")) for k in spec["expected"]):
@@ -108,7 +112,7 @@ def _table(path):
     return rows
 
 
-def _builtin(path, spec):
+def _builtin(path, spec, verifier_root=None):
     kind = spec["kind"]
     if kind == "json_fields":
         obj = load_json(path)
@@ -126,6 +130,15 @@ def _builtin(path, spec):
         if kind == "labels":
             actual = {row[spec["id_column"]]: row[spec["label_column"]] for row in rows}
             return actual == spec["expected"], "Exact per-entity label and coverage comparison"
+        if "testing_family" in spec:
+            from .science import reference_json
+            family = reference_json(verifier_root, spec["testing_family"])
+            if (not isinstance(family, dict) or set(family) != {"ids"} or not isinstance(family["ids"], list)
+                    or not family["ids"] or any(not isinstance(v, str) or not v.strip() for v in family["ids"])
+                    or len(set(family["ids"])) != len(family["ids"])):
+                raise OSError("Invalid frozen testing-family reference")
+            if set(ids) != set(family["ids"]):
+                return False, "Submitted DE table omits or adds entities relative to the frozen testing family"
         if len(rows) < spec["min_rows"]:
             return False, "Too few tested entities"
         ps = [float(row[spec["p_column"]]) for row in rows]
@@ -181,7 +194,11 @@ def grade_artifact(g, record, root, verifier_root=None):
             receipt.update(details)
             rationale = "Scientific computational contract checked; inspect verifier receipt and evidence limits"
         elif g["type"] == "artifact":
-            passed, rationale = _builtin(path, g["verifier"])
+            passed, rationale = _builtin(path, g["verifier"], verifier_root)
+            if g["verifier"]["kind"] == "de_table":
+                receipt["testing_family_scope"] = "FROZEN_REFERENCE" if "testing_family" in g["verifier"] else "SUBMITTED_ROWS_ONLY"
+                if "testing_family" in g["verifier"]:
+                    receipt["testing_family_sha256"] = g["verifier"]["testing_family"]["sha256"]
         else:
             if verifier_root is None:
                 return None, "Executable verification requires an explicitly trusted verifier root", receipt

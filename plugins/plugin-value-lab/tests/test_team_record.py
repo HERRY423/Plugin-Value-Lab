@@ -99,10 +99,10 @@ class TeamRecordTests(unittest.TestCase):
                                                 "source": "fixture", "signal": "inconclusive", "interpretation": "review"})):
                 (base / name).write_text(json.dumps(data), encoding="utf-8")
             (base / "runs.jsonl").write_text("".join(json.dumps(row) + "\n" for row in self.records), encoding="utf-8")
-            self.assertEqual(main(["team-card", str(base / "suite.json"), str(base / "runs.jsonl"),
+            self.assertEqual(main(["--enable-extensions", "team-card", str(base / "suite.json"), str(base / "runs.jsonl"),
                                    "--lock", str(base / "lock.json"), "--decision", str(base / "decision.json"),
                                    "--research", str(base / "research.json"), "--output", str(base / "team")]), 0)
-            self.assertEqual(main(["research-followup", str(base / "research.json"), str(base / "update.json"),
+            self.assertEqual(main(["--enable-extensions", "research-followup", str(base / "research.json"), str(base / "update.json"),
                                    "--output", str(base / "followup.json")]), 0)
             self.assertEqual(json.loads((base / "team" / "record.json").read_text(encoding="utf-8"))["entries"][0]["revision"], 1)
             self.assertEqual(json.loads((base / "followup.json").read_text(encoding="utf-8"))["status"], "REASSESSMENT_REQUIRED")

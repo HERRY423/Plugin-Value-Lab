@@ -34,6 +34,48 @@ class UsageCardTests(unittest.TestCase):
     def ids(items):
         return {item["case_id"] for item in items}
 
+    def test_author_plan_locates_both_arms_and_preserves_full_retest(self):
+        self.records[0]["output"] = "SOURCE: only"
+        original = copy.deepcopy((self.suite, self.records))
+        plan = self.card()["improvement_plan"]
+        failures = [i for i in plan["queue"] if i["kind"] == "outcome"]
+        self.assertEqual({i["arm"] for i in failures}, {"with", "without"})
+        target = next(i for i in failures if i["arm"] == "with")
+        self.assertEqual((target["case_id"], target["repetition"], target["criterion_id"]), ("structured-delivery", 1, "limits"))
+        self.assertFalse(target["passed"])
+        trial = plan["next_experiment"]
+        self.assertEqual(trial["planned_runs"], 18)
+        self.assertEqual(trial["case_ids"], [c["id"] for c in self.suite["cases"]])
+        self.assertEqual(trial["policy"], self.card()["scope"]["policy"])
+        self.assertIsNone(trial["estimated_cost_usd"])
+        self.assertFalse(trial["execution_authorized"])
+        self.assertFalse(plan["registration_required"])
+        self.assertEqual((self.suite, self.records), original)
+
+    def test_author_plan_retains_missing_failed_and_unknown(self):
+        self.records.pop(0)
+        self.records[0]["status"] = "error"
+        self.records[0]["error"] = "Fixture API failure"
+        self.records[1]["output"] = None
+        card = self.card()
+        plan = card["improvement_plan"]
+        self.assertEqual({i["status"] for i in plan["queue"] if i["kind"] == "execution"}, {"error", "missing"})
+        self.assertTrue(any(i.get("passed", False) is None for i in plan["queue"]))
+        self.assertEqual(plan["study_blockers"], card["source"]["blockers"])
+        self.assertEqual(plan["status"], "DIAGNOSTIC_ONLY")
+        self.assertEqual(card["use_when"], [])
+
+    def test_synthetic_author_plan_is_disclosed_in_written_artifact(self):
+        suite = demo_suite()
+        card = build_usage_card(suite, demo_records(suite), {"suite_sha256": suite_digest(suite)})
+        self.assertEqual(card["improvement_plan"]["status"], "SIMULATION_ONLY")
+        with tempfile.TemporaryDirectory() as folder:
+            paths = write_usage_card(card, Path(folder) / "card")
+            content = Path(paths["md"]).read_text(encoding="utf-8")
+            self.assertIn("作者改进清单", content)
+            self.assertIn("SIMULATION", content)
+            self.assertIn("18", content)
+
     def test_positive_is_limited_to_individually_supported_tasks(self):
         card = self.card()
         self.assertEqual(card["status"], "BOUNDED_LOCAL_GUIDANCE")
@@ -102,8 +144,8 @@ class UsageCardTests(unittest.TestCase):
                 record["output"] = "NOT_ESTABLISHED"
         self.rebind()
         card = self.card()
-        self.assertEqual(card["verdict"], "PROMISING_LOCAL_SIGNAL")
-        self.assertNotIn("insufficient-science", self.ids(card["use_when"]))
+        self.assertEqual(card["verdict"], "INSUFFICIENT_EVIDENCE")
+        self.assertEqual(card["use_when"], [])
         self.assertIn("insufficient-science", self.ids(card["investigate"]))
 
     def test_baseline_critical_failure_is_not_hidden_by_high_equal_scores(self):

@@ -1,6 +1,6 @@
 # 安装 Plugin Value Lab
 
-版本：0.4.0-alpha.1。面向截图中的桌面端“添加插件市场”，支持本地目录；同一目录结构上传到你自己的 Git 仓库后，也可以作为 Git 来源。本地安装不代表已发布 Release；远程来源应填写你实际可访问的仓库地址。
+版本：0.5.0。面向截图中的桌面端“添加插件市场”，支持本地目录；同一目录结构上传到你自己的 Git 仓库后，也可以作为 Git 来源。本地安装不代表已发布 Release；远程来源应填写你实际可访问的仓库地址。
 
 ## 按截图添加
 
@@ -14,7 +14,7 @@
 
 点击“添加市场”，找到 **Plugin Value Lab**，点击安装并启用。市场名为 `plugin-value-lab-marketplace`。添加市场只是添加目录，仍需要安装其中的插件。新建一个对话后，请求“这项任务现有能力够不够，什么时候需要插件？”或“比较这个插件相对基线的收益”。
 
-给其他用户时，发送 `plugin-value-lab-marketplace-0.4.0-alpha.1.zip`，请对方先解压，在“来源”填写解压得到的 **plugin-value-lab-marketplace 文件夹的绝对路径**。应选择含 `.agents/plugins/marketplace.json` 的市场根目录；不要选 ZIP 文件、JSON 文件或里面的 `plugins/plugin-value-lab` 子目录。这个压缩包可以在任意目录解压，不依赖开发电脑的路径。
+给其他用户时，发送 `plugin-value-lab-marketplace-0.5.0.zip`，请对方先解压，在“来源”填写解压得到的 **plugin-value-lab-marketplace 文件夹的绝对路径**。应选择含 `.agents/plugins/marketplace.json` 的市场根目录；不要选 ZIP 文件、JSON 文件或里面的 `plugins/plugin-value-lab` 子目录。这个压缩包可以在任意目录解压，不依赖开发电脑的路径。
 
 ## 运行条件
 
@@ -61,7 +61,7 @@ repository/
 
 ## 标准包与兼容包
 
-`plugin-value-lab-agent-plugins-0.4.0-alpha.1.zip` 是 Agent Plugins 1.0.0 的便携包，根目录有 `plugin.json`、`mcp.json` 和三个技能。它不包含旧宿主入口；按目标客户端的 Agent Plugins 加载流程使用。
+`plugin-value-lab-agent-plugins-0.5.0.zip` 是 Agent Plugins 1.0.0 的便携包，根目录有 `plugin.json`、`mcp.json` 和两个默认技能。研究技能保留在 `extensions/`，退出默认发现；研究与团队入口需在子命令前显式添加 `--enable-extensions`。它不包含旧宿主入口；按目标客户端的 Agent Plugins 加载流程使用。[范围与启用说明](STRUCTURAL-RISKS.zh-CN.md)。
 
 安装后的评估工作台仍是本地进程。可让助手按 `assess-value` 技能定位插件根目录并启动 `python scripts/value_lab.py workbench --data <可写证据目录>`，随后打开打印的本地地址。不要把研究数据写入只读插件缓存。真实 Agent 执行另需本机 Claude Code、认证和模型权限；安装 Value Lab 不会自动提供 Claude 账户。见 [工作台指南](WORKBENCH.zh-CN.md)。
 

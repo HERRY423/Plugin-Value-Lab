@@ -1,0 +1,14 @@
+{
+  "design": {
+    "path": "paired-design.json",
+    "sha256": "22f454adf24c3fd3de9855d4b145f3f2dbaf95b416c162e4f5bfc43742187f82"
+  },
+  "data": {
+    "path": "paired-measurements.csv",
+    "sha256": "074ae6561893a4401b05befa72ffb7e02d4ab2824b84190221654ebb8b120517"
+  },
+  "alpha": 0.1,
+  "minimum_effect": 1,
+  "absolute": 1e-10,
+  "relative": 1e-10
+}

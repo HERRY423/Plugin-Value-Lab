@@ -21,7 +21,7 @@ from statistics import mean
 from . import __version__
 
 FILE_GRADERS = {"artifact", "executable", "artifact_schema", "numeric_tolerance",
-                "abstention_correct", "over_refusal", "backend_identity", "exec"}
+                "abstention_correct", "over_refusal", "backend_identity", "exec", "replicate_effect"}
 
 
 class ValidationError(ValueError):
@@ -132,6 +132,10 @@ def validate_suite(suite):
         raise ValidationError("require_cost_categories must be boolean")
     if type(policy.get("min_clusters")) is not int or policy["min_clusters"] < 2:
         raise ValidationError("min_clusters must be an integer >= 2")
+    from .value_metrics import validate_power_plan
+    validate_power_plan(policy)
+    from .methodology import validate_limits
+    validate_limits(policy)
     cases = suite.get("cases")
     if not isinstance(cases, list) or not cases:
         raise ValidationError("cases must be a nonempty list")
@@ -449,7 +453,7 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
                     else:
                         passed, rationale = _grade(g, record)
                     scored = g["dimension"] == "outcome"
-                    if not scored and g["critical"] and g["type"] in FILE_GRADERS | {"scenario"} and passed is not True:
+                    if not scored and g["critical"] and passed is not True:
                         issues.append(f"Critical verification {g['id']} failed or is unresolved")
                     grades.append({"id": g["id"], "passed": passed, "rationale": rationale,
                                    "scored": scored, "critical": g["critical"], "weight": g["weight"]})
@@ -498,10 +502,20 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
     cost_delta = None if with_cost is None or without_cost is None else with_cost - without_cost
     clusters = len(set(c["cluster"] for c in cases_out))
     policy = suite["policy"]
+    scientific_errors = None
+    if any(g["type"] in ("scenario", "abstention_correct", "over_refusal") for c in suite["cases"] for g in c["graders"]):
+        from .scenarios import decision_metrics
+        scientific_errors = decision_metrics(suite, records, verifier_root, artifact_root)
+    from .methodology import assess_limits
+    methodology = assess_limits(policy, {"corpus": corpus_errors, "scientific": scientific_errors})
+    blockers.extend(methodology["blockers"])
     cost_analysis = analyze_costs(suite, records, cost_ledger, {
         "cases": cases_out, "summary": {"comparison_eligible": False},
         "evidence_type": "synthetic" if synthetic else suite["evidence_type"]})
     blockers.extend(cost_analysis["issues"])
+    if policy.get("require_settled_costs") and (not cost_analysis["complete_category_coverage"] or
+                                               not cost_analysis["cash_evidence"]["settlement_references_complete"]):
+        blockers.append("Settled-cost policy requires complete categories and unique settlement references; estimates cannot pass")
     if clusters < policy["min_clusters"]:
         blockers.append(f"Only {clusters} task families; protocol requires {policy['min_clusters']}")
     if not any(c["kind"] == "negative" for c in suite["cases"]):
@@ -518,7 +532,7 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
     cost_ok = cost_delta is not None and (not (policy["require_cost_saving"] or objective == "efficiency") or cost_delta < -1e-12)
     if blockers:
         verdict = "INSUFFICIENT_EVIDENCE"
-    elif critical_failures or regression:
+    elif critical_failures or regression or methodology["violations"]:
         verdict = "REGRESSION_DETECTED"
     elif quality_ok and cost_ok:
         verdict = "PROMISING_LOCAL_SIGNAL"
@@ -526,6 +540,10 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
         verdict = "NO_DEMONSTRATED_GAIN"
     measured_verdict = verdict
     cost_analysis["saving_claim_eligible"] = (not blockers and not synthetic and cost_analysis["complete_category_coverage"])
+    cost_analysis["settled_saving_claim_eligible"] = (cost_analysis["saving_claim_eligible"] and
+        cost_analysis["cash_evidence"]["settlement_references_complete"] and cost_delta is not None and cost_delta < -1e-12)
+    cost_analysis["saving_claim_basis"] = ("SETTLEMENT_REFERENCED_CASH_PLUS_TIMER_VALUED_LABOR"
+        if cost_analysis["cash_evidence"]["settlement_references_complete"] else "CONDITIONAL_ON_SUBMITTED_ESTIMATES_OR_DECLARATIONS")
     if synthetic:
         verdict = "SIMULATION_ONLY"
     if suite["evidence_type"] == "external":
@@ -533,6 +551,8 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
     warnings.append("Costs must include retries, model judges, setup, correction and review allocated consistently; omitted categories cannot be inferred")
     if not cost_analysis["complete_category_coverage"]:
         warnings.append("Detailed cost category coverage is incomplete; legacy mean costs are recorded amounts, not verified full expenditure")
+    if not cost_analysis["cash_evidence"]["settlement_references_complete"]:
+        warnings.append("Cost savings are conditional on submitted estimates/declarations; settled savings are not established")
     report = {
         "schema_version": 1, "study_id": suite["id"], "plugin": suite["plugin"],
         "evidence_type": "synthetic" if synthetic else suite["evidence_type"], "verdict": verdict,
@@ -547,7 +567,7 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
                     "objective": objective,
                     "critical_failures": critical_failures, "comparison_eligible": not blockers},
         "policy": policy, "blockers": blockers, "warnings": warnings, "cases": cases_out,
-        "cost_analysis": cost_analysis,
+        "cost_analysis": cost_analysis, "methodology": methodology,
         "uncertainty": _bootstrap(cases_out) if not blockers else {"status": "UNAVAILABLE", "reason": "Incomplete or confounded evidence"},
         "claim_limits": {"causal_benefit": "NOT_ESTABLISHED", "external_validation": "NOT_ESTABLISHED",
                          "scientific_authorization": "NONE", "independence": "DECLARED_NOT_VERIFIED",
@@ -559,9 +579,10 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
                        "hash_scope": "Byte consistency only; no proof of execution, authorship, or preregistration time"}}
     if suite.get("corpus") is not None:
         report["corpus_errors"] = corpus_errors
-    if any(g["type"] in ("scenario", "abstention_correct", "over_refusal") for c in suite["cases"] for g in c["graders"]):
-        from .scenarios import decision_metrics
-        report["scientific_errors"] = decision_metrics(suite, records, verifier_root, artifact_root)
+    if scientific_errors is not None:
+        report["scientific_errors"] = scientific_errors
+    from .value_metrics import build_value_metrics
+    report["value_metrics"] = build_value_metrics(suite, report)
     return report
 
 

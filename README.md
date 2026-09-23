@@ -1,21 +1,22 @@
 # Plugin Value Lab
 
-Measure and register the marginal value of scientific agent plugins under matched conditions.
+Help plugin authors locate failures in paired runs and prepare a fair retest after a repair.
 
 [中文](README.zh-CN.md) · [Install](docs/INSTALL.md) · [Artifact verification](docs/ARTIFACTS.md) · [Codex collection](docs/CODEX.md)
 
-Version remains **0.4.0-alpha.1**. Paired evaluation supplies the measurements; the durable assets are domain scenarios, actual studies and independent contributions. External adoption and authenticated independent reviews are not yet established.
+Version **0.5.0**. Independent-unit scientific recomputation is now available: [design, methods and limits](docs/REPLICATE-VERIFICATION.zh-CN.md). Paired evaluation supplies the measurements; the durable assets are domain scenarios, actual studies and independent contributions. External adoption and authenticated independent reviews are not yet established.
 
-## Accumulate evidence
+## First useful result: an author repair checklist
 
-- `corpus-seed` / `corpus-prepare`: eight synthetic executable scenarios across four task families, with public tasks and separately supplied answer keys. Development and heldout families stay separate; the public seed is not a secret benchmark.
-- `registry-add` / `registry-view`: recompute studies, preserve immutable snapshots and display plugin × revision × model × host records, both unsupported acceptance and over-refusal, missing costs and dissent.
-- `registry-export` / `registry-verify` / `registry-replay`: portable study submissions, byte verification and offline recomputation.
-- `registry-review`: record real reviews, conflicts and replication links without treating declared identities as authenticated independence.
+Use existing paired records to locate execution failures, unresolved evidence and failed criteria in both arms. The usage card now includes an evidence-linked improvement queue and a full retest plan preserving cases, thresholds and negative controls. The workbench displays the same checklist and can copy the frozen protocol for the next study. You do not need to register a study or publish a score.
 
-[Registry workflow and proposed interchange contract](docs/REGISTRY.zh-CN.md). These local commands neither run models nor publish submissions. Scenario validity, actual benefit and external participation still require real evidence.
+This is a testable adoption hypothesis, not established time savings. The next product milestone is one consenting external author completing a narrow repair cycle, with actual timing, costs, negative feedback and independent review. See [the three structural risks and scope gate](docs/STRUCTURAL-RISKS.zh-CN.md).
 
-Supplement missing evidence with `registry-add --parent ... --revision-reason ...`; previous snapshots and ancestor dissent remain visible within one study lineage. For review handoffs, use `registry-export --with-reviews` and verify the separately retained packet ID with `registry-verify --expected-id ...`.
+## Optional local ledger
+
+The registry retains immutable studies, failures, review disagreements and portable replay. Its JSON/HTML and signed snapshots now expose a cold-start stage: empty, synthetic-only, local pilot or unverified external submissions. All remain a **provisional local format**, not an established trusted evidence layer. Revisions do not become independent observations; declarations, hashes and signatures do not establish adoption.
+
+[Registry workflow](docs/REGISTRY.zh-CN.md). Local diagnosis works before any external network exists. No external invitations, publication or model calls are required for that workflow.
 
 ## Start locally
 
@@ -24,9 +25,10 @@ Requires Python 3.11+. Run from your checkout or extracted plugin directory:
 ```sh
 python scripts/value_lab.py doctor
 python scripts/value_lab.py demo --output work/demo-1
+python scripts/value_lab.py usage-card work/demo-1/suite.json work/demo-1/runs.jsonl --lock work/demo-1/protocol.lock.json --output work/author-card
 ```
 
-Open `work/demo-1/report.html`. This first example is explicitly synthetic. For real records, freeze a protocol before collecting both arms:
+Open `work/author-card/USAGE.md` for the checklist and `work/demo-1/report.html` for the scores. This first example is explicitly synthetic. For real records, freeze a protocol before collecting both arms:
 
 ```sh
 python scripts/value_lab.py freeze suite.json --lock protocol.lock.json
@@ -48,6 +50,8 @@ Missing artifacts, changed hashes, missing dependencies and verifier failures re
 
 ## Host execution
 
+[Executable rigor across hosts, science and replay](docs/RIGOR.zh-CN.md): unified offline native verification, version-bound host contrasts, frozen DE testing universes, bidirectional decision-error ceilings and non-executing replay preflight. These extend evidence discipline without implying a completed cross-host benefit study.
+
 [Phase 2 workflow](docs/PHASE2.md): freeze a shared host matrix, verify Codex collection receipts, inspect matched host contrasts and longitudinal gain drops, and build signed read-only registry snapshots. Positive public cards require a version-bound, trusted-key non-author review. Gemini/OpenCode execution adapters, real external studies and public deployment remain outstanding.
 
 See the [scientific graders and Scenario Pack workflow](docs/SCIENTIFIC-VALIDATION.md), and the [first CellTypePilot study protocol](docs/CELLTYPEPILOT-PILOT.md). The protocol has no real observations yet.
@@ -62,11 +66,15 @@ See the [scientific graders and Scenario Pack workflow](docs/SCIENTIFIC-VALIDATI
 
 The [first real native audit pilot](docs/NATIVE-PILOT-20260923.zh-CN.md) collected all six scheduled Claude Code / DeepSeek sessions: five completed and one retained API failure. Registration, portable export and offline replay are complete. The verdict remains insufficient evidence; no broad plugin benefit or GA is claimed.
 
-An offline decision benchmark such as Epistemic Plugin Arena asks whether a plugin improves action selection. Value Lab asks whether the plugin improves outcomes in matched host runs. `link-decision-evidence` binds the two evidence layers by hashes without pooling their scores. [Boundary and interchange](docs/EVIDENCE-LAYERS.md).
+Reports now expose task success uplift, rescued versus harmed pairs, productive-task versus abstention outcomes, time saved and full cost per successful outcome. Optional frozen power planning counts independent task families, not repeated runs. Settlement references are distinguished from estimated cost coverage. See [value metrics and confirmation design](docs/VALUE-METRICS.zh-CN.md).
+
+## Future outlook: Epistemic Plugin Arena
+
+**Epistemic Plugin Arena is a proposed future direction**, not an established external project, current dependency or integrated benchmark. It could evaluate offline action selection alongside Value Lab's matched host outcomes if a public specification, implementation and validation become available. The current `link-decision-evidence` command is a generic hash-bound reference mechanism; it does not establish an Arena integration or pool scores. [Current boundary and future conditions](docs/EVIDENCE-LAYERS.md).
 
 ## Experimental extensions
 
-Research planning and team records remain available for compatibility. They are outside the core scientific plugin measurement workflow and provide no observed plugin benefit by themselves.
+Research planning and team records are **disabled by default** in CLI, MCP and the workbench. Use `--enable-extensions` before the CLI command to opt in. The research skill lives under `extensions/`, outside default skill discovery. Compatibility code and old records are retained. The default plugin exposes six MCP tools and two skills; no runtime module was added for this repair.
 
 [Protocol (中文)](docs/PROTOCOL.zh-CN.md) · [Review contract](CONTRACT.md) · [Costs and comparisons (中文)](docs/ANALYSIS.zh-CN.md) · [Research planning (中文)](docs/RESEARCH.zh-CN.md) · [Team records (中文)](docs/TEAM-RECORD.zh-CN.md)
 

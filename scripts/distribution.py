@@ -2,7 +2,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DIRECTORIES = (".codex-plugin", ".claude-plugin", "com.openai", "value_lab", "scripts", "skills", "docs", "examples", "evals", "tests", "schemas")
+DIRECTORIES = (".codex-plugin", ".claude-plugin", "com.openai", "value_lab", "scripts", "skills", "extensions", "docs", "examples", "evals", "tests", "schemas")
 FILES = ("plugin.json", "mcp.json", ".mcp.json", ".gitignore", "README.md", "README.zh-CN.md", "LICENSE", "CHANGELOG.md", "CONTRACT.md", "pyproject.toml", "requirements-mcp.txt", "VERIFICATION.json")
 
 

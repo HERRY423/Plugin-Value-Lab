@@ -151,6 +151,14 @@ def register_study(study, metadata, registry, *, artifact_root=None, verifier_ro
     lock = load_json(study / "protocol.lock.json")
     ledger = load_json(study / "cost-ledger.json") if (study / "cost-ledger.json").exists() else None
     _metadata(metadata)
+    native_verification = None
+    if (study / "plan.json").exists():
+        native_plan = load_json(study / "plan.json")
+        if native_plan.get("backend") == "codex-cli" or native_plan.get("format") == "pvl-claude-collection-1":
+            from .hosts import verify_host_study
+            native_verification = verify_host_study(study)
+            if metadata["plugin_sha256"] != native_verification["plugin_files_sha256"]:
+                raise ValidationError("Native study metadata must bind the collected plugin file inventory digest")
     if not isinstance(lock, dict) or lock.get("suite_sha256") != suite_digest(suite):
         raise ValidationError("Registry requires the unchanged frozen study protocol")
     if parent is not None:
@@ -184,6 +192,8 @@ def register_study(study, metadata, registry, *, artifact_root=None, verifier_ro
             write_json(dest / "suite.json", suite)
             write_json(dest / "protocol.lock.json", lock)
             write_json(dest / "metadata.json", metadata)
+            if native_verification is not None:
+                write_json(dest / "native-verification.json", native_verification)
             (dest / "runs.jsonl").write_text("".join(json.dumps(r, ensure_ascii=False, allow_nan=False) + "\n" for r in records), encoding="utf-8")
             if ledger is not None:
                 write_json(dest / "cost-ledger.json", ledger)
@@ -211,6 +221,9 @@ def register_study(study, metadata, registry, *, artifact_root=None, verifier_ro
             options = dict(artifact_root=dest / "artifacts", verifier_root=verifier_root, corpus_root=corpus_root)
             report = evaluate(suite, records, lock, ledger, **options)
             card = build_usage_card(suite, records, lock, ledger, **options)
+            from .replay import replay_contract
+            write_json(dest / "replay-contract.json", replay_contract(suite, records,
+                       verifier_root=verifier_root, corpus_root=corpus_root, artifact_root=dest / "artifacts"))
             if corpus_root is not None:
                 write_json(dest / "corpus.json", load_json(Path(corpus_root) / "corpus.json"))
             write_json(dest / "report.json", report)
@@ -292,6 +305,36 @@ def add_review(registry, review):
             write_json(staged, event)
             staged.rename(target)
     return {"review_id": rid, "entry_id": review["entry_id"], "identity_verification": "NOT_VERIFIED", "published": False}
+
+
+def _bootstrap_status(rows):
+    """Describe holdings, not trust. Revisions cannot grow the pilot count.
+
+    This local ledger cannot authenticate participants, adoption or scientific
+    review. Even signed public cards must not promote the whole registry.
+    """
+    synthetic = {r["lineage_root"] for r in rows if r["evidence_type"] == "synthetic"}
+    submitted = {r["lineage_root"] for r in rows if r["evidence_type"] != "synthetic"}
+    external = {r["lineage_root"] for r in rows if r["evidence_type"] == "external"}
+    stage = "EMPTY" if not rows else "SYNTHETIC_ONLY" if not submitted else "EXTERNAL_SUBMISSIONS_UNVERIFIED" if external else "LOCAL_PILOT"
+    labels = {"EMPTY": "尚无研究", "SYNTHETIC_ONLY": "仅合成演练", "LOCAL_PILOT": "本地试点",
+              "EXTERNAL_SUBMISSIONS_UNVERIFIED": "已有自报外部提交，身份与采用待核验"}
+    return {
+        "stage": stage, "label": labels[stage], "role": "LOCAL_EVIDENCE_LEDGER",
+        "interchange_status": "PROVISIONAL_LOCAL_FORMAT", "trusted_evidence_layer": False,
+        "synthetic_lineages": len(synthetic), "submitted_non_synthetic_lineages": len(submitted),
+        "declared_external_lineages": len(external), "independent_samples": None,
+        "external_adoption": "NOT_ESTABLISHED", "independent_validation": "NOT_ESTABLISHED",
+        "next_milestone": "先完成一个外部作者的窄任务：明确同意，冻结两组比较，记录准备与修正耗时，收集对清单的实际使用反馈和独立复核。",
+        "exit_criteria": [
+            "作者在无需公开排名的条件下实际使用改进清单，并保留拒用、无收益及额外负担。",
+            "原方案与修复后的完整配对记录可重算；失败、负面结果、人工耗时和未知成本均保留。",
+            "独立人员核对具体修订、身份关系、利益冲突及复核材料；签名或自报 external 不替代这些证据。",
+            "外部实际复用或采用有可核对的来源；本地运行、导出次数、修订数量和正向分数不充当采用。",
+        ],
+        "expansion_policy": "上述证据未建立前，只维护测量、诊断和复测主流程；不据条目数扩建平台或宣称标准已获验证。",
+        "scope": "状态由本地提交记录推导，不认证外部身份、实测真实性或独立样本数。登记和公开均非本地诊断的前提。",
+    }
 
 
 def registry_view(registry):
@@ -394,7 +437,7 @@ def registry_view(registry):
             "axis": "combined" if plugin_change and model_change else "plugin" if plugin_change else "model" if model_change else "replicate",
             "quality_gain_change": after["quality_delta"] - before["quality_delta"] if eligible else None,
             "eligible": eligible, "interpretation": "Descriptive change only; no causal attribution or cross-study cost pooling"})
-    return {"schema_version": 1, "entries": rows, "changes": changes,
+    return {"schema_version": 1, "entries": rows, "changes": changes, "bootstrap": _bootstrap_status(rows),
         "counts": {"registered_studies": len(rows), "synthetic_studies": sum(r["evidence_type"] == "synthetic" for r in rows),
                    "study_lineages": len({r["lineage_root"] for r in rows}),
                    "evidence_revisions": sum(r["parent"] is not None for r in rows),
@@ -522,8 +565,12 @@ def verify_submission(directory, expected_id=None):
     return result
 
 
-def replay_bundle(bundle, *, corpus_root=None, verifier_root=None):
-    receipt = verify_submission(bundle)
+def replay_bundle(bundle, *, corpus_root=None, verifier_root=None, expected_id=None, require_same_environment=False):
+    from .replay import plan_replay, report_changes
+    readiness = plan_replay(bundle, corpus_root=corpus_root, verifier_root=verifier_root, expected_id=expected_id)
+    if require_same_environment and readiness["same_runtime"] is not True:
+        raise ValidationError("Frozen replay environment unavailable or changed; inspect registry-replay-plan before execution")
+    receipt = verify_submission(bundle, expected_id)
     root = Path(bundle) / "study" if receipt["format"] == "pvl-review-packet-1" else Path(bundle)
     suite, records, lock = load_json(root / "suite.json"), load_records(root / "runs.jsonl"), load_json(root / "protocol.lock.json")
     ledger = load_json(root / "cost-ledger.json") if (root / "cost-ledger.json").exists() else None
@@ -532,8 +579,15 @@ def replay_bundle(bundle, *, corpus_root=None, verifier_root=None):
     previous = load_json(root / "report.json")
     engine_same = load_json(root / "registration.json")["engine_sha256"] == engine_digest()
     matches = suite_digest(report) == suite_digest(previous)
-    return {**receipt, "status": "REPRODUCED" if matches and engine_same else "REPLAY_DIFFERS",
+    environment_ok = readiness["same_runtime"] is True
+    reproduced = matches and engine_same and (environment_ok or not require_same_environment)
+    return {**receipt, "status": "REPRODUCED" if reproduced else "REPLAY_DIFFERS",
             "same_engine": engine_same, "same_report": matches, "report": report,
+            "same_runtime": readiness["same_runtime"], "readiness": readiness,
+            "report_changes": report_changes(previous, report),
+            "assessment_complete": not report["blockers"],
+            "strict_replay_eligible": matches and engine_same and environment_ok and readiness["status"] == "MATERIALS_READY",
+            "replay_scope": "Recomputed assessment only; reproducing an incomplete or synthetic report does not establish efficacy",
             "scientific_replication": "NOT_ESTABLISHED"}
 
 
@@ -552,6 +606,8 @@ def write_view(registry, output):
          "已有后继修订" if r["superseded_by"] else "补证修订" if r["parent"] else "首次登记",
          review_labels[r["review_status"]], r["verdict"])) + "</tr>" for r in view["entries"])
     page = '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>科研插件边际价值登记表</title><style>body{font:16px system-ui;margin:32px;color:#173333;background:#f4f6f4}table{border-collapse:collapse;background:white}th,td{padding:10px;border:1px solid #ccc;text-align:left}pre{white-space:pre-wrap}h1{font-size:28px}</style><h1>科研插件边际价值登记表</h1><p>按插件、内容指纹、模型、宿主及固定研究条件保留历史。缺失、失败、异议和模拟记录均保留；未知成本不等于零。</p>'
+    bootstrap = view["bootstrap"]
+    page += '<h2>冷启动状态：' + esc(bootstrap["label"]) + '</h2><p>本地证据账本 · 暂定交换格式；尚未建立可信证据层。</p><p>' + esc(bootstrap["next_milestone"]) + '</p><ul>' + ''.join('<li>' + esc(item) + '</li>' for item in bootstrap["exit_criteria"]) + '</ul><p>' + esc(bootstrap["expansion_policy"]) + '</p>'
     page += f'<p>{esc(LIMIT)}</p><p>研究历史：{view["counts"]["study_lineages"]}；评估快照：{len(view["entries"])}；补证修订：{view["counts"]["evidence_revisions"]}。这些数量不等于独立实测样本量。已认证独立复核：0；外部采用：尚未建立。</p><p><a href="registry.json">完整登记记录</a></p><table><tr>'
     page += ''.join(f'<th>{h}</th>' for h in ['研究', '观察时间', '插件', '版本', '模型', '宿主', '证据类型', '质量增益', '成本差额', '修订状态', '复核', '结论']) + '</tr>' + rows + '</table>'
     page += '<h2>补证与复核记录</h2>'

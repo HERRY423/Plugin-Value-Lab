@@ -2,7 +2,7 @@
 
 Measure and register the marginal value of scientific agent plugins under matched conditions.
 
-The package version stays 0.4.0-alpha.1. These are computational contracts, not expert validation of tasks or biological truth. Existing `artifact`, trusted local `executable`, and sealed teaching corpus contracts remain compatible.
+Version 0.5.0 adds [independent-unit exact inference](REPLICATE-VERIFICATION.zh-CN.md) through the `replicate_effect` grader and `replicate-reference` command. These are computational contracts, not expert validation of tasks or biological truth. Existing `artifact`, trusted local `executable`, and sealed teaching corpus contracts remain compatible.
 
 ## Graders
 
@@ -72,4 +72,4 @@ Use `registry-add --verifiers scorers` and `registry-replay --verifiers scorers`
 
 Codex preparation already understands suite `inputs` and `output_artifacts`; execute only after reviewing data scope, filesystem confinement and account costs. Claude's native exporter rejects these unsupported graders rather than converting them to text regex or model judging. A validated Claude artifact collector is still needed for this scientific study; native diagnostic scores cannot fill that gap. See the [native evaluation contract](https://code.claude.com/docs/en/plugin-evals).
 
-These names adopt the separation suggested for Epistemic Plugin Arena. There is no verified external Arena adapter or adopter; this is a proposed PVL contract, not a claim of byte-compatible integration or an accepted standard.
+These names define a proposed PVL contract, not an accepted standard or external integration. Epistemic Plugin Arena appears only as a [future outlook](EVIDENCE-LAYERS.md#future-outlook-epistemic-plugin-arena); current scenario names and evidence boundaries do not depend on it.

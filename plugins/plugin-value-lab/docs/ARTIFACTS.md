@@ -1,5 +1,7 @@
 # Artifact and executable outcome verification
 
+The optional `de_table.testing_family` reference now binds a separate frozen `{ids:[...]}` JSON file and checks exact tested-entity coverage before BH. Missing or changed scorer material is unresolved; legacy tables without this reference verify submitted rows only. See the [rigor workflow](RIGOR.zh-CN.md) for configuration and portable replay preflight.
+
 Add an `artifact` or `executable` grader to the existing suite. Its `artifact` is a logical ID; each run maps that ID to collected bytes:
 
 ```json

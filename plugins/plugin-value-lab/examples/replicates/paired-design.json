@@ -1,0 +1,62 @@
+{
+  "format": "pvl-replicate-design-1",
+  "mode": "paired",
+  "control": "control",
+  "treatment": "treated",
+  "features": [
+    "signal",
+    "null"
+  ],
+  "training_units": [],
+  "exchangeability": "Manufactured exchangeable observations for numerical tests, not biological evidence.",
+  "samples": [
+    {
+      "id": "control0",
+      "unit": "donor0",
+      "condition": "control",
+      "block": "batch"
+    },
+    {
+      "id": "control1",
+      "unit": "donor1",
+      "condition": "control",
+      "block": "batch"
+    },
+    {
+      "id": "control2",
+      "unit": "donor2",
+      "condition": "control",
+      "block": "batch"
+    },
+    {
+      "id": "control3",
+      "unit": "donor3",
+      "condition": "control",
+      "block": "batch"
+    },
+    {
+      "id": "treated0",
+      "unit": "donor0",
+      "condition": "treated",
+      "block": "batch"
+    },
+    {
+      "id": "treated1",
+      "unit": "donor1",
+      "condition": "treated",
+      "block": "batch"
+    },
+    {
+      "id": "treated2",
+      "unit": "donor2",
+      "condition": "treated",
+      "block": "batch"
+    },
+    {
+      "id": "treated3",
+      "unit": "donor3",
+      "condition": "treated",
+      "block": "batch"
+    }
+  ]
+}

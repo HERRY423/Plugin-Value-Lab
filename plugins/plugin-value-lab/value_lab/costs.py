@@ -7,6 +7,40 @@ CATEGORIES = ("model", "tool", "human", "judge", "setup", "retry", "other")
 SUPPLEMENTAL = ("judge", "setup", "retry", "other")
 
 
+def cash_evidence(index, plan):
+    """Check settlement declarations and line references, not invoice authenticity."""
+    gaps, refs = [], set()
+    for key in plan["extras"]:
+        cost = index.get(key, {}).get("cost", {})
+        if not isinstance(cost, dict):
+            cost = {}
+        ref = cost.get("evidence_ref")
+        if cost.get("basis") != "settled" or not isinstance(ref, str) or not ref.strip():
+            gaps.append(f"{key}: model/tool settlement basis and evidence_ref required")
+        elif ref in refs:
+            gaps.append(f"{key}: reused settlement line reference")
+        else:
+            refs.add(ref)
+    for category, state in plan["coverage"].items():
+        if state not in ("not_applicable", "itemized"):
+            gaps.append(f"{category}: explicit itemization or not_applicable declaration required")
+    for entry in plan["entries"]:
+        if plan["coverage"].get(entry["category"]) == "not_applicable":
+            gaps.append(f"{entry['id']}: itemized expense contradicts not_applicable")
+        if entry["category"] != "human" and entry["treatment"] == "additional":
+            if entry["basis"] != "settled" or entry["amount_usd"] is None:
+                gaps.append(f"{entry['id']}: supplemental cash settlement required")
+            if entry["evidence_ref"] in refs:
+                gaps.append(f"{entry['id']}: reused base settlement line reference")
+            refs.add(entry["evidence_ref"])
+        elif entry["category"] != "human":
+            gaps.append(f"{entry['id']}: included breakdown is not independently reconciled")
+    return {"settlement_references_complete": not gaps, "gaps": gaps,
+            "status": "SETTLEMENT_REFERENCES_PRESENT" if not gaps else "ESTIMATED_DECLARED_OR_MISSING",
+            "limitations": "Settlement and not-applicable states are submitted declarations, not authenticated invoices. "
+            "Human labor remains timer-valued at the frozen hourly rate, never settled cash."}
+
+
 def allocation(suite, ledger=None):
     from .core import ValidationError, _number, _stamp
     keys = [(c["id"], r, a) for c in suite["cases"] for r in range(1, suite["runs_per_case"] + 1) for a in ("with", "without")]
@@ -203,8 +237,8 @@ def analyze_costs(suite, records, ledger=None, report=None, native_estimate=None
                 components[entry["category"]] += value
                 basis_totals[entry["basis"]] += value
         rows = [r for case in (report or {}).get("cases", []) for r in case["runs"] if r["arm"] == arm]
-        success = sum(r["status"] == "completed" and r["score"] is not None and r["score"] >= suite["policy"]["quality_floor"] and
-                      not any(g["critical"] and g["passed"] is not True for g in r["grades"] if g["scored"]) for r in rows)
+        success = sum(r["status"] == "completed" and not r["issues"] and r["score"] is not None and r["score"] + 1e-12 >= suite["policy"]["quality_floor"] and
+                      not any(g["critical"] and g["passed"] is not True for g in r["grades"]) for r in rows)
         if not math.isfinite(subtotal):
             raise ValidationError("总成本溢出")
         complete = not unknown and not duplicates and not plan["issues"] and plan["coverage_complete"]
@@ -236,6 +270,7 @@ def analyze_costs(suite, records, ledger=None, report=None, native_estimate=None
             values[arm] = (info["total_usd"] + (sum([info["declared_human_minutes"], extra_minutes])) * (rate-suite["policy"]["human_hourly_usd"])/60) if info["total_usd"] is not None else None
         sensitivity.append({"hourly_usd": rate, **values, "delta_usd": values["with"]-values["without"] if None not in values.values() else None})
     return {"schema_version": 1, "arms": arms, "cost_delta_usd": delta,
+            "cash_evidence": cash_evidence(index, plan),
             "saving_fraction": -delta/totals[1] if delta is not None and totals[1] > 0 else None,
             "coverage": plan["coverage"], "complete_category_coverage": coverage_complete,
             "basis": "Declared base records plus explicitly additional entries; estimates and settlements are not interchangeable",

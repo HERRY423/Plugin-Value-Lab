@@ -1,7 +1,7 @@
 {
   "name": "plugin-value-lab",
-  "version": "0.4.0-alpha.1",
-  "description": "Measure and register the marginal value of scientific agent plugins under matched conditions.",
+  "version": "0.5.0",
+  "description": "Compare plugin runs, locate failures and retest repairs under matched conditions.",
   "author": {
     "name": "Local developer"
   },

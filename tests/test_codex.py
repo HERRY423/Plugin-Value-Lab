@@ -12,6 +12,52 @@ from value_lab.execution import digest
 
 
 class CodexTests(unittest.TestCase):
+    def test_offline_verifier_rejects_promoted_identity_costs_and_forged_output(self):
+        from copy import deepcopy
+        plan, auth = self.study()
+        self.execute_fixture(plan, auth)
+        root = Path(plan["study"])
+        original = load_records(root / "runs.jsonl")
+        for field, value in (("output", "forged passing answer"), ("token_usage", {"output_tokens": 0}),
+                             ("conditions", {"model": "invented"}), ("plugin_loaded", True),
+                             ("import_issues", []), ("cost", {"model_usd": 0}), ("duration_seconds", 0)):
+            with self.subTest(field=field):
+                records = deepcopy(original)
+                records[0][field] = value
+                (root / "runs.jsonl").write_text("".join(json.dumps(r) + "\n" for r in records), encoding="utf-8")
+                with self.assertRaises(ValidationError):
+                    verify_collection(root)
+        (root / "runs.jsonl").write_text("".join(json.dumps(r) + "\n" for r in original), encoding="utf-8")
+        self.assertTrue(verify_collection(root)["complete"])
+        from value_lab.hosts import verify_host_study
+        from value_lab.registry import register_study
+        from value_lab.core import load_json
+        checked = verify_host_study(root)
+        self.assertEqual(checked["host"], "codex-cli")
+        self.assertEqual(checked["observed_condition_records"], 0)
+        meta = {"observed_at": "2026-09-23T00:00:00Z", "authors": [{"id": "Fixture", "organization": "Fixture"}],
+                "plugin_sha256": checked["plugin_files_sha256"], "limitations": "Synthetic subprocess only"}
+        registered = register_study(root, meta, self.root / "registry")
+        native = load_json(self.root / "registry/entries" / registered["entry_id"] / "native-verification.json")
+        self.assertEqual(native["records_sha256"], checked["records_sha256"])
+        bad_meta = {**meta, "plugin_sha256": "f" * 64}
+        with self.assertRaisesRegex(ValidationError, "inventory digest"):
+            register_study(root, bad_meta, self.root / "bad-registry")
+
+    def test_offline_verifier_rechecks_executed_inputs_and_plugin(self):
+        plan, auth = self.study(inputs=True)
+        self.execute_fixture(plan, auth)
+        root = Path(plan["study"])
+        path = next((root / "runs").rglob("cells.csv"))
+        saved = path.read_bytes()
+        path.write_text("substituted input", encoding="utf-8")
+        with self.assertRaisesRegex(ValidationError, "workspace input"):
+            verify_collection(root)
+        path.write_bytes(saved)
+        (root / "plugin/plugin.json").write_text("{}", encoding="utf-8")
+        with self.assertRaisesRegex(ValidationError, "plugin snapshot"):
+            verify_collection(root)
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)

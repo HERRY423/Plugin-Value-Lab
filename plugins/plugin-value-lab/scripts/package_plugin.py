@@ -7,7 +7,7 @@ from distribution import inventory
 
 
 ROOT = Path(__file__).resolve().parents[1]
-INCLUDE_DIRS = (".codex-plugin", ".claude-plugin", "value_lab", "scripts", "skills", "docs", "examples", "evals", "tests")
+INCLUDE_DIRS = (".codex-plugin", ".claude-plugin", "value_lab", "scripts", "skills", "extensions", "docs", "examples", "evals", "tests")
 INCLUDE_FILES = (".mcp.json", ".gitignore", "README.md", "CHANGELOG.md", "CONTRACT.md", "pyproject.toml", "VERIFICATION.json")
 
 

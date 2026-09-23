@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.5.0
+
+- Added independent-unit scientific recomputation: declared donor/sample identity checks, paired or within-block exact permutations, complete-family BH, fixed effect thresholds and leave-one-unit sensitivity diagnostics.
+- Reject pseudoreplication, incomplete pairs, batch confounding, declared training overlap, selective features and fabricated statistics. Correct non-significant findings pass; invalid references remain unresolved.
+- Added public synthetic reference examples, bounded standard-library execution, SciPy numerical cross-checks and portable dependency discovery for design/data references.
+- Includes the prior same-version cross-host verification, two-direction decision limits, benefit metrics, strict cost evidence, replay preflight and author repair workflows described below.
+- Unified manifest/runtime/Python versions and added version-drift checks. Preserve file bytes across Git checkouts for frozen references and marketplace consistency.
+- This is a software release. Real cross-host benefit, independent scientific validation and researcher time savings remain unestablished.
+
+## Same-version executable rigor (0.4.0-alpha.1 retained)
+
+- Strengthened Codex offline verification against raw events, prompts, runtime inputs, plugin snapshots and preserved unknowns; unified Codex/Claude receipt inspection and native registration checks.
+- Required explicit host/model versions for host contrasts; added frozen DE testing-family coverage before BH checks.
+- Enforced critical process requirements without awarding outcome credit and added frozen bidirectional decision-error ceilings.
+- Added replay material/runtime inventories, non-executing preflight, independently pinned bundle identity, strict environment checks before execution, and field-level report differences.
+- This is local engineering verification, not new real model execution, cross-host benefit or scientific certification.
+
+## Same-version value indicators and design remediation (0.4.0-alpha.1 retained)
+
+- Added success uplift, rescued/harmed pairs, productive-task/negative-control/abstention strata, family-level gains, time saved and cost per successful outcome to evaluation reports.
+- Added optional prospective power planning by independent task family, with explicit assumptions and sample shortfall; no observed-power or significance claim.
+- Added separate settlement-reference coverage and an optional strict cost-evidence gate; estimates and timer-valued labor are not settled spending.
+- Reframed Epistemic Plugin Arena as a future outlook; current evidence boundaries and generic interchange require no external Arena project.
+- Local software tests and synthetic examples do not establish real plugin benefit or independent validation.
+
 ## Same-version followup and team record extension (0.4.0-alpha.1 retained)
 
 - Added a result followup that identifies the tested research direction, downstream dependencies and directions sharing evidence, without marking a proposed check complete.

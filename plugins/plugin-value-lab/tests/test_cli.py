@@ -57,22 +57,31 @@ class CLITests(unittest.TestCase):
             self.assertEqual(payload["use_when"], [])
             self.assertTrue((root / "card" / "USAGE.md").is_file())
 
+    def test_default_help_and_commands_exclude_extensions(self):
+        help_text = self.run_cli("--help")
+        self.assertEqual(help_text.returncode, 0)
+        for command in ("research-example", "research-plan", "research-compare", "research-followup", "team-card"):
+            self.assertNotIn(command, help_text.stdout)
+            result = self.run_cli(command)
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("invalid choice", result.stderr)
+
     def test_research_context_diagnosis_and_revision_cli(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            example = self.run_cli("research-example")
+            example = self.run_cli("--enable-extensions", "research-example")
             self.assertEqual(example.returncode, 0, example.stderr)
             context = root / "context.json"
             context.write_text(example.stdout, encoding="utf-8")
-            planned = self.run_cli("research-plan", context, "--output", root / "plan")
+            planned = self.run_cli("--enable-extensions", "research-plan", context, "--output", root / "plan")
             self.assertEqual(planned.returncode, 0, planned.stderr)
             self.assertEqual(json.loads(planned.stdout)["status"], "RESEARCH_DIAGNOSIS_ONLY")
-            again = self.run_cli("research-plan", context, "--output", root / "plan")
+            again = self.run_cli("--enable-extensions", "research-plan", context, "--output", root / "plan")
             self.assertEqual(again.returncode, 2)
-            compared = self.run_cli("research-compare", context, context, "--output", root / "comparison.json")
+            compared = self.run_cli("--enable-extensions", "research-compare", context, context, "--output", root / "comparison.json")
             self.assertEqual(compared.returncode, 0, compared.stderr)
             self.assertTrue((root / "comparison.json").is_file())
-            duplicate = self.run_cli("research-compare", context, context, "--output", root / "comparison.json")
+            duplicate = self.run_cli("--enable-extensions", "research-compare", context, context, "--output", root / "comparison.json")
             self.assertEqual(duplicate.returncode, 2)
 
 

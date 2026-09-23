@@ -26,7 +26,7 @@ class ExecutionTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
-        self.plugin = self.root / "plugin with 空格"
+        self.plugin = self.root / "plugin with 绌烘牸"
         self.plugin.mkdir()
         save(self.plugin / "plugin.json", {"name": "fixture", "version": "1.0"})
         self.engine = Engine(self.root / "evidence", sys.executable)
@@ -175,7 +175,7 @@ class WorkbenchHTTPTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.engine = Engine(Path(self.temp.name) / "evidence")
-        self.server = create_server(self.engine, 0)
+        self.server = create_server(self.engine, 0, enable_extensions=getattr(self, "enable_extensions", False))
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
         self.base = f"http://127.0.0.1:{self.server.server_port}"
@@ -202,11 +202,30 @@ class WorkbenchHTTPTests(unittest.TestCase):
             detail = json.load(response)
         job = detail["state"]["id"]
         self.assertEqual(detail["state"]["verdict"], "SIMULATION_ONLY")
+        self.assertEqual(detail["usage-card/card.json"]["improvement_plan"]["status"], "SIMULATION_ONLY")
         with urlopen(self.base + f"/api/studies/{job}/files/report/report.html") as response:
             self.assertEqual(response.headers["Content-Disposition"], "attachment")
             self.assertIn("text/plain", response.headers["Content-Type"])
         with self.assertRaises(HTTPError):
             urlopen(self.base + f"/api/studies/{job}/files/../../.owner.lock")
+
+    def test_extensions_disabled_in_html_assets_and_both_http_methods(self):
+        self.assertFalse(self.get("/api/bootstrap")["extensions_enabled"])
+        with urlopen(self.base + "/") as response:
+            page = response.read().decode()
+        for name in ("research.js", "team.js"):
+            self.assertNotIn(name, page)
+            with self.assertRaises(HTTPError) as error:
+                urlopen(self.base + "/" + name)
+            self.assertEqual(error.exception.code, 404)
+        for path in ("/api/research/example", "/api/research/diagnose", "/api/team-records", "/api/team-records/example"):
+            with self.assertRaises(HTTPError) as error:
+                self.get(path)
+            self.assertEqual(error.exception.code, 404)
+            with self.assertRaises(HTTPError) as error:
+                self.post(path)
+            self.assertEqual(error.exception.code, 404)
+        self.assertEqual(self.engine.list(), [])
 
     def test_cross_site_and_missing_token_rejected(self):
         for headers in ({"Content-Type": "application/json"},
@@ -241,6 +260,14 @@ class WorkbenchHTTPTests(unittest.TestCase):
         self.assertEqual(compared["status"], "SIMULATION_ONLY")
         with urlopen(self.base + "/analysis.js") as response:
             self.assertEqual(response.status, 200)
+
+
+
+class ExtensionHTTPTests(unittest.TestCase):
+    enable_extensions = True
+    setUp = WorkbenchHTTPTests.setUp
+    tearDown = WorkbenchHTTPTests.tearDown
+    get = WorkbenchHTTPTests.get
 
     def test_research_routes_diagnose_without_starting_agent(self):
         context = self.get("/api/research/example")

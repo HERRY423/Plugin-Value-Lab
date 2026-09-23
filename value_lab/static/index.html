@@ -1,7 +1,7 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Plugin Value Lab · 评估工作台</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script><script src="/analysis.js" defer></script><script src="/research.js" defer></script><script src="/team.js" defer></script></head>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Plugin Value Lab · 评估工作台</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script><script src="/analysis.js" defer></script></head>
 <body><header><a class="brand" href="/">◈ <span>Plugin Value Lab</span></a><span class="tag">本地评估工作台 · Alpha</span></header>
-<main><section class="intro"><p class="eyebrow">让插件的价值有据可查</p><h1>从一次公平比较开始。</h1><p>冻结任务与规则，运行有插件 / 无插件两组，留下可追溯的证据。</p><div class="actions"><button id="new">新建评估</button><button id="demo" class="secondary">体验模拟示例 · 不调用模型</button></div></section>
+<main><section class="intro"><p class="eyebrow">帮作者定位问题，修复后复测</p><h1>从一次公平比较开始。</h1><p>冻结任务与规则，比较两组结果，查看逐项改进清单。可只在本地使用，无需登记或公开排名。</p><div class="actions"><button id="new">新建评估</button><button id="demo" class="secondary">体验模拟示例 · 不调用模型</button></div></section>
 <div id="notice" role="status" aria-live="polite"></div>
 <div class="layout"><aside><h2>评估记录</h2><p class="muted">保留每次执行，包括失败与中断。</p><div id="studies"></div><p id="data-dir" class="small"></p></aside><section class="content">
 <form id="setup"><div class="section-title"><span class="step">01</span><h2>准备评估</h2></div><p class="muted">首版使用 Claude Code 原生执行器。插件从本地目录冻结为独立副本；只读工具、MCP 模拟环境，不开放 Shell 或真实 MCP。</p>

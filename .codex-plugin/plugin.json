@@ -1,7 +1,7 @@
 {
   "name": "plugin-value-lab",
-  "version": "0.4.0-alpha.1",
-  "description": "Measure and register the marginal value of scientific agent plugins under matched conditions.",
+  "version": "0.5.0",
+  "description": "Compare plugin runs, locate failures and retest repairs under matched conditions.",
   "author": {
     "name": "Local developer"
   },
@@ -23,15 +23,15 @@
   },
   "interface": {
     "displayName": "Plugin Value Lab",
-    "shortDescription": "Measure scientific plugin value under matched conditions.",
-    "longDescription": "Measure and register the marginal value of scientific agent plugins under matched conditions. Verify outcome artifacts and retain both unsafe acceptance and over-refusal. Research planning and team records are experimental extensions.",
+    "shortDescription": "Diagnose plugin failures and plan matched retests.",
+    "longDescription": "Help plugin authors locate failed or unknown outcomes and prepare matched retests. Work locally without registration or public scoring. The registry is a provisional evidence ledger; research and team extensions require explicit opt-in.",
     "developerName": "Local developer",
     "category": "Productivity",
     "capabilities": [],
     "defaultPrompt": [
       "比较这个插件相对无插件基线是否有实际增益。",
       "用可执行验证器检查评估产物，保留失败和缺失证据。",
-      "把已有评估记录整理成有适用范围的使用卡。"
+      "从已有配对记录生成改进清单，再准备修复后的复测。"
     ]
   }
 }
