@@ -14,7 +14,7 @@ The full source URL is `https://github.com/HERRY423/Plugin-Value-Lab.git`. Add t
 
 Start a new task, select the plugin with `@`, and ask it to call `example_value_suite`, then `validate_value_suite`, without starting a model evaluation. Expected fields are `real_observations: 0` and `valid: true`; calibration warnings remain visible. Reopen Codex if the new task does not load the plugin.
 
-`main` was the actual installed reference. To pin the published release instead, use `v0.5.0`. A branch can move; inspect the installed version. [Installed 0.5.0 acceptance, 2026-09-23](INSTALLED-ACCEPTANCE-20260923.zh-CN.md) records 11 calls across all six default MCP tools, scientific checks and offline replay; it is not a plugin-benefit study.
+`main` was the actual installed reference. To pin the published release instead, use `v0.6.0`. A branch can move; inspect the installed version. [Installed 0.5.0 acceptance, 2026-09-23](INSTALLED-ACCEPTANCE-20260923.zh-CN.md) records 11 calls across all six default MCP tools, scientific checks and offline replay; it is not a plugin-benefit study.
 
 If the marketplace was added but the plugin is missing, clear any installed-only filter and search again. The following fallback was checked against local CLI help; it is not a claim about which commands the user ran:
 

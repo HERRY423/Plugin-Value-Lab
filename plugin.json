@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "plugin-value-lab",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Compare plugin runs, locate failures and retest repairs under matched conditions.",
   "author": {
     "name": "Local developer"

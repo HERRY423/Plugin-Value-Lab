@@ -14,7 +14,7 @@ import tempfile
 
 from .core import ValidationError, load_json, suite_digest
 
-KINDS = {"artifact", "executable", "artifact_schema", "numeric_tolerance", "abstention_correct", "over_refusal", "backend_identity", "exec", "replicate_effect"}
+KINDS = {"pseudobulk_chain", "artifact", "executable", "artifact_schema", "numeric_tolerance", "abstention_correct", "over_refusal", "backend_identity", "exec", "replicate_effect"}
 MAX_BYTES = 64 * 1024 * 1024
 
 

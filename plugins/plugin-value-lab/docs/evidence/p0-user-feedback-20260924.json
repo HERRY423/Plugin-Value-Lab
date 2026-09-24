@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-24T09:32:11.676419+00:00",
+  "role": "current_user; independent upstream maintainer identity not established",
+  "context": "User selected NGS Analysis and BioNexus, then reviewed the concrete duplicate-transcript and donor-row diagnoses",
+  "verbatim_reply": "采纳两项诊断及修复方向",
+  "diagnosis_adopted": {
+    "ngs": true,
+    "bionexus": true
+  },
+  "repair_direction_adopted": true,
+  "repair_report_sha256": "6581f493e8f33ed55851d20c3a92a634f4f167f2f8436312c04216a78bd24810",
+  "diagnosis_presented_after_initial_report_sha256": "c14ed59a4ce3019453a030f0b8fbb1a76b1e2da2a703b2c8efbbd464d364e24d",
+  "installed_patch_application_confirmed": false,
+  "independent_upstream_author_feedback": null,
+  "human_minutes": null,
+  "misdiagnoses": null,
+  "negative_feedback": null,
+  "next_issue_reuse": null
+}

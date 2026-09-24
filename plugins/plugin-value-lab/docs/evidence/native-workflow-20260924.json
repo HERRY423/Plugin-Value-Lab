@@ -1,0 +1,231 @@
+{
+  "date": "2026-09-24",
+  "version": "0.5.0",
+  "version_changed": false,
+  "tests": {
+    "run": 517,
+    "seconds": 114.324,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "log_sha256": "70ebcfa18a8aab5068c4c2c7d5c8b3264fc6383b634b15f14c0834d325aaef4d"
+  },
+  "implementation": [
+    "Existing official cases with single-attempt isolated native collection",
+    "Six evidence-linked factual stages and falsifiable repair hypotheses",
+    "Bound explicit-invocation diagnostic probes without natural-use value promotion",
+    "Offline Linux retained-directory relocation support, no execution of retained content"
+  ],
+  "native_execution": {
+    "host": "Claude Code 2.1.278 Linux/WSL",
+    "provider_host": "api.deepseek.com",
+    "model": "deepseek-flash",
+    "actual_sessions": 2,
+    "provider_api_request_count": null,
+    "original_case_bytes_unchanged": true,
+    "session_sha256": "1f20bca89ed725ab88a2570f116ff3c0765cdac156b52fc8af1256f0f34a3c8a",
+    "native_estimate_limit_usd": 0.3,
+    "native_estimated_cost_usd": 0.11628100000000001,
+    "settled_cost_usd": null,
+    "native_partial": false,
+    "process": {
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_seconds": 15.331075931
+    },
+    "native_file_exists_passes": 2,
+    "independent_artifact_checks_passed": 6,
+    "receipt_sha256": "bfc72859923d4a5b58371a72a9ce7bdc545eb86b4e838065aa527510c55b6fe9",
+    "capture_path": "C:\\Test\\native-workflow-canary-linux-20260924\\recovered\\collected",
+    "offline_replay": "REPRODUCED",
+    "model_relaunched_for_collection": false,
+    "initial_incomplete_capture_preserved": true,
+    "native_sealing_warning": true,
+    "seal_authentication": "NOT_ESTABLISHED",
+    "startup_failure_before_model": {
+      "exit_code": 126,
+      "reason": "Windows executable blocked by Linux namespace",
+      "preserved": true,
+      "regression_test_added": true
+    },
+    "runs": [
+      {
+        "arm": "with",
+        "status": "completed",
+        "binding": {
+          "native_json_pointer": "/cases/0/arms/with/0",
+          "native_run_sha256": "e115df97b21ff4c7445bd144da9df2df3df84d2783dd8562446e4589ec77289e",
+          "method": "native_tracePath_init_cwd_sealed_layout"
+        },
+        "grades": [
+          {
+            "id": "bh",
+            "passed": true
+          },
+          {
+            "id": "preserve-p",
+            "passed": true
+          },
+          {
+            "id": "preserve-effect",
+            "passed": true
+          }
+        ],
+        "plugin_names": [
+          "ngs-analysis-pvl-canary"
+        ],
+        "skill_calls": [],
+        "issues": [
+          "Native workspace relocation observed; sealing is NOT verified. Retained contents remain untrusted and are never executed by the sidecar."
+        ]
+      },
+      {
+        "arm": "without",
+        "status": "completed",
+        "binding": {
+          "native_json_pointer": "/cases/0/arms/without/0",
+          "native_run_sha256": "7e3f01c45cd6863186107a139bd69cc3e36814a83d1b7f6616791ead15b4bc38",
+          "method": "native_tracePath_init_cwd_sealed_layout"
+        },
+        "grades": [
+          {
+            "id": "bh",
+            "passed": true
+          },
+          {
+            "id": "preserve-p",
+            "passed": true
+          },
+          {
+            "id": "preserve-effect",
+            "passed": true
+          }
+        ],
+        "plugin_names": [],
+        "skill_calls": [],
+        "issues": [
+          "Native workspace relocation observed; sealing is NOT verified. Retained contents remain untrusted and are never executed by the sidecar."
+        ]
+      }
+    ]
+  },
+  "isolation": {
+    "four_case_preflight": {
+      "passed": true,
+      "observations": {
+        "files": [
+          {
+            "path": "/mnt/c/Test/native-analysis-20260924/study/plan/plan.json",
+            "readable": false,
+            "writable_existing": false,
+            "replacement_creatable": false
+          },
+          {
+            "path": "/mnt/c/Test/native-analysis-20260924/scorers/complete-family/decision.json",
+            "readable": false,
+            "writable_existing": false,
+            "replacement_creatable": false
+          },
+          {
+            "path": "/mnt/c/Test/native-analysis-20260924/scorers/complete-family/family.json",
+            "readable": false,
+            "writable_existing": false,
+            "replacement_creatable": false
+          },
+          {
+            "path": "/mnt/c/Test/native-analysis-20260924/scorers/complete-family/input.csv",
+            "readable": false,
+            "writable_existing": false,
+            "replacement_creatable": false
+          },
+          {
+            "path": "/mnt/c/Test/native-analysis-20260924/scorers/ties-and-boundaries/decision.json",
+            "readable": false,
+            "writable_existing": false,
+            "replacement_creatable": false
+          },
+          {
+            "path": "/mnt/c/Test/native-analysis-20260924/scorers/ties-and-boundaries/family.json",
+            "readable": false,
+            "writable_existing": false,
+            "replacement_creatable": false
+          },
+          {
+            "path": "/mnt/c/Test/native-analysis-20260924/scorers/ties-and-boundaries/input.csv",
+            "readable": false,
+            "writable_existing": false,
+            "replacement_creatable": false
+          },
+          {
+            "path": "/mnt/c/Test/native-analysis-20260924/scorers/invalid-p/decision.json",
+            "readable": false,
+            "writable_existing": false,
+            "replacement_creatable": false
+          },
+          {
+            "path": "/mnt/c/Test/native-analysis-20260924/scorers/duplicate-id/decision.json",
+            "readable": false,
+            "writable_existing": false,
+            "replacement_creatable": false
+          }
+        ],
+        "windows_interop_succeeded": false
+      },
+      "host_bytes_unchanged": true,
+      "scope": "These named roots denied read/write/replacement in the tested namespace; no assertion about undisclosed copies, prior exposure or independent scientific blinding."
+    },
+    "actual_canary_before_execution": {
+      "passed": true,
+      "observations": {
+        "files": [
+          {
+            "path": "/mnt/c/Test/p0-native-csv-20260924/plan/plan.json",
+            "readable": false,
+            "writable_existing": false,
+            "replacement_creatable": false
+          },
+          {
+            "path": "/mnt/c/Test/p0-native-csv-20260924/scorers/family.json",
+            "readable": false,
+            "writable_existing": false,
+            "replacement_creatable": false
+          },
+          {
+            "path": "/mnt/c/Test/p0-native-csv-20260924/scorers/input.csv",
+            "readable": false,
+            "writable_existing": false,
+            "replacement_creatable": false
+          }
+        ],
+        "windows_interop_succeeded": false
+      },
+      "host_bytes_unchanged": true,
+      "scope": "These named roots denied read/write/replacement in the tested namespace; no assertion about undisclosed copies, prior exposure or independent scientific blinding."
+    },
+    "scope": "Named paths only; not undisclosed copies, prior exposure, independent blinding or scientific validity"
+  },
+  "hypotheses": {
+    "report_sha256": "a683fe95408f6f4de6c7d8c0abff298d0c16d256951ee280eb454c05aa59ad46",
+    "explicit_probe_prepared": true,
+    "explicit_probe_executed": false,
+    "causal_trigger_defect_established": false,
+    "natural_use_value_replaced": false
+  },
+  "distribution": {
+    "published": false,
+    "installed_cache_updated": false,
+    "default_skills": 2,
+    "default_mcp_tools": 6
+  },
+  "limits": {
+    "comparison_eligible": false,
+    "plugin_benefit": "NOT_ESTABLISHED",
+    "biological_validity": "NOT_ESTABLISHED",
+    "independent_expert_review": "PENDING",
+    "independent_external_reuse": "PENDING",
+    "external_author_acceptance": "NOT_ESTABLISHED",
+    "prior_unknown_settlement_unchanged": true,
+    "new_paid_catalog_calls": 0,
+    "external_messages": 0
+  }
+}

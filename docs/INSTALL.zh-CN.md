@@ -1,6 +1,6 @@
 # 安装 Plugin Value Lab
 
-版本：0.5.0。以下以用户在 Codex 桌面端成功安装的 GitHub 市场配置为主。2026-09-23 已核对 Git 来源、`main` 引用、插件启用状态，并在该任务中实调全部 6 个默认 MCP 工具。[实测记录](INSTALLED-ACCEPTANCE-20260923.zh-CN.md)。
+版本：0.6.0。以下以用户在 Codex 桌面端成功安装的 GitHub 市场配置为主。2026-09-23 的历史 0.5.0 安装已核对 Git 来源、`main` 引用、插件启用状态，并在该任务中实调全部 6 个默认 MCP 工具。[实测记录](INSTALLED-ACCEPTANCE-20260923.zh-CN.md)。
 
 ## 按截图添加
 
@@ -12,7 +12,7 @@
 | Git 引用 | `main` |
 | 稀疏路径 | **留空**；灰色的 `plugins/codex` 是提示，不是要填写的值 |
 
-完整 Git URL `https://github.com/HERRY423/Plugin-Value-Lab.git` 也可作为来源；已安装配置将来源保存为这个 URL。`main` 是本次成功安装采用的分支；希望固定已发布版本时，可改用 `v0.5.0`，但这不是本次用户安装所用的引用。
+完整 Git URL `https://github.com/HERRY423/Plugin-Value-Lab.git` 也可作为来源；已安装配置将来源保存为这个 URL。`main` 是本次成功安装采用的分支；希望固定已发布版本时，可改用 `v0.6.0`，但这不是本次用户安装所用的引用。
 
 1. 点击“添加市场”。市场名为 `plugin-value-lab-marketplace`。
 2. 回到插件列表搜索 **Plugin Value Lab**，打开后点击**安装并启用**。插件标识为 `plugin-value-lab@plugin-value-lab-marketplace`。
@@ -36,7 +36,7 @@ codex plugin add plugin-value-lab@plugin-value-lab-marketplace
 
 也可选择包含 `.agents/plugins/marketplace.json` 的市场根目录绝对路径作为来源，Git 引用与稀疏路径均留空，然后安装并启用插件。
 
-给其他用户时，发送 `plugin-value-lab-marketplace-0.5.0.zip`，请对方先解压，在“来源”填写解压得到的 **plugin-value-lab-marketplace 文件夹的绝对路径**。应选择含 `.agents/plugins/marketplace.json` 的市场根目录；不要选 ZIP 文件、JSON 文件或里面的 `plugins/plugin-value-lab` 子目录。这个压缩包可以在任意目录解压，不依赖开发电脑的路径。
+给其他用户时，发送 `plugin-value-lab-marketplace-0.6.0.zip`，请对方先解压，在“来源”填写解压得到的 **plugin-value-lab-marketplace 文件夹的绝对路径**。应选择含 `.agents/plugins/marketplace.json` 的市场根目录；不要选 ZIP 文件、JSON 文件或里面的 `plugins/plugin-value-lab` 子目录。这个压缩包可以在任意目录解压，不依赖开发电脑的路径。
 
 ## 运行条件
 
@@ -83,7 +83,7 @@ repository/
 
 ## 标准包与兼容包
 
-`plugin-value-lab-agent-plugins-0.5.0.zip` 是 Agent Plugins 1.0.0 的便携包，根目录有 `plugin.json`、`mcp.json` 和两个默认技能。研究技能保留在 `extensions/`，退出默认发现；研究与团队入口需在子命令前显式添加 `--enable-extensions`。它不包含旧宿主入口；按目标客户端的 Agent Plugins 加载流程使用。[范围与启用说明](STRUCTURAL-RISKS.zh-CN.md)。
+`plugin-value-lab-agent-plugins-0.6.0.zip` 是 Agent Plugins 1.0.0 的便携包，根目录有 `plugin.json`、`mcp.json` 和两个默认技能。研究技能保留在 `extensions/`，退出默认发现；研究与团队入口需在子命令前显式添加 `--enable-extensions`。它不包含旧宿主入口；按目标客户端的 Agent Plugins 加载流程使用。[范围与启用说明](STRUCTURAL-RISKS.zh-CN.md)。
 
 安装后的评估工作台仍是本地进程。可让助手按 `assess-value` 技能定位插件根目录并启动 `python scripts/value_lab.py workbench --data <可写证据目录>`，随后打开打印的本地地址。不要把研究数据写入只读插件缓存。真实 Agent 执行另需本机 Claude Code、认证和模型权限；安装 Value Lab 不会自动提供 Claude 账户。见 [工作台指南](WORKBENCH.zh-CN.md)。
 

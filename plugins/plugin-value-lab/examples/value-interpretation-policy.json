@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "primary_estimand": "scientific_correctness",
+  "pairing_rationale": "Same case and randomized execution block; repetitions are not individual counterfactuals",
+  "task_distribution": "Three manufactured tutorial families only",
+  "failure_rules": {
+    "scientific_correctness": {
+      "measurement": "unknown",
+      "tested_system": "failure",
+      "provider": "unknown",
+      "infrastructure": "unknown",
+      "unclassified": "unknown"
+    },
+    "runtime_reliability": {
+      "measurement": "unknown",
+      "tested_system": "failure",
+      "provider": "failure",
+      "infrastructure": "failure",
+      "unclassified": "unknown"
+    },
+    "full_delivery": {
+      "measurement": "unknown",
+      "tested_system": "failure",
+      "provider": "failure",
+      "infrastructure": "failure",
+      "unclassified": "unknown"
+    }
+  }
+}

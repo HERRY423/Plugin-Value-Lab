@@ -1,6 +1,6 @@
 # Screenshot remediation — versions unchanged
 
-本页下方是较早修复的历史记录；其中零真实运行和旧测试数量不代表当前状态。三个结构性风险的最新处理见[本次记录](STRUCTURAL-RISKS.zh-CN.md)，当前验收见 `VERIFICATION.json`。本页所述历史修复未增加版本；当前 0.5.0 的验收见 `VERIFICATION.json`。
+本页下方是较早修复的历史记录；其中零真实运行和旧测试数量不代表当前状态。三个结构性风险的最新处理见[本次记录](STRUCTURAL-RISKS.zh-CN.md)，当前验收见 `VERIFICATION.json`。本页所述历史修复未增加版本；当前 0.6.0 的验收见 `VERIFICATION.json`。
 
 This revision keeps the product at `0.4.0-alpha.1` and the Python package at `0.4.0a1`.
 

@@ -1,0 +1,65 @@
+{
+  "format": "pvl-p2-acceptance-1",
+  "version": "0.5.0",
+  "delivery_sha256": "119ac73961d782ad7fbe1f1f0676aad0a8617a9043519d723d335b2dd095b4c4",
+  "study_package_id": "39be340a49f1d00bfde672534bf14137cb490b38cd51c840b4d72c52cead9407",
+  "relocated_files_verified": 26,
+  "retained_real_pilot": {
+    "expected_runs": 6,
+    "observed_runs": 6,
+    "failed_runs": 1,
+    "verdict": "INSUFFICIENT_EVIDENCE",
+    "comparison_eligible": false
+  },
+  "fresh_process_replay": {
+    "status": "REPRODUCED",
+    "same_report": true,
+    "same_engine": true,
+    "same_runtime": true,
+    "assessment_complete": false,
+    "new_observations": 0,
+    "new_independent_samples": 0
+  },
+  "received_receipt_check": {
+    "package_id": "39be340a49f1d00bfde672534bf14137cb490b38cd51c840b4d72c52cead9407",
+    "integrity": "BYTES_MATCH",
+    "observation_set_sha256": "77fe2539f08d6cdaec611ac09b989efa7b823a05aae784c20dee5c693afdb366",
+    "receipt_integrity": "INTERNALLY_CONSISTENT",
+    "reported_replay_status": "REPRODUCED",
+    "participant": null,
+    "new_observations": 0,
+    "new_independent_samples": 0,
+    "participant_authenticated": false,
+    "execution_authenticated": false,
+    "independent_reuse": "NOT_ESTABLISHED",
+    "scope": "Received declarations and artifacts are consistent; independently rerun to check computation, independently establish participant identity"
+  },
+  "pseudobulk_relocated_check": {
+    "passed": true,
+    "independent_units": 8,
+    "testing_family_size": 7877
+  },
+  "synthetic_guidance_demo": "SIMULATION_ONLY",
+  "external_participants": 0,
+  "independent_expert_review": "PENDING",
+  "new_model_calls": 0,
+  "new_reference_fits": 0,
+  "new_paid_catalog_calls": 0,
+  "current_user_response": "暂无外部记录，先完成可复用交付",
+  "prior_unknown_settlement_unchanged": true,
+  "scope": "Local isolated-process replay of actual retained evidence plus explicitly synthetic decision tests; no independent external reuse or actual host/model comparison",
+  "evidence_files": {
+    "pilot-replay/receipt.json": "1877d566f3a822a5af1ddc3f6a6517d9f4ccea04cb5f08a57fe3c0c1c42b142a",
+    "pilot-replay/report.json": "460f8035d8de17a3d10038cd3d3a94cfeba32ddbd0c0c340fb9fd25a9af4bcea",
+    "pseudobulk.log": "4dbdcbac5c8bef12b73d9b4637d4edf5583b8eaf7810029e38b5a2178acebe8a",
+    "guidance-demo/guidance.json": "141eb6c74bcca2dd1ef381510892895448a483188f4aa7e534322680eb853847"
+  },
+  "tests": {
+    "run": 471,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "runtime_seconds": 85.037,
+    "log_sha256": "672711dbce30af3b0cef8ec938cab1d539c9fce0857cedd86db5f35475cf2c30"
+  }
+}

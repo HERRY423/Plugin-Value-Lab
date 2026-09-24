@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "at": "2026-09-24T09:32:12.349522+00:00",
+  "host": "Claude Code 2.1.278",
+  "provider": "configured DeepSeek Anthropic-compatible endpoint",
+  "candidate": "unchanged NGS understand-ngs-results skill wrapper; not complete installed plugin",
+  "source_skill_sha256": "68b60db1155b7357770e5ff8113271f6d77ad21dcd8c1e2a89536380e0cb9e73",
+  "evidence_type": "real_native_sessions_on_public_synthetic_CSV",
+  "completed_model_sessions": 2,
+  "prior_network_blocked_sessions": 2,
+  "prior_trace_assistant_or_result_events": 0,
+  "prior_settled_cost_usd": null,
+  "prior_attempt_preserved": true,
+  "successful_native_result_sha256": "a73ec9303f54c72b26b492c917c9bec017805b6c3e72f87da599359465454c87",
+  "failed_native_result_sha256": "dddf0533bb112df1a2a1c6190f4ad2a3953ee7521f3ae25150c0872326600dc9",
+  "sidecar_receipt_sha256": "a366d263b0870a278c96262bb1ae89450714bb845295e72da2422f6f56f74bfc",
+  "failed_sidecar_receipt_sha256": "740e3a9d5bb1a678a4e98547c46415f925ebbee94b1f51375879b26877cdeaeb",
+  "replay": "REPRODUCED",
+  "relocated_replay": "REPRODUCED",
+  "failed_replay": "REPRODUCED",
+  "official_file_exists": {
+    "with": true,
+    "without": true
+  },
+  "runs": [
+    {
+      "arm": "with",
+      "session_id": "8732d34a-d9ad-4518-b581-d9653d77b98f",
+      "observed_model": "deepseek-flash",
+      "observed_plugin_names": [
+        "ngs-analysis-pvl-canary"
+      ],
+      "skill_calls": [],
+      "grades": [
+        {
+          "id": "bh",
+          "passed": true,
+          "rationale": "Artifact satisfies the frozen computational contract; biological validity not established"
+        },
+        {
+          "id": "preserve-p",
+          "passed": true,
+          "rationale": "Scientific computational contract checked; inspect verifier receipt and evidence limits"
+        },
+        {
+          "id": "preserve-effect",
+          "passed": true,
+          "rationale": "Scientific computational contract checked; inspect verifier receipt and evidence limits"
+        }
+      ],
+      "usage_envelope": {
+        "input_tokens": 7775,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 7808,
+        "output_tokens": 555
+      },
+      "provider_peak_rate_estimate_usd": 0.003045348,
+      "native_estimate_usd": 0.05665400000000001,
+      "native_model_cost_basis": "unknown"
+    },
+    {
+      "arm": "without",
+      "session_id": "41fbf12a-e920-4ac6-9765-f0e3527aebee",
+      "observed_model": "deepseek-flash",
+      "observed_plugin_names": [],
+      "skill_calls": [],
+      "grades": [
+        {
+          "id": "bh",
+          "passed": false,
+          "rationale": "BH adjusted probabilities disagree with the complete submitted testing family"
+        },
+        {
+          "id": "preserve-p",
+          "passed": true,
+          "rationale": "Scientific computational contract checked; inspect verifier receipt and evidence limits"
+        },
+        {
+          "id": "preserve-effect",
+          "passed": true,
+          "rationale": "Scientific computational contract checked; inspect verifier receipt and evidence limits"
+        }
+      ],
+      "usage_envelope": {
+        "input_tokens": 7702,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 7680,
+        "output_tokens": 487
+      },
+      "provider_peak_rate_estimate_usd": 0.00294108,
+      "native_estimate_usd": 0.054525,
+      "native_model_cost_basis": "unknown"
+    }
+  ],
+  "scipy_bh_oracle_input_order_A_B_C": [
+    0.03,
+    0.04,
+    0.04
+  ],
+  "native_estimated_cost_usd": 0.111179,
+  "native_estimated_ceiling_usd": 0.1,
+  "ceiling_overrun": "in-flight second run, no runs skipped",
+  "native_cost_basis": "unknown for custom model; not provider bill",
+  "provider_peak_rate_estimate_usd": 0.005986428,
+  "pricing_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+  "settled_cost_usd": null,
+  "paid_catalog_calls": 0,
+  "human_minutes": null,
+  "comparison_eligible": false,
+  "reference_isolation_verified": false,
+  "windows_native_workspace_sealed": false,
+  "limits": [
+    "Only one case and one run per arm; no plugin benefit inference.",
+    "No Skill invocation observed in either arm; cannot attribute numerical difference to plugin.",
+    "Original native cases unchanged between freeze and capture.",
+    "Original failed attempt preserved and not converted to success.",
+    "Windows native host warns it cannot seal retained directories; no immutable execution/authentication or scorer isolation claim."
+  ]
+}

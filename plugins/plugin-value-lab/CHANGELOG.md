@@ -1,5 +1,45 @@
 # Changelog
 
+## 0.6.0 — 2026-09-24
+
+This release includes the native workflow, scientific analysis, P0/P1/P2 and evidence-reuse changes detailed below. Runtime, Python and plugin manifests are synchronized at 0.6.0. Dated implementation records retain the version and evidence available when they were written.
+
+### Native workflow and falsifiable diagnostics
+
+- Add a bounded Linux/WSL wrapper around existing official cases: freeze the invocation, probe scorer access and executable startup inside isolation, authorize one attempt, bind retained workspaces and grade offline. Preserve partial results and uncertain process state; recovery never relaunches the model.
+- Link six diagnostic stages to observed evidence and separate interventions, predictions and falsifiers from causal conclusions. Extend usage-card repair queues with falsifiable checks.
+- Prepare explicitly labeled invocation probes and reject changed inputs, protocols, contexts, reused sessions or failed Skill results in diagnostic contrasts. Natural-use value remains separate.
+- See `docs/NATIVE-WORKFLOW-HYPOTHESES.zh-CN.md` and its acceptance receipt for actual execution, tests, costs and pending external validation.
+
+### Native analysis and repair additions
+
+- Prepare official native file/script analysis cases with frozen input bytes and separate scientific rules; no model executor or automatic calls added.
+- Observe exact foreground Bash calls and linked results; retain runtime failures, unknowns, input changes, model conflicts and retry errors.
+- Recompute complete before/after native repair packages, reject protocol changes and session reuse, retain both arms and control regressions without causal promotion.
+- Validate four disclosed controls in WSL with an operator-written script; 491 tests passed. New native model execution, reference isolation and independent review remain unverified.
+
+### P2 changes
+
+- Add registry-free pinned handoffs, separate allowlisted scorer delivery, non-executing offline replay and receipt consistency inspection. Preserve incomplete evidence; replays add zero observations or independent samples.
+- Add explicit single-axis host/model/plugin/replicate comparisons with version, content, lineage and protocol checks; legacy comparison behavior remains available.
+- Generate scoped trial guidance from recomputed observations under prospectively frozen quality, cost and failure limits. Keep baseline progress distinct from enabled-outcome decline; no automatic retirement or noninferiority claim.
+- Deliver real retained pilot/scientific materials for external reuse. No external participant, independent expert review, new live host experiment or paid model call is asserted.
+
+### P1 changes
+
+- Use observed paired improvement/regression labels; preserve legacy machine fields and old study semantics.
+- Add opt-in frozen estimands, explicit evidenced failure classes, planned denominators, equal-family success endpoints, descriptive uncertainty and per-check evidence qualifications without upgrading legacy verdicts.
+- Add donor-aware raw-count aggregation, version-pinned PyDESeq2 reference execution, retained fitting changes, offline chain verification and separate backend receipts; open scientific solutions remain subject to review.
+- Add a reusable development scenario, controlled error/valid-variation corpus and real Kang/GSE96583 cached-data checks. Independent expert review remains pending; no new model calls or benefit claims.
+
+### P0 changes
+
+- Reuse native eval cases with frozen artifact contracts, allowlisted collection, exact retained trace/workspace links for Claude Code 2.1.278, and independent offline scientific diagnosis/replay.
+- Preserve partial runs, failures, unknown evidence and raw host observations; do not promote workspace mappings or file hashes to authenticated execution or plugin benefit.
+- Reproduced and repaired NGS/BioNexus component defects in isolated copies, with full frozen local retests and actual current-user adoption feedback. Installed upstream packages remain unchanged.
+- Completed a real two-arm CSV canary: native file-existence graders passed both; independent BH verification detected the incorrect baseline artifact. No Skill calls were observed, so this is not evidence of plugin value. Windows reference isolation and independent upstream adoption remain unverified.
+- 421 tests passed with no skips; see `docs/P0-IMPLEMENTATION-20260924.zh-CN.md` for exact evidence and cost boundaries.
+
 ## 0.5.0
 
 - Added independent-unit scientific recomputation: declared donor/sample identity checks, paired or within-block exact permutations, complete-family BH, fixed effect thresholds and leave-one-unit sensitivity diagnostics.

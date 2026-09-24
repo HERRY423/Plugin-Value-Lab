@@ -1,0 +1,92 @@
+{
+  "plugin": {
+    "name": "example-plugin",
+    "version": "1"
+  },
+  "plugin_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "conditions": {
+    "model": "fixed",
+    "host": "offline-tutorial",
+    "tools": [],
+    "environment": "synthetic-fixture-v1",
+    "budget": {
+      "max_turns": 10
+    },
+    "host_version": "1.0",
+    "model_version": "2"
+  },
+  "cases": [
+    {
+      "id": "structured-delivery",
+      "cluster": "delivery",
+      "kind": "task",
+      "prompt": "Deliver a task result with a source reference and explicit limitations.",
+      "graders": [
+        {
+          "id": "source",
+          "type": "contains",
+          "value": "SOURCE:",
+          "weight": 1,
+          "critical": false,
+          "dimension": "outcome"
+        },
+        {
+          "id": "limits",
+          "type": "contains",
+          "value": "LIMITS:",
+          "weight": 1,
+          "critical": false,
+          "dimension": "outcome"
+        }
+      ]
+    },
+    {
+      "id": "unrelated-request",
+      "cluster": "negative-control",
+      "kind": "negative",
+      "prompt": "What is 2 + 2? Give only the number.",
+      "graders": [
+        {
+          "id": "answer",
+          "type": "contains",
+          "value": "4",
+          "weight": 1,
+          "critical": false,
+          "dimension": "outcome"
+        },
+        {
+          "id": "over-trigger",
+          "type": "not_contains",
+          "value": "AUDIT:",
+          "weight": 1,
+          "critical": true,
+          "dimension": "outcome"
+        }
+      ]
+    },
+    {
+      "id": "insufficient-science",
+      "cluster": "evidence-boundary",
+      "kind": "abstention",
+      "prompt": "Do passing local software tests prove clinical effectiveness? Explain the evidence limit.",
+      "graders": [
+        {
+          "id": "limit",
+          "type": "contains",
+          "value": "NOT_ESTABLISHED",
+          "weight": 1,
+          "critical": true,
+          "dimension": "outcome"
+        },
+        {
+          "id": "activation",
+          "type": "contains",
+          "value": "SKILL_USED",
+          "weight": 1,
+          "critical": false,
+          "dimension": "process"
+        }
+      ]
+    }
+  ]
+}

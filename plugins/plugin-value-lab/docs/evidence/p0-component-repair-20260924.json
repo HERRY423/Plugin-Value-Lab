@@ -1,0 +1,298 @@
+{
+  "schema_version": 1,
+  "protocol_sha256": "0282acf427180b42fb825e2281be4f25f577003541e365461c8b00839ac07745",
+  "status": "LOCAL_REPAIR_RETESTED_AUTHOR_VALIDATION_PENDING",
+  "coverage": {
+    "ngs": {
+      "before": {
+        "passed": 2,
+        "total": 7
+      },
+      "after": {
+        "passed": 7,
+        "total": 7
+      }
+    },
+    "bionexus": {
+      "before": {
+        "passed": 2,
+        "total": 5
+      },
+      "after": {
+        "passed": 5,
+        "total": 5
+      }
+    }
+  },
+  "installed_plugins_modified": false,
+  "native_host_eval_executed": false,
+  "actual_model_calls": 0,
+  "paid_catalog_calls": 0,
+  "human_minutes": null,
+  "full_project_cost_usd": null,
+  "limits": [
+    "NGS executes the complete copied aggregation script; no FASTQ or whole workflow run.",
+    "BioNexus executes the exact copied helper AST; the current harvest path does not call it.",
+    "Fixtures were designed during code review; not blinded or held out.",
+    "Independent maintainer feedback and application to installed source remain pending."
+  ],
+  "source_snapshots": {
+    "ngs": {
+      "before_sha256": "d5831c9e38cd70fd860ebe77b9bf355d452ebc3b2c5d72e65794dc9a35342dc4",
+      "after_sha256": "173c6a596bcaa220f6d3865ceeb8ed9c8e7c70019cee0dda5a31e2a38ca6725f",
+      "patch_sha256": "a72d0ded032623da3aa48fc130ad3d6e4d24685d15a05b82154f9dd1e19c7f5a"
+    },
+    "bionexus": {
+      "before_sha256": "53ce1f3d4a2b1d340b2f8de986c8012812671dca10b35147ea66d847061e4e9c",
+      "after_sha256": "89091b4d537cfdc4e19cc5a02343bf37232ee7ee82ea950440c3414f2bdc2322",
+      "patch_sha256": "b9319590512144c108fbab85b068b04cf4c57210ce3d23cb2da975d0581a2b8e"
+    }
+  },
+  "source_versions": {
+    "ngs": "installed 0.2.16",
+    "bionexus": "1.0.0-rc.8; dirty working tree at 683018420a753738d8a84d43f0c60b3a36516698, source bytes identified separately"
+  },
+  "full_local_manifest_sha256": "10555c9960a59e609338c0658ba4c7742e41014756761e88cb3009b5d090653d",
+  "results": [
+    {
+      "plugin": "ngs",
+      "revision": "before",
+      "case_id": "duplicate_transcript",
+      "passed": false,
+      "rationale": "JSON artifact field mismatch: rejected_before_matrix",
+      "input_sha256": "95d19f3635c607cfd1ed6b5c567511e2b6dc507732cf5a53b16805338b70ec75",
+      "executed_code_sha256": "d5831c9e38cd70fd860ebe77b9bf355d452ebc3b2c5d72e65794dc9a35342dc4",
+      "elapsed_seconds": 0.1575909999664873
+    },
+    {
+      "plugin": "ngs",
+      "revision": "before",
+      "case_id": "nonfinite_reads",
+      "passed": false,
+      "rationale": "JSON artifact field mismatch: rejected_before_matrix",
+      "input_sha256": "df2659deccaf1565b9661e6424943974dcb1bb8aca087b633fd6b23d639ff7d1",
+      "executed_code_sha256": "d5831c9e38cd70fd860ebe77b9bf355d452ebc3b2c5d72e65794dc9a35342dc4",
+      "elapsed_seconds": 0.14328560000285506
+    },
+    {
+      "plugin": "ngs",
+      "revision": "before",
+      "case_id": "negative_reads",
+      "passed": false,
+      "rationale": "JSON artifact field mismatch: rejected_before_matrix",
+      "input_sha256": "b25ac24e1df23e4ba61ddfa56a1504a2c4fef07e8b9ef0fb3998f3470bbefe0b",
+      "executed_code_sha256": "d5831c9e38cd70fd860ebe77b9bf355d452ebc3b2c5d72e65794dc9a35342dc4",
+      "elapsed_seconds": 0.13014649995602667
+    },
+    {
+      "plugin": "ngs",
+      "revision": "before",
+      "case_id": "empty_table",
+      "passed": false,
+      "rationale": "JSON artifact field mismatch: rejected_before_matrix",
+      "input_sha256": "0419a0d2839cde9a860d3abf93061af0496b9747f62142f92656798b0b1e75d7",
+      "executed_code_sha256": "d5831c9e38cd70fd860ebe77b9bf355d452ebc3b2c5d72e65794dc9a35342dc4",
+      "elapsed_seconds": 0.12495909992139786
+    },
+    {
+      "plugin": "ngs",
+      "revision": "before",
+      "case_id": "duplicate_header",
+      "passed": false,
+      "rationale": "JSON artifact field mismatch: rejected_before_matrix",
+      "input_sha256": "4ffc5315645520ed0cac1cdae9628c23826cab0a5c7595bfaa10d3a698997081",
+      "executed_code_sha256": "d5831c9e38cd70fd860ebe77b9bf355d452ebc3b2c5d72e65794dc9a35342dc4",
+      "elapsed_seconds": 0.1136992999818176
+    },
+    {
+      "plugin": "ngs",
+      "revision": "before",
+      "case_id": "valid_fractional_counts",
+      "passed": true,
+      "rationale": "Artifact satisfies the frozen computational contract; biological validity not established",
+      "input_sha256": "272a8a5d5d3bd52e489c95da02670e9546469c8817533d86b8cdc8907b1c0a09",
+      "executed_code_sha256": "d5831c9e38cd70fd860ebe77b9bf355d452ebc3b2c5d72e65794dc9a35342dc4",
+      "elapsed_seconds": 0.11971700005233288
+    },
+    {
+      "plugin": "ngs",
+      "revision": "before",
+      "case_id": "valid_zero_counts",
+      "passed": true,
+      "rationale": "Artifact satisfies the frozen computational contract; biological validity not established",
+      "input_sha256": "4113d492e2931aa89533cea83e40286b600fcd03e2c5fe68fd74652161e9a9c7",
+      "executed_code_sha256": "d5831c9e38cd70fd860ebe77b9bf355d452ebc3b2c5d72e65794dc9a35342dc4",
+      "elapsed_seconds": 0.14482929999940097
+    },
+    {
+      "plugin": "ngs",
+      "revision": "after",
+      "case_id": "duplicate_transcript",
+      "passed": true,
+      "rationale": "Artifact satisfies the frozen computational contract; biological validity not established",
+      "input_sha256": "95d19f3635c607cfd1ed6b5c567511e2b6dc507732cf5a53b16805338b70ec75",
+      "executed_code_sha256": "173c6a596bcaa220f6d3865ceeb8ed9c8e7c70019cee0dda5a31e2a38ca6725f",
+      "elapsed_seconds": 0.14816580002661794
+    },
+    {
+      "plugin": "ngs",
+      "revision": "after",
+      "case_id": "nonfinite_reads",
+      "passed": true,
+      "rationale": "Artifact satisfies the frozen computational contract; biological validity not established",
+      "input_sha256": "df2659deccaf1565b9661e6424943974dcb1bb8aca087b633fd6b23d639ff7d1",
+      "executed_code_sha256": "173c6a596bcaa220f6d3865ceeb8ed9c8e7c70019cee0dda5a31e2a38ca6725f",
+      "elapsed_seconds": 0.1503381000366062
+    },
+    {
+      "plugin": "ngs",
+      "revision": "after",
+      "case_id": "negative_reads",
+      "passed": true,
+      "rationale": "Artifact satisfies the frozen computational contract; biological validity not established",
+      "input_sha256": "b25ac24e1df23e4ba61ddfa56a1504a2c4fef07e8b9ef0fb3998f3470bbefe0b",
+      "executed_code_sha256": "173c6a596bcaa220f6d3865ceeb8ed9c8e7c70019cee0dda5a31e2a38ca6725f",
+      "elapsed_seconds": 0.16075409995391965
+    },
+    {
+      "plugin": "ngs",
+      "revision": "after",
+      "case_id": "empty_table",
+      "passed": true,
+      "rationale": "Artifact satisfies the frozen computational contract; biological validity not established",
+      "input_sha256": "0419a0d2839cde9a860d3abf93061af0496b9747f62142f92656798b0b1e75d7",
+      "executed_code_sha256": "173c6a596bcaa220f6d3865ceeb8ed9c8e7c70019cee0dda5a31e2a38ca6725f",
+      "elapsed_seconds": 0.12918859999626875
+    },
+    {
+      "plugin": "ngs",
+      "revision": "after",
+      "case_id": "duplicate_header",
+      "passed": true,
+      "rationale": "Artifact satisfies the frozen computational contract; biological validity not established",
+      "input_sha256": "4ffc5315645520ed0cac1cdae9628c23826cab0a5c7595bfaa10d3a698997081",
+      "executed_code_sha256": "173c6a596bcaa220f6d3865ceeb8ed9c8e7c70019cee0dda5a31e2a38ca6725f",
+      "elapsed_seconds": 0.1359214000403881
+    },
+    {
+      "plugin": "ngs",
+      "revision": "after",
+      "case_id": "valid_fractional_counts",
+      "passed": true,
+      "rationale": "Artifact satisfies the frozen computational contract; biological validity not established",
+      "input_sha256": "272a8a5d5d3bd52e489c95da02670e9546469c8817533d86b8cdc8907b1c0a09",
+      "executed_code_sha256": "173c6a596bcaa220f6d3865ceeb8ed9c8e7c70019cee0dda5a31e2a38ca6725f",
+      "elapsed_seconds": 0.14238000009208918
+    },
+    {
+      "plugin": "ngs",
+      "revision": "after",
+      "case_id": "valid_zero_counts",
+      "passed": true,
+      "rationale": "Artifact satisfies the frozen computational contract; biological validity not established",
+      "input_sha256": "4113d492e2931aa89533cea83e40286b600fcd03e2c5fe68fd74652161e9a9c7",
+      "executed_code_sha256": "173c6a596bcaa220f6d3865ceeb8ed9c8e7c70019cee0dda5a31e2a38ca6725f",
+      "elapsed_seconds": 0.1295615000417456
+    },
+    {
+      "plugin": "bionexus",
+      "revision": "before",
+      "case_id": "technical_rows",
+      "passed": false,
+      "rationale": "JSON artifact field mismatch: min_replicates_per_condition",
+      "input_sha256": "01c61667701ecfa12f9d2a5291a3150a55b6e23191bf7cf78c01b1ab1ed15ab0",
+      "executed_code_sha256": "53ce1f3d4a2b1d340b2f8de986c8012812671dca10b35147ea66d847061e4e9c",
+      "elapsed_seconds": 0.018435899983160198
+    },
+    {
+      "plugin": "bionexus",
+      "revision": "before",
+      "case_id": "independent_donors",
+      "passed": true,
+      "rationale": "Artifact satisfies the frozen computational contract; biological validity not established",
+      "input_sha256": "3c96683b8f70fcf100b9d9656dce3413b95f434b70d81deefbf2be028c456af5",
+      "executed_code_sha256": "53ce1f3d4a2b1d340b2f8de986c8012812671dca10b35147ea66d847061e4e9c",
+      "elapsed_seconds": 0.01044089999049902
+    },
+    {
+      "plugin": "bionexus",
+      "revision": "before",
+      "case_id": "paired_donors",
+      "passed": true,
+      "rationale": "Artifact satisfies the frozen computational contract; biological validity not established",
+      "input_sha256": "a642ac2f4581f74165f5d4235c8573a5b9663feba2fd15704a77aabd1088328d",
+      "executed_code_sha256": "53ce1f3d4a2b1d340b2f8de986c8012812671dca10b35147ea66d847061e4e9c",
+      "elapsed_seconds": 0.0053122000535950065
+    },
+    {
+      "plugin": "bionexus",
+      "revision": "before",
+      "case_id": "missing_donors",
+      "passed": false,
+      "rationale": "JSON artifact field mismatch: min_replicates_per_condition",
+      "input_sha256": "996723fac19826dba41d68faa468af6ac02fa1555289280dd1b29803f6574a2c",
+      "executed_code_sha256": "53ce1f3d4a2b1d340b2f8de986c8012812671dca10b35147ea66d847061e4e9c",
+      "elapsed_seconds": 0.006226499914191663
+    },
+    {
+      "plugin": "bionexus",
+      "revision": "before",
+      "case_id": "partial_donors",
+      "passed": false,
+      "rationale": "JSON artifact field mismatch: min_replicates_per_condition",
+      "input_sha256": "b82dfd86478f46aacb0a6e07447935911f061f9ddf17d343c6166b0b44886e36",
+      "executed_code_sha256": "53ce1f3d4a2b1d340b2f8de986c8012812671dca10b35147ea66d847061e4e9c",
+      "elapsed_seconds": 0.006854300037957728
+    },
+    {
+      "plugin": "bionexus",
+      "revision": "after",
+      "case_id": "technical_rows",
+      "passed": true,
+      "rationale": "Artifact satisfies the frozen computational contract; biological validity not established",
+      "input_sha256": "01c61667701ecfa12f9d2a5291a3150a55b6e23191bf7cf78c01b1ab1ed15ab0",
+      "executed_code_sha256": "89091b4d537cfdc4e19cc5a02343bf37232ee7ee82ea950440c3414f2bdc2322",
+      "elapsed_seconds": 0.02096800005529076
+    },
+    {
+      "plugin": "bionexus",
+      "revision": "after",
+      "case_id": "independent_donors",
+      "passed": true,
+      "rationale": "Artifact satisfies the frozen computational contract; biological validity not established",
+      "input_sha256": "3c96683b8f70fcf100b9d9656dce3413b95f434b70d81deefbf2be028c456af5",
+      "executed_code_sha256": "89091b4d537cfdc4e19cc5a02343bf37232ee7ee82ea950440c3414f2bdc2322",
+      "elapsed_seconds": 0.005211899988353252
+    },
+    {
+      "plugin": "bionexus",
+      "revision": "after",
+      "case_id": "paired_donors",
+      "passed": true,
+      "rationale": "Artifact satisfies the frozen computational contract; biological validity not established",
+      "input_sha256": "a642ac2f4581f74165f5d4235c8573a5b9663feba2fd15704a77aabd1088328d",
+      "executed_code_sha256": "89091b4d537cfdc4e19cc5a02343bf37232ee7ee82ea950440c3414f2bdc2322",
+      "elapsed_seconds": 0.005995200015604496
+    },
+    {
+      "plugin": "bionexus",
+      "revision": "after",
+      "case_id": "missing_donors",
+      "passed": true,
+      "rationale": "Artifact satisfies the frozen computational contract; biological validity not established",
+      "input_sha256": "996723fac19826dba41d68faa468af6ac02fa1555289280dd1b29803f6574a2c",
+      "executed_code_sha256": "89091b4d537cfdc4e19cc5a02343bf37232ee7ee82ea950440c3414f2bdc2322",
+      "elapsed_seconds": 0.0073216999880969524
+    },
+    {
+      "plugin": "bionexus",
+      "revision": "after",
+      "case_id": "partial_donors",
+      "passed": true,
+      "rationale": "Artifact satisfies the frozen computational contract; biological validity not established",
+      "input_sha256": "b82dfd86478f46aacb0a6e07447935911f061f9ddf17d343c6166b0b44886e36",
+      "executed_code_sha256": "89091b4d537cfdc4e19cc5a02343bf37232ee7ee82ea950440c3414f2bdc2322",
+      "elapsed_seconds": 0.00731599994469434
+    }
+  ]
+}

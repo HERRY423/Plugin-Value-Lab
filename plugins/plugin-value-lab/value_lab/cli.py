@@ -57,7 +57,8 @@ def doctor():
             "optional_mcp_available": importlib.util.find_spec("mcp") is not None,
             "claude_executable": claude, "claude_version": version,
             "codex_executable": codex, "codex_version": codex_version,
-            "artifact_verifiers": ["json_fields", "de_table", "labels", "h5ad", "executable", "artifact_schema", "numeric_tolerance", "abstention_correct", "over_refusal", "backend_identity", "exec", "scenario", "replicate_effect"],
+            "artifact_verifiers": ["json_fields", "de_table", "labels", "h5ad", "executable", "artifact_schema", "numeric_tolerance", "abstention_correct", "over_refusal", "backend_identity", "exec", "scenario", "replicate_effect", "pseudobulk_chain"],
+            "optional_pseudobulk_reference_available": importlib.util.find_spec("pydeseq2") is not None,
             "optional_h5ad_available": importlib.util.find_spec("anndata") is not None,
             "native_eval_executed": False, "host_plugin_installation_verified": False,
             "notes": ["Core, reports and review packets use only the Python standard library.",
@@ -95,6 +96,22 @@ def main(argv=None):
     p.add_argument("spec", help="replicate_effect verifier specification JSON")
     p.add_argument("--verifiers", required=True)
     p.add_argument("--output", required=True, help="New empty directory for reference.json and design-audit.json")
+    p = subs.add_parser("pseudobulk-reference", help="Run version-pinned PyDESeq2 on frozen donor-aware raw counts; optional scientific dependencies required")
+    p.add_argument("design")
+    p.add_argument("data")
+    p.add_argument("--output", required=True)
+    p = subs.add_parser("pseudobulk-check", help="Verify a full donor-aware analysis artifact offline; no model fitting")
+    p.add_argument("artifact")
+    p.add_argument("--spec", required=True)
+    p.add_argument("--verifiers", required=True)
+    p = subs.add_parser("pseudobulk-corpus", help="Evaluate controlled error and valid-variation artifacts; not expert-adjudicated accuracy")
+    p.add_argument("spec")
+    p.add_argument("--verifiers", required=True)
+    p.add_argument("--output", required=True)
+    p = subs.add_parser("pseudobulk-scenario", help="Export a donor-aware development scenario with separate public inputs and private scorers")
+    p.add_argument("spec")
+    p.add_argument("--verifiers", required=True)
+    p.add_argument("--output", required=True)
     p = subs.add_parser("scenario-prepare", help="Prepare a suite with opaque private scorer commitments")
     p.add_argument("pack")
     p.add_argument("--template", required=True)
@@ -174,6 +191,31 @@ def main(argv=None):
     p.add_argument("--before-artifacts")
     p.add_argument("--after-artifacts")
     p.add_argument("--verifiers")
+    p.add_argument("--axis", choices=("host", "model", "plugin", "replicate"), help="Explicit bounded comparison; requires observed versions and evidence context")
+    for name in ("reuse-prepare", "reuse-replay", "reuse-scorers", "reuse-inspect"):
+        p = subs.add_parser(name, help="Offline registry-free reuse; never starts models or executes supplied graders")
+        p.add_argument("source")
+        if name != "reuse-prepare":
+            p.add_argument("--expected-id", required=True)
+        if name == "reuse-inspect":
+            p.add_argument("--receipt", required=True)
+        else:
+            p.add_argument("--output", required=True)
+            p.add_argument("--verifiers", required=name == "reuse-scorers")
+        if name == "reuse-prepare":
+            p.add_argument("--artifacts")
+        if name == "reuse-replay":
+            p.add_argument("--participant", help="Actual participant declaration and feedback; not authenticated identity")
+    p = subs.add_parser("conditional-guidance", help="Recompute scoped trial guidance under prospectively frozen quality/cost/risk limits")
+    p.add_argument("before")
+    p.add_argument("after")
+    p.add_argument("--axis", required=True, choices=("host", "model", "plugin", "replicate"))
+    p.add_argument("--target", required=True)
+    p.add_argument("--output", required=True)
+    p.add_argument("--before-artifacts")
+    p.add_argument("--after-artifacts")
+    p.add_argument("--before-verifiers")
+    p.add_argument("--after-verifiers")
     p = subs.add_parser("export-claude")
     p.add_argument("suite")
     p.add_argument("--output", required=True)
@@ -184,6 +226,71 @@ def main(argv=None):
     p.add_argument("--output", required=True)
     p = subs.add_parser("native-report")
     p.add_argument("result")
+    p.add_argument("--output", required=True)
+    p = subs.add_parser("native-hypotheses", help="Separate observed native facts from falsifiable repair explanations")
+    p.add_argument("study")
+    p.add_argument("--receipt-sha256", required=True)
+    p.add_argument("--expectations", required=True)
+    p.add_argument("--output", required=True)
+    p = subs.add_parser("prepare-trigger-diagnostic", help="Append only an explicit-invocation probe to a frozen natural-use plan")
+    p.add_argument("study")
+    p.add_argument("--plan-sha256", required=True)
+    p.add_argument("--expectations", required=True)
+    p.add_argument("--references")
+    p.add_argument("--output", required=True)
+    p = subs.add_parser("compare-trigger-diagnostic", help="Compare a bound explicit probe without replacing natural-use evidence")
+    p.add_argument("natural")
+    p.add_argument("explicit")
+    p.add_argument("--natural-receipt", required=True)
+    p.add_argument("--explicit-receipt", required=True)
+    p.add_argument("--expectations", required=True)
+    p.add_argument("--output", required=True)
+    p = subs.add_parser("prepare-native-session", help="Prepare isolated one-attempt collection around existing official cases; Linux/WSL")
+    p.add_argument("study")
+    p.add_argument("--plan-sha256", required=True)
+    p.add_argument("--plugin", required=True)
+    p.add_argument("--invocation", required=True, help="JSON argument array or object with argv")
+    p.add_argument("--references")
+    p.add_argument("--timeout", type=int, default=1800)
+    p.add_argument("--output", required=True)
+    for command in ("run-native-session", "finish-native-session"):
+        p = subs.add_parser(command)
+        p.add_argument("study")
+        p.add_argument("--session-sha256", required=True)
+        if command == "run-native-session":
+            p.add_argument("--execute", action="store_true")
+    p = subs.add_parser("prepare-native-analysis", help="Prepare file/script cases for the official native executor; no model calls")
+    p.add_argument("recipe")
+    p.add_argument("--plugin", required=True)
+    p.add_argument("--inputs", required=True)
+    p.add_argument("--references")
+    p.add_argument("--output", required=True)
+    p = subs.add_parser("compare-native-repair", help="Recompute pinned before/after evidence and check full native repair retests")
+    p.add_argument("before")
+    p.add_argument("after")
+    p.add_argument("--before-receipt", required=True)
+    p.add_argument("--after-receipt", required=True)
+    p.add_argument("--output", required=True)
+    p = subs.add_parser("prepare-native-evidence", help="Freeze add-on artifact checks for existing native cases; no model calls")
+    p.add_argument("contract")
+    p.add_argument("--plugin", required=True)
+    p.add_argument("--references")
+    p.add_argument("--output", required=True)
+    p = subs.add_parser("capture-native-evidence", help="Collect explicitly mapped retained native workspaces and grade offline")
+    p.add_argument("study")
+    p.add_argument("--plan-sha256", required=True)
+    p.add_argument("--plugin", required=True)
+    p.add_argument("--result", required=True)
+    p.add_argument("--bindings", required=True)
+    p.add_argument("--retained-root", help="Explicit retained sandbox root for native tracePath/init.cwd links")
+    p.add_argument("--references")
+    p.add_argument("--output", required=True)
+    p = subs.add_parser("verify-native-evidence", help="Verify a pinned sidecar and recompute its artifact diagnoses")
+    p.add_argument("study")
+    p.add_argument("--receipt-sha256", required=True)
+    p = subs.add_parser("native-bindings", help="Read exact retained-workspace links from a supported native export")
+    p.add_argument("result")
+    p.add_argument("--retained-root", required=True)
     p.add_argument("--output", required=True)
     p = subs.add_parser("prepare-claude-collection", help="Freeze a read-only native Claude scientific audit")
     p.add_argument("suite")
@@ -306,6 +413,24 @@ def main(argv=None):
                    "blocker_count": len(report["blockers"])})
             if args.gate:
                 return 0 if report["verdict"] == "PROMISING_LOCAL_SIGNAL" else (2 if report["verdict"] in ("SIMULATION_ONLY", "INSUFFICIENT_EVIDENCE") else 1)
+        elif args.command == "pseudobulk-reference":
+            from .pseudobulk import create_reference
+            _emit(create_reference(args.design, args.data, args.output))
+        elif args.command == "pseudobulk-scenario":
+            from .pseudobulk_corpus import scenario_pack
+            _emit(scenario_pack(args.spec, args.verifiers, args.output))
+        elif args.command == "pseudobulk-corpus":
+            from .pseudobulk_corpus import evaluate_corpus
+            result = evaluate_corpus(args.spec, args.verifiers, args.output)
+            _emit({k: v for k, v in result.items() if k not in ("cases", "spec")})
+            return 0 if not any(result[k] for k in ("false_accepts", "false_rejects", "unresolved")) else 2
+        elif args.command == "pseudobulk-check":
+            from .pseudobulk import check, validate_spec
+            spec = load_json(args.spec)
+            validate_spec(spec)
+            passed, detail = check(args.artifact, spec, args.verifiers)
+            _emit({"passed": passed, "detail": detail})
+            return 0 if passed is True else 2
         elif args.command == "replicate-reference":
             from .replicates import recompute, validate_spec
             from .science import read_reference, reference_json
@@ -408,6 +533,53 @@ def main(argv=None):
         elif args.command == "native-report":
             from .native import native_report
             _emit(write_reports(native_report(load_json(args.result)), args.output))
+        elif args.command == "native-hypotheses":
+            from .native_hypotheses import write_native_hypotheses
+            _emit(write_native_hypotheses(args.study, args.receipt_sha256, load_json(args.expectations), args.output))
+        elif args.command == "prepare-trigger-diagnostic":
+            from .native_trigger import prepare_trigger_probe
+            _emit(prepare_trigger_probe(args.study, args.plan_sha256, load_json(args.expectations), args.output, references=args.references))
+        elif args.command == "compare-trigger-diagnostic":
+            from .native_trigger import compare_trigger_probe
+            _emit(compare_trigger_probe(args.natural, args.natural_receipt, args.explicit, args.explicit_receipt, load_json(args.expectations), args.output))
+        elif args.command == "prepare-native-session":
+            from .native_session import prepare_native_session
+            invocation = load_json(args.invocation)
+            _emit(prepare_native_session(args.study, args.plan_sha256, args.plugin,
+                  invocation.get("argv") if isinstance(invocation, dict) else invocation, args.output,
+                  references=args.references, timeout_seconds=args.timeout))
+        elif args.command == "run-native-session":
+            from .native_session import run_native_session
+            _emit(run_native_session(args.study, args.session_sha256, execute=args.execute))
+        elif args.command == "finish-native-session":
+            from .native_session import finish_native_session
+            _emit(finish_native_session(args.study, args.session_sha256))
+        elif args.command == "prepare-native-analysis":
+            from .native_analysis import prepare_native_analysis
+            _emit(prepare_native_analysis(load_json(args.recipe), args.plugin, args.inputs, args.output, references=args.references))
+        elif args.command == "compare-native-repair":
+            from .native_repair import compare_native_repair
+            _emit(compare_native_repair(args.before, args.before_receipt, args.after, args.after_receipt, args.output))
+        elif args.command == "prepare-native-evidence":
+            from .native_evidence import prepare_native_evidence
+            _emit(prepare_native_evidence(args.plugin, load_json(args.contract), args.output, references=args.references))
+        elif args.command == "capture-native-evidence":
+            from .native_evidence import capture_native_evidence
+            _emit(capture_native_evidence(args.study, args.plan_sha256, args.plugin, args.result,
+                                         load_json(args.bindings), args.output, references=args.references, retained_root=args.retained_root))
+        elif args.command == "native-bindings":
+            from .native_evidence import discover_native_bindings
+            result = discover_native_bindings(args.result, args.retained_root)
+            destination = Path(args.output)
+            if destination.exists():
+                raise ValidationError("Bindings destination already exists")
+            with destination.open("x", encoding="utf-8") as stream:
+                json.dump(result["bindings"], stream, ensure_ascii=False, indent=2, allow_nan=False)
+                stream.write("\n")
+            _emit({"output": str(destination), "bound_runs": len(result["bindings"]), "missing": result["missing"], "profile": result["profile"], "scope": result["scope"]})
+        elif args.command == "verify-native-evidence":
+            from .native_evidence import verify_native_evidence
+            _emit(verify_native_evidence(args.study, args.receipt_sha256))
         elif args.command == "prepare-claude-collection":
             from .claude_collection import prepare
             _emit(prepare(load_json(args.suite), args.plugin, args.output, args.inputs, args.claude))
@@ -504,10 +676,31 @@ def main(argv=None):
                 write_json(args.output, result)
             _emit(result)
             return 0 if result["valid"] else 2
+        elif args.command == "reuse-prepare":
+            from .reuse import prepare_reuse
+            _emit(prepare_reuse(args.source, args.output, artifact_root=args.artifacts, verifier_root=args.verifiers))
+        elif args.command == "reuse-replay":
+            from .reuse import replay_reuse
+            result = replay_reuse(args.source, args.expected_id, args.output, verifier_root=args.verifiers,
+                                  participant=load_json(args.participant) if args.participant else None)
+            _emit(result)
+            return 0 if result["status"] == "REPRODUCED" else 2
+        elif args.command == "reuse-scorers":
+            from .reuse import export_scorers
+            _emit(export_scorers(args.source, args.expected_id, args.verifiers, args.output))
+        elif args.command == "reuse-inspect":
+            from .reuse import inspect_receipt
+            _emit(inspect_receipt(args.source, args.expected_id, args.receipt))
+        elif args.command == "conditional-guidance":
+            from .guidance import conditional_guidance, write_guidance
+            result = conditional_guidance(load_json(args.before), load_json(args.after), load_json(args.target), axis=args.axis,
+                                          artifact_roots=(args.before_artifacts, args.after_artifacts),
+                                          verifier_roots=(args.before_verifiers, args.after_verifiers))
+            _emit({"status": result["status"], "files": write_guidance(result, args.output), "automatic_actions": False})
         elif args.command == "compare-studies":
             from .comparison import compare_studies
             result = compare_studies(load_json(args.before), load_json(args.after),
-                                     artifact_roots=(args.before_artifacts, args.after_artifacts), verifier_root=args.verifiers)
+                                     artifact_roots=(args.before_artifacts, args.after_artifacts), verifier_root=args.verifiers, axis=args.axis)
             if Path(args.output).exists():
                 raise ValidationError("Output exists; preserve previous comparisons")
             write_json(args.output, result)

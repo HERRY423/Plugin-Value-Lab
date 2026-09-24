@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "scope_rationale": "Manufactured fixed tasks; no population inference",
+  "minimum_gain": 0.1,
+  "maximum_quality_loss": 0.05,
+  "maximum_cost_increase_usd": 3,
+  "maximum_failure_rate": 0,
+  "require_settled_costs": false
+}

@@ -1,10 +1,21 @@
 # Plugin Value Lab
 
+New: [existing native cases, isolated sidecar collection and falsifiable repair hypotheses](docs/NATIVE-WORKFLOW-HYPOTHESES.zh-CN.md). Preserve case bytes, run the official host once after explicit authorization, retain failures and grade artifacts offline. Diagnostic explicit-invocation probes never replace natural-use value evidence. Included in version 0.6.0.
+
+Existing Claude cases can now receive [post-run scientific artifact diagnostics](docs/NATIVE-EVIDENCE.zh-CN.md) without rewriting the suite: freeze a small file/grade contract, retain native workspaces, collect explicitly mapped files, and replay offline checks. See the [NGS/BioNexus local repair evidence and limits](docs/P0-IMPLEMENTATION-20260924.zh-CN.md).
+
 Help plugin authors locate failures in paired runs and prepare a fair retest after a repair.
 
 [中文](README.zh-CN.md) · [Install](docs/INSTALL.md) · [Artifact verification](docs/ARTIFACTS.md) · [Codex collection](docs/CODEX.md)
 
-Version **0.5.0**. Independent-unit scientific recomputation is now available: [design, methods and limits](docs/REPLICATE-VERIFICATION.zh-CN.md). Paired evaluation supplies the measurements; the durable assets are domain scenarios, actual studies and independent contributions. External adoption and authenticated independent reviews are not yet established.
+Version **0.6.0**. Independent-unit scientific recomputation is now available: [design, methods and limits](docs/REPLICATE-VERIFICATION.zh-CN.md). Paired evaluation supplies the measurements; the durable assets are domain scenarios, actual studies and independent contributions. External adoption and authenticated independent reviews are not yet established.
+
+P1 adds prospectively frozen value endpoints and failure handling, plus a [donor-aware pseudobulk scenario](docs/PSEUDOBULK.zh-CN.md). Real cached-data computation and controlled verifier checks are recorded; independent expert review remains pending. See [implementation and evidence limits](docs/P1-IMPLEMENTATION-20260924.zh-CN.md).
+
+P2 adds [registry-free reuse and scoped trial guidance](docs/P2-REUSE-GUIDANCE.zh-CN.md): pinned offline handoffs, explicit single-axis comparisons, and prospective quality/cost/risk limits. Independent external reuse is still pending. See [P2 acceptance and limits](docs/P2-IMPLEMENTATION-20260924.zh-CN.md).
+
+The [native scientific analysis and repair workflow](docs/NATIVE-ANALYSIS-REPAIR.zh-CN.md) prepares official-host cases, pins input bytes, observes script tool results and checks complete repair retests. Four local operator-script controls ran; new native model experiments and independent review remain pending.
+
 
 ## Install in Codex desktop
 

@@ -1,0 +1,101 @@
+{
+  "format": "pvl-p1-acceptance-1",
+  "version": "0.5.0",
+  "reference_input": {
+    "cells": 1301,
+    "donors": 8,
+    "samples": 16,
+    "input_genes": 14053,
+    "tested_genes": 7877,
+    "source_sha256": "46122ba4e196561a781123614d856fed7d1ca05743d39a1d117597fd6d0bb993",
+    "data_sha256": "6ed9d672009f4342224d1e40cc3ce4ade8edc540a0ee94e8929677bf51616916",
+    "design_sha256": "310cef40e16b3a4240e0c2752a3cee9da0799f6cbdfd4311b56fb3ac13ae3f3c",
+    "scope": "public cached data, local extraction; no independent review"
+  },
+  "preserved_preflight": {
+    "min_cells": 20,
+    "status": "REJECTED_BEFORE_FITTING",
+    "minimum_observed_cells": 18,
+    "reason": "Sample below frozen minimum cell count; revise prospectively, do not drop it silently",
+    "new_pre_fit_min_cells": 10,
+    "donors_removed": 0
+  },
+  "observed_backend": {
+    "backend": "pydeseq2",
+    "version": "0.5.4",
+    "formula": "~donor + condition",
+    "contrast": [
+      "condition",
+      "stim",
+      "ctrl"
+    ],
+    "normalization": "median_of_ratios",
+    "independent_filter": false,
+    "cooks_filter": true,
+    "refit_cooks": true,
+    "alpha": 0.05,
+    "requested_dispersion_trend": "parametric",
+    "observed_dispersion_trend": "mean"
+  },
+  "runtime_warnings": [
+    "The dispersion trend curve fitting did not converge. Switching to a mean-based dispersion trend."
+  ],
+  "reference_spec_sha256": "c7036a5fad5ea8d4d2f2836235bebdacb997ad24a654183bc685e3bd619e248f",
+  "reference_artifact_sha256": "df6e48c3d9caa8ea0dadd1580da2a9ec2808bd474fd5d3f8692bff249c90cd72",
+  "three_local_reference_fits_same_statistics": true,
+  "reference_runner_snapshot_sha256": "b8a4ad593c72d65a2004229c78e6cf8338a6868d462d9789c688a8f978f81c78",
+  "observed_libraries": {
+    "pydeseq2": "0.5.4",
+    "numpy": "2.3.5",
+    "scipy": "1.16.3",
+    "pandas": "2.3.3",
+    "anndata": "0.13.1",
+    "formulaic": "1.2.2"
+  },
+  "crosscheck": {
+    "status": "PASSED",
+    "geo_metadata_cells_matched": 1301,
+    "pseudobulk_samples_reaggregated": 16,
+    "bh_values_crosschecked": 7877,
+    "wald_intervals_crosschecked": 7877,
+    "source_h5ad_sha256": "46122ba4e196561a781123614d856fed7d1ca05743d39a1d117597fd6d0bb993",
+    "geo_metadata_sha256": "1d57e72e92ca8695250e88cc0f1c3fa8c0be1175d974f8b427c58f1274dc6c09",
+    "reference_sha256": "df6e48c3d9caa8ea0dadd1580da2a9ec2808bd474fd5d3f8692bff249c90cd72",
+    "scope": "Independent implementations of aggregation/BH/interval arithmetic on local public caches; no independent count-model fit or expert review"
+  },
+  "corpus": {
+    "format": "pvl-verifier-corpus-1",
+    "positive_cases": 4,
+    "negative_cases": 13,
+    "false_accepts": 0,
+    "false_rejects": 0,
+    "unresolved": 0,
+    "controlled_false_accept_rate": 0.0,
+    "controlled_false_reject_rate": 0.0,
+    "independent_expert_review": "PENDING",
+    "representative_accuracy": "NOT_ESTABLISHED",
+    "scope": "Controlled mutations and valid serialization/order variants; not independent scientific adjudication"
+  },
+  "portable_replay": {
+    "status": "REPRODUCED",
+    "artifact_passed": true,
+    "backend_receipt_passed": true,
+    "backend_identity_scope": "Trusted collector assertion; authenticity not independently verified",
+    "required_numerical_backend_for_replay": false
+  },
+  "expert_review": {
+    "status": "PENDING",
+    "current_user_response": "暂时没有，保留待审阅"
+  },
+  "new_model_calls": 0,
+  "new_paid_catalog_calls": 0,
+  "new_tool_charges_usd": 0,
+  "scope": "Local implementation, real cached-data computation and controlled diagnostic variants; not expert approval, representative verifier accuracy or plugin benefit",
+  "previous_p0_unknown_settlement_unchanged": true,
+  "files": {
+    "crosscheck.json": "e9db6cc0d0238a94c46814473d52ec7c804f2ff947091944e3c73ecf9bcde37f",
+    "reference-r3/execution.json": "045b43258b4e720d4e39fd61284a8de1464fe7fac1030e3b8d6252cd8aff6f7f",
+    "corpus-r3/corpus-report.json": "d62dcb6e18b988fca62384e0672f65b0e14fa3ae5fc7bb301217b5c97e5d91b1",
+    "scenario/pack.json": "b799f3f049de2548e032c651cf1f600b3a8c415c7cdfdf8260e64f82d85aae2f"
+  }
+}

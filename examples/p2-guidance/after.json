@@ -1,0 +1,766 @@
+{
+  "suite": {
+    "schema_version": 1,
+    "id": "tutorial-value-study",
+    "plugin": {
+      "name": "example-plugin",
+      "version": "1"
+    },
+    "evidence_type": "synthetic",
+    "runs_per_case": 3,
+    "conditions": {
+      "model": "fixed",
+      "host": "offline-tutorial",
+      "tools": [],
+      "environment": "synthetic-fixture-v1",
+      "budget": {
+        "max_turns": 10
+      },
+      "host_version": "1.0",
+      "model_version": "2"
+    },
+    "policy": {
+      "min_quality_delta": 0.1,
+      "quality_floor": 0.8,
+      "max_case_regression": 0,
+      "min_clusters": 3,
+      "require_cost_saving": false,
+      "human_hourly_usd": 60,
+      "use_decision": {
+        "version": 1,
+        "scope_rationale": "Manufactured fixed tasks; no population inference",
+        "minimum_gain": 0.1,
+        "maximum_quality_loss": 0.05,
+        "maximum_cost_increase_usd": 3,
+        "maximum_failure_rate": 0,
+        "require_settled_costs": false
+      }
+    },
+    "cases": [
+      {
+        "id": "structured-delivery",
+        "cluster": "delivery",
+        "kind": "task",
+        "prompt": "Deliver a task result with a source reference and explicit limitations.",
+        "graders": [
+          {
+            "id": "source",
+            "type": "contains",
+            "value": "SOURCE:",
+            "weight": 1,
+            "critical": false,
+            "dimension": "outcome"
+          },
+          {
+            "id": "limits",
+            "type": "contains",
+            "value": "LIMITS:",
+            "weight": 1,
+            "critical": false,
+            "dimension": "outcome"
+          }
+        ]
+      },
+      {
+        "id": "unrelated-request",
+        "cluster": "negative-control",
+        "kind": "negative",
+        "prompt": "What is 2 + 2? Give only the number.",
+        "graders": [
+          {
+            "id": "answer",
+            "type": "contains",
+            "value": "4",
+            "weight": 1,
+            "critical": false,
+            "dimension": "outcome"
+          },
+          {
+            "id": "over-trigger",
+            "type": "not_contains",
+            "value": "AUDIT:",
+            "weight": 1,
+            "critical": true,
+            "dimension": "outcome"
+          }
+        ]
+      },
+      {
+        "id": "insufficient-science",
+        "cluster": "evidence-boundary",
+        "kind": "abstention",
+        "prompt": "Do passing local software tests prove clinical effectiveness? Explain the evidence limit.",
+        "graders": [
+          {
+            "id": "limit",
+            "type": "contains",
+            "value": "NOT_ESTABLISHED",
+            "weight": 1,
+            "critical": true,
+            "dimension": "outcome"
+          },
+          {
+            "id": "activation",
+            "type": "contains",
+            "value": "SKILL_USED",
+            "weight": 1,
+            "critical": false,
+            "dimension": "process"
+          }
+        ]
+      }
+    ]
+  },
+  "records": [
+    {
+      "case_id": "structured-delivery",
+      "repetition": 1,
+      "arm": "with",
+      "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c",
+      "session_id": "newSYNTHETIC-0-1-with",
+      "conditions": {
+        "model": "fixed",
+        "host": "offline-tutorial",
+        "tools": [],
+        "environment": "synthetic-fixture-v1",
+        "budget": {
+          "max_turns": 10
+        },
+        "host_version": "1.0",
+        "model_version": "2"
+      },
+      "plugin_loaded": true,
+      "status": "completed",
+      "output": "SOURCE: example LIMITS: simulated",
+      "source": "synthetic",
+      "cost": {
+        "model_usd": 0.02,
+        "tool_usd": 0,
+        "human_minutes": 1
+      },
+      "human_intervals": [
+        {
+          "actor": "SYNTHETIC-NO-PERSON",
+          "start": "2026-01-01T00:00:00+00:00",
+          "end": "2026-01-01T00:01:00+00:00"
+        }
+      ],
+      "duration_seconds": 10
+    },
+    {
+      "case_id": "structured-delivery",
+      "repetition": 1,
+      "arm": "without",
+      "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c",
+      "session_id": "newSYNTHETIC-0-1-without",
+      "conditions": {
+        "model": "fixed",
+        "host": "offline-tutorial",
+        "tools": [],
+        "environment": "synthetic-fixture-v1",
+        "budget": {
+          "max_turns": 10
+        },
+        "host_version": "1.0",
+        "model_version": "2"
+      },
+      "plugin_loaded": false,
+      "status": "completed",
+      "output": "SOURCE: example",
+      "source": "synthetic",
+      "cost": {
+        "model_usd": 0.01,
+        "tool_usd": 0,
+        "human_minutes": 2
+      },
+      "human_intervals": [
+        {
+          "actor": "SYNTHETIC-NO-PERSON",
+          "start": "2026-01-01T01:00:00+00:00",
+          "end": "2026-01-01T01:02:00+00:00"
+        }
+      ],
+      "duration_seconds": 8
+    },
+    {
+      "case_id": "structured-delivery",
+      "repetition": 2,
+      "arm": "with",
+      "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c",
+      "session_id": "newSYNTHETIC-0-2-with",
+      "conditions": {
+        "model": "fixed",
+        "host": "offline-tutorial",
+        "tools": [],
+        "environment": "synthetic-fixture-v1",
+        "budget": {
+          "max_turns": 10
+        },
+        "host_version": "1.0",
+        "model_version": "2"
+      },
+      "plugin_loaded": true,
+      "status": "completed",
+      "output": "SOURCE: example LIMITS: simulated",
+      "source": "synthetic",
+      "cost": {
+        "model_usd": 0.02,
+        "tool_usd": 0,
+        "human_minutes": 1
+      },
+      "human_intervals": [
+        {
+          "actor": "SYNTHETIC-NO-PERSON",
+          "start": "2026-01-01T02:00:00+00:00",
+          "end": "2026-01-01T02:01:00+00:00"
+        }
+      ],
+      "duration_seconds": 10
+    },
+    {
+      "case_id": "structured-delivery",
+      "repetition": 2,
+      "arm": "without",
+      "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c",
+      "session_id": "newSYNTHETIC-0-2-without",
+      "conditions": {
+        "model": "fixed",
+        "host": "offline-tutorial",
+        "tools": [],
+        "environment": "synthetic-fixture-v1",
+        "budget": {
+          "max_turns": 10
+        },
+        "host_version": "1.0",
+        "model_version": "2"
+      },
+      "plugin_loaded": false,
+      "status": "completed",
+      "output": "An answer without traceable support.",
+      "source": "synthetic",
+      "cost": {
+        "model_usd": 0.01,
+        "tool_usd": 0,
+        "human_minutes": 2
+      },
+      "human_intervals": [
+        {
+          "actor": "SYNTHETIC-NO-PERSON",
+          "start": "2026-01-01T03:00:00+00:00",
+          "end": "2026-01-01T03:02:00+00:00"
+        }
+      ],
+      "duration_seconds": 8
+    },
+    {
+      "case_id": "structured-delivery",
+      "repetition": 3,
+      "arm": "with",
+      "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c",
+      "session_id": "newSYNTHETIC-0-3-with",
+      "conditions": {
+        "model": "fixed",
+        "host": "offline-tutorial",
+        "tools": [],
+        "environment": "synthetic-fixture-v1",
+        "budget": {
+          "max_turns": 10
+        },
+        "host_version": "1.0",
+        "model_version": "2"
+      },
+      "plugin_loaded": true,
+      "status": "completed",
+      "output": "SOURCE: example LIMITS: simulated",
+      "source": "synthetic",
+      "cost": {
+        "model_usd": 0.02,
+        "tool_usd": 0,
+        "human_minutes": 1
+      },
+      "human_intervals": [
+        {
+          "actor": "SYNTHETIC-NO-PERSON",
+          "start": "2026-01-01T04:00:00+00:00",
+          "end": "2026-01-01T04:01:00+00:00"
+        }
+      ],
+      "duration_seconds": 10
+    },
+    {
+      "case_id": "structured-delivery",
+      "repetition": 3,
+      "arm": "without",
+      "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c",
+      "session_id": "newSYNTHETIC-0-3-without",
+      "conditions": {
+        "model": "fixed",
+        "host": "offline-tutorial",
+        "tools": [],
+        "environment": "synthetic-fixture-v1",
+        "budget": {
+          "max_turns": 10
+        },
+        "host_version": "1.0",
+        "model_version": "2"
+      },
+      "plugin_loaded": false,
+      "status": "completed",
+      "output": "An answer without traceable support.",
+      "source": "synthetic",
+      "cost": {
+        "model_usd": 0.01,
+        "tool_usd": 0,
+        "human_minutes": 2
+      },
+      "human_intervals": [
+        {
+          "actor": "SYNTHETIC-NO-PERSON",
+          "start": "2026-01-01T05:00:00+00:00",
+          "end": "2026-01-01T05:02:00+00:00"
+        }
+      ],
+      "duration_seconds": 8
+    },
+    {
+      "case_id": "unrelated-request",
+      "repetition": 1,
+      "arm": "with",
+      "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c",
+      "session_id": "newSYNTHETIC-1-1-with",
+      "conditions": {
+        "model": "fixed",
+        "host": "offline-tutorial",
+        "tools": [],
+        "environment": "synthetic-fixture-v1",
+        "budget": {
+          "max_turns": 10
+        },
+        "host_version": "1.0",
+        "model_version": "2"
+      },
+      "plugin_loaded": true,
+      "status": "completed",
+      "output": "4",
+      "source": "synthetic",
+      "cost": {
+        "model_usd": 0.02,
+        "tool_usd": 0,
+        "human_minutes": 1
+      },
+      "human_intervals": [
+        {
+          "actor": "SYNTHETIC-NO-PERSON",
+          "start": "2026-01-01T06:00:00+00:00",
+          "end": "2026-01-01T06:01:00+00:00"
+        }
+      ],
+      "duration_seconds": 10
+    },
+    {
+      "case_id": "unrelated-request",
+      "repetition": 1,
+      "arm": "without",
+      "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c",
+      "session_id": "newSYNTHETIC-1-1-without",
+      "conditions": {
+        "model": "fixed",
+        "host": "offline-tutorial",
+        "tools": [],
+        "environment": "synthetic-fixture-v1",
+        "budget": {
+          "max_turns": 10
+        },
+        "host_version": "1.0",
+        "model_version": "2"
+      },
+      "plugin_loaded": false,
+      "status": "completed",
+      "output": "4",
+      "source": "synthetic",
+      "cost": {
+        "model_usd": 0.01,
+        "tool_usd": 0,
+        "human_minutes": 2
+      },
+      "human_intervals": [
+        {
+          "actor": "SYNTHETIC-NO-PERSON",
+          "start": "2026-01-01T07:00:00+00:00",
+          "end": "2026-01-01T07:02:00+00:00"
+        }
+      ],
+      "duration_seconds": 8
+    },
+    {
+      "case_id": "unrelated-request",
+      "repetition": 2,
+      "arm": "with",
+      "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c",
+      "session_id": "newSYNTHETIC-1-2-with",
+      "conditions": {
+        "model": "fixed",
+        "host": "offline-tutorial",
+        "tools": [],
+        "environment": "synthetic-fixture-v1",
+        "budget": {
+          "max_turns": 10
+        },
+        "host_version": "1.0",
+        "model_version": "2"
+      },
+      "plugin_loaded": true,
+      "status": "completed",
+      "output": "4",
+      "source": "synthetic",
+      "cost": {
+        "model_usd": 0.02,
+        "tool_usd": 0,
+        "human_minutes": 1
+      },
+      "human_intervals": [
+        {
+          "actor": "SYNTHETIC-NO-PERSON",
+          "start": "2026-01-01T08:00:00+00:00",
+          "end": "2026-01-01T08:01:00+00:00"
+        }
+      ],
+      "duration_seconds": 10
+    },
+    {
+      "case_id": "unrelated-request",
+      "repetition": 2,
+      "arm": "without",
+      "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c",
+      "session_id": "newSYNTHETIC-1-2-without",
+      "conditions": {
+        "model": "fixed",
+        "host": "offline-tutorial",
+        "tools": [],
+        "environment": "synthetic-fixture-v1",
+        "budget": {
+          "max_turns": 10
+        },
+        "host_version": "1.0",
+        "model_version": "2"
+      },
+      "plugin_loaded": false,
+      "status": "completed",
+      "output": "4",
+      "source": "synthetic",
+      "cost": {
+        "model_usd": 0.01,
+        "tool_usd": 0,
+        "human_minutes": 2
+      },
+      "human_intervals": [
+        {
+          "actor": "SYNTHETIC-NO-PERSON",
+          "start": "2026-01-01T09:00:00+00:00",
+          "end": "2026-01-01T09:02:00+00:00"
+        }
+      ],
+      "duration_seconds": 8
+    },
+    {
+      "case_id": "unrelated-request",
+      "repetition": 3,
+      "arm": "with",
+      "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c",
+      "session_id": "newSYNTHETIC-1-3-with",
+      "conditions": {
+        "model": "fixed",
+        "host": "offline-tutorial",
+        "tools": [],
+        "environment": "synthetic-fixture-v1",
+        "budget": {
+          "max_turns": 10
+        },
+        "host_version": "1.0",
+        "model_version": "2"
+      },
+      "plugin_loaded": true,
+      "status": "completed",
+      "output": "4",
+      "source": "synthetic",
+      "cost": {
+        "model_usd": 0.02,
+        "tool_usd": 0,
+        "human_minutes": 1
+      },
+      "human_intervals": [
+        {
+          "actor": "SYNTHETIC-NO-PERSON",
+          "start": "2026-01-01T10:00:00+00:00",
+          "end": "2026-01-01T10:01:00+00:00"
+        }
+      ],
+      "duration_seconds": 10
+    },
+    {
+      "case_id": "unrelated-request",
+      "repetition": 3,
+      "arm": "without",
+      "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c",
+      "session_id": "newSYNTHETIC-1-3-without",
+      "conditions": {
+        "model": "fixed",
+        "host": "offline-tutorial",
+        "tools": [],
+        "environment": "synthetic-fixture-v1",
+        "budget": {
+          "max_turns": 10
+        },
+        "host_version": "1.0",
+        "model_version": "2"
+      },
+      "plugin_loaded": false,
+      "status": "completed",
+      "output": "4",
+      "source": "synthetic",
+      "cost": {
+        "model_usd": 0.01,
+        "tool_usd": 0,
+        "human_minutes": 2
+      },
+      "human_intervals": [
+        {
+          "actor": "SYNTHETIC-NO-PERSON",
+          "start": "2026-01-01T11:00:00+00:00",
+          "end": "2026-01-01T11:02:00+00:00"
+        }
+      ],
+      "duration_seconds": 8
+    },
+    {
+      "case_id": "insufficient-science",
+      "repetition": 1,
+      "arm": "with",
+      "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c",
+      "session_id": "newSYNTHETIC-2-1-with",
+      "conditions": {
+        "model": "fixed",
+        "host": "offline-tutorial",
+        "tools": [],
+        "environment": "synthetic-fixture-v1",
+        "budget": {
+          "max_turns": 10
+        },
+        "host_version": "1.0",
+        "model_version": "2"
+      },
+      "plugin_loaded": true,
+      "status": "completed",
+      "output": "NOT_ESTABLISHED SKILL_USED",
+      "source": "synthetic",
+      "cost": {
+        "model_usd": 0.02,
+        "tool_usd": 0,
+        "human_minutes": 1
+      },
+      "human_intervals": [
+        {
+          "actor": "SYNTHETIC-NO-PERSON",
+          "start": "2026-01-01T12:00:00+00:00",
+          "end": "2026-01-01T12:01:00+00:00"
+        }
+      ],
+      "duration_seconds": 10
+    },
+    {
+      "case_id": "insufficient-science",
+      "repetition": 1,
+      "arm": "without",
+      "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c",
+      "session_id": "newSYNTHETIC-2-1-without",
+      "conditions": {
+        "model": "fixed",
+        "host": "offline-tutorial",
+        "tools": [],
+        "environment": "synthetic-fixture-v1",
+        "budget": {
+          "max_turns": 10
+        },
+        "host_version": "1.0",
+        "model_version": "2"
+      },
+      "plugin_loaded": false,
+      "status": "completed",
+      "output": "NOT_ESTABLISHED",
+      "source": "synthetic",
+      "cost": {
+        "model_usd": 0.01,
+        "tool_usd": 0,
+        "human_minutes": 2
+      },
+      "human_intervals": [
+        {
+          "actor": "SYNTHETIC-NO-PERSON",
+          "start": "2026-01-01T13:00:00+00:00",
+          "end": "2026-01-01T13:02:00+00:00"
+        }
+      ],
+      "duration_seconds": 8
+    },
+    {
+      "case_id": "insufficient-science",
+      "repetition": 2,
+      "arm": "with",
+      "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c",
+      "session_id": "newSYNTHETIC-2-2-with",
+      "conditions": {
+        "model": "fixed",
+        "host": "offline-tutorial",
+        "tools": [],
+        "environment": "synthetic-fixture-v1",
+        "budget": {
+          "max_turns": 10
+        },
+        "host_version": "1.0",
+        "model_version": "2"
+      },
+      "plugin_loaded": true,
+      "status": "completed",
+      "output": "NOT_ESTABLISHED SKILL_USED",
+      "source": "synthetic",
+      "cost": {
+        "model_usd": 0.02,
+        "tool_usd": 0,
+        "human_minutes": 1
+      },
+      "human_intervals": [
+        {
+          "actor": "SYNTHETIC-NO-PERSON",
+          "start": "2026-01-01T14:00:00+00:00",
+          "end": "2026-01-01T14:01:00+00:00"
+        }
+      ],
+      "duration_seconds": 10
+    },
+    {
+      "case_id": "insufficient-science",
+      "repetition": 2,
+      "arm": "without",
+      "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c",
+      "session_id": "newSYNTHETIC-2-2-without",
+      "conditions": {
+        "model": "fixed",
+        "host": "offline-tutorial",
+        "tools": [],
+        "environment": "synthetic-fixture-v1",
+        "budget": {
+          "max_turns": 10
+        },
+        "host_version": "1.0",
+        "model_version": "2"
+      },
+      "plugin_loaded": false,
+      "status": "completed",
+      "output": "Testing proves value.",
+      "source": "synthetic",
+      "cost": {
+        "model_usd": 0.01,
+        "tool_usd": 0,
+        "human_minutes": 2
+      },
+      "human_intervals": [
+        {
+          "actor": "SYNTHETIC-NO-PERSON",
+          "start": "2026-01-01T15:00:00+00:00",
+          "end": "2026-01-01T15:02:00+00:00"
+        }
+      ],
+      "duration_seconds": 8
+    },
+    {
+      "case_id": "insufficient-science",
+      "repetition": 3,
+      "arm": "with",
+      "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c",
+      "session_id": "newSYNTHETIC-2-3-with",
+      "conditions": {
+        "model": "fixed",
+        "host": "offline-tutorial",
+        "tools": [],
+        "environment": "synthetic-fixture-v1",
+        "budget": {
+          "max_turns": 10
+        },
+        "host_version": "1.0",
+        "model_version": "2"
+      },
+      "plugin_loaded": true,
+      "status": "completed",
+      "output": "NOT_ESTABLISHED SKILL_USED",
+      "source": "synthetic",
+      "cost": {
+        "model_usd": 0.02,
+        "tool_usd": 0,
+        "human_minutes": 1
+      },
+      "human_intervals": [
+        {
+          "actor": "SYNTHETIC-NO-PERSON",
+          "start": "2026-01-01T16:00:00+00:00",
+          "end": "2026-01-01T16:01:00+00:00"
+        }
+      ],
+      "duration_seconds": 10
+    },
+    {
+      "case_id": "insufficient-science",
+      "repetition": 3,
+      "arm": "without",
+      "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c",
+      "session_id": "newSYNTHETIC-2-3-without",
+      "conditions": {
+        "model": "fixed",
+        "host": "offline-tutorial",
+        "tools": [],
+        "environment": "synthetic-fixture-v1",
+        "budget": {
+          "max_turns": 10
+        },
+        "host_version": "1.0",
+        "model_version": "2"
+      },
+      "plugin_loaded": false,
+      "status": "completed",
+      "output": "Testing proves value.",
+      "source": "synthetic",
+      "cost": {
+        "model_usd": 0.01,
+        "tool_usd": 0,
+        "human_minutes": 2
+      },
+      "human_intervals": [
+        {
+          "actor": "SYNTHETIC-NO-PERSON",
+          "start": "2026-01-01T17:00:00+00:00",
+          "end": "2026-01-01T17:02:00+00:00"
+        }
+      ],
+      "duration_seconds": 8
+    }
+  ],
+  "lock": {
+    "suite_sha256": "f0db248bd06a5ce0e5a9673258667b55fbed53f53cf7cc8d0a14c862a32b0f1c"
+  },
+  "context": {
+    "plugin_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "claude_version": "fixed",
+    "engine_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "lineage_id": "test-lineage-1",
+    "observed_at": "2026-09-22T00:00:00+00:00"
+  },
+  "cost_ledger": {
+    "schema_version": 1,
+    "coverage": {
+      "judge": "included",
+      "setup": "included",
+      "retry": "included",
+      "other": "included"
+    },
+    "entries": []
+  }
+}

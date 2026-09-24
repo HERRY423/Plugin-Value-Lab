@@ -19,6 +19,47 @@ from .execution import snapshot, hashes, now, resolve_claude
 from .report import write_reports
 
 
+def observe_native_events(text):
+    """Read an optional exported stream without inventing expected conditions.
+
+    A native eval aggregate does not promise this stream format. Unsupported or
+    incomplete streams remain raw evidence with unknown observations.
+    """
+    try:
+        events = [json.loads(line) for line in text.splitlines() if line.strip()]
+    except (ValueError, TypeError) as exc:
+        raise ValidationError("Malformed exported native event stream") from exc
+    if any(not isinstance(e, dict) for e in events):
+        raise ValidationError("Native events must be JSON objects")
+    starts = [e for e in events if e.get("type") == "system" and e.get("subtype") == "init"]
+    ends = [e for e in events if e.get("type") == "result"]
+    unknown = {"session_id": None, "model": None, "plugins": None, "tools": None,
+               "skill_calls": None, "final_output": None, "issues": ["No supported, consistent init/result stream"]}
+    if len(starts) != 1 or len(ends) > 1:
+        return unknown
+    start, end = starts[0], ends[0] if ends else {}
+    sid = start.get("session_id")
+    if not isinstance(sid, str) or not sid.strip() or (ends and end.get("session_id") != sid):
+        return unknown
+    calls = []
+    for event in events:
+        if event.get("session_id") not in (None, sid):
+            return unknown
+        message = event.get("message")
+        if event.get("type") != "assistant" or not isinstance(message, dict):
+            continue
+        content = message.get("content")
+        if isinstance(content, list):
+            calls.extend(block.get("input") for block in content if isinstance(block, dict)
+                         and block.get("type") == "tool_use" and block.get("name") == "Skill")
+    return {"session_id": sid, "model": start.get("model"), "plugins": start.get("plugins"),
+            "cwd": start.get("cwd"), "claude_code_version": start.get("claude_code_version"),
+            "tools": start.get("tools"), "skill_calls": calls,
+            "final_output": end.get("result"), "trace_complete": bool(ends),
+            "issues": [] if ends else ["Native result event missing; init observations do not establish completion"],
+            "scope": "observed in operator-supplied stream, not provider attestation"}
+
+
 def parse_events(path, suite, arm):
     events = load_records(path)
     starts = [e for e in events if e.get("type") == "system" and e.get("subtype") == "init"]

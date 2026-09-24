@@ -20,7 +20,7 @@ from statistics import mean
 
 from . import __version__
 
-FILE_GRADERS = {"artifact", "executable", "artifact_schema", "numeric_tolerance",
+FILE_GRADERS = {"pseudobulk_chain", "artifact", "executable", "artifact_schema", "numeric_tolerance",
                 "abstention_correct", "over_refusal", "backend_identity", "exec", "replicate_effect"}
 
 
@@ -134,6 +134,10 @@ def validate_suite(suite):
         raise ValidationError("min_clusters must be an integer >= 2")
     from .value_metrics import validate_power_plan
     validate_power_plan(policy)
+    from .interpretation import validate_policy
+    validate_policy(policy)
+    from .guidance import validate_decision_policy
+    validate_decision_policy(policy)
     from .methodology import validate_limits
     validate_limits(policy)
     cases = suite.get("cases")
@@ -323,6 +327,8 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
             continue
         if key in indexed:
             blockers.append(f"Duplicate execution {key}; repeated attempts cannot replace a failed planned run")
+            if "value_interpretation" in suite["policy"]:
+                indexed[key]["observation_issues"].append("Duplicate execution identity; ambiguous observation")
             continue
         issues = []
         if record.get("source") == "synthetic":
@@ -354,6 +360,10 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
             issues.append("Malformed import issues")
         else:
             issues.extend(imported_issues)
+        observation_issues = [i for i in issues if i != "Failure is infrastructure-related or unclassified; do not attribute it to plugin value"]
+        if "value_interpretation" in suite["policy"]:
+            from .interpretation import validate_failure
+            validate_failure(record)
         for mapping in ("reviews", "grades"):
             if not isinstance(record.get(mapping, {}), dict) or any(not isinstance(x, dict) for x in record.get(mapping, {}).values()):
                 raise ValidationError(f"{mapping} must map grader IDs to objects")
@@ -403,7 +413,8 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
         # missing/skipped measurements block complete comparison.
         if status == "skipped":
             issues.append("Execution was skipped")
-        indexed[key] = {"record": record, "issues": issues, "cost_usd": total_cost}
+        indexed[key] = {"record": record, "issues": issues, "cost_usd": total_cost,
+                        "observation_issues": observation_issues}
     for actor, intervals in all_intervals.items():
         intervals.sort(key=lambda item: item[0])
         latest_end = None
@@ -487,6 +498,9 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
                 rows.append({"arm": arm, "repetition": rep, "status": status, "score": score,
                              "grades": grades, "cost_usd": item["cost_usd"], "issues": issues,
                              "duration_seconds": record.get("duration_seconds"), "error": record.get("error")})
+                if "value_interpretation" in suite["policy"]:
+                    rows[-1].update(observation_issues=item["observation_issues"],
+                                    failure_observation=record.get("failure_observation"))
             complete_pairs += int(comparable_pair)
         def full_mean(values):
             return None if not values or None in values else mean(values)
@@ -583,6 +597,9 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
         report["scientific_errors"] = scientific_errors
     from .value_metrics import build_value_metrics
     report["value_metrics"] = build_value_metrics(suite, report)
+    if "value_interpretation" in policy:
+        from .interpretation import build_interpretation
+        report["value_interpretation"] = build_interpretation(suite, report)
     return report
 
 

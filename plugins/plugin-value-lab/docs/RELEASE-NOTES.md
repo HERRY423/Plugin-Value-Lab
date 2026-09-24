@@ -1,26 +1,30 @@
-# Plugin Value Lab 0.5.0 — executable scientific evidence
+# Plugin Value Lab 0.6.0 — native workflows and reusable scientific evidence
 
-Scientific artifacts can contain plausible numbers while using the wrong independent unit, omitting tests or reporting an unsupported conclusion. Version 0.5.0 adds a bounded `replicate_effect` verifier that recomputes scientific results from frozen independent-unit measurements.
+Version 0.6.0 brings the latest native execution, scientific artifact checks, repair comparisons and evidence handoffs into one versioned release.
 
-- **Independent units and design:** reject repeated donors in independent designs, incomplete pairs, completely confounded batches and declared training/evaluation overlap. Permutations preserve blocks or pairs.
-- **Recomputed outcomes:** compare treatment-control effects, exact two-sided p values, complete-family BH values, sample counts, frozen-threshold decisions and leave-one-unit effect ranges. Correct non-significant findings are valid outcomes.
-- **Portable evidence:** design/data commitments join replay dependency preflight. Bundle identity, environment checks and field-level differences distinguish recomputation from complete or scientifically valid evidence.
-- **Cross-host and methodology:** unified Codex/Claude archive verification; requested settings are not observations; process checks do not add outcome points; unsupported acceptance and over-refusal have separate limits; unknown costs remain unknown.
-- **Value measures:** success uplift, rescued and harmed pairs, family-level gains, time and cost per successful task; prospective task-family sample planning remains distinct from a confirmatory test.
-- **Release consistency:** Python/runtime/plugin versions are all 0.5.0; Git preserves frozen bytes across operating systems. Research/team extensions remain opt-in. Epistemic Plugin Arena remains future outlook.
+## Changes
+
+- **Native workflow:** reuse frozen official cases, probe Linux/WSL isolation and executable startup, authorize a single host attempt, retain failures and partial results, and recover collection without relaunching the model.
+- **Analysis and repair:** bind foreground script calls to retained workspaces and frozen inputs; recompute scientific artifacts offline; compare complete before/after repair packages while retaining regressions and unresolved observations.
+- **Falsifiable diagnosis:** connect six diagnostic stages to observed evidence and explicit predictions/falsifiers. Explicit-invocation probes remain separate from natural-use value evidence.
+- **Scientific evaluation:** add prospectively frozen estimands, explicit failure classes, planned denominators and descriptive uncertainty; add donor-aware raw-count aggregation, a pinned PyDESeq2 backend and controlled error/valid-variation checks.
+- **Reuse and guidance:** add registry-free pinned handoffs, separate scorer delivery, non-executing offline replay, scoped host/model/plugin/replicate comparisons and conditional guidance under frozen quality, cost and failure limits.
+- **Packaging:** synchronize Python, runtime and all plugin manifests at 0.6.0. The marketplace and portable Agent Plugins packages include the latest documentation, examples and tests. Research/team extensions remain opt-in.
 
 ## Install
 
-Choose the marketplace ZIP for the Codex/Claude-compatible repository layout, the Agent Plugins ZIP for the portable standard manifest, or the Python wheel. Extract ZIP files before loading them. Python 3.11+ is required; install the `mcp` extra for MCP and `science` for h5ad/SciPy support. Core deterministic verification uses the standard library.
+Use GitHub tag `v0.6.0` to pin this release. Choose the marketplace ZIP for the Codex/Claude-compatible repository layout, the Agent Plugins ZIP for the portable standard manifest, or the Python wheel. Extract ZIP files before loading them.
+
+Python 3.11+ is required. After downloading the wheel:
 
 ```sh
-python -m pip install "plugin_value_lab-0.5.0-py3-none-any.whl[mcp,science]"
+python -m pip install "plugin_value_lab-0.6.0-py3-none-any.whl[mcp,science]"
 ```
 
-This command installs a downloaded wheel; this release does not imply PyPI publication. See attached checksums and the repository installation guide.
+Add the `pseudobulk` extra when running the optional PyDESeq2 reference backend. This GitHub release does not imply PyPI publication. Verify downloads using the attached SHA256SUMS.txt.
 
-## Evidence boundaries
+## Validation and evidence boundaries
 
-Tests include adversarial fixtures and independent SciPy numerical checks. Public examples are synthetic teaching material, not a hidden benchmark. The verifier accepts already prepared unit-level measurements; it does not validate normalization, raw-count models, biological identity, exchangeability or hidden training exposure. Exact enumeration has fixed resource limits and no silent approximate fallback.
+Local Windows / Python 3.13 acceptance: **517 tests passed, zero failures, errors or skips**. Manifest validation and byte-identical marketplace checks passed. Current release acceptance is recorded in `VERIFICATION.json`; dated P0/P1/P2 and native-workflow receipts preserve their original versions and observations. The release packages contain public examples and evidence summaries, not private local studies or account configuration.
 
-No new real model trial, cross-host benefit study, external expert review or biological validation is claimed. The historical native pilot remains evidence-limited and is preserved separately in `VERIFICATION.json`. Computational agreement does not establish scientific truth or plugin efficacy.
+Prior native canaries and cached public-data computations are bounded observations. Missing Skill calls, uncertain sealing, failures and unknown settled costs remain visible. Offline replay creates no new independent observations. External independent reuse, expert scientific validation, cross-host benefit and researcher time savings remain unestablished. Software publication is not scientific certification or a claim of general availability.

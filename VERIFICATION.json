@@ -1,15 +1,74 @@
 {
-  "version": "0.5.0",
-  "scope": "Local engineering acceptance for independent-unit scientific recomputation and the accumulated evidence-governed evaluation changes. Hosted status belongs to exact-commit CI and release evidence.",
-  "tests": {
-    "command": "python -B scripts/check_release_tests.py",
-    "run": 403,
+  "version": "0.6.0",
+  "p1_addendum_20260924": {
+    "tests_run": 443,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
-    "local_log": "work/release-0.5.0/tests.log",
-    "scientific_tests": 22,
-    "numerical_oracle": "SciPy exact independent and paired permutations, including ties, nulls and reversed effects"
+    "log": "C:/Test/p1-tests-final-20260924.log",
+    "new_frozen_value_estimands": [
+      "scientific_correctness",
+      "runtime_reliability",
+      "full_delivery"
+    ],
+    "legacy_study_semantics_preserved": true,
+    "real_cached_data_reference": {
+      "accession": "GSE96583",
+      "cells": 1301,
+      "declared_donors": 8,
+      "samples": 16,
+      "tested_genes": 7877,
+      "backend": "PyDESeq2 0.5.4"
+    },
+    "controlled_verifier_cases": {
+      "valid_variants": 4,
+      "errors": 13,
+      "false_accepts": 0,
+      "false_rejects": 0,
+      "unresolved": 0
+    },
+    "portable_replay": "REPRODUCED_WITH_SEPARATE_BACKEND_RECEIPT",
+    "independent_expert_review": "PENDING_USER_CONFIRMED_NO_RECORD",
+    "representative_verifier_accuracy": "NOT_ESTABLISHED",
+    "new_model_calls": 0,
+    "new_paid_catalog_calls": 0,
+    "previous_p0_unknown_settlement_unchanged": true,
+    "details": "docs/P1-IMPLEMENTATION-20260924.zh-CN.md"
+  },
+  "p0_addendum_20260924": {
+    "tests_run": 421,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "new_native_completed_sessions": 2,
+    "preserved_network_blocked_sessions": 2,
+    "native_csv_replay": "REPRODUCED_AFTER_RELOCATION",
+    "local_component_retest": {
+      "ngs": "7/7",
+      "bionexus_helper": "5/5"
+    },
+    "current_user_diagnosis_adoption": true,
+    "independent_upstream_adoption": "NOT_ESTABLISHED",
+    "scorer_os_isolation": "NOT_VERIFIED",
+    "installed_external_plugins_modified": false,
+    "native_estimated_usd": 0.111179,
+    "provider_peak_rate_estimate_usd": 0.005986428,
+    "settled_usd": null,
+    "paid_catalog_calls": 0,
+    "details": "docs/P0-IMPLEMENTATION-20260924.zh-CN.md"
+  },
+  "scope": "Local engineering acceptance with separate P0 native/component evidence, P1 real cached-data computation, and P2 reusable delivery and conditional guidance. The tests field preserves release-time acceptance; dated addenda record subsequent validation. Independent external reuse and scientific review remain pending. Hosted CI and release status require exact-commit evidence.",
+  "tests": {
+    "command": "python -B scripts/check_release_tests.py",
+    "run": 517,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 109.201,
+    "python": "3.13.9",
+    "platform": "Windows",
+    "local_log": "work/release-0.6.0/tests.log",
+    "log_sha256": "a76c1a8f790ffd471d3ac9b112114830be818e9b88a73351f841a64637ee1f26"
   },
   "checks": {
     "scientific_reference": "FROZEN_UNIT_DESIGN_AND_DATA_RECOMPUTED",
@@ -19,8 +78,10 @@
     "replay": "Synthetic scientific bundle relocated and recomputed with separate reference materials",
     "scope": "No real benefit or scientific validity claim"
   },
-  "new_model_calls": 0,
-  "new_paid_service_calls": 0,
+  "new_model_calls": null,
+  "new_model_calls_note": "P0 added two completed native model sessions and preserved two network-blocked attempts; exact provider request count and settled spending are not asserted.",
+  "new_paid_service_calls": null,
+  "new_paid_catalog_calls": 0,
   "real_cross_host_benefit": "NOT_ESTABLISHED",
   "independent_scientific_validation": "NOT_ESTABLISHED",
   "researcher_benefit": "NOT_ESTABLISHED",
@@ -491,5 +552,100 @@
       "distribution_receipt": "work/structural-risk-repair/distribution.json",
       "scope_note": "Existing current_revision and native installation entries describe historical native-pilot work; this field records the separate structural repair"
     }
+  },
+  "p2_addendum_20260924": {
+    "tests": {
+      "run": 471,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "runtime_seconds": 85.037,
+      "log_sha256": "672711dbce30af3b0cef8ec938cab1d539c9fce0857cedd86db5f35475cf2c30"
+    },
+    "reusable_delivery": "PINNED_AND_REPLAYED_AFTER_RELOCATION",
+    "real_pilot_runs_retained": 6,
+    "real_pilot_failures_retained": 1,
+    "real_pilot_verdict": "INSUFFICIENT_EVIDENCE",
+    "new_observations": 0,
+    "new_independent_samples": 0,
+    "comparison_and_guidance_validation": "EXPLICITLY_SYNTHETIC_CONTROLLED_CASES",
+    "external_participants": 0,
+    "independent_external_reuse": "PENDING_USER_CONFIRMED_NO_RECORD",
+    "independent_expert_review": "PENDING",
+    "new_model_calls": 0,
+    "new_paid_catalog_calls": 0,
+    "previous_p0_unknown_settlement_unchanged": true,
+    "details": "docs/P2-IMPLEMENTATION-20260924.zh-CN.md",
+    "acceptance": "docs/evidence/p2-acceptance-20260924.json"
+  },
+  "native_analysis_addendum_20260924": {
+    "tests": {
+      "run": 491,
+      "seconds": 91.836,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "log_sha256": "cbb2ec71241c52a92253d79b2d102ed5770a8f9c60542e75b215a785cf5fab09"
+    },
+    "version_changed": false,
+    "new_model_calls": 0,
+    "new_paid_catalog_calls": 0,
+    "native_analysis_execution": "PREPARED_NOT_RUN",
+    "actual_local_scaffold_and_script_cases": 4,
+    "actual_local_artifact_checks": 10,
+    "local_execution_context": "WSL2/bubblewrap; operator-written control script",
+    "historical_native_replay": "REPRODUCED",
+    "independent_expert_review": "PENDING",
+    "independent_external_reuse": "PENDING",
+    "scorer_os_isolation": "NOT_VERIFIED",
+    "prior_unknown_settlement_unchanged": true,
+    "details": "docs/NATIVE-ANALYSIS-REPAIR.zh-CN.md",
+    "acceptance": "docs/evidence/native-analysis-20260924.json"
+  },
+  "native_workflow_addendum_20260924": {
+    "tests": {
+      "run": 517,
+      "seconds": 114.324,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "log_sha256": "70ebcfa18a8aab5068c4c2c7d5c8b3264fc6383b634b15f14c0834d325aaef4d"
+    },
+    "version_changed": false,
+    "actual_native_sessions": 2,
+    "native_estimated_cost_usd": 0.11628100000000001,
+    "settled_cost_usd": null,
+    "independent_artifact_checks_passed": 6,
+    "skill_calls_observed": 0,
+    "native_reference_path_isolation": "ACTUALLY_PROBED_BEFORE_EXECUTION",
+    "native_directory_sealing": "WARNING_PRESERVED_NOT_VERIFIED",
+    "collection_recovery": "OFFLINE_RELOCATION_COMPATIBILITY; ORIGINAL_CAPTURE_PRESERVED",
+    "replay": "REPRODUCED",
+    "comparison_eligible": false,
+    "independent_expert_review": "PENDING",
+    "independent_external_reuse": "PENDING",
+    "new_paid_catalog_calls": 0,
+    "prior_unknown_settlement_unchanged": true,
+    "details": "docs/NATIVE-WORKFLOW-HYPOTHESES.zh-CN.md",
+    "acceptance": "docs/evidence/native-workflow-20260924.json"
+  },
+  "release_0_5_0_tests": {
+    "command": "python -B scripts/check_release_tests.py",
+    "run": 403,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "local_log": "work/release-0.5.0/tests.log",
+    "scientific_tests": 22,
+    "numerical_oracle": "SciPy exact independent and paired permutations, including ties, nulls and reversed effects"
+  },
+  "release_0_6_0": {
+    "date": "2026-09-24",
+    "version": "0.6.0",
+    "tag": "v0.6.0",
+    "scope": "Software release of current native workflow, scientific analysis and P0/P1/P2 additions; dated receipts remain historical evidence.",
+    "new_model_calls_during_release": 0,
+    "new_paid_catalog_calls_during_release": 0,
+    "hosted_ci": "Check exact release commit on GitHub Actions; not asserted by this local receipt."
   }
 }

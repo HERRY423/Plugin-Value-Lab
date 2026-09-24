@@ -1,6 +1,6 @@
 # 正向价值指标与验证设计
 
-目标是回答“插件具体增加了哪些成功、节省了多少投入、代价是什么”。新增指标由 `evaluate` 的原始评分结果计算，输出到 JSON、HTML 和 Markdown；不需要另起服务。当前版本 0.5.0。指标定义与软件实现已经提供，真实价值仍须用实际研究测量。
+目标是回答“插件具体增加了哪些成功、节省了多少投入、代价是什么”。新增指标由 `evaluate` 的原始评分结果计算，输出到 JSON、HTML 和 Markdown；不需要另起服务。当前版本 0.6.0。指标定义与软件实现已经提供，真实价值仍须用实际研究测量。
 
 ## 一、正向收益与对应代价
 
@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | 任务成功率提升 | 两侧成功次数 / 各自全部计划运行数之差；成功须完成、达到冻结质量底线且通过所有关键检查 | 相同投入约束下完成更多可验收任务 |
 | 每 100 次净新增成功 | 100 ×（基线失败而插件成功的配对 − 基线成功而插件失败的配对）/ 全部计划配对 | 将收益换算为容易理解的交付数量 |
-| 挽救率 / 损害率 | 挽救次数 / 基线失败次数；损害次数 / 基线成功次数 | 同时展示补足能力与破坏已有能力的风险 |
+| 观察到的配对改善 / 退步比例 | 改善次数 / 基线失败次数；退步次数 / 基线成功次数 | 配对转移的描述，受重复编号对应关系影响，不是个体因果挽救/损害 |
 | 普通任务、负对照、应弃答任务成功率 | 在预先标注的三类任务内分别计算 | 不让“什么都拒绝”伪装成有用；普通任务衡量产出，其他两类衡量边界 |
 | 任务族均权质量差、改善/退步族数 | 每族先求配对质量差均值，再给各族相同权重 | 查看收益是否集中于重复很多的少数题目；与原有案例均权分数并列 |
 | 节省人工分钟 / 经过秒数 | 完整配对两侧的每次平均投入之差 | 区分实际劳动与等待；运行级人工计时不含补充账本的设置、复核时间 |
@@ -60,3 +60,29 @@
 - 已实现：上述指标、分层与固定分母，前瞻样本量规划，结算引用检查及可选门槛，三种格式的报告。
 - 仍需真实材料：足量独立任务、实际模型执行与结算明细、独立评审和确认性研究。新增指标不能把旧先导研究自动升级为已证明有效。
 - Epistemic Plugin Arena 仅为[后续展望](EVIDENCE-LAYERS.md)，不是这些指标或证据边界的前提。
+
+## 五、新冻结研究的评价目标与失败处理
+
+旧 `success.rescued/harmed/rescue_rate/harm_rate` 字段仅为兼容历史研究保留，显示名称改为观察到的改善/退步。不会改写旧研究的失败分母或总评。只有在采集前加入并冻结以下完整配置，新报告才增加 `value_interpretation`：
+
+```json
+"value_interpretation": {
+  "version": 1,
+  "primary_estimand": "scientific_correctness",
+  "pairing_rationale": "同一任务与随机交错的执行区组；重复编号不是个体反事实",
+  "task_distribution": "明确填写计划覆盖的人群、任务族和抽样范围",
+  "failure_rules": {
+    "scientific_correctness": {"measurement":"unknown","tested_system":"failure","provider":"unknown","infrastructure":"unknown","unclassified":"unknown"},
+    "runtime_reliability": {"measurement":"unknown","tested_system":"failure","provider":"failure","infrastructure":"failure","unclassified":"unknown"},
+    "full_delivery": {"measurement":"unknown","tested_system":"failure","provider":"failure","infrastructure":"failure","unclassified":"unknown"}
+  }
+}
+```
+
+这个例子将有证据的系统错误记为完整交付失败，同时保留服务商故障对科学正确性的不确定性。可按事先确定的研究问题把允许的 failure 改成 unknown；测量失败和未知归因必须 unknown，服务商/基础设施不能被算成科学错误。所有缺失、跳过、无法信任的观测保持 unknown，仍占计划分母。
+
+单次记录可附 `failure_observation: {"class":"provider", "evidence_ref":"trace.jsonl:42", "rationale":"实际服务端错误"}`。必须指向保留证据；这是提交者归因，不是经过认证的因果判定。旧 `failure_kind` 不被自动推断成新分类。完成运行但评分器不可用可标 measurement：运行完成仍可观察，科学正确性未知。
+
+新报告提供三种评价目标的任务分布成功率差、任务族均权成功率差、固定计划分母的缺失上下界、2000 次固定种子描述性族 bootstrap。少于两族或有未知时不生成区间；家庭标签不证明独立性，重复次数不替代族数。现有 `power_plan` 仍针对质量差，不能冒充新成功率终点的样本量设计。
+
+`check_claims` 保留各项原始评分、验证回执与观测问题，费用不齐不会抹去数值诊断；现金节省、供体独立性、新数据泛化另行标记。任何新端点都不提升既有 `verdict` 或 `comparison_eligible`，模拟数据始终 SIMULATION_ONLY。

@@ -127,7 +127,7 @@ class ValueMetricsTests(unittest.TestCase):
             paths = write_reports(self.report(), directory)
             for kind in ("html", "md"):
                 content = Path(paths[kind]).read_text(encoding="utf-8")
-                for term in ("插件带来了什么收益", "挽救失败", "样本量规划", "结算引用"):
+                for term in ("插件带来了什么收益", "观察到的配对改善", "样本量规划", "结算引用"):
                     self.assertIn(term, content)
 
 

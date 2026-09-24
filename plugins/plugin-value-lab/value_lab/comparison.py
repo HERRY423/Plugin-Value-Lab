@@ -13,7 +13,7 @@ def _difference(before, after, prefix=""):
     return []
 
 
-def compare_studies(before, after, *, artifact_roots=None, verifier_root=None):
+def compare_studies(before, after, *, artifact_roots=None, verifier_root=None, verifier_roots=None, axis=None):
     """Input objects contain suite, records, lock; optional cost_ledger and context.
 
     Context is observed by the caller (snapshot hash / CLI version), not inferred
@@ -28,8 +28,14 @@ def compare_studies(before, after, *, artifact_roots=None, verifier_root=None):
     roots = artifact_roots if artifact_roots is not None else (None, None)
     if not isinstance(roots, (tuple, list)) or len(roots) != 2:
         raise ValidationError("Provide one artifact root for each study")
-    reports = [evaluate(s["suite"], s["records"], s["lock"], s.get("cost_ledger"), artifact_root=root, verifier_root=verifier_root)
-               for s, root in zip((before, after), roots)]
+    scorer_roots = verifier_roots if verifier_roots is not None else (verifier_root, verifier_root)
+    if not isinstance(scorer_roots, (tuple, list)) or len(scorer_roots) != 2:
+        raise ValidationError("Provide one scorer root per study")
+    requested_axis = axis
+    if axis is not None and axis not in ("host", "model", "plugin", "replicate"):
+        raise ValidationError("Explicit comparison axis must be host, model, plugin or replicate")
+    reports = [evaluate(s["suite"], s["records"], s["lock"], s.get("cost_ledger"), artifact_root=root, verifier_root=scorer)
+               for s, root, scorer in zip((before, after), roots, scorer_roots)]
     contexts = [s.get("context") or {} for s in (before, after)]
     if any(not isinstance(c, dict) for c in contexts):
         raise ValidationError("比较上下文必须是对象")
@@ -42,6 +48,38 @@ def compare_studies(before, after, *, artifact_roots=None, verifier_root=None):
     axis = "combined" if plugin_change and model_change else "plugin_revision" if plugin_change else "model" if model_change else "replicate"
     blockers, warnings = [], []
     allowed = {"plugin.version", "context.plugin_sha256", "conditions.model"}
+    if requested_axis is not None:
+        import re
+        from .registry import _timestamp
+        axis = requested_axis
+        allowed = {"context.observed_at", "context.lineage_id"} | {
+            "host": {"conditions.host", "conditions.host_version"},
+            "model": {"conditions.model", "conditions.model_version"},
+            "plugin": {"plugin.version", "context.plugin_sha256"}, "replicate": set()}[axis]
+        for suite in (a, b):
+            if any(not isinstance(suite["conditions"].get(k), str) or not suite["conditions"][k].strip()
+                   for k in ("host_version", "model_version")):
+                blockers.append("Explicit comparisons require observed host_version and model_version, not aliases alone")
+        for context in contexts:
+            if any(not isinstance(context.get(k), str) or not re.fullmatch(r"[a-f0-9]{64}", context[k]) for k in ("plugin_sha256", "engine_sha256")):
+                blockers.append("Explicit comparisons require plugin and scoring-engine content digests")
+            if not isinstance(context.get("lineage_id"), str) or not context["lineage_id"].strip():
+                blockers.append("Explicit comparisons require a study lineage identity")
+        if contexts[0].get("lineage_id") == contexts[1].get("lineage_id"):
+            blockers.append("Evidence revisions or replays of one lineage are not new observations")
+        try:
+            times = [_timestamp(c.get("observed_at")) for c in contexts]
+            if axis != "host" and times[1] <= times[0]:
+                blockers.append("New observations must follow previous observations")
+        except (ValueError, TypeError, AttributeError):
+            blockers.append("Observed timestamps missing or invalid")
+        axis_fields = allowed - {"context.observed_at", "context.lineage_id"}
+        if axis != "replicate" and not fields & axis_fields:
+            blockers.append("No change on the requested comparison axis")
+        # Preserve every non-axis extension, input/truth commitment and study policy.
+        from .longitudinal import _basis
+        if suite_digest(_basis(a)) != suite_digest(_basis(b)):
+            blockers.append("Frozen tasks, inputs, truth, policy or protocol extensions changed")
     confounders = sorted(fields - allowed)
     if confounders:
         blockers.append("除目标因素外还有条件变化：" + ", ".join(confounders))

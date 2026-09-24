@@ -6,7 +6,16 @@ Compare plugin runs, locate failures and retest repairs under matched conditions
 
 [English](README.md) · [安装](docs/INSTALL.zh-CN.md) · [本次修复状态](docs/REMEDIATION.md)
 
-当前版本 **0.5.0**。新增[独立样本科研推断重算](docs/REPLICATE-VERIFICATION.zh-CN.md)：检查供体单位、批次与配对，重算效应、精确检验和完整多重校正。配对评分提供测量能力，长期积累的是领域任务、实测账本和外部贡献。目前没有认证独立复核，也未建立外部采用。
+当前版本 **0.6.0**。新增[独立样本科研推断重算](docs/REPLICATE-VERIFICATION.zh-CN.md)：检查供体单位、批次与配对，重算效应、精确检验和完整多重校正。配对评分提供测量能力，长期积累的是领域任务、实测账本和外部贡献。目前没有认证独立复核，也未建立外部采用。
+
+本地 P1 增加[评价目标与失败处理](docs/VALUE-METRICS.zh-CN.md)和[供体感知差异分析场景包](docs/PSEUDOBULK.zh-CN.md)。真实公开数据参考运行与错误/合理变体检查已记录；独立专家审阅仍待完成。[实施与验收边界](docs/P1-IMPLEMENTATION-20260924.zh-CN.md)。
+
+P2 提供[无需登记的复用交接与条件化建议](docs/P2-REUSE-GUIDANCE.zh-CN.md)：保留旧观察重跑，限定宿主/模型比较范围，并按事前确定的质量、成本与风险界限给出场景建议。独立外部重跑尚未发生。[P2 验收边界](docs/P2-IMPLEMENTATION-20260924.zh-CN.md)。
+
+新增[原生科研文件分析与完整修复复测](docs/NATIVE-ANALYSIS-REPAIR.zh-CN.md)：官方宿主执行、冻结输入、脚本工具记录、独立产物复算和完整对照复测相连。四个本地脚本对照已跑通，新模型实验与外部审阅仍待完成。
+
+新增[既有用例附加采集与可检验修复假设](docs/NATIVE-WORKFLOW-HYPOTHESES.zh-CN.md)：沿用原用例，准备并核验参考隔离，显式授权后单次启动官方执行、保留失败、自动采集与独立评分。六级诊断区分事实、解释、预期与反证；明确调用探针仅用于定位，不替代自然使用评估。
+
 
 ## 在 Codex 桌面端安装
 
@@ -58,6 +67,8 @@ python scripts/value_lab.py evaluate suite.json runs.jsonl --lock protocol.lock.
 ```
 
 ## 直接验证产物
+
+已有 Claude 原生用例可直接使用[科研文件附加诊断](docs/NATIVE-EVIDENCE.zh-CN.md)：冻结原用例，保留原生工作目录，绑定并收集真实 CSV/JSON 文件，运行后独立评分及离线重算。无需登记，也无需转换或重写整套原生用例。[NGS/BioNexus 本地修复记录与验收边界](docs/P0-IMPLEMENTATION-20260924.zh-CN.md)。
 
 新增评分规则可以读取实际文件：DE 表的基因标识、有限数值和 BH 校正，逐细胞标签与参照的一致性，h5ad 的结构与必要字段，以及 JSON 产物的类型和值。还可显式运行固定 SHA-256 的 Python 验证器。
 

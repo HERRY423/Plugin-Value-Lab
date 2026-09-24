@@ -82,6 +82,16 @@ def _improvement_plan(suite, report):
                     "action": "对照冻结判据检查实际产物；修复相关行为后同时复测正确处理和不应拒绝的任务。"
                         if grade["passed"] is False else "结果尚未知：补齐产物或真实人工复核，不把未知当作已证实缺陷。"})
     queue.sort(key=lambda item: (item["priority"], item["case_id"], item["arm"], item["repetition"]))
+    for item in queue:
+        if item["kind"] == "outcome" and item.get("passed") is False:
+            prediction = "在原输入、评分参考与阈值不变时，失败判据转为通过，且正常与不应拒答对照不退步。"
+            falsifier = "失败仍存在、对照退步，或只有修改输入、阈值或删减案例才通过。"
+        else:
+            prediction = "补充的实际会话、产物或复核记录能明确原缺口；保留原有失败记录。"
+            falsifier = "新增记录仍缺失或与原记录冲突；不能把执行恢复等同于科研结果修复。"
+        item["testable_hypothesis"] = {"status": "UNTESTED", "observed_fact": item["evidence"],
+            "intervention": item["action"], "prediction": prediction, "falsifier": falsifier,
+            "causal_claim": False, "explicit_invocation_is_diagnostic_only": True}
     return {
         "status": "SIMULATION_ONLY" if report["evidence_type"] == "synthetic" else "DIAGNOSTIC_ONLY",
         "registration_required": False, "publication_required": False,
@@ -300,6 +310,9 @@ def _render_markdown(card):
                   f"状态：{_markdown(plan['status'])}", ""]
         for item in plan["queue"]:
             lines += [f"- {_markdown(item['case_id'])} / {_markdown(item['arm'])} / 第 {item['repetition']} 次 / {_markdown(item.get('criterion_id', item['kind']))}：{_markdown(item['evidence'])} {_markdown(item['action'])}"]
+            if "testable_hypothesis" in item:
+                hypothesis = item["testable_hypothesis"]
+                lines += [f"  预期观察：{_markdown(hypothesis['prediction'])} 反证条件：{_markdown(hypothesis['falsifier'])}"]
         if not plan["queue"]:
             lines += ["未定位到逐项失败；这不代表已有增益。仍需检查整项研究阻断和成本。"]
         trial = plan["next_experiment"]

@@ -15,7 +15,7 @@ import uuid
 
 from .core import ValidationError, load_json
 
-KINDS = {"artifact_schema", "numeric_tolerance", "abstention_correct", "over_refusal", "backend_identity", "exec", "replicate_effect"}
+KINDS = {"pseudobulk_chain", "artifact_schema", "numeric_tolerance", "abstention_correct", "over_refusal", "backend_identity", "exec", "replicate_effect"}
 REFERENCE_FIELDS = ("truth", "program", "testing_family", "design", "data")
 
 
@@ -43,7 +43,10 @@ def reference(ref):
 
 
 def validate_spec(kind, spec):
-    if kind == "replicate_effect":
+    if kind == "pseudobulk_chain":
+        from .pseudobulk import validate_spec as validate_pseudobulk
+        validate_pseudobulk(spec)
+    elif kind == "replicate_effect":
         from .replicates import validate_spec as validate_replicates
         validate_replicates(spec)
     elif kind == "artifact_schema":
@@ -290,6 +293,9 @@ def sandbox_check(path, spec, root):
 
 
 def check(kind, path, spec, root, record, artifact_sha):
+    if kind == "pseudobulk_chain":
+        from .pseudobulk import check as check_pseudobulk
+        return check_pseudobulk(path, spec, root)
     if kind == "replicate_effect":
         from .replicates import check as check_replicates
         return check_replicates(path, spec, root)

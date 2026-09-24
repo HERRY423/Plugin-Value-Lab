@@ -1,0 +1,135 @@
+{
+  "version": "0.5.0",
+  "scope": "Native workflow preparation and local operator-script checks; no new host model execution",
+  "local_analysis": {
+    "scope": "Local operator-written control script and generated scaffold under WSL/bwrap; no Claude session or agent-generated script; no scorer-access isolation test",
+    "cases": [
+      {
+        "case_id": "complete-family",
+        "scaffold_exit_code": 0,
+        "script_exit_code": 0,
+        "input_hashes_match": true,
+        "grades": [
+          {
+            "id": "decision",
+            "passed": true,
+            "rationale": "Scientific computational contract checked; inspect verifier receipt and evidence limits"
+          },
+          {
+            "id": "complete-bh",
+            "passed": true,
+            "rationale": "Artifact satisfies the frozen computational contract; biological validity not established"
+          },
+          {
+            "id": "preserve-p",
+            "passed": true,
+            "rationale": "Scientific computational contract checked; inspect verifier receipt and evidence limits"
+          },
+          {
+            "id": "preserve-effect",
+            "passed": true,
+            "rationale": "Scientific computational contract checked; inspect verifier receipt and evidence limits"
+          }
+        ],
+        "script_sha256": "3f72945e033a33b8d8c5950d15e45b192d9cfcf5776adeb9cc1f5e2d32f47ff8"
+      },
+      {
+        "case_id": "ties-and-boundaries",
+        "scaffold_exit_code": 0,
+        "script_exit_code": 0,
+        "input_hashes_match": true,
+        "grades": [
+          {
+            "id": "decision",
+            "passed": true,
+            "rationale": "Scientific computational contract checked; inspect verifier receipt and evidence limits"
+          },
+          {
+            "id": "complete-bh",
+            "passed": true,
+            "rationale": "Artifact satisfies the frozen computational contract; biological validity not established"
+          },
+          {
+            "id": "preserve-p",
+            "passed": true,
+            "rationale": "Scientific computational contract checked; inspect verifier receipt and evidence limits"
+          },
+          {
+            "id": "preserve-effect",
+            "passed": true,
+            "rationale": "Scientific computational contract checked; inspect verifier receipt and evidence limits"
+          }
+        ],
+        "script_sha256": "3f72945e033a33b8d8c5950d15e45b192d9cfcf5776adeb9cc1f5e2d32f47ff8"
+      },
+      {
+        "case_id": "invalid-p",
+        "scaffold_exit_code": 0,
+        "script_exit_code": 0,
+        "input_hashes_match": true,
+        "grades": [
+          {
+            "id": "decision",
+            "passed": true,
+            "rationale": "Scientific computational contract checked; inspect verifier receipt and evidence limits"
+          }
+        ],
+        "script_sha256": "3f72945e033a33b8d8c5950d15e45b192d9cfcf5776adeb9cc1f5e2d32f47ff8"
+      },
+      {
+        "case_id": "duplicate-id",
+        "scaffold_exit_code": 0,
+        "script_exit_code": 0,
+        "input_hashes_match": true,
+        "grades": [
+          {
+            "id": "decision",
+            "passed": true,
+            "rationale": "Scientific computational contract checked; inspect verifier receipt and evidence limits"
+          }
+        ],
+        "script_sha256": "3f72945e033a33b8d8c5950d15e45b192d9cfcf5776adeb9cc1f5e2d32f47ff8"
+      }
+    ],
+    "model_calls": 0,
+    "native_model_execution": "NOT_RUN",
+    "new_independent_samples": 0,
+    "expert_review": "PENDING"
+  },
+  "scipy_bh_maximum_absolute_errors": {
+    "complete-family": 0.0,
+    "ties-and-boundaries": 3.469446951953614e-18
+  },
+  "historical_native_replay": "REPRODUCED",
+  "historical_receipt_sha256": "a366d263b0870a278c96262bb1ae89450714bb845295e72da2422f6f56f74bfc",
+  "historical_with_grades": [
+    true,
+    true,
+    true
+  ],
+  "historical_without_grades": [
+    false,
+    true,
+    true
+  ],
+  "wsl_preflight": {
+    "host_version": "2.1.278",
+    "python": "3.14.4",
+    "bubblewrap_start": true,
+    "socat_present": true,
+    "scorer_access_isolation": "NOT_VERIFIED"
+  },
+  "new_model_calls": 0,
+  "new_paid_catalog_calls": 0,
+  "prior_unknown_settlement_unchanged": true,
+  "independent_expert_review": "PENDING",
+  "independent_external_reuse": "PENDING",
+  "tests": {
+    "run": 491,
+    "seconds": 91.836,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "log_sha256": "cbb2ec71241c52a92253d79b2d102ed5770a8f9c60542e75b215a785cf5fab09"
+  }
+}

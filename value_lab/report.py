@@ -254,13 +254,24 @@ def _value_notes(report):
     value = report["value_metrics"]
     success, plan = value["success"], value["power_plan"]
     status = {"SIMULATION_ONLY": "模拟演示", "DESCRIPTIVE_LOCAL": "局部描述性结果", "INCOMPLETE_OR_CONFOUNDED": "证据不全或条件混杂"}[value["status"]]
-    return [f"指标状态：{status}。当前支持正向局部结论：{_text(value['benefit_claim_eligible'])}；不代表统计学证明。",
-            f"计划配对 {success['planned_pairs']}；挽救失败 {success['rescued']}；引入失败 {success['harmed']}；未知配对 {success['unknown_pairs']}。每 100 次净新增成功：{_measurement(success['net_additional_successes_per_100'])}。",
-            f"挽救率（基线失败为分母）：{_score(success['rescue_rate'])}；损害率（基线成功为分母）：{_score(success['harm_rate'])}。",
+    notes = [f"指标状态：{status}。当前支持正向局部结论：{_text(value['benefit_claim_eligible'])}；不代表统计学证明。",
+            f"计划配对 {success['planned_pairs']}；观察到的配对改善 {success['rescued']}；观察到的配对退步 {success['harmed']}；未知配对 {success['unknown_pairs']}。每 100 次净新增成功：{_measurement(success['net_additional_successes_per_100'])}。",
+            f"观察到的改善比例（基线失败为分母）：{_score(success['rescue_rate'])}；观察到的退步比例（基线成功为分母）：{_score(success['harm_rate'])}。配对转移依赖重复编号的对应关系，不代表个体因果效应。",
             f"任务族均权质量差：{_delta(value['families']['equal_weight_quality_delta'])}；改善 {value['families']['improved']} 族，退步 {value['families']['regressed']} 族。",
             f"样本量规划：已有 {plan['planned_families']} 个任务族，目标 {_text(plan['required_families'])}，还需 {_text(plan['additional_families'])}。这是前瞻近似规划，不是事后功效或显著性检验；重复运行不增加独立任务族数。",
             "成功须完成任务、达到冻结质量底线并通过全部关键检查；缺失保留在计划分母。人工分钟仅含运行计时，额外设置与复核投入计入完整成本。",
             "成本证据：" + report["cost_analysis"]["cash_evidence"]["status"] + "。结算引用仍由提交者提供，不能认证账单真实性；人工折算不是现金结算。"]
+    interpretation = report.get("value_interpretation")
+    if interpretation:
+        plan = interpretation["frozen_plan"]
+        labels = {"scientific_correctness": "科学产物正确性", "runtime_reliability": "运行可靠性", "full_delivery": "完整交付"}
+        notes.append("预先选定的主要评价目标：" + labels[plan["primary_estimand"]] + "。配对依据：" + plan["pairing_rationale"])
+        for name, endpoint in interpretation["endpoints"].items():
+            notes.append(labels[name] + "：任务分布成功率差 " + _delta(endpoint["task_distribution_success_delta"]) +
+                         "；任务族均权成功率差 " + _delta(endpoint["equal_family_success_delta"]) +
+                         "；区间状态 " + endpoint["family_uncertainty"]["status"] + "。")
+        notes.append("逐项检查结论保存在 JSON 的 value_interpretation.check_claims；费用缺失不抹去数值诊断。缺失范围不是置信区间；失败归因尚未经独立认证。")
+    return notes
 
 
 def _value_html(report):
