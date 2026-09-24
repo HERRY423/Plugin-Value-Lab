@@ -60,15 +60,15 @@
   "scope": "Local engineering acceptance with separate P0 native/component evidence, P1 real cached-data computation, and P2 reusable delivery and conditional guidance. The tests field preserves release-time acceptance; dated addenda record subsequent validation. Independent external reuse and scientific review remain pending. Hosted CI and release status require exact-commit evidence.",
   "tests": {
     "command": "python -B scripts/check_release_tests.py",
-    "run": 517,
+    "run": 518,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
-    "seconds": 109.201,
+    "seconds": 106.287,
     "python": "3.13.9",
     "platform": "Windows",
-    "local_log": "work/release-0.6.0/tests.log",
-    "log_sha256": "a76c1a8f790ffd471d3ac9b112114830be818e9b88a73351f841a64637ee1f26"
+    "local_log": "work/release-0.6.0/tests-final.log",
+    "log_sha256": "128c2ecc49c5df506754fd2af8d320324da4d2c15636d5bf9344cf58cdd99257"
   },
   "checks": {
     "scientific_reference": "FROZEN_UNIT_DESIGN_AND_DATA_RECOMPUTED",
@@ -646,6 +646,7 @@
     "scope": "Software release of current native workflow, scientific analysis and P0/P1/P2 additions; dated receipts remain historical evidence.",
     "new_model_calls_during_release": 0,
     "new_paid_catalog_calls_during_release": 0,
-    "hosted_ci": "Check exact release commit on GitHub Actions; not asserted by this local receipt."
+    "hosted_ci": "Check exact release commit on GitHub Actions; not asserted by this local receipt.",
+    "windows_path_fix": "Canonicalize Windows 8.3 paths before retained-root comparison, preserve no-link and traversal checks; includes regression coverage."
   }
 }

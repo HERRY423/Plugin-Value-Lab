@@ -9,6 +9,7 @@ Version 0.6.0 brings the latest native execution, scientific artifact checks, re
 - **Falsifiable diagnosis:** connect six diagnostic stages to observed evidence and explicit predictions/falsifiers. Explicit-invocation probes remain separate from natural-use value evidence.
 - **Scientific evaluation:** add prospectively frozen estimands, explicit failure classes, planned denominators and descriptive uncertainty; add donor-aware raw-count aggregation, a pinned PyDESeq2 backend and controlled error/valid-variation checks.
 - **Reuse and guidance:** add registry-free pinned handoffs, separate scorer delivery, non-executing offline replay, scoped host/model/plugin/replicate comparisons and conditional guidance under frozen quality, cost and failure limits.
+- **Windows compatibility:** normalize short directory names when binding retained native traces and workspaces; reject traversal and linked artifacts.
 - **Packaging:** synchronize Python, runtime and all plugin manifests at 0.6.0. The marketplace and portable Agent Plugins packages include the latest documentation, examples and tests. Research/team extensions remain opt-in.
 
 ## Install
@@ -25,6 +26,6 @@ Add the `pseudobulk` extra when running the optional PyDESeq2 reference backend.
 
 ## Validation and evidence boundaries
 
-Local Windows / Python 3.13 acceptance: **517 tests passed, zero failures, errors or skips**. Manifest validation and byte-identical marketplace checks passed. Current release acceptance is recorded in `VERIFICATION.json`; dated P0/P1/P2 and native-workflow receipts preserve their original versions and observations. The release packages contain public examples and evidence summaries, not private local studies or account configuration.
+Local Windows / Python 3.13 acceptance: **518 tests passed, zero failures, errors or skips**. Manifest validation and byte-identical marketplace checks passed. Current release acceptance is recorded in `VERIFICATION.json`; dated P0/P1/P2 and native-workflow receipts preserve their original versions and observations. The release packages contain public examples and evidence summaries, not private local studies or account configuration.
 
 Prior native canaries and cached public-data computations are bounded observations. Missing Skill calls, uncertain sealing, failures and unknown settled costs remain visible. Offline replay creates no new independent observations. External independent reuse, expert scientific validation, cross-host benefit and researcher time savings remain unestablished. Software publication is not scientific certification or a claim of general availability.

@@ -290,12 +290,27 @@ def render_diagnosis(report):
     return "\n".join(lines)
 
 
+def _retained_path(raw, root, message):
+    """Normalize OS aliases while preserving the no-linked-artifacts boundary."""
+    path = Path(raw)
+    if not path.is_absolute() or '..' in path.parts:
+        raise ValidationError(message)
+    resolved = path.resolve()
+    if not resolved.is_relative_to(root):
+        raise ValidationError(message)
+    # Windows 8.3 aliases can differ from root.resolve(). Check original path
+    # components before canonicalizing so internal symlinks stay forbidden.
+    for candidate in (path, *path.parents):
+        if candidate.resolve() == root:
+            break
+        if candidate.is_symlink() or (hasattr(candidate, 'is_junction') and candidate.is_junction()):
+            raise ValidationError('Linked artifacts are not accepted')
+    return confined(root, resolved.relative_to(root).as_posix())
+
+
 def _retained_workspace(trace, cwd, root, version):
     """Resolve only an observed, version-bounded native relocation, never scan."""
-    workspace = Path(cwd)
-    if not workspace.is_absolute() or not workspace.is_relative_to(root):
-        raise ValidationError('Native init.cwd is outside the retained root')
-    confined(root, workspace.relative_to(root).as_posix())
+    workspace = _retained_path(cwd, root, 'Native init.cwd is outside the retained root')
     run_root = trace.parent.parent
     relocated = None
     if (version == '2.1.278' and trace.name == 'trace.jsonl' and trace.parent.name == 'out'
@@ -333,11 +348,8 @@ def discover_native_bindings(result_path, retained_root):
                 if not isinstance(raw, str) or not raw:
                     missing.append({**key, "reason": "Native tracePath absent"})
                     continue
-                path = Path(raw)
-                if not path.is_absolute() or not path.is_relative_to(root):
-                    raise ValidationError("Native tracePath is outside the explicitly supplied retained root")
-                relative = path.relative_to(root).as_posix()
-                safe_trace = confined(root, relative)
+                safe_trace = _retained_path(raw, root, "Native tracePath is outside the explicitly supplied retained root")
+                relative = safe_trace.relative_to(root).as_posix()
                 if not safe_trace.is_file():
                     missing.append({**key, "reason": "Retained native trace file missing"})
                     continue

@@ -234,6 +234,43 @@ class NativeEvidenceTests(unittest.TestCase):
         with self.assertRaises(ValidationError):
             self.capture(bindings=found["bindings"], retained_root=retained)
 
+    def test_native_profile_accepts_os_path_aliases(self):
+        retained = self.root / 'retained long directory name'
+        retained.mkdir()
+        alias = retained
+        import os
+        if os.name == 'nt':
+            import ctypes
+            from ctypes import wintypes
+            get_short = ctypes.WinDLL('kernel32', use_last_error=True).GetShortPathNameW
+            get_short.argtypes = [wintypes.LPCWSTR, wintypes.LPWSTR, wintypes.DWORD]
+            get_short.restype = wintypes.DWORD
+            buffer = ctypes.create_unicode_buffer(32768)
+            length = get_short(str(retained), buffer, len(buffer))
+            self.assertGreater(length, 0)
+            self.assertLess(length, len(buffer))
+            alias = Path(buffer.value)
+        for arm in ('with', 'without'):
+            workspace = alias / arm / 'home/cwd'
+            workspace.mkdir(parents=True)
+            shutil.copyfile(self.root / arm / 'result.csv', workspace / 'result.csv')
+            trace = alias / arm / 'out/trace.jsonl'
+            trace.parent.mkdir()
+            trace.write_text(json.dumps({'type': 'system', 'subtype': 'init', 'session_id': arm,
+                                         'cwd': str(workspace)}), encoding='utf-8')
+            self.native['cases'][0]['arms'][arm][0]['tracePath'] = str(trace)
+        self.native['claudeVersion'] = '2.1.278'
+        write_json(self.result_path, self.native)
+        found = discover_native_bindings(self.result_path, retained.resolve())
+        self.assertFalse(found['missing'])
+        result = self.capture(bindings=found['bindings'], retained_root=retained)
+        self.assertEqual(verify_native_evidence(self.output, result['receipt_sha256'])['status'], 'REPRODUCED')
+        # Normalization must not turn path traversal into a valid binding.
+        self.native['cases'][0]['arms']['with'][0]['tracePath'] = str(alias / 'with/../with/out/trace.jsonl')
+        write_json(self.result_path, self.native)
+        with self.assertRaises(ValidationError):
+            discover_native_bindings(self.result_path, retained)
+
     def test_native_profile_refuses_unsupported_versions_and_escaping_trace(self):
         with self.assertRaises(ValidationError):
             discover_native_bindings(self.result_path, self.root / "retained")

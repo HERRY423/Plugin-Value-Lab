@@ -4,6 +4,8 @@
 
 This release includes the native workflow, scientific analysis, P0/P1/P2 and evidence-reuse changes detailed below. Runtime, Python and plugin manifests are synchronized at 0.6.0. Dated implementation records retain the version and evidence available when they were written.
 
+- Fix retained native trace/workspace binding on Windows systems using 8.3 short directory names; add path-alias regression coverage.
+
 ### Native workflow and falsifiable diagnostics
 
 - Add a bounded Linux/WSL wrapper around existing official cases: freeze the invocation, probe scorer access and executable startup inside isolation, authorize one attempt, bind retained workspaces and grade offline. Preserve partial results and uncertain process state; recovery never relaunches the model.
