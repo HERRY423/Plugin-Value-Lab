@@ -1,0 +1,694 @@
+{
+  "format": "pvl-structural-author-acceptance-1",
+  "version": "0.6.0",
+  "version_changed": false,
+  "author_entry": {
+    "default_commands": [
+      "diagnose",
+      "demo",
+      "doctor",
+      "compare-native-repair"
+    ],
+    "default_help_lines": 23,
+    "advanced_help_lines": 115,
+    "runtime_modules": 46,
+    "runtime_modules_added": 0,
+    "documentation_files_retained": 36,
+    "readme_zh_lines": 43,
+    "setup_and_reading_burden_established": false
+  },
+  "machine_timing": {
+    "samples": [
+      {
+        "exit_code": 0,
+        "process_seconds": 0.16823889999795938,
+        "stderr": "",
+        "diagnosis": {
+          "status": "CONTRACT_FAILED",
+          "findings": 1,
+          "timing": {
+            "machine_seconds_to_diagnosis": 0.03601679999701446,
+            "human_time_to_first_diagnosis_seconds": null,
+            "scope": "CLI entry to computed diagnosis; excludes interpreter startup, installation, preparation, reading and repair"
+          },
+          "report": "C:\\Test\\structural-20260925\\acceptance\\first-diagnosis-1\\DIAGNOSIS.md",
+          "json": "C:\\Test\\structural-20260925\\acceptance\\first-diagnosis-1\\diagnosis.json"
+        }
+      },
+      {
+        "exit_code": 0,
+        "process_seconds": 0.17402009999932488,
+        "stderr": "",
+        "diagnosis": {
+          "status": "CONTRACT_FAILED",
+          "findings": 1,
+          "timing": {
+            "machine_seconds_to_diagnosis": 0.031604299998434726,
+            "human_time_to_first_diagnosis_seconds": null,
+            "scope": "CLI entry to computed diagnosis; excludes interpreter startup, installation, preparation, reading and repair"
+          },
+          "report": "C:\\Test\\structural-20260925\\acceptance\\first-diagnosis-2\\DIAGNOSIS.md",
+          "json": "C:\\Test\\structural-20260925\\acceptance\\first-diagnosis-2\\diagnosis.json"
+        }
+      },
+      {
+        "exit_code": 0,
+        "process_seconds": 0.17912770000111777,
+        "stderr": "",
+        "diagnosis": {
+          "status": "CONTRACT_FAILED",
+          "findings": 1,
+          "timing": {
+            "machine_seconds_to_diagnosis": 0.03260069999669213,
+            "human_time_to_first_diagnosis_seconds": null,
+            "scope": "CLI entry to computed diagnosis; excludes interpreter startup, installation, preparation, reading and repair"
+          },
+          "report": "C:\\Test\\structural-20260925\\acceptance\\first-diagnosis-3\\DIAGNOSIS.md",
+          "json": "C:\\Test\\structural-20260925\\acceptance\\first-diagnosis-3\\diagnosis.json"
+        }
+      },
+      {
+        "exit_code": 0,
+        "process_seconds": 0.1723078000068199,
+        "stderr": "",
+        "diagnosis": {
+          "status": "CONTRACT_FAILED",
+          "findings": 1,
+          "timing": {
+            "machine_seconds_to_diagnosis": 0.032059299999673385,
+            "human_time_to_first_diagnosis_seconds": null,
+            "scope": "CLI entry to computed diagnosis; excludes interpreter startup, installation, preparation, reading and repair"
+          },
+          "report": "C:\\Test\\structural-20260925\\acceptance\\first-diagnosis-4\\DIAGNOSIS.md",
+          "json": "C:\\Test\\structural-20260925\\acceptance\\first-diagnosis-4\\diagnosis.json"
+        }
+      },
+      {
+        "exit_code": 0,
+        "process_seconds": 0.17887039999914123,
+        "stderr": "",
+        "diagnosis": {
+          "status": "CONTRACT_FAILED",
+          "findings": 1,
+          "timing": {
+            "machine_seconds_to_diagnosis": 0.030833299999358132,
+            "human_time_to_first_diagnosis_seconds": null,
+            "scope": "CLI entry to computed diagnosis; excludes interpreter startup, installation, preparation, reading and repair"
+          },
+          "report": "C:\\Test\\structural-20260925\\acceptance\\first-diagnosis-5\\DIAGNOSIS.md",
+          "json": "C:\\Test\\structural-20260925\\acceptance\\first-diagnosis-5\\diagnosis.json"
+        }
+      }
+    ],
+    "median_process_seconds": 0.17402009999932488,
+    "min_process_seconds": 0.16823889999795938,
+    "max_process_seconds": 0.17912770000111777,
+    "scope": "Five fresh Python processes, warm OS caches; includes imports, CLI parse, check and report writes; no installation or human time"
+  },
+  "author_timing": {
+    "actual_participants": 0,
+    "time_to_first_actionable_diagnosis_seconds": null,
+    "interactive_recorder_implemented": true,
+    "comparison_against_previous_method": null
+  },
+  "detector_audit": {
+    "manifest_sha256": "6d169b5b67bab534473d6959d12033945e87f3d96035547060e0be3060fbda46",
+    "summary": {
+      "TP": 5,
+      "FN": 4,
+      "FP": 1,
+      "TN": 5,
+      "UNKNOWN": 1,
+      "EXCLUDED_LABEL": 2,
+      "cases": 18,
+      "detection": {
+        "planned": 10,
+        "unknown": 1,
+        "rate": null,
+        "lower": 0.5,
+        "upper": 0.6
+      },
+      "false_positive": {
+        "planned": 6,
+        "unknown": 0,
+        "rate": 0.16666666666666666,
+        "lower": 0.16666666666666666,
+        "upper": 0.16666666666666666
+      },
+      "distinct_families": 12
+    },
+    "by_family": {
+      "aggregation": {
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 1,
+        "UNKNOWN": 0,
+        "EXCLUDED_LABEL": 0,
+        "cases": 1,
+        "detection": {
+          "planned": 0,
+          "unknown": 0,
+          "rate": null,
+          "lower": null,
+          "upper": null
+        },
+        "false_positive": {
+          "planned": 1,
+          "unknown": 0,
+          "rate": 0.0,
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "distinct_families": 1
+      },
+      "biological-interpretation": {
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 0,
+        "UNKNOWN": 0,
+        "EXCLUDED_LABEL": 0,
+        "cases": 0,
+        "detection": {
+          "planned": 0,
+          "unknown": 0,
+          "rate": null,
+          "lower": null,
+          "upper": null
+        },
+        "false_positive": {
+          "planned": 0,
+          "unknown": 0,
+          "rate": null,
+          "lower": null,
+          "upper": null
+        },
+        "distinct_families": 0
+      },
+      "confounding": {
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 0,
+        "UNKNOWN": 0,
+        "EXCLUDED_LABEL": 0,
+        "cases": 0,
+        "detection": {
+          "planned": 0,
+          "unknown": 0,
+          "rate": null,
+          "lower": null,
+          "upper": null
+        },
+        "false_positive": {
+          "planned": 0,
+          "unknown": 0,
+          "rate": null,
+          "lower": null,
+          "upper": null
+        },
+        "distinct_families": 0
+      },
+      "effect-direction": {
+        "TP": 0,
+        "FN": 1,
+        "FP": 0,
+        "TN": 0,
+        "UNKNOWN": 0,
+        "EXCLUDED_LABEL": 0,
+        "cases": 1,
+        "detection": {
+          "planned": 1,
+          "unknown": 0,
+          "rate": 0.0,
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "false_positive": {
+          "planned": 0,
+          "unknown": 0,
+          "rate": null,
+          "lower": null,
+          "upper": null
+        },
+        "distinct_families": 1
+      },
+      "identity": {
+        "TP": 1,
+        "FN": 0,
+        "FP": 0,
+        "TN": 0,
+        "UNKNOWN": 0,
+        "EXCLUDED_LABEL": 0,
+        "cases": 1,
+        "detection": {
+          "planned": 1,
+          "unknown": 0,
+          "rate": 1.0,
+          "lower": 1.0,
+          "upper": 1.0
+        },
+        "false_positive": {
+          "planned": 0,
+          "unknown": 0,
+          "rate": null,
+          "lower": null,
+          "upper": null
+        },
+        "distinct_families": 1
+      },
+      "input-preservation": {
+        "TP": 0,
+        "FN": 1,
+        "FP": 0,
+        "TN": 0,
+        "UNKNOWN": 0,
+        "EXCLUDED_LABEL": 0,
+        "cases": 1,
+        "detection": {
+          "planned": 1,
+          "unknown": 0,
+          "rate": 0.0,
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "false_positive": {
+          "planned": 0,
+          "unknown": 0,
+          "rate": null,
+          "lower": null,
+          "upper": null
+        },
+        "distinct_families": 1
+      },
+      "leakage": {
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 0,
+        "UNKNOWN": 0,
+        "EXCLUDED_LABEL": 0,
+        "cases": 0,
+        "detection": {
+          "planned": 0,
+          "unknown": 0,
+          "rate": null,
+          "lower": null,
+          "upper": null
+        },
+        "false_positive": {
+          "planned": 0,
+          "unknown": 0,
+          "rate": null,
+          "lower": null,
+          "upper": null
+        },
+        "distinct_families": 0
+      },
+      "method-choice": {
+        "TP": 0,
+        "FN": 0,
+        "FP": 1,
+        "TN": 0,
+        "UNKNOWN": 0,
+        "EXCLUDED_LABEL": 2,
+        "cases": 3,
+        "detection": {
+          "planned": 0,
+          "unknown": 0,
+          "rate": null,
+          "lower": null,
+          "upper": null
+        },
+        "false_positive": {
+          "planned": 1,
+          "unknown": 0,
+          "rate": 1.0,
+          "lower": 1.0,
+          "upper": 1.0
+        },
+        "distinct_families": 1
+      },
+      "multiple-testing": {
+        "TP": 1,
+        "FN": 0,
+        "FP": 0,
+        "TN": 2,
+        "UNKNOWN": 0,
+        "EXCLUDED_LABEL": 0,
+        "cases": 3,
+        "detection": {
+          "planned": 1,
+          "unknown": 0,
+          "rate": 1.0,
+          "lower": 1.0,
+          "upper": 1.0
+        },
+        "false_positive": {
+          "planned": 2,
+          "unknown": 0,
+          "rate": 0.0,
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "distinct_families": 1
+      },
+      "numerics": {
+        "TP": 2,
+        "FN": 0,
+        "FP": 0,
+        "TN": 0,
+        "UNKNOWN": 0,
+        "EXCLUDED_LABEL": 0,
+        "cases": 2,
+        "detection": {
+          "planned": 2,
+          "unknown": 0,
+          "rate": 1.0,
+          "lower": 1.0,
+          "upper": 1.0
+        },
+        "false_positive": {
+          "planned": 0,
+          "unknown": 0,
+          "rate": null,
+          "lower": null,
+          "upper": null
+        },
+        "distinct_families": 1
+      },
+      "replication": {
+        "TP": 1,
+        "FN": 0,
+        "FP": 0,
+        "TN": 1,
+        "UNKNOWN": 0,
+        "EXCLUDED_LABEL": 0,
+        "cases": 2,
+        "detection": {
+          "planned": 1,
+          "unknown": 0,
+          "rate": 1.0,
+          "lower": 1.0,
+          "upper": 1.0
+        },
+        "false_positive": {
+          "planned": 1,
+          "unknown": 0,
+          "rate": 0.0,
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "distinct_families": 1
+      },
+      "serialization": {
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 1,
+        "UNKNOWN": 0,
+        "EXCLUDED_LABEL": 0,
+        "cases": 1,
+        "detection": {
+          "planned": 0,
+          "unknown": 0,
+          "rate": null,
+          "lower": null,
+          "upper": null
+        },
+        "false_positive": {
+          "planned": 1,
+          "unknown": 0,
+          "rate": 0.0,
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "distinct_families": 1
+      },
+      "testing-family": {
+        "TP": 0,
+        "FN": 1,
+        "FP": 0,
+        "TN": 0,
+        "UNKNOWN": 0,
+        "EXCLUDED_LABEL": 0,
+        "cases": 1,
+        "detection": {
+          "planned": 1,
+          "unknown": 0,
+          "rate": 0.0,
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "false_positive": {
+          "planned": 0,
+          "unknown": 0,
+          "rate": null,
+          "lower": null,
+          "upper": null
+        },
+        "distinct_families": 1
+      },
+      "tool-selection": {
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 0,
+        "UNKNOWN": 0,
+        "EXCLUDED_LABEL": 0,
+        "cases": 0,
+        "detection": {
+          "planned": 0,
+          "unknown": 0,
+          "rate": null,
+          "lower": null,
+          "upper": null
+        },
+        "false_positive": {
+          "planned": 0,
+          "unknown": 0,
+          "rate": null,
+          "lower": null,
+          "upper": null
+        },
+        "distinct_families": 0
+      },
+      "transport": {
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 0,
+        "UNKNOWN": 1,
+        "EXCLUDED_LABEL": 0,
+        "cases": 1,
+        "detection": {
+          "planned": 1,
+          "unknown": 1,
+          "rate": null,
+          "lower": 0.0,
+          "upper": 1.0
+        },
+        "false_positive": {
+          "planned": 0,
+          "unknown": 0,
+          "rate": null,
+          "lower": null,
+          "upper": null
+        },
+        "distinct_families": 1
+      },
+      "upstream-identity": {
+        "TP": 0,
+        "FN": 1,
+        "FP": 0,
+        "TN": 0,
+        "UNKNOWN": 0,
+        "EXCLUDED_LABEL": 0,
+        "cases": 1,
+        "detection": {
+          "planned": 1,
+          "unknown": 0,
+          "rate": 0.0,
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "false_positive": {
+          "planned": 0,
+          "unknown": 0,
+          "rate": null,
+          "lower": null,
+          "upper": null
+        },
+        "distinct_families": 1
+      }
+    },
+    "by_origin": {
+      "replayed_real": {
+        "TP": 1,
+        "FN": 1,
+        "FP": 0,
+        "TN": 2,
+        "UNKNOWN": 0,
+        "EXCLUDED_LABEL": 0,
+        "cases": 4,
+        "detection": {
+          "planned": 2,
+          "unknown": 0,
+          "rate": 0.5,
+          "lower": 0.5,
+          "upper": 0.5
+        },
+        "false_positive": {
+          "planned": 2,
+          "unknown": 0,
+          "rate": 0.0,
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "distinct_families": 3
+      },
+      "synthetic": {
+        "TP": 4,
+        "FN": 3,
+        "FP": 1,
+        "TN": 3,
+        "UNKNOWN": 1,
+        "EXCLUDED_LABEL": 2,
+        "cases": 14,
+        "detection": {
+          "planned": 8,
+          "unknown": 1,
+          "rate": null,
+          "lower": 0.5,
+          "upper": 0.625
+        },
+        "false_positive": {
+          "planned": 4,
+          "unknown": 0,
+          "rate": 0.25,
+          "lower": 0.25,
+          "upper": 0.25
+        },
+        "distinct_families": 9
+      }
+    },
+    "blind_spots": {
+      "observed_misses": [
+        "truncated-family",
+        "reversed-effects",
+        "fabricated-input-p",
+        "observed-ngs-duplicate_transcript"
+      ],
+      "false_alarms": [
+        "allowed-bonferroni"
+      ],
+      "unresolved": [
+        "missing-transport"
+      ],
+      "untested_families": [
+        "biological-interpretation",
+        "confounding",
+        "leakage",
+        "tool-selection"
+      ]
+    },
+    "representative_accuracy": null,
+    "scope": "Labels are supplied independently of detector outputs but not authenticated. Cases can share causes and are not independent population samples. Bounds are missing-result bounds, not confidence intervals. Preferences and disputes are excluded labels, not successes."
+  },
+  "native_replay": {
+    "before_receipt_sha256": "bfc72859923d4a5b58371a72a9ce7bdc545eb86b4e838065aa527510c55b6fe9",
+    "reproduced": true,
+    "runs": 2,
+    "invocation_observations": [
+      {
+        "case_id": "csv-bh",
+        "repetition": 1,
+        "calls": []
+      }
+    ],
+    "findings": [
+      {
+        "case_id": "csv-bh",
+        "arm": "with",
+        "repetition": 1,
+        "kind": "invocation_evidence_gap",
+        "reason": "Successful namespaced plugin Skill call not observed. Passing artifact checks cannot establish plugin use; other invocation mechanisms are not assessed."
+      }
+    ],
+    "new_model_calls": 0,
+    "complete_natural_use_repair_chain_established": false
+  },
+  "open_empirical_gates": [
+    "A real model-invoked failure followed by a recorded repair and full natural-use retest",
+    "Actual external author first-diagnosis timing including setup and a comparison method",
+    "Independent labels and family-held-out representative real defect incidents"
+  ],
+  "new_paid_catalog_calls": 0,
+  "new_model_calls": 0,
+  "historical_unknown_settlement": "UNCHANGED",
+  "published": false,
+  "installed_cache_updated": false,
+  "tests": {
+    "run": 528,
+    "seconds": 117.184,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "log_sha256": "e27d8487ab93a2c700d54416f9cc35a261cee45c39992c01dff032567a066cc2"
+  },
+  "runtime_files_sha256": {
+    "value_lab/__init__.py": "06f5df4a4e89e947079056639c501dfee4767af6d6e2a9d9c363c3d79069acdd",
+    "value_lab/artifacts.py": "64a876a3a129b91ef0995b07e48a4d89f06e83ef7f82d9c59d636c612ba6a5be",
+    "value_lab/claude_collection.py": "d136a91c0bda964c9ba360a0876c7d09b9a45e719ef6d8f985e0e1e8b3b9ba53",
+    "value_lab/cli.py": "6dfd22f7258b32e4b38ddecd1f0bf72e40f7d659fdedc4f7c93cd4262ddbb3b9",
+    "value_lab/codex.py": "a0211f82acfb5baaa174f6c1bbc254d4203634bcb2f23f04f87ceb65debd8b1c",
+    "value_lab/comparison.py": "72da81b7c0d91e819e3c2b850afffef1b443763135c040d66b8f0ad273c2f05d",
+    "value_lab/core.py": "c871dbd9598510addfb9a8f434d43c0544c56f6922666bbd62a0364695ff7a06",
+    "value_lab/corpus.py": "29006d2dba39f7ef361bfac4e71e72b3a0fe666f6ee86ae46ec6526e37f14b8c",
+    "value_lab/costs.py": "5ce6700eaf5f2ea1b2c1ad0fc4e1220e36e5eba36b68f164773470007cc6a134",
+    "value_lab/exchange.py": "5845d0f1ab393d07c6231e632430ebd20d1a73bbc6ab6d912d27402859a74286",
+    "value_lab/execution.py": "2561b766c3486ccbae2f9fc8b56eadc580fd0b18b1019ce5fa131886de79618d",
+    "value_lab/guidance.py": "e27116f8236b376b413c5dd9cfccba1ee8948af834abb5b0fb3a6272ef83558b",
+    "value_lab/hosts.py": "62cd50ff3ee060af6c3e72ae97fa869ecb156a876169060816f20dd66d695fd4",
+    "value_lab/interpretation.py": "a17c622d0b2498d3bbe85a160fdbb8201cc19a9676e572ab03a8ba2df474a0e1",
+    "value_lab/longitudinal.py": "69b5da70fda225add03ea5b1c675923c9c668b18b67e69aecb8cb7dbcf134436",
+    "value_lab/methodology.py": "2246c6e0fdd7275aefc55f3bc161aa21ac59af9778a207b3137f042732519b9b",
+    "value_lab/native.py": "9aa60229414be5854a60b0ca1f3268ebd7f211dc23c9f9968923fcf363281a58",
+    "value_lab/native_analysis.py": "96f9cd6a930782ec9d3e821eb27ecabaf190848058bd1eb16fcea8236b3d388b",
+    "value_lab/native_evidence.py": "c76e43ddac5ef6419db70f6ed58524a3bcf3d9516020cdae2bab727187b19b6f",
+    "value_lab/native_execution.py": "4a2ff3f614f7bb51b2597d183dfa141fe9c3c709dc72adb6a8cca4d607f381ef",
+    "value_lab/native_hypotheses.py": "0562dc249740df585ae0bb37f2df080935eb35f7ce4bbf485cb2f1e8c79f15c6",
+    "value_lab/native_repair.py": "2bbfbf8803e5d3da36fa1683e32e8420541d905a22d094396f3f9b89c2fc1b4f",
+    "value_lab/native_session.py": "4fb36b16bb6c64d4d99a5ef3645f50639af4e71edf90ec34c13ea80052d0d6bb",
+    "value_lab/native_trigger.py": "46eb9ea73d3ff8f6c1e2eefd7a6c40de44f55d1b42eecc9b4513ff0635c2dd79",
+    "value_lab/processes.py": "f4267b3470b99df0ff7a33bb8c7884552ca633eae46c90fcc889971c9b0808d0",
+    "value_lab/pseudobulk.py": "b8a4ad593c72d65a2004229c78e6cf8338a6868d462d9789c688a8f978f81c78",
+    "value_lab/pseudobulk_corpus.py": "d1b7e5e157e76d25b51c1a3cd4dd390fa82b30093399edc46f66a507abf4e250",
+    "value_lab/publication.py": "6ed81963918de5ca779cb7d40f6c89f0730ae40c96c20d830589335ce23e9b14",
+    "value_lab/registry.py": "d3beb29539e998a06469b69deb8d21c60cd35514675ce16782134352b69d0e3b",
+    "value_lab/replay.py": "a43bb4e103c5eec7c64608a8453e28d10cd860da5eab419aabbd83d3e1d0073b",
+    "value_lab/replicates.py": "6d3cae591ddd3f43ee84bfea738201eb55f6dffb49e7bb051b909fd26206967c",
+    "value_lab/report.py": "41312866c5bb1fa7972083f9758a4c55ee3eb77b4d532ca1351fca30fd85b9a8",
+    "value_lab/research.py": "698a8d5ea4e6043eeab0f0ad9d7cb5145f98178cf742d0221522a238c7c61991",
+    "value_lab/reuse.py": "de054b9d269863c3ece0bb2e2f1c66056f77df3de5e64468bc8691bf0f878b32",
+    "value_lab/review.py": "6b579249d8ddacfc0b86eced6ea715fe6011d1d6878c95556d878b93afb18f05",
+    "value_lab/review_policy.py": "41e1e2b10847788f9e8f21a83d90c67ef34b1f60aa6d85608dae882fe190688e",
+    "value_lab/scenarios.py": "0dbf8471ce8bf885e7116b4f05ffb2550e7a472edaa87fd2a84016411b015784",
+    "value_lab/science.py": "b360d9186585fe21b031b795ec2b04ccf4426d540696d83555b4383c977411f8",
+    "value_lab/scoring.py": "a2b7256439c7ab777a1cfcbe273562bfd08c3e871ebd3ea8b77678e5ede3df0d",
+    "value_lab/server.py": "f01ac5d36bac4c09d30bf8ec52a75c7f0a39fd7635e5a24a3fa52fdf90aa5997",
+    "value_lab/signatures.py": "0ee041792dbea620083c00c362e37478f73d07ad7b60ebecba2e4b0d1d10c424",
+    "value_lab/team_record.py": "5cd9f6849d9faff92e93d719bc02e4436a36e70ca8b7bd9453a38a42e9869138",
+    "value_lab/usage.py": "39f4dc34ece406bb9e7265b1e24c70ecf8ac0cdf92d95cb8f09b5ad3a8fa1f32",
+    "value_lab/value_metrics.py": "f8eaeecf7a684263b3cb52a0e677a5fedf97b56df3078c3a59b4b4ad2f1ae010",
+    "value_lab/workbench.py": "d69341c66b116335f85bdbf88f18e04c64eb052b57ca89c0283479ab750fca08",
+    "value_lab/workflow.py": "f53839804c512d9905c4adef7b449a5dee1b68c4eda360bc7cefb9577837853f"
+  },
+  "validation": {
+    "ruff_F": "PASSED",
+    "git_diff_check": "PASSED",
+    "agent_plugin_manifest": "VALID",
+    "historical_component_manifest_matches_retained_evidence": true
+  }
+}

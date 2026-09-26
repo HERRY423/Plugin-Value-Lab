@@ -36,8 +36,12 @@ def skill_events(text, path):
         matches = replies.get(key, []) if isinstance(key, str) else []
         if key and len(matches) == 1 and sum(c['tool_use_id'] == key for c in calls) == 1:
             line, result = matches[0]
-            if call['evidence']['line'] < line < terminal_line and type(result.get('is_error')) is bool:
-                call['result_status'] = 'TOOL_ERROR' if result['is_error'] else 'TOOL_REPORTED_SUCCESS'
+            # Anthropic tool_result.is_error is optional; omission is the
+            # ordinary non-error result seen in real Claude Code Skill traces.
+            # A missing result block is still UNKNOWN, as are malformed flags.
+            error = result.get('is_error', False)
+            if call['evidence']['line'] < line < terminal_line and type(error) is bool:
+                call['result_status'] = 'TOOL_ERROR' if error else 'TOOL_REPORTED_SUCCESS'
                 call['result_evidence'] = {'path': path, 'line': line}
     return calls
 

@@ -1,0 +1,542 @@
+{
+  "format": "pvl-detector-corpus-1",
+  "families": [
+    "aggregation",
+    "biological-interpretation",
+    "confounding",
+    "effect-direction",
+    "identity",
+    "input-preservation",
+    "leakage",
+    "method-choice",
+    "multiple-testing",
+    "numerics",
+    "replication",
+    "serialization",
+    "testing-family",
+    "tool-selection",
+    "transport",
+    "upstream-identity"
+  ],
+  "cases": [
+    {
+      "id": "correct-bh",
+      "family": "multiple-testing",
+      "label": "valid",
+      "basis": "task_contract",
+      "origin": "synthetic",
+      "source": "Hand-specified computational examples; public development cases, not blinded",
+      "label_reason": "Three p-values .01,.04,.03 have BH q-values .03,.04,.04 by reverse cumulative minimum.",
+      "artifact": {
+        "path": "correct-bh.csv",
+        "sha256": "ea50e008beb6122ae77ccf734bd8303e13788827430937e63791d48cb0bc754f"
+      },
+      "grader": {
+        "id": "check",
+        "type": "artifact",
+        "artifact": "result",
+        "verifier": {
+          "kind": "de_table",
+          "id_column": "gene",
+          "p_column": "p_value",
+          "q_column": "q_value",
+          "effect_column": "log2fc",
+          "min_rows": 1,
+          "bh_tolerance": 1e-08
+        }
+      }
+    },
+    {
+      "id": "wrong-bh",
+      "family": "multiple-testing",
+      "label": "defect",
+      "basis": "task_contract",
+      "origin": "synthetic",
+      "source": "Hand-specified computational examples; public development cases, not blinded",
+      "label_reason": "Task explicitly requires BH, but first q is raw p=.01 rather than .03.",
+      "artifact": {
+        "path": "wrong-bh.csv",
+        "sha256": "2a829227b84844f6580686f526b2b18ce886fb7ceb816433bdd552a2376826a1"
+      },
+      "grader": {
+        "id": "check",
+        "type": "artifact",
+        "artifact": "result",
+        "verifier": {
+          "kind": "de_table",
+          "id_column": "gene",
+          "p_column": "p_value",
+          "q_column": "q_value",
+          "effect_column": "log2fc",
+          "min_rows": 1,
+          "bh_tolerance": 1e-08
+        }
+      }
+    },
+    {
+      "id": "reordered",
+      "family": "serialization",
+      "label": "valid",
+      "basis": "task_contract",
+      "origin": "synthetic",
+      "source": "Hand-specified computational examples; public development cases, not blinded",
+      "label_reason": "Permutation preserves every entity and value.",
+      "artifact": {
+        "path": "reordered.csv",
+        "sha256": "ed57711ac7f7ae26cef9fa0dd4f6e392b8ea5bcbc788f0e380b242b25cc6dce1"
+      },
+      "grader": {
+        "id": "check",
+        "type": "artifact",
+        "artifact": "result",
+        "verifier": {
+          "kind": "de_table",
+          "id_column": "gene",
+          "p_column": "p_value",
+          "q_column": "q_value",
+          "effect_column": "log2fc",
+          "min_rows": 1,
+          "bh_tolerance": 1e-08
+        }
+      }
+    },
+    {
+      "id": "ties-boundaries",
+      "family": "multiple-testing",
+      "label": "valid",
+      "basis": "task_contract",
+      "origin": "synthetic",
+      "source": "Hand-specified computational examples; public development cases, not blinded",
+      "label_reason": "Ties share q=4*.1/3; probabilities zero and one are valid.",
+      "artifact": {
+        "path": "ties-boundaries.csv",
+        "sha256": "81ff64f44e0c85a15f3502ad3b949547f7ca53de502fc1f88a52f7ad1f106963"
+      },
+      "grader": {
+        "id": "check",
+        "type": "artifact",
+        "artifact": "result",
+        "verifier": {
+          "kind": "de_table",
+          "id_column": "gene",
+          "p_column": "p_value",
+          "q_column": "q_value",
+          "effect_column": "log2fc",
+          "min_rows": 1,
+          "bh_tolerance": 1e-08
+        }
+      }
+    },
+    {
+      "id": "duplicate-output-id",
+      "family": "identity",
+      "label": "defect",
+      "basis": "task_contract",
+      "origin": "synthetic",
+      "source": "Hand-specified computational examples; public development cases, not blinded",
+      "label_reason": "Task requires one result per gene; a appears twice.",
+      "artifact": {
+        "path": "duplicate-output-id.csv",
+        "sha256": "32af736b8234298b58722c603c5cfbe4b6c75f6abc6911bb27aa179f74fc6c82"
+      },
+      "grader": {
+        "id": "check",
+        "type": "artifact",
+        "artifact": "result",
+        "verifier": {
+          "kind": "de_table",
+          "id_column": "gene",
+          "p_column": "p_value",
+          "q_column": "q_value",
+          "effect_column": "log2fc",
+          "min_rows": 1,
+          "bh_tolerance": 1e-08
+        }
+      }
+    },
+    {
+      "id": "nonfinite-effect",
+      "family": "numerics",
+      "label": "defect",
+      "basis": "task_contract",
+      "origin": "synthetic",
+      "source": "Hand-specified computational examples; public development cases, not blinded",
+      "label_reason": "Task requires finite effect values.",
+      "artifact": {
+        "path": "nonfinite-effect.csv",
+        "sha256": "0abdb8af4236a3865f753eb5ecf79a4c67a08f5906b0366ac3c26780f31b5727"
+      },
+      "grader": {
+        "id": "check",
+        "type": "artifact",
+        "artifact": "result",
+        "verifier": {
+          "kind": "de_table",
+          "id_column": "gene",
+          "p_column": "p_value",
+          "q_column": "q_value",
+          "effect_column": "log2fc",
+          "min_rows": 1,
+          "bh_tolerance": 1e-08
+        }
+      }
+    },
+    {
+      "id": "negative-probability",
+      "family": "numerics",
+      "label": "defect",
+      "basis": "task_contract",
+      "origin": "synthetic",
+      "source": "Hand-specified computational examples; public development cases, not blinded",
+      "label_reason": "A p-value cannot be negative.",
+      "artifact": {
+        "path": "negative-probability.csv",
+        "sha256": "37b02c990dd45494bd051c3a40a75b56dd030b73a6d52ced38f5328edea8d673"
+      },
+      "grader": {
+        "id": "check",
+        "type": "artifact",
+        "artifact": "result",
+        "verifier": {
+          "kind": "de_table",
+          "id_column": "gene",
+          "p_column": "p_value",
+          "q_column": "q_value",
+          "effect_column": "log2fc",
+          "min_rows": 1,
+          "bh_tolerance": 1e-08
+        }
+      }
+    },
+    {
+      "id": "truncated-family",
+      "family": "testing-family",
+      "label": "defect",
+      "basis": "task_contract",
+      "origin": "synthetic",
+      "source": "Hand-specified computational examples; public development cases, not blinded",
+      "label_reason": "Task required all a,b,c; output omits b,c and recomputes internally consistent BH. Unpinned checker cannot know full family.",
+      "artifact": {
+        "path": "truncated-family.csv",
+        "sha256": "a0e72b1a94d0f6fac39f2e509c176fd7ee4d3cecd545e5783e127275cbf9c19c"
+      },
+      "grader": {
+        "id": "check",
+        "type": "artifact",
+        "artifact": "result",
+        "verifier": {
+          "kind": "de_table",
+          "id_column": "gene",
+          "p_column": "p_value",
+          "q_column": "q_value",
+          "effect_column": "log2fc",
+          "min_rows": 1,
+          "bh_tolerance": 1e-08
+        }
+      }
+    },
+    {
+      "id": "reversed-effects",
+      "family": "effect-direction",
+      "label": "defect",
+      "basis": "task_contract",
+      "origin": "synthetic",
+      "source": "Hand-specified computational examples; public development cases, not blinded",
+      "label_reason": "Task required preserving input effects 1,2,-1; all signs were reversed. BH-only check has no input binding.",
+      "artifact": {
+        "path": "reversed-effects.csv",
+        "sha256": "3a647020e1a7e0074dc018104f6e6f736d3ddb76042ce8852c44e0864d5d7201"
+      },
+      "grader": {
+        "id": "check",
+        "type": "artifact",
+        "artifact": "result",
+        "verifier": {
+          "kind": "de_table",
+          "id_column": "gene",
+          "p_column": "p_value",
+          "q_column": "q_value",
+          "effect_column": "log2fc",
+          "min_rows": 1,
+          "bh_tolerance": 1e-08
+        }
+      }
+    },
+    {
+      "id": "fabricated-input-p",
+      "family": "input-preservation",
+      "label": "defect",
+      "basis": "task_contract",
+      "origin": "synthetic",
+      "source": "Hand-specified computational examples; public development cases, not blinded",
+      "label_reason": "Task required preserving input p=.01,.04,.03; output invents other p-values and consistent BH.",
+      "artifact": {
+        "path": "fabricated-input-p.csv",
+        "sha256": "6aa54f6e7d7d0d4062f712c9d52ee49781e37fe97e165eb45cb0a9152b41f6b9"
+      },
+      "grader": {
+        "id": "check",
+        "type": "artifact",
+        "artifact": "result",
+        "verifier": {
+          "kind": "de_table",
+          "id_column": "gene",
+          "p_column": "p_value",
+          "q_column": "q_value",
+          "effect_column": "log2fc",
+          "min_rows": 1,
+          "bh_tolerance": 1e-08
+        }
+      }
+    },
+    {
+      "id": "allowed-bonferroni",
+      "family": "method-choice",
+      "label": "valid",
+      "basis": "task_contract",
+      "origin": "synthetic",
+      "source": "Hand-specified computational examples; public development cases, not blinded",
+      "label_reason": "This task permits Bonferroni q=min(1,3*p). Configuring a BH-only checker is an inappropriate rule and creates a false alarm.",
+      "artifact": {
+        "path": "allowed-bonferroni.csv",
+        "sha256": "cc979ec48d123c287d6cb42ce13a7f7a307f9d9ce8f2531e450fe3dfe30b02ae"
+      },
+      "grader": {
+        "id": "check",
+        "type": "artifact",
+        "artifact": "result",
+        "verifier": {
+          "kind": "de_table",
+          "id_column": "gene",
+          "p_column": "p_value",
+          "q_column": "q_value",
+          "effect_column": "log2fc",
+          "min_rows": 1,
+          "bh_tolerance": 1e-08
+        }
+      }
+    },
+    {
+      "id": "preference-only",
+      "family": "method-choice",
+      "label": "defect",
+      "basis": "operator_preference",
+      "origin": "synthetic",
+      "source": "Hand-specified computational examples; public development cases, not blinded",
+      "label_reason": "Operator dislikes three decimal places; no task violation. Excluded from accuracy denominator.",
+      "artifact": {
+        "path": "preference-only.csv",
+        "sha256": "4af06fc7913d0be1adc379b6b688b9d0fc7c2ff6dd3da09a5668c0259d71f813"
+      },
+      "grader": {
+        "id": "check",
+        "type": "artifact",
+        "artifact": "result",
+        "verifier": {
+          "kind": "de_table",
+          "id_column": "gene",
+          "p_column": "p_value",
+          "q_column": "q_value",
+          "effect_column": "log2fc",
+          "min_rows": 1,
+          "bh_tolerance": 1e-08
+        }
+      }
+    },
+    {
+      "id": "disputed-method",
+      "family": "method-choice",
+      "label": "disputed",
+      "basis": "task_contract",
+      "origin": "synthetic",
+      "source": "Hand-specified computational examples; public development cases, not blinded",
+      "label_reason": "Whether a fourth unreported test belongs in this family is unresolved; no binary truth label.",
+      "artifact": {
+        "path": "disputed-method.csv",
+        "sha256": "0ec26995e05f6fba8eefc820a6c4a9ee1c3325254bc1695f65173e655a5a027f"
+      },
+      "grader": {
+        "id": "check",
+        "type": "artifact",
+        "artifact": "result",
+        "verifier": {
+          "kind": "de_table",
+          "id_column": "gene",
+          "p_column": "p_value",
+          "q_column": "q_value",
+          "effect_column": "log2fc",
+          "min_rows": 1,
+          "bh_tolerance": 1e-08
+        }
+      }
+    },
+    {
+      "id": "missing-transport",
+      "family": "transport",
+      "label": "defect",
+      "basis": "task_contract",
+      "origin": "synthetic",
+      "source": "Hand-specified computational examples; public development cases, not blinded",
+      "label_reason": "Expected defective artifact unavailable; unknown is retained, not counted as pass or detection.",
+      "artifact": {
+        "path": "not-collected.csv",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "grader": {
+        "id": "check",
+        "type": "artifact",
+        "artifact": "result",
+        "verifier": {
+          "kind": "de_table",
+          "id_column": "gene",
+          "p_column": "p_value",
+          "q_column": "q_value",
+          "effect_column": "log2fc",
+          "min_rows": 1,
+          "bh_tolerance": 1e-08
+        }
+      }
+    },
+    {
+      "id": "observed-ngs-duplicate_transcript",
+      "family": "upstream-identity",
+      "label": "defect",
+      "basis": "task_contract",
+      "origin": "replayed_real",
+      "source": "Local real component execution on synthetic inputs; NGS full script / BioNexus helper AST. Not natural host use or independently reviewed.",
+      "label_reason": "The real script silently overwrote duplicate tx1 input rows. A check of downstream unique IDs/last values cannot detect source data loss.",
+      "artifact": {
+        "path": "observed-ngs-duplicate_transcript.tsv",
+        "sha256": "5340f3eba5f7578db3b1ff1a3a164799c1326e9dc0148cad0cf22668031e1265"
+      },
+      "input_reference": {
+        "path": "observed-ngs-duplicate_transcript-input.txt",
+        "sha256": "716f3ec5cc29132d2d7e42ca04c20dc7d9f5de9061d93789aeba1b5d43cab431"
+      },
+      "provenance": {
+        "historical_manifest_sha256": "10555c9960a59e609338c0658ba4c7742e41014756761e88cb3009b5d090653d",
+        "historical_path": "ngs/before/duplicate_transcript/matrices/num_reads.tsv",
+        "protocol_sha256": "0282acf427180b42fb825e2281be4f25f577003541e365461c8b00839ac07745"
+      },
+      "grader": {
+        "id": "check",
+        "type": "artifact",
+        "artifact": "result",
+        "verifier": {
+          "kind": "labels",
+          "id_column": "transcript_id",
+          "label_column": "S1",
+          "expected": {
+            "tx1": "20"
+          }
+        }
+      }
+    },
+    {
+      "id": "observed-ngs-valid_fractional_counts",
+      "family": "aggregation",
+      "label": "valid",
+      "basis": "task_contract",
+      "origin": "replayed_real",
+      "source": "Local real component execution on synthetic inputs; NGS full script / BioNexus helper AST. Not natural host use or independently reviewed.",
+      "label_reason": "Frozen synthetic input has tx1=10 and tx2=20.25; fractional estimated counts are allowed.",
+      "artifact": {
+        "path": "observed-ngs-valid_fractional_counts.tsv",
+        "sha256": "ee6bd4d899fc9b9df0e225a1f118a488667099acc1d1f9d72a5640ea4cd911a8"
+      },
+      "input_reference": {
+        "path": "observed-ngs-valid_fractional_counts-input.txt",
+        "sha256": "08a359e601df073b8fd333d3b24ab16ce40aeb1dc747aea5ba0b0113ead7e0fc"
+      },
+      "provenance": {
+        "historical_manifest_sha256": "10555c9960a59e609338c0658ba4c7742e41014756761e88cb3009b5d090653d",
+        "historical_path": "ngs/before/valid_fractional_counts/matrices/num_reads.tsv",
+        "protocol_sha256": "0282acf427180b42fb825e2281be4f25f577003541e365461c8b00839ac07745"
+      },
+      "grader": {
+        "id": "check",
+        "type": "artifact",
+        "artifact": "result",
+        "verifier": {
+          "kind": "labels",
+          "id_column": "transcript_id",
+          "label_column": "S1",
+          "expected": {
+            "tx1": "10",
+            "tx2": "20.25"
+          }
+        }
+      }
+    },
+    {
+      "id": "observed-bionexus-technical_rows",
+      "family": "replication",
+      "label": "defect",
+      "basis": "task_contract",
+      "origin": "replayed_real",
+      "source": "Local real component execution on synthetic inputs; NGS full script / BioNexus helper AST. Not natural host use or independently reviewed.",
+      "label_reason": "Two rows per condition share one donor; independent units are one per condition, two overall.",
+      "artifact": {
+        "path": "observed-bionexus-technical_rows.json",
+        "sha256": "bc7febe9f5e59a26f36e29e49dc17577402bf031edf49fb03fa9640f80518abc"
+      },
+      "input_reference": {
+        "path": "observed-bionexus-technical_rows-input.txt",
+        "sha256": "93eb2644679befcd2af72c5480986a73a2151dc9d75a0348669e6c10d88894c3"
+      },
+      "provenance": {
+        "historical_manifest_sha256": "10555c9960a59e609338c0658ba4c7742e41014756761e88cb3009b5d090653d",
+        "historical_path": "bionexus/before/technical_rows/observed.json",
+        "protocol_sha256": "0282acf427180b42fb825e2281be4f25f577003541e365461c8b00839ac07745"
+      },
+      "grader": {
+        "id": "check",
+        "type": "artifact",
+        "artifact": "result",
+        "verifier": {
+          "kind": "json_fields",
+          "expected": {
+            "sample_count": 4,
+            "min_replicates_per_condition": 1,
+            "biological_replicates_count": 2
+          }
+        }
+      }
+    },
+    {
+      "id": "observed-bionexus-independent_donors",
+      "family": "replication",
+      "label": "valid",
+      "basis": "task_contract",
+      "origin": "replayed_real",
+      "source": "Local real component execution on synthetic inputs; NGS full script / BioNexus helper AST. Not natural host use or independently reviewed.",
+      "label_reason": "Four distinct donors, two per condition; exact counts follow frozen input.",
+      "artifact": {
+        "path": "observed-bionexus-independent_donors.json",
+        "sha256": "e31dcd14fb0fd00cd2cf97d7ae1a59b7671c7f39bf52710c4deffea77de012df"
+      },
+      "input_reference": {
+        "path": "observed-bionexus-independent_donors-input.txt",
+        "sha256": "110e628a85751091e05f6c31fc158a7f618bca28868b3dc17b2346c98da81a40"
+      },
+      "provenance": {
+        "historical_manifest_sha256": "10555c9960a59e609338c0658ba4c7742e41014756761e88cb3009b5d090653d",
+        "historical_path": "bionexus/before/independent_donors/observed.json",
+        "protocol_sha256": "0282acf427180b42fb825e2281be4f25f577003541e365461c8b00839ac07745"
+      },
+      "grader": {
+        "id": "check",
+        "type": "artifact",
+        "artifact": "result",
+        "verifier": {
+          "kind": "json_fields",
+          "expected": {
+            "sample_count": 4,
+            "min_replicates_per_condition": 2,
+            "biological_replicates_count": 4
+          }
+        }
+      }
+    }
+  ]
+}

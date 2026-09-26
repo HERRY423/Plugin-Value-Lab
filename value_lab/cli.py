@@ -66,12 +66,26 @@ def doctor():
 
 
 def main(argv=None):
+    import time
+    started = time.perf_counter()
     extension_parser = argparse.ArgumentParser(add_help=False)
     extension_parser.add_argument("--enable-extensions", action="store_true", help="Opt into research and team workflows; place before the command")
     extension_options, _ = extension_parser.parse_known_args(argv)
     parser = argparse.ArgumentParser(description="Plugin Value Lab — paired evaluation, diagnosis and retest", parents=[extension_parser])
     parser.add_argument("--version", action="version", version=__version__)
+    parser.add_argument("--advanced", action="store_true", help="Show all specialist commands; existing commands remain callable")
     subs = parser.add_subparsers(dest="command", required=True)
+    p = subs.add_parser("diagnose", help="One local author report from an artifact, study or detector corpus")
+    p.add_argument("source")
+    p.add_argument("--output", default="pvl-diagnosis")
+    p.add_argument("--check", choices=("bh",), help="Explicitly require BH correction on gene,p_value,q_value,log2fc columns")
+    p.add_argument("--spec", help="Explicit built-in artifact grader JSON; no executable graders")
+    p.add_argument("--audit", action="store_true", help="Audit detector against a labeled corpus manifest")
+    p.add_argument("--interactive", action="store_true", help="Time actual author reading and record actionable/unclear/unhelpful feedback")
+    p.add_argument("--receipt", help="Separately retained native evidence receipt digest")
+    p.add_argument("--artifacts")
+    p.add_argument("--verifiers")
+    p.add_argument("--corpus")
     for name in ("init", "demo"):
         p = subs.add_parser(name)
         p.add_argument("--output", required=True)
@@ -270,6 +284,7 @@ def main(argv=None):
     p.add_argument("after")
     p.add_argument("--before-receipt", required=True)
     p.add_argument("--after-receipt", required=True)
+    p.add_argument("--repair-record", help="Author diagnosis-to-edit links and use-mode declaration; traces independently checked")
     p.add_argument("--output", required=True)
     p = subs.add_parser("prepare-native-evidence", help="Freeze add-on artifact checks for existing native cases; no model calls")
     p.add_argument("contract")
@@ -380,9 +395,37 @@ def main(argv=None):
     p.add_argument("--data", default="work/workbench")
     p.add_argument("--port", type=int, default=8766)
     p.add_argument("--claude")
+    supplied = list(sys.argv[1:] if argv is None else argv)
+    if "--advanced" not in supplied:
+        visible = ("doctor", "freeze", "evaluate", "usage-card", "compare-studies")
+        subs.metavar = "{" + ",".join(visible) + "}"
+        subs._choices_actions = [a for a in subs._choices_actions if a.dest in visible]
+        parser.epilog = "Start with the five commands in README: doctor -> freeze -> evaluate -> usage-card -> compare-studies. Existing specialist commands still work; --advanced --help lists them."
     args = parser.parse_args(argv)
     try:
-        if args.command in ("init", "demo"):
+        if args.command == "diagnose":
+            from .usage import diagnose
+            result = diagnose(args.source, args.output, check=args.check, spec=args.spec, audit=args.audit,
+                              receipt=args.receipt, artifact_root=args.artifacts, verifier_root=args.verifiers,
+                              corpus_root=args.corpus, started=started)
+            if args.interactive:
+                print(Path(result['report']).read_text(encoding='utf-8'))
+                print('After reading, enter actionable / unclear / unhelpful. This records CLI-entry-to-feedback time, not installation time.')
+                try:
+                    feedback = input().strip()
+                except (EOFError, KeyboardInterrupt):
+                    feedback = 'abandoned'
+                if feedback not in ('actionable', 'unclear', 'unhelpful', 'abandoned'):
+                    feedback = 'unrecognized'
+                elapsed = time.perf_counter() - started
+                timing = {'feedback': feedback, 'elapsed_seconds': elapsed,
+                          'time_to_first_actionable_diagnosis_seconds': elapsed if feedback == 'actionable' else None,
+                          'measurement': 'operator self-report from CLI entry; excludes installation and prior preparation',
+                          'source_diagnosis_sha256': suite_digest(load_json(result['json']))}
+                write_json(Path(args.output) / 'author-timing.json', timing)
+                result['author_timing'] = timing
+            _emit(result)
+        elif args.command in ("init", "demo"):
             out = _new_directory(args.output)
             suite = demo_suite()
             write_json(out / "suite.json", suite)
@@ -559,7 +602,8 @@ def main(argv=None):
             _emit(prepare_native_analysis(load_json(args.recipe), args.plugin, args.inputs, args.output, references=args.references))
         elif args.command == "compare-native-repair":
             from .native_repair import compare_native_repair
-            _emit(compare_native_repair(args.before, args.before_receipt, args.after, args.after_receipt, args.output))
+            _emit(compare_native_repair(args.before, args.before_receipt, args.after, args.after_receipt, args.output,
+                                       repair_record=load_json(args.repair_record) if args.repair_record else None))
         elif args.command == "prepare-native-evidence":
             from .native_evidence import prepare_native_evidence
             _emit(prepare_native_evidence(args.plugin, load_json(args.contract), args.output, references=args.references))

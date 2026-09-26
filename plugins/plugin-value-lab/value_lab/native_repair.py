@@ -26,7 +26,7 @@ def validate_context(value):
         raise ValidationError("Explicit positive finite native estimate ceiling required")
 
 
-def compare_native_repair(before, before_digest, after, after_digest, output):
+def compare_native_repair(before, before_digest, after, after_digest, output, *, repair_record=None):
     output = _fresh(output)
     roots = [Path(before).resolve(), Path(after).resolve()]
     for root in roots:
@@ -132,11 +132,103 @@ def compare_native_repair(before, before_digest, after, after_digest, output):
               "comparison_eligible": False, "paired_repetition_claim": False,
               "new_observations_by_comparator": 0, "independent_review": "PENDING",
               "scope": "Descriptive full-suite retest of selected candidate bytes; declarations and traces do not authenticate execution, exact model weights, unlisted dependencies, causality or biological truth."}
+    report['repair_chain'] = _repair_chain(roots, plans, reports, report, repair_record)
     output.mkdir(parents=True)
     write_json(output / "repair.json", report)
     lines = ["# 原生修复复测", "", status, "", "保留全部案例、对照臂和失败；数组位置不当作配对样本。", ""]
+    lines += ['修复链：' + report['repair_chain']['status'], '',
+              *['- ' + gap for gap in report['repair_chain']['gaps']], '']
     for row in rows:
         lines.append(f"- {row['case_id']} / {row['arm']} / {row['grader_id']}: {row['before']} → {row['after']}")
     lines.extend(["", "## 条件变化与证据缺口", "", *["- " + s for s in protocol_changes + gaps], "", report["scope"], ""])
     (output / "REPAIR.md").write_text("\n".join(lines), encoding="utf-8")
     return {"output": str(output), "report_sha256": suite_digest(report), "report": report}
+
+
+def _repair_chain(roots, plans, diagnoses, comparison, record):
+    """A local chain is additional evidence, never implied by a passing artifact.
+
+    Operator mapping of diagnosis to edit is retained as a claim. Trace support
+    cannot certify natural use, execution authenticity or causal effectiveness.
+    """
+    from .artifacts import confined
+    from .native_hypotheses import skill_events
+    gaps, links = [], []
+    if comparison['status'] != 'LOCAL_RETEST_IMPROVEMENT':
+        gaps.append('Complete comparable repair improvement has not been observed')
+    if record is None:
+        gaps.append('Missing author repair record linking the prior diagnosis to changed plugin files and natural-use intent')
+    else:
+        fields = {'before_receipt_sha256', 'before_diagnosis_sha256', 'use_mode', 'evidence_type', 'repairs'}
+        if not isinstance(record, dict) or set(record) != fields:
+            raise ValidationError('Repair record needs before receipt/diagnosis digests, use_mode, evidence_type and repairs')
+        if record['use_mode'] not in ('natural', 'explicit_probe') or record['evidence_type'] not in ('synthetic', 'local', 'external'):
+            raise ValidationError('Declare use mode and evidence type; declarations are not authenticated')
+        if record['before_receipt_sha256'] != comparison['before_receipt_sha256'] or record['before_diagnosis_sha256'] != suite_digest(diagnoses[0]):
+            raise ValidationError('Repair record is not bound to the verified before diagnosis')
+        if record['use_mode'] != 'natural':
+            gaps.append('Explicit invocation probe is not a natural-use retest')
+        if record['evidence_type'] == 'synthetic':
+            gaps.append('Manufactured traces cannot establish an observed real repair chain')
+        if not isinstance(record['repairs'], list) or not record['repairs']:
+            raise ValidationError('Repair record requires at least one diagnosis-to-edit link')
+        seen = set()
+        for item in record['repairs']:
+            if not isinstance(item, dict) or set(item) != {'case_id', 'grader_id', 'skill', 'changed_files', 'rationale'}:
+                raise ValidationError('Each repair needs case_id, grader_id, skill, changed_files and rationale')
+            if any(not isinstance(item[k], str) or not item[k].strip() for k in ('case_id', 'grader_id', 'skill', 'rationale')):
+                raise ValidationError('Repair link text must be nonempty')
+            key = (item['case_id'], 'with', item['grader_id'])
+            if key in seen or key not in comparison['repaired_checks']:
+                raise ValidationError('Repair link must name a unique actually repaired failed check')
+            seen.add(key)
+            if (not isinstance(item['changed_files'], list) or not item['changed_files']
+                    or any(not isinstance(p, str) or p not in comparison['changed_selected_plugin_files'] for p in item['changed_files'])):
+                raise ValidationError('Repair link must identify changed selected candidate bytes')
+            plugin_name = plans[0]['plugin_identity']['name']
+            # Namespaced Skill identity is required; an unrelated tool cannot close the chain.
+            if not item['skill'].startswith(plugin_name + ':') or item['skill'] == plugin_name + ':':
+                gaps.append('Expected skill must be namespaced to the tested plugin: ' + item['case_id'])
+            observations = []
+            for side, (root, diagnosis) in enumerate(zip(roots, diagnoses)):
+                for index, run in enumerate(diagnosis['runs']):
+                    if run['case_id'] != item['case_id'] or run['arm'] != 'with':
+                        continue
+                    # Before evidence must connect the actual failed result to a call.
+                    grades = [g for g in run['grades'] if g['id'] == item['grader_id']]
+                    if side == 0 and not any(g['passed'] is False for g in grades):
+                        continue
+                    trace = confined(root, f'runs/{index}/events.jsonl')
+                    text = trace.read_text(encoding='utf-8-sig') if trace.is_file() else ''
+                    calls = skill_events(text, f'runs/{index}/events.jsonl')
+                    matching = [c for c in calls if c['skill'] == item['skill'] and c['result_status'] == 'TOOL_REPORTED_SUCCESS']
+                    numbered = [n for n, line in enumerate(text.splitlines(), 1) if line.strip()]
+                    executions = [e for e in (run.get('execution') or {}).get('calls', []) if e['status'] == 'TOOL_REPORTED_SUCCESS']
+                    command_line = min((numbered[e['call_event']] for e in executions), default=0)
+                    ordered = [c for c in matching if c['result_evidence']['line'] < command_line]
+                    if not ordered:
+                        gaps.append(f"{'before' if side == 0 else 'after'}:{run['case_id']}/{run['repetition']}: plugin result before artifact-producing script not established")
+                    observations.append({'revision': 'before' if side == 0 else 'after',
+                                         'case_id': run['case_id'], 'repetition': run['repetition'], 'calls': matching})
+                    if not matching:
+                        gaps.append(f"{'before' if side == 0 else 'after'}:{run['case_id']}/{run['repetition']}: successful tested-plugin invocation not observed")
+            links.append({**item, 'observations': observations, 'causal_attribution': 'AUTHOR_HYPOTHESIS'})
+        if seen != set(comparison['repaired_checks']):
+            gaps.append('Repair record does not cover every repaired check')
+    if any('diagnostic_intent' in p['contract'] for p in plans):
+        gaps.append('Frozen protocol identifies an explicit diagnostic probe')
+    for side, (root, plan, diagnosis) in enumerate(zip(roots, plans, diagnoses)):
+        plugin = (plan.get('plugin_identity') or {}).get('name')
+        for index, run in enumerate(diagnosis['runs']):
+            trace = confined(root, f'runs/{index}/events.jsonl')
+            if run['arm'] != 'without' or not trace.is_file():
+                continue
+            calls = skill_events(trace.read_text(encoding='utf-8-sig'), f'runs/{index}/events.jsonl')
+            if any(plugin and isinstance(c['skill'], str) and c['skill'].startswith(plugin + ':')
+                   and c['result_status'] == 'TOOL_REPORTED_SUCCESS' for c in calls):
+                gaps.append(f"{'before' if side == 0 else 'after'}:{run['case_id']}: baseline invoked tested plugin")
+    return {'status': 'OPEN' if gaps else 'TRACE_SUPPORTED_LOCAL_CHAIN', 'gaps': gaps, 'links': links,
+            'repair_record': record, 'repair_record_sha256': suite_digest(record) if record is not None else None,
+            'natural_use_independently_verified': False, 'causal_plugin_benefit_established': False,
+            'use_recommendation': 'INSUFFICIENT_EVIDENCE',
+            'scope': 'Skill-call traces plus an author-declared diagnosis/edit mapping. Does not authenticate declarations, execution, naturalness, adoption, cost savings or generalization.'}

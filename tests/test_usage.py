@@ -312,7 +312,7 @@ class UsageCardTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "fresh"
             paths = write_usage_card(self.card(), output)
-            self.assertEqual({x.name for x in output.iterdir()}, {"card.json", "USAGE.md"})
+            self.assertEqual({x.name for x in output.iterdir()}, {"card.json", "USAGE.md", "ENVELOPE.html"})
             original = Path(paths["json"]).read_bytes()
             with self.assertRaises(ValidationError):
                 write_usage_card(self.card(), output)

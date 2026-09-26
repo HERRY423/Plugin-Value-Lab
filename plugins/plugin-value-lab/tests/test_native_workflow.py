@@ -9,12 +9,30 @@ from unittest.mock import patch
 import test_native_analysis as support
 from value_lab.core import ValidationError, load_json, write_json
 from value_lab.native_evidence import discover_native_bindings
-from value_lab.native_hypotheses import build_native_hypotheses, write_native_hypotheses
+from value_lab.native_hypotheses import build_native_hypotheses, write_native_hypotheses, skill_events
 from value_lab.native_trigger import prepare_trigger_probe, compare_trigger_probe
 from value_lab.native_session import prepare_native_session, run_native_session, finish_native_session, _namespace
 
 
 class HypothesisTests(unittest.TestCase):
+    def test_real_skill_result_optional_error_flag_and_missing_result_are_distinct(self):
+        call = {'type': 'assistant', 'message': {'content': [{'type': 'tool_use', 'name': 'Skill',
+                'id': 'call1', 'input': {'skill': 'plugin:skill'}}]}}
+        reply = {'type': 'user', 'message': {'content': [{'type': 'tool_result', 'tool_use_id': 'call1',
+                 'content': 'Launching skill: plugin:skill'}]}}
+        terminal = {'type': 'result', 'subtype': 'success'}
+        def status(events):
+            return skill_events('\n'.join(json.dumps(e) for e in events), 'trace.jsonl')[0]['result_status']
+        self.assertEqual(status([call, reply, terminal]), 'TOOL_REPORTED_SUCCESS')
+        self.assertEqual(status([call, terminal]), 'UNKNOWN')
+        self.assertEqual(status([reply, call, terminal]), 'UNKNOWN')
+        self.assertEqual(status([call, terminal, reply]), 'UNKNOWN')
+        self.assertEqual(status([call, reply, reply, terminal]), 'UNKNOWN')
+        reply['message']['content'][0]['is_error'] = True
+        self.assertEqual(status([call, reply, terminal]), 'TOOL_ERROR')
+        reply['message']['content'][0]['is_error'] = None
+        self.assertEqual(status([call, reply, terminal]), 'UNKNOWN')
+
     def setUp(self):
         self.fx = support.NativeAnalysisTests()
         self.fx.setUp()

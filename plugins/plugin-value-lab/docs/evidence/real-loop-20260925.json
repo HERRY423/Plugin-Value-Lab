@@ -1,0 +1,1966 @@
+{
+  "format": "pvl-real-loop-progress-1",
+  "recorded_at_utc": "2026-09-25T03:43:52.823290+00:00",
+  "version": "0.6.0",
+  "version_changed": false,
+  "trigger_probe": {
+    "sessions": 2,
+    "native_result_sha256": "3c80e0f39f08ba090354c17414fed3f2db79aee43a1e36af5c208a95f232494a",
+    "native_list_price_estimate_usd": 0.16332000000000002,
+    "settled_usd": null,
+    "explicit_receipt_sha256": "28ecf7e86d3ac022bf67bbbf6e46a01556367cbd8ea77972a2287b3359c89db4",
+    "comparison": {
+      "schema_version": 1,
+      "status": "CONTROLLED_DIAGNOSTIC_CONTRAST",
+      "natural_receipt": "bfc72859923d4a5b58371a72a9ce7bdc545eb86b4e838065aa527510c55b6fe9",
+      "explicit_receipt": "28ecf7e86d3ac022bf67bbbf6e46a01556367cbd8ea77972a2287b3359c89db4",
+      "cases": [
+        {
+          "case_id": "csv-bh",
+          "natural": {
+            "runs": 1,
+            "expected_calls": 0,
+            "successful_skill_results": 0,
+            "artifact_pass": 1,
+            "artifact_fail": 0,
+            "unknown": 0
+          },
+          "explicit": {
+            "runs": 1,
+            "expected_calls": 1,
+            "successful_skill_results": 1,
+            "artifact_pass": 1,
+            "artifact_fail": 0,
+            "unknown": 0
+          },
+          "finding": "TRIGGER_EXPLANATION_NOT_ESTABLISHED"
+        }
+      ],
+      "problems": [],
+      "comparison_eligible": false,
+      "natural_use_value_replaced": false,
+      "scope": "Even a controlled explicit-invocation success only prioritizes a falsifiable trigger hypothesis; prompt assistance and sampling remain competing explanations."
+    },
+    "pvl_defect": "Optional is_error omitted in a real ordered unique tool_result was classified UNKNOWN.",
+    "repair": "Treat omitted is_error as false; preserve missing, malformed, duplicate and unordered results as UNKNOWN.",
+    "retest": "Same original traces replayed offline, no extra model session.",
+    "scope": "PVL parser repair, not a plugin natural-use output repair chain"
+  },
+  "upstream": [
+    {
+      "component": "BioNexus",
+      "url": "https://github.com/HERRY423/BioNexus/pull/36",
+      "status": "OPEN",
+      "before_passed": 2,
+      "after_passed": 5,
+      "cases": 5,
+      "source_scope": "Direct parse_samplesheet helper; no harvest-path or scientific validation claim",
+      "relationship": "SAME_OWNER",
+      "adopted": null,
+      "independent_adoption": null,
+      "human_review_minutes": null,
+      "human_retest_minutes": null,
+      "rebuttal": null,
+      "initial_ci_failure": "Retest-runner import formatting and lambda style; fixed in 10ec244",
+      "submitted_at_utc": "2026-09-25T02:39:18Z",
+      "snapshot": {
+        "comments": [],
+        "createdAt": "2026-09-25T02:39:18Z",
+        "headRefOid": "10ec244add817d6b7b5dfe5f2b8a06d2e7062888",
+        "reviews": [],
+        "state": "OPEN",
+        "statusCheckRollup": [
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T02:57:12Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925047404",
+            "name": "Code Quality & Config Integrity",
+            "startedAt": "2026-09-25T02:56:38Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T02:57:19Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327847/job/107925048253",
+            "name": "roc-validator 0.11.2 (REQUIRED)",
+            "startedAt": "2026-09-25T02:56:38Z",
+            "status": "COMPLETED",
+            "workflowName": "Official RO-Crate Conformance"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:04:27Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327786/job/107925047394",
+            "name": "build-sif",
+            "startedAt": "2026-09-25T02:56:38Z",
+            "status": "COMPLETED",
+            "workflowName": "container"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T02:58:23Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925162779",
+            "name": "Core Types, Branch Coverage & DE Requirement Evidence",
+            "startedAt": "2026-09-25T02:57:14Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:02:50Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925163064",
+            "name": "Canonical Scientific Stack (ubuntu-latest, Python 3.10)",
+            "startedAt": "2026-09-25T02:57:15Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:02:05Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925162974",
+            "name": "Canonical Scientific Stack (ubuntu-latest, Python 3.11)",
+            "startedAt": "2026-09-25T02:57:14Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:06:03Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925162925",
+            "name": "Canonical Scientific Stack (ubuntu-latest, Python 3.12)",
+            "startedAt": "2026-09-25T02:57:15Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:02:28Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925162896",
+            "name": "Canonical Scientific Stack (macos-latest, Python 3.10)",
+            "startedAt": "2026-09-25T02:57:18Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:04:54Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925162912",
+            "name": "Canonical Scientific Stack (macos-latest, Python 3.11)",
+            "startedAt": "2026-09-25T02:57:24Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:04:21Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925162960",
+            "name": "Canonical Scientific Stack (macos-latest, Python 3.12)",
+            "startedAt": "2026-09-25T02:57:21Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:07:14Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925162929",
+            "name": "Canonical Scientific Stack (windows-latest, Python 3.10)",
+            "startedAt": "2026-09-25T02:57:14Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:06:43Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925162945",
+            "name": "Canonical Scientific Stack (windows-latest, Python 3.11)",
+            "startedAt": "2026-09-25T02:57:18Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:07:23Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925163011",
+            "name": "Canonical Scientific Stack (windows-latest, Python 3.12)",
+            "startedAt": "2026-09-25T02:57:17Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:07:37Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925162937",
+            "name": "Flagship Data, Evidence & Strict Benchmark",
+            "startedAt": "2026-09-25T02:57:16Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T02:58:00Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925162877",
+            "name": "Audited Graceful Degradation (ubuntu-latest, Python 3.11)",
+            "startedAt": "2026-09-25T02:57:16Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T02:57:56Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925162826",
+            "name": "Audited Graceful Degradation (macos-latest, Python 3.11)",
+            "startedAt": "2026-09-25T02:57:19Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T02:58:18Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925162806",
+            "name": "Audited Graceful Degradation (windows-latest, Python 3.11)",
+            "startedAt": "2026-09-25T02:57:14Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T02:59:50Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925162886",
+            "name": "scVI Probabilistic VAE Smoke",
+            "startedAt": "2026-09-25T02:57:15Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T02:57:53Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925162803",
+            "name": "nf-core Launch Artifact Verification",
+            "startedAt": "2026-09-25T02:57:14Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T02:58:03Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925162808",
+            "name": "FastMCP SDK & Local Protocol",
+            "startedAt": "2026-09-25T02:57:15Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:00:44Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925393792",
+            "name": "Core Reliability (ubuntu-latest, Python 3.10)",
+            "startedAt": "2026-09-25T02:58:25Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:00:52Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925393811",
+            "name": "Core Reliability (ubuntu-latest, Python 3.11)",
+            "startedAt": "2026-09-25T02:58:26Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:00:55Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925393832",
+            "name": "Core Reliability (ubuntu-latest, Python 3.12)",
+            "startedAt": "2026-09-25T02:58:26Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:03:09Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925394133",
+            "name": "Core Reliability (macos-latest, Python 3.10)",
+            "startedAt": "2026-09-25T03:00:16Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:00:08Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925393820",
+            "name": "Core Reliability (macos-latest, Python 3.11)",
+            "startedAt": "2026-09-25T02:58:29Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:00:26Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925393801",
+            "name": "Core Reliability (macos-latest, Python 3.12)",
+            "startedAt": "2026-09-25T02:58:29Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:01:57Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925393937",
+            "name": "Core Reliability (windows-latest, Python 3.10)",
+            "startedAt": "2026-09-25T02:58:26Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:01:46Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925393833",
+            "name": "Core Reliability (windows-latest, Python 3.11)",
+            "startedAt": "2026-09-25T02:58:26Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          },
+          {
+            "__typename": "CheckRun",
+            "completedAt": "2026-09-25T03:02:02Z",
+            "conclusion": "SUCCESS",
+            "detailsUrl": "https://github.com/HERRY423/BioNexus/actions/runs/36088327787/job/107925393915",
+            "name": "Core Reliability (windows-latest, Python 3.12)",
+            "startedAt": "2026-09-25T02:58:26Z",
+            "status": "COMPLETED",
+            "workflowName": "BioNexus CI/CD"
+          }
+        ],
+        "updatedAt": "2026-09-25T02:56:33Z",
+        "url": "https://github.com/HERRY423/BioNexus/pull/36"
+      },
+      "head_commit": "10ec244add817d6b7b5dfe5f2b8a06d2e7062888",
+      "all_recorded_ci_checks_passed": true,
+      "review_status": "NO_HUMAN_RESPONSE"
+    },
+    {
+      "component": "NGS",
+      "upstream": "https://github.com/openai/plugins",
+      "branch": "https://github.com/HERRY423/plugins/tree/fix/pvl-quant-validation",
+      "compare": "https://github.com/openai/plugins/compare/main...HERRY423:plugins:fix/pvl-quant-validation",
+      "status": "UPSTREAM_PR_BLOCKED_BY_REPOSITORY_INTERACTION_POLICY",
+      "pull_request": null,
+      "web_verified_reason": "Repository owner limited opening pull requests to collaborators.",
+      "before_passed": 2,
+      "after_passed": 7,
+      "cases": 7,
+      "source_scope": "Aggregation CLI on synthetic quant.sf inputs",
+      "adopted": null,
+      "human_review_minutes": null,
+      "human_retest_minutes": null,
+      "rebuttal": null
+    }
+  ],
+  "cold_start": {
+    "closed_natural_use_plugin_repair_chains": 0,
+    "independent_external_adoptions": 0,
+    "real_author_timing_samples": 0,
+    "representative_detector_accuracy": null
+  },
+  "validation": {
+    "tests_run": 529,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "followup_author_and_native_tests": {
+      "tests_run": 33,
+      "failures": 0,
+      "errors": 0,
+      "scope": "Runtime-first diagnosis wording plus native trace/parser regressions"
+    },
+    "log_sha256": "bdbf4c5e8bd2537ed7d49b4f5b2ee726543d9b74102237d7d3abe5c720b0e60b"
+  },
+  "cost_scope": {
+    "new_paid_catalog_calls": 0,
+    "actual_settlement_unknown": true,
+    "historical_unknown_costs_preserved": true,
+    "known_recorded_first_round_estimate_usd": 3.4239430000000004,
+    "known_recorded_probe_plus_first_round_estimate_usd": 3.5872630000000005,
+    "in_progress_unrecorded_costs_excluded": false,
+    "known_first_round_estimate_remaining_usd": 0.5960569999999992
+  },
+  "runtime_dns_incident": {
+    "reason": "Outer /mnt masking hid /etc/resolv.conf symlink target /mnt/wsl/resolv.conf.",
+    "native_estimate_usd": 0,
+    "native_partial": true,
+    "model_assistant_events": 0,
+    "synthetic_host_api_error_messages": 1,
+    "automatic_host_dns_retries_retained": true,
+    "old_attempt_preserved": "C:\\Test\\unique-capability-runs-20260925\\ontology",
+    "recovery": "Minimal read-only DNS file mount, independent DNS/TCP smoke, new attempt directories.",
+    "settled_usd": null,
+    "shared_new_authorization_threshold_usd": 3.0
+  },
+  "runtime_socket_incident": {
+    "scope": "Operator/native runner environment, not a plugin defect",
+    "message": "Native Bash sandbox cannot create Unix sockets on /mnt/c (ENOTSUP).",
+    "paid_sessions": 2,
+    "native_estimated_usd": 1.011872,
+    "settled_usd": null,
+    "status": "PRESERVED_FAILURES; later Linux run started Bash successfully, with separate dependency and collection failures",
+    "diagnosis": "C:/Test/unique-capability-ontology-diagnosis-20260925/diagnosis.json",
+    "machine_diagnosis_seconds": 0.2157902999970247,
+    "human_first_diagnosis_seconds": null
+  },
+  "first_round": {
+    "authorized_sessions": 20,
+    "tasks": [
+      {
+        "family": "ontology",
+        "planned_per_arm": 3,
+        "status": "NATIVE_RESULT_RECORDED",
+        "partial": true,
+        "native_estimate_usd": 1.0118719999999999,
+        "result_sha256": "3551e416516170400dd470b4719b22c2d45ccc84acecc5aec1e715f97f2fa2bf",
+        "capture": {
+          "output": "/mnt/c/Test/unique-capability-runs-20260925-dns-fixed/ontology/verified-collected",
+          "receipt_sha256": "0870436cfc9fd302aa6a394d7b7d38278180c64f698c51aa5d0a375c8f42cb7e",
+          "diagnosis": {
+            "schema_version": 1,
+            "status": "LOCAL_ARTIFACT_DIAGNOSIS",
+            "contract_sha256": "d8a93daf380a3aa27c6ec06778a96dd82c5facf5da0e80e63932c3e8007b77e0",
+            "runs": [
+              {
+                "case_id": "ontology",
+                "arm": "with",
+                "repetition": 1,
+                "status": "error",
+                "grades": [
+                  {
+                    "id": "frozen-outcome",
+                    "passed": null,
+                    "rationale": "Artifact path and collected SHA-256 unavailable",
+                    "receipt": {
+                      "rule_sha256": "28b727cbf80ff492792f6f00ceeb659bdd8ffd6097924430fd7bc388d3336cfd",
+                      "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                    }
+                  }
+                ],
+                "issues": [
+                  "Native execution failed; local artifacts may still be diagnosable",
+                  "Missing artifacts: result",
+                  "Missing artifacts: script",
+                  "Native workspace relocation observed; sealing is NOT verified. Retained contents remain untrusted and are never executed by the sidecar."
+                ],
+                "binding": {
+                  "native_json_pointer": "/cases/0/arms/with/0",
+                  "native_run_sha256": "7ab3a10e402cb412d59bfd0fe7c57674dbe084079c3498a6638341d7802fc342",
+                  "method": "native_tracePath_init_cwd_sealed_layout"
+                },
+                "observations": {
+                  "session_id": "760d06ca-e4b7-4841-8a17-dcb5cf1ef45a",
+                  "model": "deepseek-flash",
+                  "plugins": [
+                    {
+                      "name": "celltypepilot",
+                      "path": "/mnt/c/Test/unique-capability-study-20260925-r2/execution-dns-fixed/ontology/candidate",
+                      "source": "celltypepilot@inline",
+                      "version": "0.5.0"
+                    }
+                  ],
+                  "cwd": "/mnt/c/Test/unique-capability-runs-20260925-dns-fixed/ontology/retained/claude-eval-B7oCDn/home/cwd",
+                  "claude_code_version": "2.1.278",
+                  "tools": [
+                    "Task",
+                    "Bash",
+                    "Edit",
+                    "Glob",
+                    "Grep",
+                    "NotebookEdit",
+                    "Read",
+                    "Skill",
+                    "TaskStop",
+                    "Write"
+                  ],
+                  "skill_calls": [
+                    {
+                      "skill": "celltypepilot:celltypepilot",
+                      "args": "harmonize labels against lung_evidence_v0_1 contract and marker atlas"
+                    }
+                  ],
+                  "final_output": null,
+                  "trace_complete": true,
+                  "issues": [],
+                  "scope": "observed in operator-supplied stream, not provider attestation"
+                },
+                "input_integrity": {
+                  "input0": "MATCH"
+                },
+                "execution": {
+                  "status": "NOT_OBSERVED",
+                  "command": "python3 analysis.py",
+                  "calls": [],
+                  "terminal_status": "ERROR",
+                  "model_conflict_observed": false,
+                  "script": null,
+                  "authenticated_execution": false,
+                  "scope": "Tool results are operator-supplied observations; final script bytes do not prove the bytes executed, isolation or scientific validity."
+                },
+                "next_check": {
+                  "stage": "RUNTIME",
+                  "action": "Inspect the preserved native error and trace; a valid partial artifact does not establish completed analysis.",
+                  "plugin_cause_established": false
+                }
+              },
+              {
+                "case_id": "ontology",
+                "arm": "with",
+                "repetition": 2,
+                "status": "error",
+                "grades": [
+                  {
+                    "id": "frozen-outcome",
+                    "passed": null,
+                    "rationale": "Artifact path and collected SHA-256 unavailable",
+                    "receipt": {
+                      "rule_sha256": "28b727cbf80ff492792f6f00ceeb659bdd8ffd6097924430fd7bc388d3336cfd",
+                      "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                    }
+                  }
+                ],
+                "issues": [
+                  "Native execution failed; local artifacts may still be diagnosable",
+                  "Missing artifacts: result",
+                  "Missing artifacts: script",
+                  "Native workspace relocation observed; sealing is NOT verified. Retained contents remain untrusted and are never executed by the sidecar."
+                ],
+                "binding": {
+                  "native_json_pointer": "/cases/0/arms/with/1",
+                  "native_run_sha256": "b5c701d9260798d68d33b78c012378c7e6569eef7d7790b2b6d9b1108835b7b1",
+                  "method": "native_tracePath_init_cwd_sealed_layout"
+                },
+                "observations": {
+                  "session_id": "38b8008f-a04e-4b41-a000-19f4e084c09a",
+                  "model": "deepseek-flash",
+                  "plugins": [
+                    {
+                      "name": "celltypepilot",
+                      "path": "/mnt/c/Test/unique-capability-study-20260925-r2/execution-dns-fixed/ontology/candidate",
+                      "source": "celltypepilot@inline",
+                      "version": "0.5.0"
+                    }
+                  ],
+                  "cwd": "/mnt/c/Test/unique-capability-runs-20260925-dns-fixed/ontology/retained/claude-eval-5e6irN/home/cwd",
+                  "claude_code_version": "2.1.278",
+                  "tools": [
+                    "Task",
+                    "Bash",
+                    "Edit",
+                    "Glob",
+                    "Grep",
+                    "NotebookEdit",
+                    "Read",
+                    "Skill",
+                    "TaskStop",
+                    "Write"
+                  ],
+                  "skill_calls": [
+                    {
+                      "skill": "celltypepilot:celltypepilot"
+                    }
+                  ],
+                  "final_output": null,
+                  "trace_complete": true,
+                  "issues": [],
+                  "scope": "observed in operator-supplied stream, not provider attestation"
+                },
+                "input_integrity": {
+                  "input0": "MATCH"
+                },
+                "execution": {
+                  "status": "NOT_OBSERVED",
+                  "command": "python3 analysis.py",
+                  "calls": [],
+                  "terminal_status": "ERROR",
+                  "model_conflict_observed": false,
+                  "script": null,
+                  "authenticated_execution": false,
+                  "scope": "Tool results are operator-supplied observations; final script bytes do not prove the bytes executed, isolation or scientific validity."
+                },
+                "next_check": {
+                  "stage": "RUNTIME",
+                  "action": "Inspect the preserved native error and trace; a valid partial artifact does not establish completed analysis.",
+                  "plugin_cause_established": false
+                }
+              },
+              {
+                "case_id": "ontology",
+                "arm": "with",
+                "repetition": 3,
+                "status": "missing",
+                "grades": [
+                  {
+                    "id": "frozen-outcome",
+                    "passed": null,
+                    "rationale": "Artifact path and collected SHA-256 unavailable",
+                    "receipt": {
+                      "rule_sha256": "28b727cbf80ff492792f6f00ceeb659bdd8ffd6097924430fd7bc388d3336cfd",
+                      "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                    }
+                  }
+                ],
+                "issues": [
+                  "Native run not present; no session or output fabricated",
+                  "Retained workspace not supplied"
+                ],
+                "binding": null,
+                "observations": null,
+                "input_integrity": {
+                  "input0": "MISSING"
+                },
+                "execution": {
+                  "status": "UNKNOWN",
+                  "command": "python3 analysis.py",
+                  "calls": [],
+                  "terminal_status": "UNKNOWN",
+                  "model_conflict_observed": false,
+                  "script": null,
+                  "authenticated_execution": false,
+                  "scope": "Tool results are operator-supplied observations; final script bytes do not prove the bytes executed, isolation or scientific validity."
+                },
+                "next_check": {
+                  "stage": "INPUT_INTEGRITY",
+                  "action": "Restore the frozen input bytes and inspect the producing/copying step before interpreting output differences.",
+                  "plugin_cause_established": false
+                }
+              },
+              {
+                "case_id": "ontology",
+                "arm": "without",
+                "repetition": 1,
+                "status": "missing",
+                "grades": [
+                  {
+                    "id": "frozen-outcome",
+                    "passed": null,
+                    "rationale": "Artifact path and collected SHA-256 unavailable",
+                    "receipt": {
+                      "rule_sha256": "28b727cbf80ff492792f6f00ceeb659bdd8ffd6097924430fd7bc388d3336cfd",
+                      "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                    }
+                  }
+                ],
+                "issues": [
+                  "Native run not present; no session or output fabricated",
+                  "Retained workspace not supplied"
+                ],
+                "binding": null,
+                "observations": null,
+                "input_integrity": {
+                  "input0": "MISSING"
+                },
+                "execution": {
+                  "status": "UNKNOWN",
+                  "command": "python3 analysis.py",
+                  "calls": [],
+                  "terminal_status": "UNKNOWN",
+                  "model_conflict_observed": false,
+                  "script": null,
+                  "authenticated_execution": false,
+                  "scope": "Tool results are operator-supplied observations; final script bytes do not prove the bytes executed, isolation or scientific validity."
+                },
+                "next_check": {
+                  "stage": "INPUT_INTEGRITY",
+                  "action": "Restore the frozen input bytes and inspect the producing/copying step before interpreting output differences.",
+                  "plugin_cause_established": false
+                }
+              },
+              {
+                "case_id": "ontology",
+                "arm": "without",
+                "repetition": 2,
+                "status": "missing",
+                "grades": [
+                  {
+                    "id": "frozen-outcome",
+                    "passed": null,
+                    "rationale": "Artifact path and collected SHA-256 unavailable",
+                    "receipt": {
+                      "rule_sha256": "28b727cbf80ff492792f6f00ceeb659bdd8ffd6097924430fd7bc388d3336cfd",
+                      "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                    }
+                  }
+                ],
+                "issues": [
+                  "Native run not present; no session or output fabricated",
+                  "Retained workspace not supplied"
+                ],
+                "binding": null,
+                "observations": null,
+                "input_integrity": {
+                  "input0": "MISSING"
+                },
+                "execution": {
+                  "status": "UNKNOWN",
+                  "command": "python3 analysis.py",
+                  "calls": [],
+                  "terminal_status": "UNKNOWN",
+                  "model_conflict_observed": false,
+                  "script": null,
+                  "authenticated_execution": false,
+                  "scope": "Tool results are operator-supplied observations; final script bytes do not prove the bytes executed, isolation or scientific validity."
+                },
+                "next_check": {
+                  "stage": "INPUT_INTEGRITY",
+                  "action": "Restore the frozen input bytes and inspect the producing/copying step before interpreting output differences.",
+                  "plugin_cause_established": false
+                }
+              },
+              {
+                "case_id": "ontology",
+                "arm": "without",
+                "repetition": 3,
+                "status": "missing",
+                "grades": [
+                  {
+                    "id": "frozen-outcome",
+                    "passed": null,
+                    "rationale": "Artifact path and collected SHA-256 unavailable",
+                    "receipt": {
+                      "rule_sha256": "28b727cbf80ff492792f6f00ceeb659bdd8ffd6097924430fd7bc388d3336cfd",
+                      "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                    }
+                  }
+                ],
+                "issues": [
+                  "Native run not present; no session or output fabricated",
+                  "Retained workspace not supplied"
+                ],
+                "binding": null,
+                "observations": null,
+                "input_integrity": {
+                  "input0": "MISSING"
+                },
+                "execution": {
+                  "status": "UNKNOWN",
+                  "command": "python3 analysis.py",
+                  "calls": [],
+                  "terminal_status": "UNKNOWN",
+                  "model_conflict_observed": false,
+                  "script": null,
+                  "authenticated_execution": false,
+                  "scope": "Tool results are operator-supplied observations; final script bytes do not prove the bytes executed, isolation or scientific validity."
+                },
+                "next_check": {
+                  "stage": "INPUT_INTEGRITY",
+                  "action": "Restore the frozen input bytes and inspect the producing/copying step before interpreting output differences.",
+                  "plugin_cause_established": false
+                }
+              }
+            ],
+            "native_partial": true,
+            "native_estimated_cost_usd": 1.0118719999999999,
+            "settled_cost_usd": null,
+            "human_minutes": null,
+            "model_calls_by_sidecar": 0,
+            "plugin_identity": {
+              "name": "celltypepilot",
+              "version": "0.5.0"
+            },
+            "plugin_inventory_scope": "Explicit allowlist plus first plugin manifest; other dependencies are not frozen",
+            "comparison_eligible": false,
+            "external_author_acceptance": null,
+            "limits": [
+              "Workspace bindings are explicit operator declarations, not authenticated host receipts.",
+              "Repetition is native array position, not established paired-run identity.",
+              "Computational checks do not establish plugin benefit, independent science or author adoption.",
+              "Missing events, costs, outputs and unstarted runs remain missing."
+            ]
+          }
+        }
+      },
+      {
+        "family": "salmon-aggregation",
+        "planned_per_arm": 3,
+        "status": "NOT_STARTED"
+      },
+      {
+        "family": "spp1-cd44-evidence",
+        "planned_per_arm": 3,
+        "status": "NOT_STARTED"
+      }
+    ],
+    "aggregate_plugin_benefit": null,
+    "scope": "Three different plugin/task pairs, one family each; do not pool or claim three families per plugin.",
+    "revised_authorization": {
+      "approved": true,
+      "user_answer": "允许总计 20 次及 US$4.02 估算阈值",
+      "max_total_sessions": 20,
+      "first_round_total_estimate_threshold_usd": 4.02,
+      "retained_failed_sessions": 2,
+      "retained_failed_estimate_usd": 1.011872,
+      "fresh_sessions_authorized": 18,
+      "provider": "https://api.deepseek.com",
+      "model": "deepseek-flash",
+      "data_scope": "Previously approved selected plugin code and skills, synthetic inputs, local-path-redacted SPP1-CD44 result excerpts, task prompts and generated content from unique-capability-study-20260925-r2; no grading answers or account configuration",
+      "in_flight_estimate_overrun_accepted": true,
+      "second_round_authorized": false,
+      "actual_settlement_usd": null
+    },
+    "retained_prior_paid_failures": 2,
+    "fresh_cohort": [
+      {
+        "family": "ontology",
+        "planned_per_arm": 3,
+        "status": "NATIVE_RESULT_RECORDED",
+        "unix-socket-preflight.json": {
+          "returncode": 0,
+          "stdout": "Unix-domain socket creation passed\n",
+          "stderr": "",
+          "model_calls": 0
+        },
+        "network-preflight.json": {
+          "returncode": 0,
+          "stdout": "DNS and TCP connection verified; no HTTP/model request\n",
+          "stderr": "",
+          "model_requests": 0
+        },
+        "dependency-smoke.json": {
+          "returncode": 0,
+          "stdout": "identity helper imported\n",
+          "stderr": "",
+          "model_calls": 0
+        },
+        "partial": true,
+        "partial_reason": "cost_ceiling",
+        "native_estimate_usd": 1.161203,
+        "result_sha256": "131e2066172c794ef5f76dafbfdb34f0180b1360c25d9a7eaa9287b0a5192cbe",
+        "observed_runs": {
+          "with": 2,
+          "without": 0
+        },
+        "capture": {
+          "output": "/tmp/pvl-u25/ontology/verified-collected",
+          "receipt_sha256": "ea2b552d078ae119492a734f506380c85959b732d19351dfe9045a3cf852a721",
+          "diagnosis": {
+            "schema_version": 1,
+            "status": "LOCAL_ARTIFACT_DIAGNOSIS",
+            "contract_sha256": "d8a93daf380a3aa27c6ec06778a96dd82c5facf5da0e80e63932c3e8007b77e0",
+            "runs": [
+              {
+                "case_id": "ontology",
+                "arm": "with",
+                "repetition": 1,
+                "status": "error",
+                "grades": [
+                  {
+                    "id": "frozen-outcome",
+                    "passed": null,
+                    "rationale": "Artifact path and collected SHA-256 unavailable",
+                    "receipt": {
+                      "rule_sha256": "28b727cbf80ff492792f6f00ceeb659bdd8ffd6097924430fd7bc388d3336cfd",
+                      "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                    }
+                  }
+                ],
+                "issues": [
+                  "Native execution failed; local artifacts may still be diagnosable",
+                  "Retained workspace not supplied"
+                ],
+                "binding": {
+                  "native_json_pointer": "/cases/0/arms/with/0",
+                  "native_run_sha256": "be7f350a4b0c41ebb862392d6a40dc7f58aa72d485ee903bd8931cfe37817de3",
+                  "method": "operator_declared_retained_workspace"
+                },
+                "observations": null,
+                "input_integrity": {
+                  "input0": "MISSING"
+                },
+                "execution": {
+                  "status": "UNKNOWN",
+                  "command": "python3 analysis.py",
+                  "calls": [],
+                  "terminal_status": "UNKNOWN",
+                  "model_conflict_observed": false,
+                  "script": null,
+                  "authenticated_execution": false,
+                  "scope": "Tool results are operator-supplied observations; final script bytes do not prove the bytes executed, isolation or scientific validity."
+                },
+                "next_check": {
+                  "stage": "INPUT_INTEGRITY",
+                  "action": "Restore the frozen input bytes and inspect the producing/copying step before interpreting output differences.",
+                  "plugin_cause_established": false
+                }
+              },
+              {
+                "case_id": "ontology",
+                "arm": "with",
+                "repetition": 2,
+                "status": "completed",
+                "grades": [
+                  {
+                    "id": "frozen-outcome",
+                    "passed": null,
+                    "rationale": "Artifact path and collected SHA-256 unavailable",
+                    "receipt": {
+                      "rule_sha256": "28b727cbf80ff492792f6f00ceeb659bdd8ffd6097924430fd7bc388d3336cfd",
+                      "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                    }
+                  }
+                ],
+                "issues": [
+                  "Retained workspace not supplied"
+                ],
+                "binding": {
+                  "native_json_pointer": "/cases/0/arms/with/1",
+                  "native_run_sha256": "c0d45e0b53fc0f745e6d3f0b6d3e0161a46d93c118ccb078b5581855cbb2bedc",
+                  "method": "operator_declared_retained_workspace"
+                },
+                "observations": null,
+                "input_integrity": {
+                  "input0": "MISSING"
+                },
+                "execution": {
+                  "status": "UNKNOWN",
+                  "command": "python3 analysis.py",
+                  "calls": [],
+                  "terminal_status": "UNKNOWN",
+                  "model_conflict_observed": false,
+                  "script": null,
+                  "authenticated_execution": false,
+                  "scope": "Tool results are operator-supplied observations; final script bytes do not prove the bytes executed, isolation or scientific validity."
+                },
+                "next_check": {
+                  "stage": "INPUT_INTEGRITY",
+                  "action": "Restore the frozen input bytes and inspect the producing/copying step before interpreting output differences.",
+                  "plugin_cause_established": false
+                }
+              },
+              {
+                "case_id": "ontology",
+                "arm": "with",
+                "repetition": 3,
+                "status": "missing",
+                "grades": [
+                  {
+                    "id": "frozen-outcome",
+                    "passed": null,
+                    "rationale": "Artifact path and collected SHA-256 unavailable",
+                    "receipt": {
+                      "rule_sha256": "28b727cbf80ff492792f6f00ceeb659bdd8ffd6097924430fd7bc388d3336cfd",
+                      "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                    }
+                  }
+                ],
+                "issues": [
+                  "Native run not present; no session or output fabricated",
+                  "Retained workspace not supplied"
+                ],
+                "binding": null,
+                "observations": null,
+                "input_integrity": {
+                  "input0": "MISSING"
+                },
+                "execution": {
+                  "status": "UNKNOWN",
+                  "command": "python3 analysis.py",
+                  "calls": [],
+                  "terminal_status": "UNKNOWN",
+                  "model_conflict_observed": false,
+                  "script": null,
+                  "authenticated_execution": false,
+                  "scope": "Tool results are operator-supplied observations; final script bytes do not prove the bytes executed, isolation or scientific validity."
+                },
+                "next_check": {
+                  "stage": "INPUT_INTEGRITY",
+                  "action": "Restore the frozen input bytes and inspect the producing/copying step before interpreting output differences.",
+                  "plugin_cause_established": false
+                }
+              },
+              {
+                "case_id": "ontology",
+                "arm": "without",
+                "repetition": 1,
+                "status": "missing",
+                "grades": [
+                  {
+                    "id": "frozen-outcome",
+                    "passed": null,
+                    "rationale": "Artifact path and collected SHA-256 unavailable",
+                    "receipt": {
+                      "rule_sha256": "28b727cbf80ff492792f6f00ceeb659bdd8ffd6097924430fd7bc388d3336cfd",
+                      "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                    }
+                  }
+                ],
+                "issues": [
+                  "Native run not present; no session or output fabricated",
+                  "Retained workspace not supplied"
+                ],
+                "binding": null,
+                "observations": null,
+                "input_integrity": {
+                  "input0": "MISSING"
+                },
+                "execution": {
+                  "status": "UNKNOWN",
+                  "command": "python3 analysis.py",
+                  "calls": [],
+                  "terminal_status": "UNKNOWN",
+                  "model_conflict_observed": false,
+                  "script": null,
+                  "authenticated_execution": false,
+                  "scope": "Tool results are operator-supplied observations; final script bytes do not prove the bytes executed, isolation or scientific validity."
+                },
+                "next_check": {
+                  "stage": "INPUT_INTEGRITY",
+                  "action": "Restore the frozen input bytes and inspect the producing/copying step before interpreting output differences.",
+                  "plugin_cause_established": false
+                }
+              },
+              {
+                "case_id": "ontology",
+                "arm": "without",
+                "repetition": 2,
+                "status": "missing",
+                "grades": [
+                  {
+                    "id": "frozen-outcome",
+                    "passed": null,
+                    "rationale": "Artifact path and collected SHA-256 unavailable",
+                    "receipt": {
+                      "rule_sha256": "28b727cbf80ff492792f6f00ceeb659bdd8ffd6097924430fd7bc388d3336cfd",
+                      "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                    }
+                  }
+                ],
+                "issues": [
+                  "Native run not present; no session or output fabricated",
+                  "Retained workspace not supplied"
+                ],
+                "binding": null,
+                "observations": null,
+                "input_integrity": {
+                  "input0": "MISSING"
+                },
+                "execution": {
+                  "status": "UNKNOWN",
+                  "command": "python3 analysis.py",
+                  "calls": [],
+                  "terminal_status": "UNKNOWN",
+                  "model_conflict_observed": false,
+                  "script": null,
+                  "authenticated_execution": false,
+                  "scope": "Tool results are operator-supplied observations; final script bytes do not prove the bytes executed, isolation or scientific validity."
+                },
+                "next_check": {
+                  "stage": "INPUT_INTEGRITY",
+                  "action": "Restore the frozen input bytes and inspect the producing/copying step before interpreting output differences.",
+                  "plugin_cause_established": false
+                }
+              },
+              {
+                "case_id": "ontology",
+                "arm": "without",
+                "repetition": 3,
+                "status": "missing",
+                "grades": [
+                  {
+                    "id": "frozen-outcome",
+                    "passed": null,
+                    "rationale": "Artifact path and collected SHA-256 unavailable",
+                    "receipt": {
+                      "rule_sha256": "28b727cbf80ff492792f6f00ceeb659bdd8ffd6097924430fd7bc388d3336cfd",
+                      "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                    }
+                  }
+                ],
+                "issues": [
+                  "Native run not present; no session or output fabricated",
+                  "Retained workspace not supplied"
+                ],
+                "binding": null,
+                "observations": null,
+                "input_integrity": {
+                  "input0": "MISSING"
+                },
+                "execution": {
+                  "status": "UNKNOWN",
+                  "command": "python3 analysis.py",
+                  "calls": [],
+                  "terminal_status": "UNKNOWN",
+                  "model_conflict_observed": false,
+                  "script": null,
+                  "authenticated_execution": false,
+                  "scope": "Tool results are operator-supplied observations; final script bytes do not prove the bytes executed, isolation or scientific validity."
+                },
+                "next_check": {
+                  "stage": "INPUT_INTEGRITY",
+                  "action": "Restore the frozen input bytes and inspect the producing/copying step before interpreting output differences.",
+                  "plugin_cause_established": false
+                }
+              }
+            ],
+            "native_partial": true,
+            "native_estimated_cost_usd": 1.161203,
+            "settled_cost_usd": null,
+            "human_minutes": null,
+            "model_calls_by_sidecar": 0,
+            "plugin_identity": {
+              "name": "celltypepilot",
+              "version": "0.5.0"
+            },
+            "plugin_inventory_scope": "Explicit allowlist plus first plugin manifest; other dependencies are not frozen",
+            "comparison_eligible": false,
+            "external_author_acceptance": null,
+            "limits": [
+              "Workspace bindings are explicit operator declarations, not authenticated host receipts.",
+              "Repetition is native array position, not established paired-run identity.",
+              "Computational checks do not establish plugin benefit, independent science or author adoption.",
+              "Missing events, costs, outputs and unstarted runs remain missing."
+            ]
+          }
+        }
+      },
+      {
+        "family": "salmon-aggregation",
+        "planned_per_arm": 3,
+        "status": "PREPARED_NO_EXPORTED_RESULT",
+        "unix-socket-preflight.json": {
+          "returncode": 0,
+          "stdout": "Unix-domain socket creation passed\n",
+          "stderr": "",
+          "model_calls": 0
+        },
+        "network-preflight.json": {
+          "returncode": 0,
+          "stdout": "DNS and TCP connection verified; no HTTP/model request\n",
+          "stderr": "",
+          "model_requests": 0
+        },
+        "dependency-smoke.json": {
+          "returncode": 0,
+          "stdout": "usage: aggregate_salmon_quant.py [-h] --config CONFIG --outdir OUTDIR\n                                 [--quant QUANT]\n\nAggregate Salmon quant.sf files into transcript- and gene-level matrices.\n\noptions:\n  -h, --help       show this help message and exit\n  --config CONFIG\n  --outdir OUTDIR\n  --quant QUANT    sample=/path/to/quant.sf\n",
+          "stderr": "",
+          "model_calls": 0
+        }
+      },
+      {
+        "family": "spp1-cd44-evidence",
+        "planned_per_arm": 3,
+        "status": "PREPARED_NO_EXPORTED_RESULT",
+        "unix-socket-preflight.json": {
+          "returncode": 0,
+          "stdout": "Unix-domain socket creation passed\n",
+          "stderr": "",
+          "model_calls": 0
+        },
+        "network-preflight.json": {
+          "returncode": 0,
+          "stdout": "DNS and TCP connection verified; no HTTP/model request\n",
+          "stderr": "",
+          "model_requests": 0
+        },
+        "dependency-smoke.json": {
+          "returncode": 0,
+          "stdout": "{\n  \"evidence_id\": \"PVL-SPP1-CD44-DERIVED-REVIEW\",\n  \"status\": \"VALID\",\n  \"integrity_verified\": true,\n  \"producer_identity_status\": \"DECLARED_NOT_AUTHENTICATED\",\n  \"accepted_for_context\": true,\n  \"accepted_for_claim_support\": false,\n  \"conclusion_maturity\": \"UNASSESSED\",\n  \"allowed_context_use\": \"content-bound analysis result\",\n  \"missing_context\": [],\n  \"errors\": [],\n  \"warnings\": [\n    \"producer.plugin_version is not declared; producer identity remains version-incomplete\",\n    \"request_sha256 is absent; the result is not bound to the originating query/request\"\n  ],\n  \"prohibited_inferences\": [\n    \"Do not infer biological generalization from execution success alone.\",\n    \"Do not infer causality without an identified design and causal assumptions.\"\n  ]\n}\n",
+          "stderr": "",
+          "model_calls": 0
+        }
+      }
+    ],
+    "final_observed_summary": {
+      "scope": "Three distinct plugin/task pairs, one family per plugin; no pooled causal benefit estimate",
+      "prior_paid_runtime_failures": 2,
+      "prior_failed_estimate_usd": 1.011872,
+      "settled_usd": null,
+      "closed_plugin_natural_repair_chains": 0,
+      "families": [
+        {
+          "family": "ontology",
+          "receipt_sha256": "ea2b552d078ae119492a734f506380c85959b732d19351dfe9045a3cf852a721",
+          "partial": true,
+          "partial_reason": "cost_ceiling",
+          "estimate_usd": 1.161203,
+          "runs": [
+            {
+              "arm": "with",
+              "repetition": 1,
+              "execution_status": "error",
+              "artifact_contract_passed": false,
+              "grades": [
+                {
+                  "id": "frozen-outcome",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "28b727cbf80ff492792f6f00ceeb659bdd8ffd6097924430fd7bc388d3336cfd",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                }
+              ],
+              "skills": [],
+              "tool_errors": [],
+              "issues": [
+                "Native execution failed; local artifacts may still be diagnosable",
+                "Retained workspace not supplied"
+              ]
+            },
+            {
+              "arm": "with",
+              "repetition": 2,
+              "execution_status": "completed",
+              "artifact_contract_passed": false,
+              "grades": [
+                {
+                  "id": "frozen-outcome",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "28b727cbf80ff492792f6f00ceeb659bdd8ffd6097924430fd7bc388d3336cfd",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                }
+              ],
+              "skills": [],
+              "tool_errors": [],
+              "issues": [
+                "Retained workspace not supplied"
+              ]
+            },
+            {
+              "arm": "with",
+              "repetition": 3,
+              "execution_status": "missing",
+              "artifact_contract_passed": false,
+              "grades": [
+                {
+                  "id": "frozen-outcome",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "28b727cbf80ff492792f6f00ceeb659bdd8ffd6097924430fd7bc388d3336cfd",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                }
+              ],
+              "skills": [],
+              "tool_errors": [],
+              "issues": [
+                "Native run not present; no session or output fabricated",
+                "Retained workspace not supplied"
+              ]
+            },
+            {
+              "arm": "without",
+              "repetition": 1,
+              "execution_status": "missing",
+              "artifact_contract_passed": false,
+              "grades": [
+                {
+                  "id": "frozen-outcome",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "28b727cbf80ff492792f6f00ceeb659bdd8ffd6097924430fd7bc388d3336cfd",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                }
+              ],
+              "skills": [],
+              "tool_errors": [],
+              "issues": [
+                "Native run not present; no session or output fabricated",
+                "Retained workspace not supplied"
+              ]
+            },
+            {
+              "arm": "without",
+              "repetition": 2,
+              "execution_status": "missing",
+              "artifact_contract_passed": false,
+              "grades": [
+                {
+                  "id": "frozen-outcome",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "28b727cbf80ff492792f6f00ceeb659bdd8ffd6097924430fd7bc388d3336cfd",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                }
+              ],
+              "skills": [],
+              "tool_errors": [],
+              "issues": [
+                "Native run not present; no session or output fabricated",
+                "Retained workspace not supplied"
+              ]
+            },
+            {
+              "arm": "without",
+              "repetition": 3,
+              "execution_status": "missing",
+              "artifact_contract_passed": false,
+              "grades": [
+                {
+                  "id": "frozen-outcome",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "28b727cbf80ff492792f6f00ceeb659bdd8ffd6097924430fd7bc388d3336cfd",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                }
+              ],
+              "skills": [],
+              "tool_errors": [],
+              "issues": [
+                "Native run not present; no session or output fabricated",
+                "Retained workspace not supplied"
+              ]
+            }
+          ],
+          "with": {
+            "planned": 3,
+            "completed": 1,
+            "artifact_contract_passed": 0,
+            "completed_and_contract_passed": 0,
+            "successful_skill_runs": 0
+          },
+          "without": {
+            "planned": 3,
+            "completed": 0,
+            "artifact_contract_passed": 0,
+            "completed_and_contract_passed": 0,
+            "successful_skill_runs": 0
+          },
+          "author_entry": {
+            "report": "C:\\Test\\unique-capability-author-diagnosis-linux-ontology-20260925\\DIAGNOSIS.md",
+            "timing": {
+              "machine_seconds_to_diagnosis": 0.07697239999833982,
+              "human_time_to_first_diagnosis_seconds": null,
+              "scope": "CLI entry to computed diagnosis; excludes interpreter startup, installation, preparation, reading and repair"
+            }
+          }
+        },
+        {
+          "family": "salmon-aggregation",
+          "receipt_sha256": "af34435e6f3729ab46815276e069c4559d2cf736f83c5d7323ca53290f06cfe8",
+          "partial": true,
+          "partial_reason": "interrupted",
+          "estimate_usd": 0.5233709999999999,
+          "runs": [
+            {
+              "arm": "with",
+              "repetition": 1,
+              "execution_status": "completed",
+              "artifact_contract_passed": false,
+              "grades": [
+                {
+                  "id": "frozen-outcome",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "276b22d4728fb30798b0056b94fae531b09ca94316c81bfec790e53632e68d1a",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                }
+              ],
+              "skills": [
+                {
+                  "skill": "ngs-analysis:ngs-bulk-rnaseq-counts-qc",
+                  "tool_use_id": "call_00_EkCMMMtpgEjpwdXzVgMK3731",
+                  "evidence": {
+                    "path": "C:\\Test\\unique-capability-runs-20260925-persistent-r2\\salmon-aggregation\\verified-collected\\runs\\0\\events.jsonl",
+                    "line": 787
+                  },
+                  "result_status": "TOOL_REPORTED_SUCCESS",
+                  "result_evidence": {
+                    "path": "C:\\Test\\unique-capability-runs-20260925-persistent-r2\\salmon-aggregation\\verified-collected\\runs\\0\\events.jsonl",
+                    "line": 788
+                  }
+                }
+              ],
+              "tool_errors": [
+                {
+                  "line": 163,
+                  "content": "Sandbox is required but failed to initialize: Failed to create bridge sockets after 5 attempts. Restart to retry.",
+                  "tool_use_id": "call_00_C74VIhZQb0fhavnYsTbG9133"
+                },
+                {
+                  "line": 164,
+                  "content": "Sandbox is required but failed to initialize: Failed to create bridge sockets after 5 attempts. Restart to retry.",
+                  "tool_use_id": "call_01_A9lZnHuXXf483c76jTgC6443"
+                },
+                {
+                  "line": 187,
+                  "content": "Sandbox is required but failed to initialize: Failed to create bridge sockets after 5 attempts. Restart to retry.",
+                  "tool_use_id": "call_00_yfBU1lCJTLFGB8s9T9Iv9199"
+                },
+                {
+                  "line": 1700,
+                  "content": "Sandbox is required but failed to initialize: Failed to create bridge sockets after 5 attempts. Restart to retry.",
+                  "tool_use_id": "call_00_ckggbKn8OmOK6DADhVkg5382"
+                },
+                {
+                  "line": 1803,
+                  "content": "Sandbox is required but failed to initialize: Failed to create bridge sockets after 5 attempts. Restart to retry.",
+                  "tool_use_id": "call_00_fqH7ZGyKclbZ2mI8FfLN5329"
+                },
+                {
+                  "line": 2109,
+                  "content": "Sandbox is required but failed to initialize: Failed to create bridge sockets after 5 attempts. Restart to retry.",
+                  "tool_use_id": "call_00_vsf1QHJYvmvLzU3Y3tVp6800"
+                },
+                {
+                  "line": 2172,
+                  "content": "Sandbox is required but failed to initialize: Failed to create bridge sockets after 5 attempts. Restart to retry.",
+                  "tool_use_id": "call_00_EffQRFy2EXJUbVhTrHaQ5127"
+                }
+              ],
+              "issues": [
+                "Missing artifacts: result",
+                "Native workspace relocation observed; sealing is NOT verified. Retained contents remain untrusted and are never executed by the sidecar."
+              ]
+            },
+            {
+              "arm": "with",
+              "repetition": 2,
+              "execution_status": "error",
+              "artifact_contract_passed": false,
+              "grades": [
+                {
+                  "id": "frozen-outcome",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "276b22d4728fb30798b0056b94fae531b09ca94316c81bfec790e53632e68d1a",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                }
+              ],
+              "skills": [
+                {
+                  "skill": "ngs-analysis:ngs-bulk-rnaseq-counts-qc",
+                  "tool_use_id": "call_00_grlKbxTMD5TpL797DUEb8136",
+                  "evidence": {
+                    "path": "C:\\Test\\unique-capability-runs-20260925-persistent-r2\\salmon-aggregation\\verified-collected\\runs\\1\\events.jsonl",
+                    "line": 385
+                  },
+                  "result_status": "TOOL_REPORTED_SUCCESS",
+                  "result_evidence": {
+                    "path": "C:\\Test\\unique-capability-runs-20260925-persistent-r2\\salmon-aggregation\\verified-collected\\runs\\1\\events.jsonl",
+                    "line": 386
+                  }
+                }
+              ],
+              "tool_errors": [
+                {
+                  "line": 19,
+                  "content": "Sandbox is required but failed to initialize: Failed to create bridge sockets after 5 attempts. Restart to retry.",
+                  "tool_use_id": "call_00_WP2p9Gvhs9jjwQsOuj9n1680"
+                },
+                {
+                  "line": 20,
+                  "content": "Sandbox is required but failed to initialize: Failed to create bridge sockets after 5 attempts. Restart to retry.",
+                  "tool_use_id": "call_01_r9f5libXg2FgWLPQGDw11489"
+                },
+                {
+                  "line": 35,
+                  "content": "Sandbox is required but failed to initialize: Failed to create bridge sockets after 5 attempts. Restart to retry.",
+                  "tool_use_id": "call_00_A5zQqDrxJEILpJlqCj155471"
+                },
+                {
+                  "line": 389,
+                  "content": "Sandbox is required but failed to initialize: Failed to create bridge sockets after 5 attempts. Restart to retry.",
+                  "tool_use_id": "call_01_GZXHYaAX0UVn1U32oUAD3693"
+                },
+                {
+                  "line": 808,
+                  "content": "Sandbox is required but failed to initialize: Failed to create bridge sockets after 5 attempts. Restart to retry.",
+                  "tool_use_id": "call_00_w859sCugtKng5E3cs4lR3526"
+                },
+                {
+                  "line": 1189,
+                  "content": "Sandbox is required but failed to initialize: Failed to create bridge sockets after 5 attempts. Restart to retry.",
+                  "tool_use_id": "call_00_ET_fl9KBhrrIqWB2ePMkRIr5126"
+                },
+                {
+                  "line": 1299,
+                  "content": "Sandbox is required but failed to initialize: Failed to create bridge sockets after 5 attempts. Restart to retry.",
+                  "tool_use_id": "call_00_FN0okEKVaaFGeCzLoKjC2833"
+                }
+              ],
+              "issues": [
+                "Native execution failed; local artifacts may still be diagnosable",
+                "Missing artifacts: result",
+                "Native result event missing; init observations do not establish completion",
+                "Native workspace relocation observed; sealing is NOT verified. Retained contents remain untrusted and are never executed by the sidecar."
+              ]
+            },
+            {
+              "arm": "with",
+              "repetition": 3,
+              "execution_status": "missing",
+              "artifact_contract_passed": false,
+              "grades": [
+                {
+                  "id": "frozen-outcome",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "276b22d4728fb30798b0056b94fae531b09ca94316c81bfec790e53632e68d1a",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                }
+              ],
+              "skills": [],
+              "tool_errors": [],
+              "issues": [
+                "Native run not present; no session or output fabricated",
+                "Retained workspace not supplied"
+              ]
+            },
+            {
+              "arm": "without",
+              "repetition": 1,
+              "execution_status": "missing",
+              "artifact_contract_passed": false,
+              "grades": [
+                {
+                  "id": "frozen-outcome",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "276b22d4728fb30798b0056b94fae531b09ca94316c81bfec790e53632e68d1a",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                }
+              ],
+              "skills": [],
+              "tool_errors": [],
+              "issues": [
+                "Native run not present; no session or output fabricated",
+                "Retained workspace not supplied"
+              ]
+            },
+            {
+              "arm": "without",
+              "repetition": 2,
+              "execution_status": "missing",
+              "artifact_contract_passed": false,
+              "grades": [
+                {
+                  "id": "frozen-outcome",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "276b22d4728fb30798b0056b94fae531b09ca94316c81bfec790e53632e68d1a",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                }
+              ],
+              "skills": [],
+              "tool_errors": [],
+              "issues": [
+                "Native run not present; no session or output fabricated",
+                "Retained workspace not supplied"
+              ]
+            },
+            {
+              "arm": "without",
+              "repetition": 3,
+              "execution_status": "missing",
+              "artifact_contract_passed": false,
+              "grades": [
+                {
+                  "id": "frozen-outcome",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "276b22d4728fb30798b0056b94fae531b09ca94316c81bfec790e53632e68d1a",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                }
+              ],
+              "skills": [],
+              "tool_errors": [],
+              "issues": [
+                "Native run not present; no session or output fabricated",
+                "Retained workspace not supplied"
+              ]
+            }
+          ],
+          "with": {
+            "planned": 3,
+            "completed": 1,
+            "artifact_contract_passed": 0,
+            "completed_and_contract_passed": 0,
+            "successful_skill_runs": 2
+          },
+          "without": {
+            "planned": 3,
+            "completed": 0,
+            "artifact_contract_passed": 0,
+            "completed_and_contract_passed": 0,
+            "successful_skill_runs": 0
+          },
+          "author_entry": {
+            "report": "C:\\Test\\unique-capability-author-diagnosis-linux-salmon-aggregation-20260925\\DIAGNOSIS.md",
+            "timing": {
+              "machine_seconds_to_diagnosis": 0.19358809999539517,
+              "human_time_to_first_diagnosis_seconds": null,
+              "scope": "CLI entry to computed diagnosis; excludes interpreter startup, installation, preparation, reading and repair"
+            }
+          }
+        },
+        {
+          "family": "spp1-cd44-evidence",
+          "receipt_sha256": "7be022c9211e036c3b20c19eec33d39e282f48aa1e1900bb4aeb12816297a3ad",
+          "partial": true,
+          "partial_reason": "interrupted",
+          "estimate_usd": 0.7274970000000001,
+          "runs": [
+            {
+              "arm": "with",
+              "repetition": 1,
+              "execution_status": "error",
+              "artifact_contract_passed": false,
+              "grades": [
+                {
+                  "id": "frozen-outcome",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "606d0f3696aa7ad81aedc96a5b52fa6edead3ce90239f52688d558cf7394f18b",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                },
+                {
+                  "id": "actual-audit-file",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "6a20eb6b7976b9f7235b40165d2b04c531fafdef27c7d44c4d73f90a8907718a",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                }
+              ],
+              "skills": [
+                {
+                  "skill": "bionexus-reliability:external-evidence-audit",
+                  "tool_use_id": "call_01_FRkDGgFd5w8xHv7vcBam2213",
+                  "evidence": {
+                    "path": "C:\\Test\\unique-capability-runs-20260925-spp1-final\\spp1-cd44-evidence\\verified-collected\\runs\\0\\events.jsonl",
+                    "line": 574
+                  },
+                  "result_status": "TOOL_REPORTED_SUCCESS",
+                  "result_evidence": {
+                    "path": "C:\\Test\\unique-capability-runs-20260925-spp1-final\\spp1-cd44-evidence\\verified-collected\\runs\\0\\events.jsonl",
+                    "line": 576
+                  }
+                }
+              ],
+              "tool_errors": [
+                {
+                  "line": 3253,
+                  "content": "Exit code 1\n/bin/bash: /var/tmp/pvl3/spp1-cd44-evidence/retained/claude-eval-d5vdgq/home/.bashrc: Permission denied\n/bin/bash: /var/tmp/pvl3/spp1-cd44-evidence/retained/claude-eval-d5vdgq/home/.bashrc: Permission denied\nTraceback (most recent call last):\n  File \"/mnt/c/Test/unique-capability-study-20260925-r2/execution-spp1-final/spp1-cd44-evidence/candidate/skills/external-evidence-audit/scripts/audit_external_evidence.py\", line 16, in <module>\n    from bionexus.ecosystem_intake import (  # noqa: E402\n    ...<2 lines>...\n    )\n  File \"/mnt/c/Test/unique-capability-study-20260925-r2/execution-spp1-final/spp1-cd44-evidence/candidate/src/bionexus/__init__.py\", line 1, in <module>\n    from .agent_routing import (\n    ...<9 lines>...\n    )\n  File \"/mnt/c/Test/unique-capability-study-20260925-r2/execution-spp1-final/spp1-cd44-evidence/candidate/src/bionexus/agent_routing.py\", line 49, in <module>\n    from bionexus.intent_router import (  # noqa: E402\n    ...<5 lines>...\n    )\n  File \"/mnt/c/Test/unique-capability-study-20260925-r2/execution-spp1-final/spp1-cd44-evidence/candidate/src/bionexus/intent_router.py\", line 43, in <module>\n    from bionexus.integrity import audit_expression_matrix\n  File \"/mnt/c/Test/unique-capability-study-20260925-r2/execution-spp1-final/spp1-cd44-evidence/candidate/src/bionexus/integrity.py\", line 13, in <module>\n    import numpy as np\nModuleNotFoundError: No module named 'numpy'\nevidence-audit capability produced no artifact (exit 1)",
+                  "tool_use_id": "call_00_ET_pObp0ETX8lCepQMGqaGM2347"
+                }
+              ],
+              "issues": [
+                "Native execution failed; local artifacts may still be diagnosable",
+                "Missing artifacts: result",
+                "Missing artifacts: audit",
+                "Native workspace relocation observed; sealing is NOT verified. Retained contents remain untrusted and are never executed by the sidecar."
+              ]
+            },
+            {
+              "arm": "with",
+              "repetition": 2,
+              "execution_status": "error",
+              "artifact_contract_passed": false,
+              "grades": [
+                {
+                  "id": "frozen-outcome",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "606d0f3696aa7ad81aedc96a5b52fa6edead3ce90239f52688d558cf7394f18b",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                },
+                {
+                  "id": "actual-audit-file",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "6a20eb6b7976b9f7235b40165d2b04c531fafdef27c7d44c4d73f90a8907718a",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                }
+              ],
+              "skills": [
+                {
+                  "skill": "bionexus-reliability:external-evidence-audit",
+                  "tool_use_id": "call_00_XW3fwyA2YtC3vzv71iY56762",
+                  "evidence": {
+                    "path": "C:\\Test\\unique-capability-runs-20260925-spp1-final\\spp1-cd44-evidence\\verified-collected\\runs\\1\\events.jsonl",
+                    "line": 384
+                  },
+                  "result_status": "TOOL_REPORTED_SUCCESS",
+                  "result_evidence": {
+                    "path": "C:\\Test\\unique-capability-runs-20260925-spp1-final\\spp1-cd44-evidence\\verified-collected\\runs\\1\\events.jsonl",
+                    "line": 385
+                  }
+                }
+              ],
+              "tool_errors": [
+                {
+                  "line": 19,
+                  "content": "Exit code 128\nOn branch main\n\nNo commits yet\n\nUntracked files:\n  (use \"git add <file>...\" to include in what will be committed)\n\t../.bash_aliases\n\t../.bash_login\n\t../.bash_logout\n\t../.bash_profile\n\t../.bashrc\n\t../.bazeliskrc\n\t../.bazelrc\n\t../.bazelversion\n\t../.bunfig.toml\n\t../.cargo\n\t../.claude.json\n\t../.claude/\n\t../.config/\n\t../.devcontainer\n\t../.devcontainer.json\n\t../.envrc\n\t../.gitconfig\n\t../.gitmodules\n\t../.husky\n\t../.idea\n\t../.lefthook.yaml\n\t../.lefthook.yml\n\t../.mcp.json\n\t../.mvn\n\t../.npm/\n\t../.npmrc\n\t../.pnp.cjs\n\t../.pnp.loader.mjs\n\t../.pnpmfile.cjs\n\t../.pre-commit-config.yaml\n\t../.profile\n\t../.ripgreprc\n\t../.vscode\n\t../.yarn\n\t../.yarnrc\n\t../.yarnrc.yml\n\t../.zlogin\n\t../.zlogout\n\t../.zprofile\n\t../.zshenv\n\t../.zshrc\n\t../bunfig.toml\n\t./\n\t../gradle-wrapper.properties\n\t../lefthook.yaml\n\t../lefthook.yml\n\t../maven-wrapper.properties\n\t../pyrightconfig.json\n\nnothing added to commit but untracked files present (use \"git add\" to track)",
+                  "tool_use_id": "call_01_b0eLhhySK9bbnm9ceTaV0675"
+                }
+              ],
+              "issues": [
+                "Native execution failed; local artifacts may still be diagnosable",
+                "Missing artifacts: result",
+                "Missing artifacts: audit",
+                "Native result event missing; init observations do not establish completion",
+                "Native workspace relocation observed; sealing is NOT verified. Retained contents remain untrusted and are never executed by the sidecar."
+              ]
+            },
+            {
+              "arm": "with",
+              "repetition": 3,
+              "execution_status": "missing",
+              "artifact_contract_passed": false,
+              "grades": [
+                {
+                  "id": "frozen-outcome",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "606d0f3696aa7ad81aedc96a5b52fa6edead3ce90239f52688d558cf7394f18b",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                },
+                {
+                  "id": "actual-audit-file",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "6a20eb6b7976b9f7235b40165d2b04c531fafdef27c7d44c4d73f90a8907718a",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                }
+              ],
+              "skills": [],
+              "tool_errors": [],
+              "issues": [
+                "Native run not present; no session or output fabricated",
+                "Retained workspace not supplied"
+              ]
+            },
+            {
+              "arm": "without",
+              "repetition": 1,
+              "execution_status": "missing",
+              "artifact_contract_passed": false,
+              "grades": [
+                {
+                  "id": "frozen-outcome",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "606d0f3696aa7ad81aedc96a5b52fa6edead3ce90239f52688d558cf7394f18b",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                },
+                {
+                  "id": "actual-audit-file",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "6a20eb6b7976b9f7235b40165d2b04c531fafdef27c7d44c4d73f90a8907718a",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                }
+              ],
+              "skills": [],
+              "tool_errors": [],
+              "issues": [
+                "Native run not present; no session or output fabricated",
+                "Retained workspace not supplied"
+              ]
+            },
+            {
+              "arm": "without",
+              "repetition": 2,
+              "execution_status": "missing",
+              "artifact_contract_passed": false,
+              "grades": [
+                {
+                  "id": "frozen-outcome",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "606d0f3696aa7ad81aedc96a5b52fa6edead3ce90239f52688d558cf7394f18b",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                },
+                {
+                  "id": "actual-audit-file",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "6a20eb6b7976b9f7235b40165d2b04c531fafdef27c7d44c4d73f90a8907718a",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                }
+              ],
+              "skills": [],
+              "tool_errors": [],
+              "issues": [
+                "Native run not present; no session or output fabricated",
+                "Retained workspace not supplied"
+              ]
+            },
+            {
+              "arm": "without",
+              "repetition": 3,
+              "execution_status": "missing",
+              "artifact_contract_passed": false,
+              "grades": [
+                {
+                  "id": "frozen-outcome",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "606d0f3696aa7ad81aedc96a5b52fa6edead3ce90239f52688d558cf7394f18b",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                },
+                {
+                  "id": "actual-audit-file",
+                  "passed": null,
+                  "rationale": "Artifact path and collected SHA-256 unavailable",
+                  "receipt": {
+                    "rule_sha256": "6a20eb6b7976b9f7235b40165d2b04c531fafdef27c7d44c4d73f90a8907718a",
+                    "scope": "LOCAL_COMPUTATIONAL_CHECK"
+                  }
+                }
+              ],
+              "skills": [],
+              "tool_errors": [],
+              "issues": [
+                "Native run not present; no session or output fabricated",
+                "Retained workspace not supplied"
+              ]
+            }
+          ],
+          "with": {
+            "planned": 3,
+            "completed": 0,
+            "artifact_contract_passed": 0,
+            "completed_and_contract_passed": 0,
+            "successful_skill_runs": 2
+          },
+          "without": {
+            "planned": 3,
+            "completed": 0,
+            "artifact_contract_passed": 0,
+            "completed_and_contract_passed": 0,
+            "successful_skill_runs": 0
+          },
+          "author_entry": {
+            "status": "LOCAL_ARTIFACT_DIAGNOSIS",
+            "findings": 19,
+            "timing": {
+              "machine_seconds_to_diagnosis": 0.681677699998545,
+              "human_time_to_first_diagnosis_seconds": null,
+              "scope": "CLI entry to computed diagnosis; excludes interpreter startup, installation, preparation, reading and repair"
+            },
+            "report": "C:\\Test\\unique-capability-author-diagnosis-linux-spp1-cd44-evidence-20260925\\DIAGNOSIS.md",
+            "json": "C:\\Test\\unique-capability-author-diagnosis-linux-spp1-cd44-evidence-20260925\\diagnosis.json"
+          }
+        }
+      ],
+      "known_first_round_estimate_usd": 3.4239430000000004,
+      "known_probe_plus_first_round_estimate_usd": 3.5872630000000005,
+      "without_candidate_access_independent_os_guarantee": false,
+      "without_candidate_access_review": "Pending inspection of actual tool calls and returned content; absence of observed access is not a proof of OS denial"
+    },
+    "actual_session_counts": {
+      "initial_socket_failures": 2,
+      "ontology_linux": 2,
+      "salmon_bridge_socket": 2,
+      "spp1_inner_dependencies": 2,
+      "total": 8,
+      "without": 0
+    },
+    "status": "STOPPED_INCOMPLETE_HOST_RUNTIME_AND_COLLECTION_FAILURES",
+    "balanced_18_session_study_completed": false,
+    "minimum_three_repeats_per_arm_met": false
+  },
+  "linux_runtime_followup": {
+    "first_round_additional_sessions": 2,
+    "native_estimate_usd": 1.161203,
+    "native_outcome": "WITH repetition 1 hit max turns; repetition 2 passed native file-existence checks; budget stopped all remaining ontology runs",
+    "runtime_defect": "Native Bash selected /usr/bin/python3, while dependency preflight used the venv interpreter; pandas unavailable to model.",
+    "collection_defect": "Native sealed directory unreadable; export retained traces and native summary but not sealed workspace. Linux /tmp was absent after WSL restarted.",
+    "artifact_content_status": "UNKNOWN: do not reconstruct original artifacts from tool-call text or count native file existence as content correctness",
+    "plugin_access": "Actual Read and Bash results show access to CellTypePilot skill, identity_contract.py and ontology_map.json; no Skill tool event required for this narrow direct-file observation",
+    "pvl_detector_blind_spot": "Namespaced Skill events cover only one invocation mechanism; absent Skill events do not establish absent plugin use",
+    "traces": {
+      "unique-capability-runs-20260925-linux\\ontology\\retained\\claude-eval-kxOmOr\\out\\trace.jsonl": "09a6d36413c3b25298ff18f5bb57f9aa00807be6d06dbb34b89bc23cf6b89691",
+      "unique-capability-runs-20260925-linux\\ontology\\retained\\claude-eval-xuVve7\\out\\trace.jsonl": "30cf181160d53fdaf75c2bd243109a0220de38eb0915c9acbf36d58c1eba0557"
+    }
+  },
+  "additional_runtime_incidents": [
+    {
+      "family": "salmon-aggregation",
+      "sessions": 2,
+      "estimate_usd": 0.523371,
+      "observed": "Repeated bridge socket initialization failures; operator interrupted parent before more sessions",
+      "likely_explanation": "Long persistent directory prefix; later exact native-layout 98-byte socket creation and Bash execution passed",
+      "scope": "Runtime intervention; not a plugin source repair or causal attribution"
+    },
+    {
+      "family": "spp1-cd44-evidence",
+      "sessions": 2,
+      "estimate_usd": 0.727497,
+      "observed": "Real Skill calls and Bash execution; native Python could not import numpy despite outer namespace dependency preflight passing",
+      "scope": "Outer preflight is not an end-to-end native host dependency guarantee; no further paid retry",
+      "recovery_observed_in_trace": "Model found an ambient scientific venv and ran an audit probe successfully with PYTHONPATH; not a completed frozen result",
+      "isolation_limit": "Native Bash exposed ambient /usr/local resources. Outer namespace checks cannot establish per-arm isolation or a hermetic approved runtime.",
+      "next_gate": "Require a zero-provider-cost native-host tool smoke proving exact interpreter, dependencies, allowed paths, denied alternate sources, full socket layout and post-exit export before new paid study."
+    }
+  ]
+}

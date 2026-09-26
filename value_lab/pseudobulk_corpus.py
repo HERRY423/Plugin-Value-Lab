@@ -117,7 +117,7 @@ def scenario_pack(spec_path, root, output):
     # This public schema comes from the implementation, never from hidden values.
     public_contract = {"format": "pvl-pseudobulk-result-1", "required_fields": ["format", "pseudobulk", "method", "normalization", "design_matrix", "testing_family", "results", "conclusion_scope", "uncertainty"],
                        "implementation": "value_lab.pseudobulk.fit_reference defines serialization; source and local reference runner are permitted tools",
-                       "documentation": "docs/PSEUDOBULK.zh-CN.md", "scorer_values_included": False}
+                       "documentation": "docs/history/PSEUDOBULK.zh-CN.md", "scorer_values_included": False}
     write_json(inputs / "output-contract.json", public_contract)
     pack = {"format": "pvl-scenario-pack-1", "id": "donor-pseudobulk-development", "evidence_type": "local",
             "sources": [{"url": data["provenance"].get("source", design["reference_workflow"]),

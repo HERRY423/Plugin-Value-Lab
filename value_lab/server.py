@@ -6,7 +6,7 @@ def create_server(*, enable_extensions=False):
     try:
         from mcp.server.fastmcp import FastMCP
     except ImportError as exc:
-        raise ValidationError('MCP SDK missing from this Python. Install with the host Python: python -m pip install "mcp==1.28.1"; then restart the plugin connection. See docs/INSTALL.zh-CN.md.') from exc
+        raise ValidationError('MCP SDK missing from this Python. Install with the host Python: python -m pip install "mcp==1.28.1"; then restart the plugin connection. See docs/history/INSTALL.zh-CN.md.') from exc
     mcp = FastMCP("Plugin Value Lab", instructions=(
         "Compare paired runs, locate failures and plan a bounded repair/retest for plugin authors. Registration is optional. "
         "All tools are local and read-only. "

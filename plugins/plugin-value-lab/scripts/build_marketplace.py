@@ -90,7 +90,7 @@ def main():
         market_payload = {f"plugins/{NAME}/{name}": data for name, data in payload.items()}
         for name in (".agents/plugins/marketplace.json", ".claude-plugin/marketplace.json"):
             market_payload[name] = (ROOT / name).read_bytes()
-        market_payload["INSTALL.zh-CN.md"] = (ROOT / "docs/INSTALL.zh-CN.md").read_bytes()
+        market_payload["INSTALL.zh-CN.md"] = (ROOT / "docs/history/INSTALL.zh-CN.md").read_bytes()
         result["archives"] = [
             archive(ROOT / "dist" / f"{MARKET}-{version}.zip", MARKET, market_payload),
             archive(ROOT / "dist" / f"{NAME}-agent-plugins-{version}.zip", NAME, inventory(portable=True)),

@@ -27,9 +27,10 @@ jobs:
           python -c "import json,os; assert os.environ['RELEASE_TAG'].removeprefix('v') == json.load(open('plugin.json'))['version']"
       - run: python -m pip install ".[dev,mcp,science,registry]" wheel "setuptools>=68"
       - run: python scripts/check_release_tests.py
+      - run: python scripts/check_feature_freeze.py
       - run: python scripts/build_marketplace.py --check --package
       - run: python -m pip wheel . --no-deps --no-build-isolation --wheel-dir dist
       - name: Create reviewable draft; never publish automatically
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$RELEASE_TAG" dist/* --verify-tag --draft --title "Plugin Value Lab $RELEASE_TAG" --notes-file docs/RELEASE-NOTES.md
+        run: gh release create "$RELEASE_TAG" dist/* --verify-tag --draft --title "Plugin Value Lab $RELEASE_TAG" --notes-file docs/history/RELEASE-NOTES.md

@@ -8,10 +8,118 @@ from __future__ import annotations
 import copy
 import html
 import json
+import re
 from pathlib import Path
 from statistics import mean
 
 from .core import ValidationError, evaluate, suite_digest
+
+
+def diagnose(source, output, *, check=None, spec=None, audit=False, receipt=None,
+             artifact_root=None, verifier_root=None, corpus_root=None, started=None):
+    """Small author entry point. Timing is machine latency, never human adoption."""
+    import time
+    from .core import load_json, load_records, write_json
+    from .artifacts import grade_artifact, sha, validate_verifier
+    started = time.perf_counter() if started is None else started
+    source, output = Path(source).resolve(), Path(output).resolve()
+    if output.exists():
+        raise ValidationError("Preserve earlier diagnoses; choose a new --output directory")
+    if not source.exists():
+        raise ValidationError("Source missing: supply an artifact file or collected study directory")
+    if source == output or source.is_relative_to(output) or (source.is_dir() and output.is_relative_to(source)):
+        raise ValidationError("Diagnosis output must be separate from its source")
+    modes = int(audit) + int(check is not None) + int(spec is not None) + int(receipt is not None)
+    if modes > 1:
+        raise ValidationError("Choose one of --audit, --check, --spec or --receipt")
+    if audit:
+        from .methodology import audit_detector
+        result = audit_detector(source, verifier_root=verifier_root)
+        findings = [{k: r[k] for k in ('id', 'classification', 'reason', 'label_reason')}
+                    for r in result['cases'] if r['classification'] not in ('TP', 'TN')]
+        result['next_action'] = 'Review every FN, FP and UNKNOWN with its label basis; collect external adjudicated cases before claiming field accuracy.'
+    elif source.is_dir() and (source / 'receipt.json').is_file():
+        from .native_evidence import verify_native_evidence
+        if not receipt:
+            raise ValidationError("Native evidence requires --receipt with the separately retained digest")
+        result = verify_native_evidence(source, receipt)['diagnosis']
+        findings = [dict(case_id=r['case_id'], arm=r['arm'], repetition=r['repetition'], **g)
+                    for r in result['runs'] for g in r['grades'] if g['passed'] is not True]
+        from .native_hypotheses import skill_events
+        from .artifacts import confined
+        plugin = (load_json(source / 'plan.json').get('plugin_identity') or {}).get('name')
+        result['invocation_observations'] = []
+        for index, run in enumerate(result['runs']):
+            if run['status'] != 'completed':
+                findings.append({'case_id': run['case_id'], 'arm': run['arm'], 'kind': 'execution', 'reason': run['status']})
+            if run['arm'] != 'with':
+                continue
+            trace = confined(source, f'runs/{index}/events.jsonl')
+            calls = skill_events(trace.read_text(encoding='utf-8-sig'), f'runs/{index}/events.jsonl') if trace.is_file() else []
+            matching = [c for c in calls if plugin and isinstance(c['skill'], str)
+                        and c['skill'].startswith(plugin + ':') and c['result_status'] == 'TOOL_REPORTED_SUCCESS']
+            result['invocation_observations'].append({'case_id': run['case_id'], 'repetition': run['repetition'], 'calls': matching})
+            if not matching:
+                findings.append({'case_id': run['case_id'], 'arm': 'with', 'repetition': run['repetition'],
+                                 'kind': 'invocation_evidence_gap',
+                                 'reason': 'Successful namespaced plugin Skill call not observed. Passing artifact checks cannot establish plugin use; other invocation mechanisms are not assessed.'})
+        result['next_action'] = ('Inspect runtime errors, missing evidence and invocation traces first. '
+                                 'Establish whether the failure belongs to the host or plugin before changing plugin bytes. '
+                                 'Then repeat the complete frozen natural-use study with the relevant correction; '
+                                 'missing evidence and absent Skill events alone do not establish a plugin defect.')
+    elif source.is_dir():
+        if modes:
+            raise ValidationError("Artifact checks require a file; native --receipt requires a captured native directory")
+        required = ('suite.json', 'runs.jsonl', 'protocol.lock.json')
+        if any(not (source / p).is_file() for p in required):
+            raise ValidationError("Study needs suite.json, runs.jsonl and protocol.lock.json; alternatively supply an artifact with --check bh or --spec")
+        card = build_usage_card(load_json(source / required[0]), load_records(source / required[1]),
+                                load_json(source / required[2]), artifact_root=artifact_root,
+                                verifier_root=verifier_root, corpus_root=corpus_root)
+        result = {'status': card['status'], 'card': card, 'next_action': card['improvement_plan']['next_experiment']['action']}
+        findings = card['improvement_plan']['queue']
+    else:
+        if receipt:
+            raise ValidationError("--receipt requires a captured native directory")
+        if check == 'bh':
+            grader = {'id': 'bh', 'type': 'artifact', 'artifact': 'result', 'verifier': {
+                'kind': 'de_table', 'id_column': 'gene', 'p_column': 'p_value', 'q_column': 'q_value',
+                'effect_column': 'log2fc', 'min_rows': 1, 'bh_tolerance': 1e-8}}
+        elif spec:
+            grader = load_json(spec)
+        else:
+            raise ValidationError("No statistical method inferred: use --check bh only when BH is required, or supply --spec grader.json")
+        if not isinstance(grader, dict) or grader.get('type') != 'artifact':
+            raise ValidationError("Quick diagnosis accepts only built-in artifact checks; supplied code is never executed")
+        validate_verifier(grader)
+        digest = sha(source)
+        record = {'artifacts': {grader['artifact']: {'path': source.name, 'sha256': digest}}}
+        passed, reason, evidence = grade_artifact(grader, record, source.parent, verifier_root)
+        result = {'status': 'CONTRACT_PASSED' if passed is True else 'CONTRACT_FAILED' if passed is False else 'UNKNOWN',
+                  'input_sha256': digest, 'grader': grader, 'passed': passed, 'reason': reason, 'evidence': evidence,
+                  'rule_basis': 'OPERATOR_SELECTED_CONTRACT', 'plugin_defect_established': False,
+                  'blind_spots': ['No plugin invocation or root cause established',
+                                 'No scientific method choice, donor design or biological validity judged',
+                                 'Submitted rows do not establish the full testing family without a frozen reference',
+                                 'Finite effect sizes and input p-values are not independently recomputed'],
+                  'next_action': 'Confirm the task actually requires this contract; inspect the linked failure and repeat the same check after repair. A pass alone does not close a native repair loop.'}
+        findings = [] if passed is True else [{'passed': passed, 'reason': reason}]
+    report = {'format': 'pvl-author-diagnosis-1', 'result': result, 'findings': findings,
+              'timing': {'machine_seconds_to_diagnosis': time.perf_counter() - started,
+                         'human_time_to_first_diagnosis_seconds': None,
+                         'scope': 'CLI entry to computed diagnosis; excludes interpreter startup, installation, preparation, reading and repair'},
+              'new_model_calls': 0}
+    output.mkdir(parents=True)
+    write_json(output / 'diagnosis.json', report)
+    lines = ['# 作者诊断', '', _markdown(result.get('status')), '',
+             f'待查看项：{len(findings)}。检查通过不代表插件整体正确。', '']
+    for finding in findings:
+        lines += ['- ' + _markdown(finding)]
+    lines += ['', '下一步：' + _markdown(result['next_action']), '',
+              '完整判据、证据和盲区见 diagnosis.json。机器耗时与作者首次定位耗时分开记录；后者仍未知。', '']
+    (output / 'DIAGNOSIS.md').write_text('\n'.join(lines), encoding='utf-8')
+    return {'status': result.get('status'), 'findings': len(findings), 'timing': report['timing'],
+            'report': str(output / 'DIAGNOSIS.md'), 'json': str(output / 'diagnosis.json')}
 
 
 _EPSILON = 1e-12
@@ -262,7 +370,136 @@ def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_ro
             "原始任务文字保留在本地卡片中；向他人分享前应由用户检查其中的私有资料。",
         ],
     }
+    card["envelope"] = _usage_envelope(suite, records, report, card, artifact_root, verifier_root, corpus_root)
     return card
+
+
+def _usage_envelope(suite, records, report, card, artifact_root, verifier_root, corpus_root):
+    """A conservative presentation policy, not a new outcome or efficacy test."""
+    from .value_metrics import _rates
+    from .scenarios import decision_metrics as scientific_rates
+    families = suite.get("task_families", [])
+    if (not isinstance(families, list) or any(not isinstance(f, str) or not f.strip() for f in families)
+            or len(set(families)) != len(families)):
+        raise ValidationError("task_families must be a unique list of nonempty family names")
+    digest = suite["plugin"].get("sha256")
+    if digest is not None and (not isinstance(digest, str) or not re.fullmatch(r"[a-f0-9]{64}", digest)):
+        raise ValidationError("plugin.sha256 must be a lowercase SHA-256 digest")
+    conditions = suite["conditions"]
+    binding = {"plugin_sha256": digest, "plugin": copy.deepcopy(suite["plugin"]),
+               **{k: conditions.get(k) for k in ("host", "host_version", "model", "model_version")},
+               "conditions_sha256": suite_digest(conditions),
+               "suite_sha256": card["scope"]["suite_sha256"],
+               "records_sha256": card["scope"]["records_sha256"],
+               "cost_ledger_sha256": card["scope"]["cost_ledger_sha256"]}
+    missing = [k for k in ("plugin_sha256", "host_version", "model_version")
+               if not isinstance(binding[k], str) or not binding[k].strip()
+               or any(word in binding[k].lower() for word in ("unknown", "unverified", "alias", "未知", "未核验"))]
+    supported = {r["case_id"] for r in card["use_when"]}
+    baseline = {r["case_id"] for r in card["prefer_baseline_when"]}
+    corpus, truth = report.get("corpus_errors"), None
+    if corpus is not None:
+        from .corpus import load_material
+        try:
+            _, truth = load_material(corpus_root)
+        except (OSError, ValidationError):
+            corpus = None  # A changed/unavailable key never upgrades a blocked card.
+    groups = {f: [] for f in families}
+    for case in report["cases"]:
+        groups.setdefault(case["cluster"], []).append(case)
+    rows = []
+    for family, cases in groups.items():
+        ids = {c["id"] for c in cases}
+        rates = _rates(cases, suite["runs_per_case"], report["policy"]["quality_floor"])
+        raw_cases = [c for c in suite["cases"] if c["id"] in ids]
+        # Reuse the existing decision-error denominators, including missing runs.
+        scientific = scientific_rates({**suite, "cases": raw_cases}, records, verifier_root, artifact_root)
+        refusals = {}
+        for arm in ("with", "without"):
+            rr = [r for r in scientific["metrics"] if r["metric"] == "over_refusal" and r["arm"] == arm]
+            # Sealed corpus rules need their private truth to identify allowed tasks.
+            if corpus is not None and any(g["type"] == "sealed" for c in raw_cases for g in c["graders"]):
+                cr = [r for r in corpus["runs"] if r["case_id"] in ids and r["arm"] == arm
+                      and truth["answers"][r["case_id"]]["decision"] == "allow"]
+                rr += [{"planned": len(cr), "errors": sum(r["decision"] == "withhold" for r in cr),
+                        "unknown": sum(r["decision"] is None for r in cr)}]
+            counts = {k: sum(r[k] for r in rr) for k in ("planned", "errors", "unknown")}
+            counts["rate"] = counts["errors"] / counts["planned"] if counts["planned"] and not counts["unknown"] else None
+            refusals[arm] = counts
+        arms = {}
+        for arm in ("with", "without"):
+            runs = [r for c in cases for r in c["runs"] if r["arm"] == arm]
+            failed = sum(r["status"] in _FAILURES for r in runs)
+            unknown = sum(r["status"] not in _FAILURES | {"completed"} for r in runs)
+            costs = [r["cost_usd"] for r in runs]
+            complete_cost = (bool(costs) and None not in costs and report["cost_analysis"]["complete_category_coverage"])
+            success = rates["arms"][arm]
+            arms[arm] = {"observed": sum(r["status"] != "missing" for r in runs), "planned": len(runs),
+                "failed": failed, "unknown": unknown,
+                "failure_rate": failed / len(runs) if runs and not unknown else None,
+                "failure_lower": failed / len(runs) if runs else None,
+                "failure_upper": (failed + unknown) / len(runs) if runs else None,
+                "successes": success["successes"], "success_unknown": success["unknown"],
+                "cost_per_success_usd": sum(costs) / success["successes"]
+                    if complete_cost and not success["unknown"] and success["successes"] else None}
+        deltas = [c["delta"] for c in cases]
+        delta = mean(deltas) if deltas and None not in deltas else None
+        critical = sum(g["critical"] and g["passed"] is False for c in cases for r in c["runs"]
+                       if r["arm"] == "with" for g in r["grades"])
+        negatives = []
+        if rates["harmed"]:
+            negatives.append(f"{rates['harmed']} 个 harmed pairs")
+        if delta is not None and delta < -_EPSILON:
+            negatives.append("平均质量下降")
+        if critical:
+            negatives.append(f"{critical} 个关键判据失败")
+        if arms["with"]["failed"]:
+            negatives.append(f"启用组 {arms['with']['failed']} 次执行失败（未归因）")
+        if refusals["with"]["errors"]:
+            negatives.append(f"启用组 {refusals['with']['errors']} 次误拒答")
+        observed = sum(a["observed"] for a in arms.values())
+        if not observed:
+            color, decision = "gray", "未测：无运行观察"
+        elif negatives:
+            color, decision = "red", "暂不推广：先处理负向证据"
+        elif ids and ids <= baseline and not missing:
+            color, decision = "red", "基线优先：本目标下未见额外收益"
+        elif (ids and ids <= supported and not missing and not rates["unknown_pairs"]
+              and all(r["rate"] is not None for r in refusals.values())
+              and report["cost_analysis"]["complete_category_coverage"]
+              and arms["with"]["cost_per_success_usd"] is not None):
+            color, decision = "green", "可限域试用：仅限已测案例与绑定条件"
+        else:
+            color, decision = "yellow", "仅供调查／试用：证据不足或收益未明确"
+        rows.append({"family": family, "color": color, "decision": decision, "case_ids": sorted(ids),
+            "quality_delta": delta, "harmed_pairs": rates["harmed"],
+            "unknown_pairs": rates["unknown_pairs"], "planned_pairs": rates["planned_pairs"],
+            "resolved_pairs": rates["planned_pairs"] - rates["unknown_pairs"],
+            "over_refusal": refusals, "arms": arms, "negative_evidence": negatives})
+    rows.sort(key=lambda r: ({"red": 0, "yellow": 1, "gray": 2, "green": 3}[r["color"]], r["family"]))
+    return {"schema_version": 1, "policy": "CONSERVATIVE_DISPLAY_V1", "binding": binding,
+        "binding_status": "INCOMPLETE" if missing else "DECLARED_BOUND_NOT_AUTHENTICATED",
+        "missing_identity": missing, "rows": rows,
+        "negative_evidence": [f"{r['family']}：{n}" for r in rows for n in r["negative_evidence"]],
+        "blockers": report["blockers"], "evidence_type": report["evidence_type"],
+        "cost_basis": report["cost_analysis"]["saving_claim_basis"],
+        "invalidation": ["plugin_sha256 改变，即使版本号未变。", "host/model 名称或版本、工具、环境、配置或预算改变。",
+            "任务族之外的新任务、输入分布、参考答案、质量目标或评分规则改变。",
+            "新增失败、harmed pairs、误拒答、成本或人工复核证据；必须生成新修订，旧卡保留。"],
+        "limits": "颜色是保守展示规则，不是新统计检验。harmed pairs 为基线成功而启用失败的已观察配对，不证明因果伤害。"
+                  "重复不是独立任务族；未测误拒答与未知成本不填零；合成数据不能获绿灯。哈希不认证执行或来源。"}
+
+
+def check_usage_envelope(card, plugin_sha256, conditions):
+    """Compare supplied current identity locally; never claim live monitoring."""
+    binding = card["envelope"]["binding"]
+    changes = []
+    if plugin_sha256 != binding["plugin_sha256"]:
+        changes.append("plugin_sha256")
+    if suite_digest(conditions) != binding["conditions_sha256"]:
+        changes.append("conditions")
+    return {"status": "STALE" if changes else "UNKNOWN" if card["envelope"]["missing_identity"] else "MATCHED_DECLARATIONS",
+            "changed": changes, "live_verified": False}
 
 
 def _markdown(value):
@@ -277,6 +514,83 @@ def _markdown(value):
     return " ".join(text.splitlines())
 
 
+def _envelope_cells(row):
+    def number(value):
+        return "未知" if value is None else f"{value:.3f}"
+    def refusal(r):
+        if not r["planned"]:
+            return "未测"
+        return f"{r['errors']}/{r['planned']}" + (f"；{r['unknown']} 未知" if r["unknown"] else "")
+    def failures(a):
+        if not a["planned"]:
+            return "未测"
+        rate = f"{a['failure_rate']:.0%}" if a["failure_rate"] is not None else f"{a['failure_lower']:.0%}–{a['failure_upper']:.0%}"
+        return f"{a['failed']}/{a['planned']} ({rate})"
+    w, b = row["arms"]["with"], row["arms"]["without"]
+    def cost(a):
+        return "无成功，未定义" if a["planned"] and not a["successes"] and not a["success_unknown"] else number(a["cost_per_success_usd"])
+    return [row["family"], {"red": "红", "yellow": "黄", "green": "绿", "gray": "灰"}[row["color"]] + " · " + row["decision"],
+            number(row["quality_delta"]), f"{row['harmed_pairs']}/{row['planned_pairs']}；{row['unknown_pairs']} 未知",
+            refusal(row["over_refusal"]["with"]) + " / " + refusal(row["over_refusal"]["without"]),
+            cost(w) + " / " + cost(b),
+            failures(w) + " / " + failures(b),
+            f"{len(row['case_ids'])} 案例；{w['observed']} / {b['observed']} 次；{row['resolved_pairs']}/{row['planned_pairs']} 配对可判"]
+
+
+_ENVELOPE_HEADERS = ["任务族", "决策", "质量 Δ", "harmed pairs", "over-refusal W / B", "每成功 USD W / B", "执行失败率 W / B", "样本量"]
+
+
+def _envelope_markdown(card):
+    env = card["envelope"]
+    binding = env["binding"]
+    lines = ["## 单页使用包络", "", "**负向证据优先**：" + _markdown("；".join(env["negative_evidence"]) or "未观察到负向项；不等于已证实无风险。"), "",
+             f"证据：{_markdown(env['evidence_type'])}；研究阻断 {len(env['blockers'])} 项；身份缺口：{_markdown(env['missing_identity'])}。", "",
+             "绿：限域试用；黄：调查／证据不足；红：暂不推广或基线优先；灰：未测。", "",
+             "| " + " | ".join(_ENVELOPE_HEADERS) + " |", "| " + " | ".join(["---"] * len(_ENVELOPE_HEADERS)) + " |"]
+    for row in env["rows"]:
+        lines.append("| " + " | ".join(_markdown(c) for c in _envelope_cells(row)) + " |")
+    lines += ["", "W / B = 启用 / 基线；质量 Δ = 启用 − 基线；harmed 为已判定计数，未知配对不作零伤害。失败率范围保留缺失／跳过；每成功成本包含失败与分摊开销。", "",
+              f"绑定 plugin_sha256：{_markdown(binding['plugin_sha256'])}；宿主 {_markdown(binding['host'])} / {_markdown(binding['host_version'])}；模型 {_markdown(binding['model'])} / {_markdown(binding['model_version'])}。", "",
+              "**失效条件**：" + " ".join(_markdown(s) for s in env["invalidation"]), "",
+              _markdown(env["limits"]), ""]
+    return lines
+
+
+def render_usage_envelope(card):
+    """Offline, script-free, printable single-page view; untrusted text is escaped."""
+    env, plugin = card["envelope"], card["plugin"]
+    esc = lambda value: html.escape("未知" if value is None else str(value), quote=True)
+    binding = env["binding"]
+    negative = "；".join(env["negative_evidence"]) or "尚未观察到负向项；不等于已证实无风险。"
+    if env["evidence_type"] == "synthetic":
+        negative = "合成演示：以下数值不是实际插件收益。 " + negative
+    rows = "".join('<tr class="' + row["color"] + '">' + "".join("<td>" + esc(c) + "</td>" for c in _envelope_cells(row)) + "</tr>" for row in env["rows"])
+    identity = " · ".join(f"{key}: {esc(binding[key])}" for key in ("plugin_sha256", "host", "host_version", "model", "model_version"))
+    provenance = " · ".join(f"{key}: {esc(binding[key])}" for key in ("suite_sha256", "records_sha256", "conditions_sha256", "cost_ledger_sha256"))
+    return f'''<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>{esc(plugin['name'])} · 使用包络卡</title>
+<style>
+:root{{font-family:system-ui,"Microsoft YaHei",sans-serif;color:#172432;background:#edf1f4}}
+body{{margin:0;padding:24px}}main{{max-width:1440px;margin:auto;background:white;padding:26px;border:1px solid #ccd5df;border-radius:14px}}
+h1{{font-size:26px;margin:0 0 8px}}p{{line-height:1.5;margin:9px 0}}.sub,footer{{color:#475569;font-size:12px}}.negative{{border-left:5px solid #ad2431;background:#fff0f0;padding:12px;font-size:14px}}
+.identity{{font:12px ui-monospace,monospace;overflow-wrap:anywhere}}table{{width:100%;border-collapse:collapse;font-size:12px;margin:16px 0}}th,td{{border-bottom:1px solid #ccd5df;padding:11px 8px;text-align:left;vertical-align:top;overflow-wrap:anywhere}}th{{background:#172432;color:white}}
+tr.red{{background:#fff1f2}}tr.yellow{{background:#fffae4}}tr.green{{background:#edf8f0}}tr.gray{{background:#f1f3f5;color:#56616e}}tr.red td:first-child{{border-left:5px solid #b32131}}tr.yellow td:first-child{{border-left:5px solid #956000}}tr.green td:first-child{{border-left:5px solid #16743d}}tr.gray td:first-child{{border-left:5px solid #79818c}}.scroll{{overflow:auto}}
+@media print{{@page{{size:A4 landscape;margin:10mm}}body{{padding:0;background:white}}main{{padding:0;border:0}}th,td{{padding:7px 5px}}*{{print-color-adjust:exact}}tr{{break-inside:avoid}}}}
+</style><main>
+<h1>何时值得用 · 使用包络卡</h1><p>{esc(plugin['name'])} · {esc(plugin['version'])} · {esc(card['study_id'])}</p>
+<div class="negative"><strong>先看负向证据</strong><br>{esc(negative)}</div>
+<p class="sub">证据类型：{esc(env['evidence_type'])} · 研究阻断：{len(env['blockers'])} · 身份缺口：{esc(', '.join(env['missing_identity']) or '无；仅核对声明，未认证来源')} · 所有未列任务均未测。</p>
+<p class="identity">{identity}</p>
+<p class="sub">🟢 限域试用　🟡 调查／证据不足　🔴 暂不推广／基线优先　⚪ 未测；文字与颜色同时编码。</p>
+<div class="scroll"><table><thead><tr>{''.join('<th scope="col">' + esc(h) + '</th>' for h in _ENVELOPE_HEADERS)}</tr></thead><tbody>{rows}</tbody></table></div>
+<p class="sub">W / B = 启用 / 基线；质量 Δ = 启用 − 基线（0–1）。harmed pairs = 基线成功、启用失败，未知配对单列。样本量为案例、观察运行与可判配对；重复不是独立任务族。执行失败率按计划次数，缺失／跳过给范围。每成功成本包含失败与分摊开销；未知不填零。成本依据：{esc(env['cost_basis'])}，不据此宣称已结算。</p>
+<p><strong>失效条件</strong>　{esc(' '.join(env['invalidation']))}</p>
+<footer>{esc(env['limits'])}<p>本卡离线静态生成；不监控环境，不执行安装、卸载或扩权。完整阻断与逐项来源见同目录 USAGE.md / card.json。</p><p class="identity">{provenance}</p></footer>
+</main></html>'''
+
+
 def _render_markdown(card):
     plugin, scope, source = card["plugin"], card["scope"], card["source"]
     lines = ["# 插件使用卡", "", f"**{_markdown(plugin['name'])} · {_markdown(plugin['version'])}**", "",
@@ -284,6 +598,7 @@ def _render_markdown(card):
              f"状态：{_markdown(_STATUSES[card['status']])}", "",
              f"重新计算的结论：{_markdown(card['verdict'])}", "",
              "仅对记录中的具体任务提供条件性参考。评分不会产生安装、权限或卸载操作。", "",
+             *(_envelope_markdown(card) if "envelope" in card else []),
              "## 适用范围", "",
              f"- 决策范围：{_markdown(scope['decision_scope'])}",
              f"- 目标：{_markdown(scope['objective'])}",
@@ -340,12 +655,17 @@ def write_usage_card(card, output_dir):
     # Render everything before touching the filesystem, including strict JSON.
     json_text = json.dumps(card, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
     markdown_text = _render_markdown(card)
+    html_text = render_usage_envelope(card) if "envelope" in card else None
     output = Path(output_dir)
     if output.exists() and (not output.is_dir() or any(output.iterdir())):
         raise ValidationError("Usage card output directory must be new or empty")
     output.mkdir(parents=True, exist_ok=True)
     paths = {"json": output / "card.json", "md": output / "USAGE.md"}
-    for key, content in (("json", json_text), ("md", markdown_text)):
+    contents = [("json", json_text), ("md", markdown_text)]
+    if html_text is not None:
+        paths["html"] = output / "ENVELOPE.html"
+        contents.append(("html", html_text))
+    for key, content in contents:
         try:
             with paths[key].open("x", encoding="utf-8") as stream:
                 stream.write(content)

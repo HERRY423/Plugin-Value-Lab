@@ -648,5 +648,225 @@
     "new_paid_catalog_calls_during_release": 0,
     "hosted_ci": "Check exact release commit on GitHub Actions; not asserted by this local receipt.",
     "windows_path_fix": "Canonicalize Windows 8.3 paths before retained-root comparison, preserve no-link and traversal checks; includes regression coverage."
+  },
+  "structural_author_addendum_20260925": {
+    "tests": {
+      "run": 528,
+      "seconds": 117.184,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "log_sha256": "e27d8487ab93a2c700d54416f9cc35a261cee45c39992c01dff032567a066cc2"
+    },
+    "details": "docs/evidence/structural-author-20260925.json",
+    "evidence_sha256": "3a6a34ea6b21672124931e71fe27a372ec9663101182eec0a26b2044036f529c",
+    "version_changed": false,
+    "closed_natural_use_repair_chains_established": 0,
+    "external_author_timing_samples": 0,
+    "representative_detector_accuracy": null,
+    "new_model_calls": 0,
+    "historical_unknown_settlement_unchanged": true,
+    "engineering_only": true
+  },
+  "real_loop_addendum_20260925": {
+    "details": "docs/evidence/real-loop-20260925.json",
+    "evidence_sha256": "8a1e2b18eaafcec0b623a2f05ceb478a52facec370908806a8a7c8abcdbbfbb0",
+    "tests": {
+      "tests_run": 529,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "followup_author_and_native_tests": {
+        "tests_run": 33,
+        "failures": 0,
+        "errors": 0,
+        "scope": "Runtime-first diagnosis wording plus native trace/parser regressions"
+      },
+      "log_sha256": "bdbf4c5e8bd2537ed7d49b4f5b2ee726543d9b74102237d7d3abe5c720b0e60b"
+    },
+    "closed_natural_use_plugin_repair_chains": 0,
+    "version_changed": false
+  },
+  "seeded_detection_validity_20260925": {
+    "report": "DETECTION-VALIDITY.md",
+    "report_sha256": "461aafdf99673ef4fa2643932e5aaa1063b0e3bc936528e9f6411260060375b0",
+    "details": "docs/evidence/detection-validity-20260925.json",
+    "details_sha256": "28b7596f5dc2c96c9182f51637e01f334960137b1d03d80ba659efeb993387de",
+    "families": 8,
+    "source_mutations": 24,
+    "local_fixture_processes": 96,
+    "verified_captures": 48,
+    "model_calls": 0,
+    "provider_cost_usd": 0,
+    "prior_unknown_settlement_unchanged": true,
+    "artifact_only_seed_alerts": 2,
+    "full_diagnostic_seed_alerts": 22,
+    "paired_specific_detections": 19,
+    "restored_semantically_valid": 24,
+    "restored_still_flagged": 3,
+    "full_diagnostic_distinct_negative_artifact_check_pairs": 18,
+    "full_diagnostic_false_positive_pairs": 3,
+    "validation": {
+      "meta_metric_tests": 4,
+      "author_entry_tests": 7,
+      "distribution_tests": 11,
+      "failures": 0,
+      "errors": 0
+    },
+    "archive": {
+      "archive": "C:\\Test\\pvl-detection-validity-20260925.zip",
+      "sha256": "df83f68d16af173ed4581b7963e54571fb9aba4492fcfffd73cff4c603c745ac",
+      "member_files": 4158,
+      "bytes": 3833457
+    },
+    "replay": {
+      "status": "REPRODUCED_FROM_RELOCATED_FROZEN_SOURCE",
+      "captures_verified": 48,
+      "metrics_identical": true,
+      "model_calls": 0,
+      "collected_code_executed": false,
+      "output": "C:\\Test\\pvl-detection-validity-replay-20260925"
+    },
+    "scope": "Public constructed development mutations on a small seed plugin; synthetic host transport; not native model sessions, independent labels or representative field accuracy",
+    "version_changed": false,
+    "detector_code_changed": false,
+    "new_cli_subcommands": 0
+  },
+  "usage_envelope_20260925": {
+    "status": "LOCAL_IMPLEMENTATION_VERIFIED",
+    "version_changed": false,
+    "new_runtime_modules": 0,
+    "new_cli_subcommands": 0,
+    "output_files": [
+      "card.json",
+      "USAGE.md",
+      "ENVELOPE.html"
+    ],
+    "metrics": [
+      "quality_delta",
+      "harmed_pairs",
+      "over_refusal",
+      "cost_per_success_usd",
+      "failure_rate",
+      "sample_size"
+    ],
+    "identity": [
+      "plugin_sha256",
+      "host",
+      "host_version",
+      "model",
+      "model_version",
+      "conditions_sha256",
+      "suite_sha256",
+      "records_sha256",
+      "cost_ledger_sha256"
+    ],
+    "test_suites": {
+      "test_usage": 27,
+      "test_usage_envelope": 12,
+      "test_analysis": 28,
+      "test_corpus_registry": 36,
+      "test_cli": 6,
+      "test_execution": 18,
+      "test_team_record": 7,
+      "test_distribution": 11,
+      "test_mcp": 2,
+      "test_value_metrics": 14
+    },
+    "tests_passed": 161,
+    "failures": 0,
+    "errors": 0,
+    "example": {
+      "evidence_type": "synthetic",
+      "family_rows": 5,
+      "red": 2,
+      "yellow": 1,
+      "gray": 2,
+      "green": 0,
+      "replay_byte_identical": [
+        "card.json",
+        "USAGE.md",
+        "ENVELOPE.html"
+      ],
+      "html_headers": 8,
+      "external_resources": 0
+    },
+    "browser_visual_validation": "NOT_COMPLETED: Browser Use local-file URL policy blocked preview; no workaround attempted",
+    "model_calls": 0,
+    "new_provider_cost_usd": 0,
+    "remote_published": false,
+    "source_sha256": {
+      "value_lab/usage.py": "75935f7ce417df9978ff19a75e1e235579c907434198acf11ad597fc7daea703",
+      "tests/test_usage_envelope.py": "82f6e09a219420520d29414725366af8721701e9f019c3adf2e4a6e2f5a97055",
+      "examples/usage-envelope/card/ENVELOPE.html": "f3aadd9899c5d80d6def405726e89e7cfadeddced00ff05230c9c3ba870351fc",
+      "examples/usage-envelope/card/card.json": "b26bdabd7593039f8fc92746173b44af16376a83ae76bca985c6d8a75d3f6ab2"
+    },
+    "limitations": [
+      "Display policy does not change frozen study verdicts.",
+      "No new real plugin benefit observations or natural-use repair chain.",
+      "Bindings are supplied declarations; hashes do not authenticate execution.",
+      "Large catalogs may span printed pages; rows are not dropped."
+    ]
+  },
+  "six_week_surface_freeze_20260925": {
+    "status": "LOCAL_IMPLEMENTATION_VERIFIED_HUMAN_PILOT_PENDING",
+    "version_changed": false,
+    "golden_commands": [
+      "doctor",
+      "freeze",
+      "evaluate",
+      "usage-card",
+      "compare-studies"
+    ],
+    "mainline_documents": 8,
+    "archived_documents": 37,
+    "runtime_modules": 46,
+    "new_runtime_modules": 0,
+    "new_cli_subcommands": 0,
+    "freeze_started": "2026-09-25",
+    "review_date": "2026-11-06",
+    "duration_days": 42,
+    "automatic_unfreeze": false,
+    "checks": [
+      "surface inventory",
+      "README command order",
+      "eight-document cap including nested non-history guides",
+      "mainline local links",
+      "CI and draft-release guard"
+    ],
+    "full_test_suite": {
+      "passed": 549,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 116.179
+    },
+    "followup_nested_doc_guard_tests": {
+      "passed": 4,
+      "failures": 0,
+      "errors": 0
+    },
+    "relocated_five_command_smoke": true,
+    "non_author_completed": 0,
+    "human_time_to_first_usage_seconds": null,
+    "handoff": "User will forward a frozen ZIP to a non-author colleague; no contact was made",
+    "timing_protocol": "docs/START.md",
+    "human_record": "docs/evidence/first-use-pilot-20260925.json",
+    "new_model_calls": 0,
+    "new_provider_cost_usd": 0,
+    "published": false,
+    "limitations": [
+      "Maintainer subprocess smoke is not human onboarding evidence.",
+      "Mechanical surface guard cannot detect all semantic feature additions.",
+      "Archival preserves records; it does not reduce the existing 46-module maintenance burden."
+    ],
+    "source_sha256": {
+      "README.md": "23f3d734ad359e422887bc2b6feaebf7c0bab5a5ba703c7e10fa3c0d2733b3e6",
+      "README.zh-CN.md": "2f40459daf6bacc4380795f58d85046cde0546a464e507bc3490a913a2b435a5",
+      "docs/START.md": "ae04d63c4cf633acdd0abadbf7f98e7e1b7fca72ac0e4231cc9a9b700e30824b",
+      "docs/FREEZE.md": "655395701610b283dd98729464ca109995dca4f423a9337afceb644bfe206894",
+      "docs/feature-freeze.json": "d017558178ddafc47fdd1c087d21dfe9c946fdb8a6e418b7563b5a32ec374c06",
+      "scripts/check_feature_freeze.py": "fa6ba83ba0995b649e995c862b48be9b473677d5c02ffae0fd964e78ffa0b9d9"
+    }
   }
 }

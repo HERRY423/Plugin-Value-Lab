@@ -1,0 +1,29 @@
+{
+  "format": "pvl-non-author-first-use-1",
+  "status": "AWAITING_USER_HANDOFF",
+  "as_of": "2026-09-25",
+  "handoff_owner": "user",
+  "participant": null,
+  "non_author_confirmed": null,
+  "previous_exposure": null,
+  "completed_participants": 0,
+  "attempted_participants": 0,
+  "started_at": null,
+  "usage_created_at": null,
+  "understood_at": null,
+  "wall_seconds_to_first_usage": null,
+  "wall_seconds_to_understanding": null,
+  "installation_seconds": null,
+  "help_requests": null,
+  "failed_attempts": null,
+  "abandoned": null,
+  "feedback": null,
+  "protocol": "docs/START.md",
+  "protocol_sha256": "ae04d63c4cf633acdd0abadbf7f98e7e1b7fca72ac0e4231cc9a9b700e30824b",
+  "maintainer_smoke": {
+    "golden_commands_passed": 5,
+    "relocated_directory_with_spaces": true,
+    "counts_as_participant": false
+  },
+  "scope": "The user will forward the packet. No colleague contacted and no human timing fabricated."
+}

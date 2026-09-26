@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>example-plugin · 使用包络卡</title>
+<style>
+:root{font-family:system-ui,"Microsoft YaHei",sans-serif;color:#172432;background:#edf1f4}
+body{margin:0;padding:24px}main{max-width:1440px;margin:auto;background:white;padding:26px;border:1px solid #ccd5df;border-radius:14px}
+h1{font-size:26px;margin:0 0 8px}p{line-height:1.5;margin:9px 0}.sub,footer{color:#475569;font-size:12px}.negative{border-left:5px solid #ad2431;background:#fff0f0;padding:12px;font-size:14px}
+.identity{font:12px ui-monospace,monospace;overflow-wrap:anywhere}table{width:100%;border-collapse:collapse;font-size:12px;margin:16px 0}th,td{border-bottom:1px solid #ccd5df;padding:11px 8px;text-align:left;vertical-align:top;overflow-wrap:anywhere}th{background:#172432;color:white}
+tr.red{background:#fff1f2}tr.yellow{background:#fffae4}tr.green{background:#edf8f0}tr.gray{background:#f1f3f5;color:#56616e}tr.red td:first-child{border-left:5px solid #b32131}tr.yellow td:first-child{border-left:5px solid #956000}tr.green td:first-child{border-left:5px solid #16743d}tr.gray td:first-child{border-left:5px solid #79818c}.scroll{overflow:auto}
+@media print{@page{size:A4 landscape;margin:10mm}body{padding:0;background:white}main{padding:0;border:0}th,td{padding:7px 5px}*{print-color-adjust:exact}tr{break-inside:avoid}}
+</style><main>
+<h1>何时值得用 · 使用包络卡</h1><p>example-plugin · 0.0.0-demo · synthetic-usage-envelope</p>
+<div class="negative"><strong>先看负向证据</strong><br>合成演示：以下数值不是实际插件收益。 delivery：启用组 1 次执行失败（未归因）；negative-control：1 个 harmed pairs；negative-control：平均质量下降；negative-control：1 个关键判据失败</div>
+<p class="sub">证据类型：synthetic · 研究阻断：0 · 身份缺口：plugin_sha256, host_version, model_version · 所有未列任务均未测。</p>
+<p class="identity">plugin_sha256: 未知 · host: offline-tutorial · host_version: 未知 · model: SIMULATED-NO-MODEL · model_version: 未知</p>
+<p class="sub">🟢 限域试用　🟡 调查／证据不足　🔴 暂不推广／基线优先　⚪ 未测；文字与颜色同时编码。</p>
+<div class="scroll"><table><thead><tr><th scope="col">任务族</th><th scope="col">决策</th><th scope="col">质量 Δ</th><th scope="col">harmed pairs</th><th scope="col">over-refusal W / B</th><th scope="col">每成功 USD W / B</th><th scope="col">执行失败率 W / B</th><th scope="col">样本量</th></tr></thead><tbody><tr class="red"><td>delivery</td><td>红 · 暂不推广：先处理负向证据</td><td>0.500</td><td>0/3；0 未知</td><td>未测 / 未测</td><td>1.530 / 无成功，未定义</td><td>1/3 (33%) / 0/3 (0%)</td><td>1 案例；3 / 3 次；3/3 配对可判</td></tr><tr class="red"><td>negative-control</td><td>红 · 暂不推广：先处理负向证据</td><td>-0.167</td><td>1/3；0 未知</td><td>未测 / 未测</td><td>1.530 / 2.010</td><td>0/3 (0%) / 0/3 (0%)</td><td>1 案例；3 / 3 次；3/3 配对可判</td></tr><tr class="yellow"><td>evidence-boundary</td><td>黄 · 仅供调查／试用：证据不足或收益未明确</td><td>0.667</td><td>0/3；0 未知</td><td>未测 / 未测</td><td>1.020 / 6.030</td><td>0/3 (0%) / 0/3 (0%)</td><td>1 案例；3 / 3 次；3/3 配对可判</td></tr><tr class="gray"><td>ligand-receptor-analysis</td><td>灰 · 未测：无运行观察</td><td>未知</td><td>0/0；0 未知</td><td>未测 / 未测</td><td>未知 / 未知</td><td>未测 / 未测</td><td>0 案例；0 / 0 次；0/0 配对可判</td></tr><tr class="gray"><td>ontology-mapping</td><td>灰 · 未测：无运行观察</td><td>未知</td><td>0/0；0 未知</td><td>未测 / 未测</td><td>未知 / 未知</td><td>未测 / 未测</td><td>0 案例；0 / 0 次；0/0 配对可判</td></tr></tbody></table></div>
+<p class="sub">W / B = 启用 / 基线；质量 Δ = 启用 − 基线（0–1）。harmed pairs = 基线成功、启用失败，未知配对单列。样本量为案例、观察运行与可判配对；重复不是独立任务族。执行失败率按计划次数，缺失／跳过给范围。每成功成本包含失败与分摊开销；未知不填零。成本依据：CONDITIONAL_ON_SUBMITTED_ESTIMATES_OR_DECLARATIONS，不据此宣称已结算。</p>
+<p><strong>失效条件</strong>　plugin_sha256 改变，即使版本号未变。 host/model 名称或版本、工具、环境、配置或预算改变。 任务族之外的新任务、输入分布、参考答案、质量目标或评分规则改变。 新增失败、harmed pairs、误拒答、成本或人工复核证据；必须生成新修订，旧卡保留。</p>
+<footer>颜色是保守展示规则，不是新统计检验。harmed pairs 为基线成功而启用失败的已观察配对，不证明因果伤害。重复不是独立任务族；未测误拒答与未知成本不填零；合成数据不能获绿灯。哈希不认证执行或来源。<p>本卡离线静态生成；不监控环境，不执行安装、卸载或扩权。完整阻断与逐项来源见同目录 USAGE.md / card.json。</p><p class="identity">suite_sha256: 9809025862b8af3b8c352c82a09aaf59e2f6d78029290847ee1552a38a975f13 · records_sha256: bd6344a9462fdb1531675ec4d464266433ea64ad5ad5faf778feea980b27b243 · conditions_sha256: eb9bd8566defb2dc67fee1852aa7d39c2d8a1034d43f3b6ee95b0c483265c5ec · cost_ledger_sha256: 42c97b9fff93da8d15015cf51e7cb6504819185e9eae0bb50d98b64ab3779fa2</p></footer>
+</main></html>

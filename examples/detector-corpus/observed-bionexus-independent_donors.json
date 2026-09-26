@@ -1,0 +1,10 @@
+{
+  "sample_count": 4,
+  "min_replicates_per_condition": 2,
+  "biological_replicates_count": 4,
+  "conditions_count": 2,
+  "conditions": [
+    "control",
+    "treated"
+  ]
+}

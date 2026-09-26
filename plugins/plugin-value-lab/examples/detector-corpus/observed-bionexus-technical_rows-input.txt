@@ -1,0 +1,5 @@
+sample,condition,donor
+a,control,d1
+b,control,d1
+c,treated,d2
+d,treated,d2

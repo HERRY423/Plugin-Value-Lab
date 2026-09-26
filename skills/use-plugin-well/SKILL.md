@@ -5,6 +5,8 @@ description: Help choose the simplest available capability for a task and explai
 
 # Use a plugin well
 
+For first-run onboarding, follow the five-command [README](../../README.md) and [START](../../docs/START.md). The [0.6.x freeze](../../docs/FREEZE.md) permits fixes and usability simplification, not new features. Never treat a maintainer or AI smoke run as non-author timing.
+
 Help the user complete their task with the smallest useful amount of setup. A routine task does not need a value study. Keep advice proportional to the decision: a one-time summary may need a direct answer; adopting a plugin across a team may justify a matched trial.
 
 Build any structured context yourself from the user's natural request and actual host observations. Do not ask users to fill JSON or memorize state codes. Keep missing information unknown, continue independent work, and ask only when a task-critical clarification is needed.
@@ -29,7 +31,7 @@ An existing usage card can guide task choice only within its recorded plugin ver
 
 ## Optional local artifacts
 
-If available, `plan_plugin_use` accepts the context object in [WORKFLOW-CONTRACT.md](../../docs/WORKFLOW-CONTRACT.md). `build_plugin_usage_card` accepts the suite, raw records, and optional lock; it recomputes the assessment and returns bounded guidance. Call only tools actually exposed by the current host.
+If available, `plan_plugin_use` accepts the context object in [WORKFLOW-CONTRACT.md](../../docs/history/WORKFLOW-CONTRACT.md). `build_plugin_usage_card` accepts the suite, raw records, and optional lock; it recomputes the assessment and returns bounded guidance. Call only tools actually exposed by the current host.
 
 For files, resolve the plugin root from the actual location of this skill, verify `scripts/value_lab.py` and `CONTRACT.md`, and use Python 3.11+:
 
@@ -38,14 +40,14 @@ python scripts/value_lab.py plan-use <context.json> --output <new-plan-directory
 python scripts/value_lab.py usage-card <suite.json> <runs.jsonl> --lock <lock.json> --output <new-card-directory>
 ```
 
-Use absolute paths when outside the plugin root. `plan-use` writes `plan.json` and `PLAN.md`; `usage-card` writes `card.json` and `USAGE.md`. Both operate locally and do not execute the proposed actions. Availability observations are supplied records, not live verification; stale, missing, or untrusted readiness remains uncertain. The handoff contains only public capability keywords, an exact selected reference, and any explicitly requested management action/mode; it omits the private task summary.
+Use absolute paths when outside the plugin root. `plan-use` writes `plan.json` and `PLAN.md`; `usage-card` writes `card.json`, `USAGE.md` and the single-page `ENVELOPE.html`. Show the envelope first: negative evidence precedes one row per task family, untested families are gray, and missing identity or unmeasured refusal prevents green guidance. Bind evaluated plugin bytes with frozen `plugin.sha256` and explicit host/model versions; do not rewrite old studies to fill missing identity. See the envelope contract in WORKFLOW-CONTRACT.md for invalidation and exact metric denominators. Both commands operate locally and do not execute the proposed actions. Availability observations are supplied records, not live verification; stale, missing, or untrusted readiness remains uncertain. The handoff contains only public capability keywords, an exact selected reference, and any explicitly requested management action/mode; it omits the private task summary.
 
-For a team adoption decision that must persist across evaluations, use `team-card` with the current suite, raw records, an explicit `decision.json`, optional research context, and a new output directory. Pass the preceding `record.json` as `--previous` for each later revision. The team record retains prior cards and decisions, while changed conditions, tasks, evidence or research context trigger reassessment of old guidance. The declared team choice is not inferred from a score and does not authorize management actions. See [TEAM-RECORD.zh-CN.md](../../docs/TEAM-RECORD.zh-CN.md).
+For a team adoption decision that must persist across evaluations, use `team-card` with the current suite, raw records, an explicit `decision.json`, optional research context, and a new output directory. Pass the preceding `record.json` as `--previous` for each later revision. The team record retains prior cards and decisions, while changed conditions, tasks, evidence or research context trigger reassessment of old guidance. The declared team choice is not inferred from a score and does not authorize management actions. See [TEAM-RECORD.zh-CN.md](../../docs/history/TEAM-RECORD.zh-CN.md).
 
-For matched studies with a decision policy frozen before collection, `conditional-guidance` can produce scenario-specific trial guidance within an exact target context. Do not invent thresholds after observing results, treat synthetic examples as adoption evidence, or generalize beyond recorded tasks. For reusable handoffs and the required inputs, see [P2 reuse and guidance](../../docs/P2-REUSE-GUIDANCE.zh-CN.md). Receipt consistency does not establish independent execution or participant identity.
+For matched studies with a decision policy frozen before collection, `conditional-guidance` can produce scenario-specific trial guidance within an exact target context. Do not invent thresholds after observing results, treat synthetic examples as adoption evidence, or generalize beyond recorded tasks. For reusable handoffs and the required inputs, see [P2 reuse and guidance](../../docs/history/P2-REUSE-GUIDANCE.zh-CN.md). Receipt consistency does not establish independent execution or participant identity.
 
 ## Leave lifecycle controls with their owner
 
 Use Plugin Management for discovery, dependency inspection, and user-requested inspection or changes to a named ChatGPT plugin. Permission inspection itself must correspond to an explicit user request for that plugin. A permission change or removal needs an explicit exact target and requested action; evaluation scores and recommendations provide no such authorization. Broad references such as "Google", "all", or "my plugins" are insufficient for per-plugin changes. App action permission modes do not themselves establish OAuth data-access scopes. Local code plugins use their own host's management flow; ChatGPT app permission and removal tools are not their lifecycle interface.
 
-See the [complement guide](../../docs/PLUGIN-MANAGEMENT.zh-CN.md) for Chinese task examples, verified source boundaries, and the distinction between access value and quality gain.
+See the [complement guide](../../docs/history/PLUGIN-MANAGEMENT.zh-CN.md) for Chinese task examples, verified source boundaries, and the distinction between access value and quality gain.

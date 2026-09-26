@@ -1,0 +1,2881 @@
+{
+  "format": "pvl-feature-freeze-1",
+  "status": "FROZEN",
+  "started": "2026-09-25",
+  "planned_review": "2026-11-06",
+  "duration_days": 42,
+  "version_series": "0.6.x",
+  "automatic_unfreeze": false,
+  "golden_commands": [
+    "doctor",
+    "freeze",
+    "evaluate",
+    "usage-card",
+    "compare-studies"
+  ],
+  "mainline_document_limit": 8,
+  "surface": {
+    "global_options": [
+      {
+        "name": "advanced",
+        "flags": [
+          "--advanced"
+        ],
+        "required": false,
+        "choices": null
+      },
+      {
+        "name": "enable_extensions",
+        "flags": [
+          "--enable-extensions"
+        ],
+        "required": false,
+        "choices": null
+      },
+      {
+        "name": "help",
+        "flags": [
+          "--help",
+          "-h"
+        ],
+        "required": false,
+        "choices": null
+      },
+      {
+        "name": "version",
+        "flags": [
+          "--version"
+        ],
+        "required": false,
+        "choices": null
+      }
+    ],
+    "commands": {
+      "diagnose": [
+        {
+          "name": "artifacts",
+          "flags": [
+            "--artifacts"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "audit",
+          "flags": [
+            "--audit"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "check",
+          "flags": [
+            "--check"
+          ],
+          "required": false,
+          "choices": [
+            "bh"
+          ]
+        },
+        {
+          "name": "corpus",
+          "flags": [
+            "--corpus"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "interactive",
+          "flags": [
+            "--interactive"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "receipt",
+          "flags": [
+            "--receipt"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "source",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "spec",
+          "flags": [
+            "--spec"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "verifiers",
+          "flags": [
+            "--verifiers"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "init": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "demo": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "freeze": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "lock",
+          "flags": [
+            "--lock"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "suite",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "evaluate": [
+        {
+          "name": "artifacts",
+          "flags": [
+            "--artifacts"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "corpus",
+          "flags": [
+            "--corpus"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "cost_ledger",
+          "flags": [
+            "--cost-ledger"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "gate",
+          "flags": [
+            "--gate"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "lock",
+          "flags": [
+            "--lock"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "records",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "suite",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "verifiers",
+          "flags": [
+            "--verifiers"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "scenario-validate": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "inputs",
+          "flags": [
+            "--inputs"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "pack",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "scorers",
+          "flags": [
+            "--scorers"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "replicate-reference": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "spec",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "verifiers",
+          "flags": [
+            "--verifiers"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "pseudobulk-reference": [
+        {
+          "name": "data",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "design",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "pseudobulk-check": [
+        {
+          "name": "artifact",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "spec",
+          "flags": [
+            "--spec"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "verifiers",
+          "flags": [
+            "--verifiers"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "pseudobulk-corpus": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "spec",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "verifiers",
+          "flags": [
+            "--verifiers"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "pseudobulk-scenario": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "spec",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "verifiers",
+          "flags": [
+            "--verifiers"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "scenario-prepare": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "pack",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "template",
+          "flags": [
+            "--template"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "scenario-stage": [
+        {
+          "name": "case",
+          "flags": [
+            "--case"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "inputs",
+          "flags": [
+            "--inputs"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "pack",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "scorers",
+          "flags": [
+            "--scorers"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "corpus-seed": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "corpus-prepare": [
+        {
+          "name": "corpus",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "template",
+          "flags": [
+            "--template"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "registry-add": [
+        {
+          "name": "artifacts",
+          "flags": [
+            "--artifacts"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "corpus",
+          "flags": [
+            "--corpus"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "metadata",
+          "flags": [
+            "--metadata"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "parent",
+          "flags": [
+            "--parent"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "registry",
+          "flags": [
+            "--registry"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "revision_reason",
+          "flags": [
+            "--revision-reason"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "study",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "verifiers",
+          "flags": [
+            "--verifiers"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "registry-review": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "registry",
+          "flags": [
+            "--registry"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "review",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "registry-view": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "registry",
+          "flags": [
+            "--registry"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "registry-contrasts": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "registry",
+          "flags": [
+            "--registry"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "registry-public": [
+        {
+          "name": "heldout",
+          "flags": [
+            "--heldout"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "previous",
+          "flags": [
+            "--previous"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "publisher_key",
+          "flags": [
+            "--publisher-key"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "registry",
+          "flags": [
+            "--registry"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "trust",
+          "flags": [
+            "--trust"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "registry-public-verify": [
+        {
+          "name": "directory",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "expected_snapshot",
+          "flags": [
+            "--expected-snapshot"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "trust",
+          "flags": [
+            "--trust"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "registry-sign-review": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "key",
+          "flags": [
+            "--key"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "review",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "registry-export": [
+        {
+          "name": "entry_id",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "registry",
+          "flags": [
+            "--registry"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "with_reviews",
+          "flags": [
+            "--with-reviews"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "registry-verify": [
+        {
+          "name": "bundle",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "expected_id",
+          "flags": [
+            "--expected-id"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "registry-replay": [
+        {
+          "name": "bundle",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "corpus",
+          "flags": [
+            "--corpus"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "expected_id",
+          "flags": [
+            "--expected-id"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "require_same_environment",
+          "flags": [
+            "--require-same-environment"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "verifiers",
+          "flags": [
+            "--verifiers"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "registry-replay-plan": [
+        {
+          "name": "bundle",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "corpus",
+          "flags": [
+            "--corpus"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "expected_id",
+          "flags": [
+            "--expected-id"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "verifiers",
+          "flags": [
+            "--verifiers"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "check-rules": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "samples",
+          "flags": [
+            "--samples"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "suite",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "compare-studies": [
+        {
+          "name": "after",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "after_artifacts",
+          "flags": [
+            "--after-artifacts"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "axis",
+          "flags": [
+            "--axis"
+          ],
+          "required": false,
+          "choices": [
+            "host",
+            "model",
+            "plugin",
+            "replicate"
+          ]
+        },
+        {
+          "name": "before",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "before_artifacts",
+          "flags": [
+            "--before-artifacts"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "verifiers",
+          "flags": [
+            "--verifiers"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "reuse-prepare": [
+        {
+          "name": "artifacts",
+          "flags": [
+            "--artifacts"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "source",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "verifiers",
+          "flags": [
+            "--verifiers"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "reuse-replay": [
+        {
+          "name": "expected_id",
+          "flags": [
+            "--expected-id"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "participant",
+          "flags": [
+            "--participant"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "source",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "verifiers",
+          "flags": [
+            "--verifiers"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "reuse-scorers": [
+        {
+          "name": "expected_id",
+          "flags": [
+            "--expected-id"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "source",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "verifiers",
+          "flags": [
+            "--verifiers"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "reuse-inspect": [
+        {
+          "name": "expected_id",
+          "flags": [
+            "--expected-id"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "receipt",
+          "flags": [
+            "--receipt"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "source",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "conditional-guidance": [
+        {
+          "name": "after",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "after_artifacts",
+          "flags": [
+            "--after-artifacts"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "after_verifiers",
+          "flags": [
+            "--after-verifiers"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "axis",
+          "flags": [
+            "--axis"
+          ],
+          "required": true,
+          "choices": [
+            "host",
+            "model",
+            "plugin",
+            "replicate"
+          ]
+        },
+        {
+          "name": "before",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "before_artifacts",
+          "flags": [
+            "--before-artifacts"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "before_verifiers",
+          "flags": [
+            "--before-verifiers"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "target",
+          "flags": [
+            "--target"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "export-claude": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "plugin",
+          "flags": [
+            "--plugin"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "suite",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "import-claude": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "result",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "suite",
+          "flags": [
+            "--suite"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "native-report": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "result",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "native-hypotheses": [
+        {
+          "name": "expectations",
+          "flags": [
+            "--expectations"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "receipt_sha256",
+          "flags": [
+            "--receipt-sha256"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "study",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "prepare-trigger-diagnostic": [
+        {
+          "name": "expectations",
+          "flags": [
+            "--expectations"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "plan_sha256",
+          "flags": [
+            "--plan-sha256"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "references",
+          "flags": [
+            "--references"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "study",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "compare-trigger-diagnostic": [
+        {
+          "name": "expectations",
+          "flags": [
+            "--expectations"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "explicit",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "explicit_receipt",
+          "flags": [
+            "--explicit-receipt"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "natural",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "natural_receipt",
+          "flags": [
+            "--natural-receipt"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "prepare-native-session": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "invocation",
+          "flags": [
+            "--invocation"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "plan_sha256",
+          "flags": [
+            "--plan-sha256"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "plugin",
+          "flags": [
+            "--plugin"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "references",
+          "flags": [
+            "--references"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "study",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "timeout",
+          "flags": [
+            "--timeout"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "run-native-session": [
+        {
+          "name": "execute",
+          "flags": [
+            "--execute"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "session_sha256",
+          "flags": [
+            "--session-sha256"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "study",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "finish-native-session": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "session_sha256",
+          "flags": [
+            "--session-sha256"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "study",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "prepare-native-analysis": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "inputs",
+          "flags": [
+            "--inputs"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "plugin",
+          "flags": [
+            "--plugin"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "recipe",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "references",
+          "flags": [
+            "--references"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "compare-native-repair": [
+        {
+          "name": "after",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "after_receipt",
+          "flags": [
+            "--after-receipt"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "before",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "before_receipt",
+          "flags": [
+            "--before-receipt"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "repair_record",
+          "flags": [
+            "--repair-record"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "prepare-native-evidence": [
+        {
+          "name": "contract",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "plugin",
+          "flags": [
+            "--plugin"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "references",
+          "flags": [
+            "--references"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "capture-native-evidence": [
+        {
+          "name": "bindings",
+          "flags": [
+            "--bindings"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "plan_sha256",
+          "flags": [
+            "--plan-sha256"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "plugin",
+          "flags": [
+            "--plugin"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "references",
+          "flags": [
+            "--references"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "result",
+          "flags": [
+            "--result"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "retained_root",
+          "flags": [
+            "--retained-root"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "study",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "verify-native-evidence": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "receipt_sha256",
+          "flags": [
+            "--receipt-sha256"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "study",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "native-bindings": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "result",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "retained_root",
+          "flags": [
+            "--retained-root"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "prepare-claude-collection": [
+        {
+          "name": "claude",
+          "flags": [
+            "--claude"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "inputs",
+          "flags": [
+            "--inputs"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "plugin",
+          "flags": [
+            "--plugin"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "suite",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "run-claude-collection": [
+        {
+          "name": "auth_home",
+          "flags": [
+            "--auth-home"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "continue_unstarted",
+          "flags": [
+            "--continue-unstarted"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "plan_sha256",
+          "flags": [
+            "--plan-sha256"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "previous_collector",
+          "flags": [
+            "--previous-collector"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "study",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "verify-claude-collection": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "study",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "prepare-codex": [
+        {
+          "name": "codex",
+          "flags": [
+            "--codex"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "inputs",
+          "flags": [
+            "--inputs"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "plugin",
+          "flags": [
+            "--plugin"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "suite",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "prepare-host-matrix": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "hosts",
+          "flags": [
+            "--hosts"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "suite",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "run-codex": [
+        {
+          "name": "auth_home",
+          "flags": [
+            "--auth-home"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "plan_sha256",
+          "flags": [
+            "--plan-sha256"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "study",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "verify-codex-collection": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "study",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "verify-host-study": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "study",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "link-decision-evidence": [
+        {
+          "name": "artifact",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "evidence_type",
+          "flags": [
+            "--evidence-type"
+          ],
+          "required": true,
+          "choices": [
+            "external",
+            "local",
+            "synthetic"
+          ]
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "reference",
+          "flags": [
+            "--reference"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "study",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "review-pack": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "records",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "suite",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "apply-reviews": [
+        {
+          "name": "decisions",
+          "flags": [
+            "--decisions"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "mapping",
+          "flags": [
+            "--mapping"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "records",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "suite",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "plan-use": [
+        {
+          "name": "context",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "usage-card": [
+        {
+          "name": "artifacts",
+          "flags": [
+            "--artifacts"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "corpus",
+          "flags": [
+            "--corpus"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "cost_ledger",
+          "flags": [
+            "--cost-ledger"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "lock",
+          "flags": [
+            "--lock"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "records",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "suite",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "verifiers",
+          "flags": [
+            "--verifiers"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "research-plan": [
+        {
+          "name": "context",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "research-example": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "research-compare": [
+        {
+          "name": "after",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "before",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "research-followup": [
+        {
+          "name": "context",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "update",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "team-card": [
+        {
+          "name": "cost_ledger",
+          "flags": [
+            "--cost-ledger"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "decision",
+          "flags": [
+            "--decision"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "lock",
+          "flags": [
+            "--lock"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "previous",
+          "flags": [
+            "--previous"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "records",
+          "flags": [],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "research",
+          "flags": [
+            "--research"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "suite",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "doctor": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "serve": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "workbench": [
+        {
+          "name": "claude",
+          "flags": [
+            "--claude"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "data",
+          "flags": [
+            "--data"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "port",
+          "flags": [
+            "--port"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ]
+    },
+    "mcp_signatures": {
+      "build_plugin_usage_card": "arguments(args=[arg(arg='suite', annotation=Name(id='dict', ctx=Load())), arg(arg='records', annotation=Subscript(value=Name(id='list', ctx=Load()), slice=Name(id='dict', ctx=Load()), ctx=Load())), arg(arg='lock', annotation=BinOp(left=Name(id='dict', ctx=Load()), op=BitOr(), right=Constant(value=None))), arg(arg='cost_ledger', annotation=BinOp(left=Name(id='dict', ctx=Load()), op=BitOr(), right=Constant(value=None)))], defaults=[Constant(value=None), Constant(value=None)])",
+      "evaluate_plugin_value": "arguments(args=[arg(arg='suite', annotation=Name(id='dict', ctx=Load())), arg(arg='records', annotation=Subscript(value=Name(id='list', ctx=Load()), slice=Name(id='dict', ctx=Load()), ctx=Load())), arg(arg='lock', annotation=BinOp(left=Name(id='dict', ctx=Load()), op=BitOr(), right=Constant(value=None))), arg(arg='cost_ledger', annotation=BinOp(left=Name(id='dict', ctx=Load()), op=BitOr(), right=Constant(value=None)))], defaults=[Constant(value=None), Constant(value=None)])",
+      "example_value_suite": "arguments()",
+      "inspect_claude_eval": "arguments(args=[arg(arg='result', annotation=Name(id='dict', ctx=Load()))])",
+      "plan_plugin_use": "arguments(args=[arg(arg='context', annotation=Name(id='dict', ctx=Load()))])",
+      "research_direction_advisor": "arguments(args=[arg(arg='action', annotation=Name(id='str', ctx=Load())), arg(arg='context', annotation=BinOp(left=Name(id='dict', ctx=Load()), op=BitOr(), right=Constant(value=None))), arg(arg='before', annotation=BinOp(left=Name(id='dict', ctx=Load()), op=BitOr(), right=Constant(value=None))), arg(arg='after', annotation=BinOp(left=Name(id='dict', ctx=Load()), op=BitOr(), right=Constant(value=None)))], defaults=[Constant(value=None), Constant(value=None), Constant(value=None)])",
+      "validate_value_suite": "arguments(args=[arg(arg='suite', annotation=Name(id='dict', ctx=Load())), arg(arg='samples', annotation=BinOp(left=Name(id='dict', ctx=Load()), op=BitOr(), right=Constant(value=None)))], defaults=[Constant(value=None)])"
+    },
+    "skills": [
+      "extensions/research-directions/SKILL.md",
+      "skills/assess-value/SKILL.md",
+      "skills/use-plugin-well/SKILL.md"
+    ],
+    "runtime_modules": [
+      "value_lab/__init__.py",
+      "value_lab/artifacts.py",
+      "value_lab/claude_collection.py",
+      "value_lab/cli.py",
+      "value_lab/codex.py",
+      "value_lab/comparison.py",
+      "value_lab/core.py",
+      "value_lab/corpus.py",
+      "value_lab/costs.py",
+      "value_lab/exchange.py",
+      "value_lab/execution.py",
+      "value_lab/guidance.py",
+      "value_lab/hosts.py",
+      "value_lab/interpretation.py",
+      "value_lab/longitudinal.py",
+      "value_lab/methodology.py",
+      "value_lab/native.py",
+      "value_lab/native_analysis.py",
+      "value_lab/native_evidence.py",
+      "value_lab/native_execution.py",
+      "value_lab/native_hypotheses.py",
+      "value_lab/native_repair.py",
+      "value_lab/native_session.py",
+      "value_lab/native_trigger.py",
+      "value_lab/processes.py",
+      "value_lab/pseudobulk.py",
+      "value_lab/pseudobulk_corpus.py",
+      "value_lab/publication.py",
+      "value_lab/registry.py",
+      "value_lab/replay.py",
+      "value_lab/replicates.py",
+      "value_lab/report.py",
+      "value_lab/research.py",
+      "value_lab/reuse.py",
+      "value_lab/review.py",
+      "value_lab/review_policy.py",
+      "value_lab/scenarios.py",
+      "value_lab/science.py",
+      "value_lab/scoring.py",
+      "value_lab/server.py",
+      "value_lab/signatures.py",
+      "value_lab/team_record.py",
+      "value_lab/usage.py",
+      "value_lab/value_metrics.py",
+      "value_lab/workbench.py",
+      "value_lab/workflow.py"
+    ],
+    "schemas": [
+      "schemas/agent-plugins/1.0.0/SOURCES.json",
+      "schemas/agent-plugins/1.0.0/mcp.schema.json",
+      "schemas/agent-plugins/1.0.0/plugin.schema.json",
+      "schemas/registry/1/answers.schema.json",
+      "schemas/registry/1/corpus.schema.json",
+      "schemas/registry/1/manifest.schema.json",
+      "schemas/registry/1/metadata.schema.json",
+      "schemas/registry/1/review-packet-manifest.schema.json",
+      "schemas/registry/1/review.schema.json",
+      "schemas/science/scenario-pack.schema.json"
+    ],
+    "grader_allowlists": [
+      [
+        "core.py",
+        [
+          "abstention_correct",
+          "artifact",
+          "artifact_schema",
+          "backend_identity",
+          "exec",
+          "executable",
+          "numeric_tolerance",
+          "over_refusal",
+          "pseudobulk_chain",
+          "replicate_effect"
+        ]
+      ],
+      [
+        "core.py",
+        [
+          "contains",
+          "human",
+          "json_equals",
+          "not_contains",
+          "scenario",
+          "sealed"
+        ]
+      ],
+      [
+        "artifacts.py",
+        [
+          "abstention_correct",
+          "artifact",
+          "artifact_schema",
+          "backend_identity",
+          "exec",
+          "executable",
+          "numeric_tolerance",
+          "over_refusal",
+          "pseudobulk_chain",
+          "replicate_effect"
+        ]
+      ],
+      [
+        "science.py",
+        [
+          "abstention_correct",
+          "artifact_schema",
+          "backend_identity",
+          "exec",
+          "numeric_tolerance",
+          "over_refusal",
+          "pseudobulk_chain",
+          "replicate_effect"
+        ]
+      ]
+    ]
+  }
+}

@@ -8,7 +8,7 @@ import tempfile
 import unittest
 
 from value_lab.artifacts import sha
-from value_lab.core import ValidationError, load_json, write_json
+from value_lab.core import ValidationError, load_json, write_json, suite_digest
 from value_lab.native_analysis import prepare_native_analysis
 from value_lab.native_evidence import capture_native_evidence, verify_native_evidence
 from value_lab.native_execution import observe_execution
@@ -284,6 +284,70 @@ class NativeAnalysisTests(unittest.TestCase):
                                 capture_output=True, encoding='utf-8', timeout=30)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(json.loads(result.stdout)['report']['status'], 'LOCAL_RETEST_IMPROVEMENT')
+
+    def repair_record(self, before):
+        return {'before_receipt_sha256': before[1], 'before_diagnosis_sha256': suite_digest(before[2]),
+                'use_mode': 'natural', 'evidence_type': 'synthetic',
+                'repairs': [{'case_id': 'numeric', 'grader_id': 'correct',
+                             'skill': 'fixture-analysis:analyze', 'changed_files': ['SKILL.md'],
+                             'rationale': 'Fixture repair mapping, not a real author observation.'}]}
+
+    def test_artifact_improvement_without_invocation_never_closes_chain(self):
+        a, b = self.revisions()
+        plain = self.compare(a, b)
+        self.assertEqual(plain['status'], 'LOCAL_RETEST_IMPROVEMENT')
+        self.assertEqual(plain['repair_chain']['status'], 'OPEN')
+        result = compare_native_repair(a[0], a[1], b[0], b[1], self.root/'linked', repair_record=self.repair_record(a))['report']
+        self.assertTrue(any('invocation not observed' in s for s in result['repair_chain']['gaps']))
+        self.assertEqual(result['repair_chain']['use_recommendation'], 'INSUFFICIENT_EVIDENCE')
+
+    def test_trace_chain_requires_matching_successful_skill_and_rejects_synthetic_promotion(self):
+        def mutate(workspace, events, run, case, arm):
+            if arm == 'with':
+                events[1:1] = [
+                    {'type': 'assistant', 'message': {'content': [{'type': 'tool_use', 'name': 'Skill',
+                     'id': 'skill1', 'input': {'skill': 'fixture-analysis:analyze'}}]}},
+                    {'type': 'user', 'message': {'content': [{'type': 'tool_result', 'tool_use_id': 'skill1', 'is_error': False, 'content': 'fixture'}]}}]
+        a = self.captured('before', correct=False, mutate=mutate)
+        (self.plugin/'SKILL.md').write_text('changed', encoding='utf-8')
+        b = self.captured('after', mutate=mutate)
+        record = self.repair_record(a)
+        def run(label):
+            return compare_native_repair(a[0], a[1], b[0], b[1], self.root/label, repair_record=record)['report']['repair_chain']
+        self.assertEqual(run('synthetic')['status'], 'OPEN')
+        # This exercises declaration validation only: fixture traces remain manufactured.
+        record['evidence_type'] = 'local'
+        chain = run('declared-local')
+        self.assertEqual(chain['status'], 'TRACE_SUPPORTED_LOCAL_CHAIN')
+        self.assertFalse(chain['natural_use_independently_verified'])
+        self.assertFalse(chain['causal_plugin_benefit_established'])
+        record['use_mode'] = 'explicit_probe'
+        self.assertEqual(run('probe')['status'], 'OPEN')
+        record['use_mode'] = 'natural'
+        record['repairs'][0]['skill'] = 'unrelated:analyze'
+        self.assertEqual(run('wrong-skill')['status'], 'OPEN')
+        record['before_diagnosis_sha256'] = '0'*64
+        with self.assertRaises(ValidationError):
+            run('wrong-diagnosis')
+
+    def test_skill_called_after_script_or_in_baseline_does_not_close_chain(self):
+        for mode in ('late', 'baseline'):
+            def mutate(workspace, events, run, case, arm):
+                if arm == 'with' or mode == 'baseline':
+                    at = len(events)-1 if mode == 'late' else 1
+                    events[at:at] = [
+                        {'type': 'assistant', 'message': {'content': [{'type': 'tool_use', 'name': 'Skill',
+                         'id': 'skill1', 'input': {'skill': 'fixture-analysis:analyze'}}]}},
+                        {'type': 'user', 'message': {'content': [{'type': 'tool_result', 'tool_use_id': 'skill1', 'is_error': False}]}}]
+            a = self.captured(mode+'-before', correct=False, mutate=mutate)
+            (self.plugin/'SKILL.md').write_text('changed-'+mode, encoding='utf-8')
+            b = self.captured(mode+'-after', mutate=mutate)
+            record = self.repair_record(a)
+            record['evidence_type'] = 'local'
+            chain = compare_native_repair(a[0], a[1], b[0], b[1], self.root/mode, repair_record=record)['report']['repair_chain']
+            self.assertEqual(chain['status'], 'OPEN')
+            expected = 'before artifact-producing script' if mode == 'late' else 'baseline invoked'
+            self.assertTrue(any(expected in gap for gap in chain['gaps']), chain['gaps'])
 
 
 if __name__ == '__main__':

@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "evidence_type": "real_local_component_execution_on_synthetic_inputs",
+  "cases": {
+    "ngs": [
+      {
+        "id": "duplicate_transcript",
+        "table": "Name\tLength\tEffectiveLength\tTPM\tNumReads\ntx1\t100\t80\t100\t10\ntx1\t100\t80\t200\t20\n",
+        "expected": {
+          "rejected_before_matrix": true
+        }
+      },
+      {
+        "id": "nonfinite_reads",
+        "table": "Name\tLength\tEffectiveLength\tTPM\tNumReads\ntx1\t100\t80\t100\tNaN\n",
+        "expected": {
+          "rejected_before_matrix": true
+        }
+      },
+      {
+        "id": "negative_reads",
+        "table": "Name\tLength\tEffectiveLength\tTPM\tNumReads\ntx1\t100\t80\t100\t-1\n",
+        "expected": {
+          "rejected_before_matrix": true
+        }
+      },
+      {
+        "id": "empty_table",
+        "table": "Name\tLength\tEffectiveLength\tTPM\tNumReads\n",
+        "expected": {
+          "rejected_before_matrix": true
+        }
+      },
+      {
+        "id": "duplicate_header",
+        "table": "Name\tLength\tEffectiveLength\tTPM\tNumReads\tName\ntx1\t100\t80\t100\t10\ttx2\n",
+        "expected": {
+          "rejected_before_matrix": true
+        }
+      },
+      {
+        "id": "valid_fractional_counts",
+        "table": "Name\tLength\tEffectiveLength\tTPM\tNumReads\ntx2\t100\t80\t200\t20.25\ntx1\t100\t80\t100\t10\n",
+        "expected": {
+          "valid_matrix": true
+        },
+        "expected_matrix": {
+          "tx1": 10,
+          "tx2": 20.25
+        }
+      },
+      {
+        "id": "valid_zero_counts",
+        "table": "Name\tLength\tEffectiveLength\tTPM\tNumReads\ntx1\t100\t0\t0\t0\n",
+        "expected": {
+          "valid_matrix": true
+        },
+        "expected_matrix": {
+          "tx1": 0
+        }
+      }
+    ],
+    "bionexus": [
+      {
+        "id": "technical_rows",
+        "table": "sample,condition,donor\na,control,d1\nb,control,d1\nc,treated,d2\nd,treated,d2\n",
+        "expected": {
+          "sample_count": 4,
+          "min_replicates_per_condition": 1,
+          "biological_replicates_count": 2
+        }
+      },
+      {
+        "id": "independent_donors",
+        "table": "sample,condition,donor\na,control,d1\nb,control,d2\nc,treated,d3\nd,treated,d4\n",
+        "expected": {
+          "sample_count": 4,
+          "min_replicates_per_condition": 2,
+          "biological_replicates_count": 4
+        }
+      },
+      {
+        "id": "paired_donors",
+        "table": "sample,condition,donor\na,control,d1\nb,control,d2\nc,treated,d1\nd,treated,d2\n",
+        "expected": {
+          "sample_count": 4,
+          "min_replicates_per_condition": 2,
+          "biological_replicates_count": 2
+        }
+      },
+      {
+        "id": "missing_donors",
+        "table": "sample,condition\na,control\nb,control\nc,treated\nd,treated\n",
+        "expected": {
+          "sample_count": 4,
+          "min_replicates_per_condition": 0,
+          "biological_replicates_count": 0,
+          "replicate_identity_status": "UNRESOLVED"
+        }
+      },
+      {
+        "id": "partial_donors",
+        "table": "sample,condition,donor\na,control,d1\nb,control,\nc,treated,d2\nd,treated,d2\n",
+        "expected": {
+          "sample_count": 4,
+          "min_replicates_per_condition": 0,
+          "biological_replicates_count": 0,
+          "replicate_identity_status": "UNRESOLVED"
+        }
+      }
+    ]
+  },
+  "repetitions": 1,
+  "model_calls": 0,
+  "independent_holdout": false,
+  "scope": "deterministic local component regression, not paired plugin/model benefit"
+}
