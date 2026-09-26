@@ -1,0 +1,23 @@
+{
+  "question": null,
+  "plugin_path": null,
+  "data": {"kind": "pvl-cell-counts-1", "path": null},
+  "design": {
+    "format": "pvl-pseudobulk-design-1",
+    "task_mode": "fixed_method",
+    "cell_type": null,
+    "control": null,
+    "treatment": null,
+    "min_cells": null,
+    "min_total_count": null,
+    "backend_version": "0.5.4",
+    "reference_workflow": null
+  },
+  "author_review": {
+    "raw_counts_and_identity_checked": null,
+    "paired_design_appropriate": null,
+    "fixed_method_matches_question": null,
+    "filters_chosen_before_results": null,
+    "reference_suitability_basis": null
+  }
+}

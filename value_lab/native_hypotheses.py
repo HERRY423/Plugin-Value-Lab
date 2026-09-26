@@ -1,5 +1,6 @@
 """Evidence-linked, falsifiable hypotheses; never infer causes from correlations."""
 from pathlib import Path
+import hashlib
 import json
 
 from .artifacts import confined
@@ -10,7 +11,7 @@ from .native_evidence import _fresh, _separate, verify_native_evidence
 STAGES = ('load', 'trigger', 'selection', 'execution', 'artifact', 'conclusion')
 
 
-def skill_events(text, path):
+def _tool_events(text, path):
     calls, replies = [], {}
     terminal_line = len(text.splitlines()) + 1
     for line, raw in enumerate(text.splitlines(), 1):
@@ -25,9 +26,10 @@ def skill_events(text, path):
         for block in message['content']:
             if not isinstance(block, dict):
                 continue
-            if event.get('type') == 'assistant' and block.get('type') == 'tool_use' and block.get('name') == 'Skill':
+            if event.get('type') == 'assistant' and block.get('type') == 'tool_use':
                 arg = block.get('input')
-                calls.append({'skill': arg.get('skill') if isinstance(arg, dict) else None, 'tool_use_id': block.get('id'),
+                calls.append({'name': block.get('name'), 'input': arg,
+                              'skill': arg.get('skill') if isinstance(arg, dict) else None, 'tool_use_id': block.get('id'),
                               'evidence': {'path': path, 'line': line}, 'result_status': 'UNKNOWN'})
             if event.get('type') == 'user' and block.get('type') == 'tool_result' and isinstance(block.get('tool_use_id'), str):
                 replies.setdefault(block['tool_use_id'], []).append((line, block))
@@ -43,7 +45,45 @@ def skill_events(text, path):
             if call['evidence']['line'] < line < terminal_line and type(error) is bool:
                 call['result_status'] = 'TOOL_ERROR' if error else 'TOOL_REPORTED_SUCCESS'
                 call['result_evidence'] = {'path': path, 'line': line}
+                call['result_content'] = result.get('content')
     return calls
+
+
+def skill_events(text, path):
+    return [{k: v for k, v in c.items() if k not in ('name', 'input', 'result_content')}
+            for c in _tool_events(text, path) if c['name'] == 'Skill']
+
+
+def plugin_observations(text, path, plugin_name, plugin_files):
+    """Separate Skill invocation from a successful read of pinned candidate bytes.
+
+    Exact raw Read content is supported. Formatted/truncated responses, shell
+    mentions and unsupported host transports stay unknown, never inferred reads.
+    Reading is exposure evidence, not proof of execution or causal contribution.
+    """
+    skills = [c for c in skill_events(text, path) if plugin_name and isinstance(c['skill'], str)
+              and c['skill'].startswith(plugin_name + ':') and c['result_status'] == 'TOOL_REPORTED_SUCCESS']
+    reads = []
+    for call in _tool_events(text, path):
+        if call['name'] != 'Read' or call['result_status'] != 'TOOL_REPORTED_SUCCESS' or not isinstance(call['input'], dict):
+            continue
+        filename = call['input'].get('file_path')
+        content = call.get('result_content')
+        if not isinstance(filename, str) or not isinstance(content, str):
+            continue
+        filename = filename.replace('\\', '/')
+        digest = hashlib.sha256(content.encode('utf-8')).hexdigest()
+        matching = [p for p, expected in plugin_files.items()
+                    if expected == digest and (filename == p or filename.endswith('/' + p))]
+        if len(matching) == 1:
+            reads.append({'candidate_file': matching[0], 'sha256': digest,
+                          'tool_use_id': call['tool_use_id'], 'evidence': call['evidence'],
+                          'result_evidence': call['result_evidence']})
+    return {'skill_calls': skills, 'candidate_reads': reads,
+            'status': 'SKILL_INVOCATION_OBSERVED' if skills else 'CANDIDATE_CONTENT_READ' if reads else 'USE_UNKNOWN',
+            'skill_mechanism_observed': bool(skills), 'execution_established_by_read': False,
+            'causal_contribution_established': False,
+            'coverage': 'Skill tool results and exact-content Read results only; absence is not non-use'}
 
 
 def validate_expectations(expectations, plan):
@@ -106,6 +146,7 @@ def build_native_hypotheses(directory, receipt_digest, expectations):
                 {'path': 'diagnosis.json', 'pointer': f'/runs/{index}'}]
         events_path = f'runs/{index}/events.jsonl'
         trace_refs, called = [], []
+        text = ''
         if confined(root, events_path).is_file():
             text = confined(root, events_path).read_text(encoding='utf-8-sig')
             called = skill_events(text, events_path)
@@ -115,6 +156,7 @@ def build_native_hypotheses(directory, receipt_digest, expectations):
                 event = json.loads(raw)
                 if event.get('type') == 'system' and event.get('subtype') == 'init':
                     trace_refs.append({'path': events_path, 'line': line})
+        usage = plugin_observations(text, events_path, plugin_name, plan['plugin_files'])
         supported = bool(obs.get('session_id'))
         plugins = obs.get('plugins')
         names = ([p['name'] for p in plugins] if isinstance(plugins, list) and
@@ -126,7 +168,8 @@ def build_native_hypotheses(directory, receipt_digest, expectations):
         # A truncated or unsupported stream cannot establish absence.
         complete = supported and obs.get('trace_complete') is True and all(isinstance(c['skill'], str) and c['skill'] for c in called)
         trigger = ('NOT_APPLICABLE' if run['arm'] == 'without' or not expected['expected_skills'] else
-                   'UNKNOWN' if not supported else 'OBSERVED' if expected_calls else 'NOT_OBSERVED' if complete else 'UNKNOWN')
+                   'UNKNOWN' if not supported else 'OBSERVED' if expected_calls else
+                   'SKILL_NOT_OBSERVED_FILE_READ_OBSERVED' if usage['candidate_reads'] else 'NOT_OBSERVED' if complete else 'UNKNOWN')
         alternatives = [c for c in called if isinstance(c['skill'], str) and c['skill'] not in expected['expected_skills']]
         selection = ('NOT_ASSESSED' if not expected['expected_skills'] or run['arm'] == 'without' else
                      'UNKNOWN' if not supported else 'EXPECTED_SKILL_OBSERVED' if expected_calls else
@@ -144,7 +187,7 @@ def build_native_hypotheses(directory, receipt_digest, expectations):
             return ('NOT_ASSESSED' if not checks else 'FAILED' if any(g['passed'] is False for g in checks)
                     else 'UNKNOWN' if any(g['passed'] is None for g in checks) else 'PASSED_COMPUTATIONAL_CHECKS')
         facts = [_fact('load', load, {'plugin_name': plugin_name, 'observed_plugins': names}, base + trace_refs),
-                 _fact('trigger', trigger, {'expected_skills': expected['expected_skills'], 'calls': called}, base + trace_refs),
+                 _fact('trigger', trigger, {'expected_skills': expected['expected_skills'], 'calls': called, 'plugin_observations': usage}, base + trace_refs),
                  _fact('selection', selection, {'other_calls': alternatives, 'mapping_is_operator_declared': True}, base),
                  _fact('execution', state, {'native_status': run['status'], 'execution': execution}, base),
                  _fact('artifact', checks_state(artifact_checks), artifact_checks, base),

@@ -1,0 +1,45 @@
+{
+  "type": "LOCAL_ENGINEERING_ACCEPTANCE",
+  "version": "0.6.0",
+  "full_suite": {
+    "passed": 565,
+    "seconds": 126.612,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "targeted_tests": 32,
+  "new_regression_tests": 9,
+  "tested_boundaries": [
+    "observed crash before script creation",
+    "failure denominator across repetitions",
+    "truncated and contradictory evidence remains unknown",
+    "failed tool execution is not artifact success",
+    "trigger absence to successful invocation with negative controls",
+    "negative-control over-invocation",
+    "failed Skill invocation is not non-invocation",
+    "frozen repair type and reserved endpoints",
+    "retained unsuccessful repairs and ordered author process declarations"
+  ],
+  "source_sha256": {
+    "value_lab/native_repair.py": "9ac86527824f918230c6a231ff825f6b60c68598ad1e59f59577c3771d307fec",
+    "value_lab/native_analysis.py": "026a5f6c0416914e58dbe8c9832c8e0516dc6b68a3150c08e86e49e76e9e2821",
+    "value_lab/native_evidence.py": "485be03086a2138aa1d07b6ad45e529ef36818385a6cee6eeb0f8505584d6ab2",
+    "tests/test_native_analysis.py": "576f006b0a6a4b25b921a835aaa9d62615a1e510bb0cd61f2ab5a87196bb50e7",
+    "docs/history/NATIVE-ANALYSIS-REPAIR.zh-CN.md": "d5c07ad44f54aadad5a1ed0aca55b700bb54680af63402891538888aad669ada",
+    "docs/OPERATIONS.md": "92d88be83aa7df7a007ff27cc6816e01feaca6e22e4267596de3b1a575a391ca"
+  },
+  "test_log_sha256": "bc2415652cfdff7667bd2b3327654c500b7e1369bd071a985fb18a23f13f8098",
+  "new_model_calls": 0,
+  "new_paid_provider_invocations": 0,
+  "natural_author_repair_study_performed": false,
+  "pvl_helped_author_established": false,
+  "remote_ci_run": false,
+  "published": false,
+  "limitations": [
+    "Regression streams are manufactured fixtures, not new native host observations.",
+    "Author chronology and previously unknown defect status are declarations, not authenticated facts.",
+    "Intermediate process evidence hashes are retained but not individually verified.",
+    "Skill traces do not cover direct file use or other invocation protocols."
+  ]
+}

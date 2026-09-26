@@ -48,13 +48,16 @@ def prepare_native_analysis(recipe, plugin, inputs, output, *, references=None):
     if not isinstance(recipe["cases"], list) or not recipe["cases"]:
         raise ValidationError("At least one analysis case required")
     for source in recipe["cases"]:
-        if not isinstance(source, dict) or set(source) != {"name", "prompt", "repetitions", "inputs", "artifacts", "graders", "execution"}:
+        required = {"name", "prompt", "repetitions", "inputs", "artifacts", "graders", "execution"}
+        if not isinstance(source, dict) or not required <= set(source) or set(source) - required - {"repair"}:
             raise ValidationError("Analysis case requires name, prompt, repetitions, inputs, artifacts, graders and execution")
         name = _component(source["name"], "case name")
         if not isinstance(source["prompt"], str) or not source["prompt"].strip():
             raise ValidationError("Analysis prompt must be nonempty")
         directory = f"pvl-analysis-evals/{name}"
         case = {k: deepcopy(source[k]) for k in ("name", "repetitions", "artifacts", "graders", "execution")}
+        if "repair" in source:
+            case["repair"] = deepcopy(source["repair"])
         case.update(case_directory=directory, inputs={}, input_sha256={})
         scaffold = ['#!/usr/bin/env bash', 'set -eu', 'source_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"']
         if not isinstance(source["inputs"], dict) or not source["inputs"]:

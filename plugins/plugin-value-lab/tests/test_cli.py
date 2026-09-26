@@ -1,3 +1,5 @@
+import contextlib
+import io
 import json
 import os
 import subprocess
@@ -11,6 +13,61 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class CLITests(unittest.TestCase):
+    def test_json_streams_round_trip_unicode_under_legacy_encodings(self):
+        from value_lab.cli import _emit
+        payload = {'路径': '新同事/结果 🧬.json', 'value': None, 'ok': True}
+        for encoding in ('cp1252', 'ascii', 'utf-8'):
+            for output in ('stdout', 'stderr'):
+                with self.subTest(encoding=encoding, output=output):
+                    buffer = io.BytesIO()
+                    with io.TextIOWrapper(buffer, encoding=encoding, errors='strict') as stream:
+                        if output == 'stdout':
+                            with contextlib.redirect_stdout(stream):
+                                _emit(payload)
+                        else:
+                            _emit(payload, stream=stream)
+                        stream.flush()
+                        raw = buffer.getvalue()
+                        self.assertEqual(json.loads(raw.decode('ascii')), payload)
+        with self.assertRaises(ValueError):
+            _emit({'invalid': float('nan')})
+
+    def test_redirected_unicode_success_errors_and_utf8_files(self):
+        for encoding in ('cp1252:strict', 'ascii:strict'):
+            with self.subTest(encoding=encoding), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory) / '中文 workspace 🧬'
+                root.mkdir()
+                env = dict(os.environ, PYTHONIOENCODING=encoding, PYTHONUTF8='0')
+                def run(*args):
+                    return subprocess.run([sys.executable, str(ROOT / 'scripts/value_lab.py'), *map(str, args)],
+                                          capture_output=True, env=env, timeout=30)
+                context = root / '输入.json'
+                # Source JSON is UTF-8, independent of stdout's legacy encoding.
+                data = {'schema_version': 1, 'intent': 'choose',
+                        'task': {'summary': '中文研究 🧬', 'capability': 'web reading'},
+                        'native_fit': 'sufficient', 'connected_fit': 'unknown',
+                        'plugin_management_available': False}
+                context.write_text(json.dumps(data, ensure_ascii=False), encoding='utf-8')
+                result = run('plan-use', context, '--output', root / '输出')
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIsInstance(json.loads(result.stdout.decode('ascii')), dict)
+                contents = '\n'.join(p.read_text(encoding='utf-8') for p in (root / '输出').rglob('*') if p.is_file())
+                self.assertIn(data['task']['summary'], contents)
+                missing = root / '不存在.json'
+                result = run('freeze', missing, '--lock', root / 'lock.json')
+                self.assertEqual(result.returncode, 2, result.stderr)
+                self.assertEqual(result.stdout, b'')
+                error = json.loads(result.stderr.decode('ascii'))
+                self.assertEqual(error['status'], 'INVALID_INPUT')
+                self.assertIn('不存在.json', error['error'])
+                # A file handle, rather than PIPE, must use the same contract.
+                with (root / 'stdout.json').open('wb') as stdout, (root / 'stderr.json').open('wb') as stderr:
+                    result = subprocess.run([sys.executable, str(ROOT / 'scripts/value_lab.py'),
+                        'freeze', str(missing), '--lock', str(root / 'lock.json')],
+                        stdout=stdout, stderr=stderr, env=env, timeout=30)
+                self.assertEqual(result.returncode, 2)
+                self.assertEqual(json.loads((root / 'stderr.json').read_bytes()), error)
+
     def run_cli(self, *args):
         return subprocess.run([sys.executable, str(ROOT / "scripts" / "value_lab.py"), *map(str, args)],
                               capture_output=True, encoding="utf-8", env=dict(os.environ, PYTHONIOENCODING="utf-8"), timeout=30)

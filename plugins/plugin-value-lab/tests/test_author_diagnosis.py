@@ -7,7 +7,7 @@ import sys
 import tempfile
 import unittest
 
-from value_lab.core import ValidationError, load_json, write_json
+from value_lab.core import ValidationError, load_json, write_json, demo_suite, demo_records, suite_digest
 from value_lab.methodology import audit_detector
 from value_lab.usage import diagnose
 
@@ -114,6 +114,47 @@ class AuthorDiagnosisTests(unittest.TestCase):
             timing = load_json(output/'author-timing.json')
             self.assertIsNone(timing['time_to_first_actionable_diagnosis_seconds'])
             self.assertIn(timing['feedback'], ('unhelpful', 'abandoned'))
+
+    def test_study_diagnose_and_usage_card_share_cost_ledger_end_to_end(self):
+        study = self.root/'study'
+        study.mkdir()
+        suite = demo_suite()
+        suite['evidence_type'] = 'local'  # Manufactured CLI fixture, not a benefit observation.
+        suite['policy']['require_cost_saving'] = True
+        records = demo_records(suite)
+        for record in records:
+            record['source'] = 'manual'
+        write_json(study/'suite.json', suite)
+        write_json(study/'protocol.lock.json', {'suite_sha256': suite_digest(suite)})
+        (study/'runs.jsonl').write_text('\n'.join(json.dumps(r) for r in records), encoding='utf-8')
+        ledger = {'schema_version': 1, 'coverage': {'setup': 'itemized', 'judge': 'not_applicable',
+                  'retry': 'not_applicable', 'other': 'not_applicable'}, 'entries': [{
+                  'id': 'setup', 'category': 'setup', 'arm': 'with', 'amount_usd': 180,
+                  'basis': 'estimate', 'evidence_ref': 'fixture:setup', 'treatment': 'additional'}]}
+        for mode in ('complete', 'unknown', 'absent'):
+            if mode == 'unknown':
+                ledger['entries'][0]['amount_usd'] = None
+            if mode != 'absent':
+                write_json(study/'cost-ledger.json', ledger)
+            else:
+                (study/'cost-ledger.json').unlink()
+            direct = self.root/(mode+'-card')
+            args = ['usage-card', study/'suite.json', study/'runs.jsonl', '--lock', study/'protocol.lock.json', '--output', direct]
+            if mode != 'absent':
+                args += ['--cost-ledger', study/'cost-ledger.json']
+            output = self.cli(*args)
+            self.assertEqual(output.returncode, 0, output.stderr)
+            diagnosis = self.root/(mode+'-diagnosis')
+            output = self.cli('diagnose', study, '--output', diagnosis)
+            self.assertEqual(output.returncode, 0, output.stderr)
+            expected = load_json(direct/'card.json')
+            actual = load_json(diagnosis/'diagnosis.json')['result']['card']
+            self.assertEqual(actual, expected)  # Costs, coverage, recommendations and provenance must all agree.
+            if mode == 'complete':
+                self.assertEqual(actual['verdict'], 'NO_DEMONSTRATED_GAIN')
+                self.assertEqual(actual['use_when'], [])
+        (study/'cost-ledger.json').write_text('{bad json', encoding='utf-8')
+        self.assertNotEqual(self.cli('diagnose', study, '--output', self.root/'malformed').returncode, 0)
 
 
 if __name__ == '__main__':

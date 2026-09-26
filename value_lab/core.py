@@ -200,6 +200,8 @@ def validate_suite(suite):
             raise ValidationError("Every case needs an outcome grader; activation alone is not value")
         from .scoring import validate_rules
         validate_rules(case)
+    from .usage import _validate_usage_contract
+    _validate_usage_contract(suite)
     return suite
 
 
@@ -312,6 +314,7 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
                 for rep in range(1, suite["runs_per_case"] + 1) for arm in ("with", "without")}
     indexed = {}
     sessions = set()
+    identity_blockers = []
     all_intervals = defaultdict(list)
     synthetic = suite["evidence_type"] == "synthetic" or any(
         g["type"] == "scenario" and g["verifier"]["evidence_type"] == "synthetic"
@@ -346,6 +349,7 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
             issues.append("Missing or reused session identity")
         else:
             sessions.add(sid)
+        identity_blockers.extend(f"{case_id}/{repetition}/{arm}: {issue}" for issue in issues)
         status = record.get("status")
         if status not in ("completed", "error", "timeout", "aborted", "skipped"):
             issues.append("Unknown execution status")
@@ -424,6 +428,8 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
                 blockers.append(f"Overlapping human intervals for {actor}: {latest_key} / {key}")
             if latest_end is None or end > latest_end:
                 latest_end, latest_key = end, key
+    # Shared provenance/timing/plan integrity cannot be escaped by narrowing scope.
+    scope_integrity_blockers = list(dict.fromkeys(blockers + identity_blockers))
     missing = sorted(expected - indexed.keys())
     if missing:
         blockers.append(f"Missing {len(missing)} planned executions; denominator remains {len(expected)}")
@@ -581,6 +587,7 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
                     "objective": objective,
                     "critical_failures": critical_failures, "comparison_eligible": not blockers},
         "policy": policy, "blockers": blockers, "warnings": warnings, "cases": cases_out,
+        "scope_integrity_blockers": list(dict.fromkeys(scope_integrity_blockers + cost_analysis['issues'])),
         "cost_analysis": cost_analysis, "methodology": methodology,
         "uncertainty": _bootstrap(cases_out) if not blockers else {"status": "UNAVAILABLE", "reason": "Incomplete or confounded evidence"},
         "claim_limits": {"causal_benefit": "NOT_ESTABLISHED", "external_validation": "NOT_ESTABLISHED",

@@ -15,8 +15,9 @@ from .core import (ValidationError, demo_records, demo_suite, evaluate, freeze,
 from .report import write_reports
 
 
-def _emit(data):
-    print(json.dumps(data, ensure_ascii=False, indent=2, allow_nan=False))
+def _emit(data, *, stream=None):
+    """Machine JSON is ASCII-safe on redirected Windows streams; files use UTF-8."""
+    print(json.dumps(data, ensure_ascii=True, indent=2, allow_nan=False), file=stream)
 
 
 def write_records(path, records):
@@ -751,7 +752,7 @@ def main(argv=None):
             _emit({"status": result["status"], "output": args.output, "blockers": result["blockers"]})
         return 0
     except (ValidationError, OSError, TypeError) as exc:
-        print(json.dumps({"error": str(exc), "status": "INVALID_INPUT"}, ensure_ascii=False), file=sys.stderr)
+        _emit({"error": str(exc), "status": "INVALID_INPUT"}, stream=sys.stderr)
         return 2
 
 

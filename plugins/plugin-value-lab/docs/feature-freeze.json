@@ -1,5 +1,5 @@
 {
-  "format": "pvl-feature-freeze-1",
+  "format": "pvl-feature-freeze-2",
   "status": "FROZEN",
   "started": "2026-09-25",
   "planned_review": "2026-11-06",
@@ -2748,13 +2748,394 @@
       ]
     },
     "mcp_signatures": {
-      "build_plugin_usage_card": "arguments(args=[arg(arg='suite', annotation=Name(id='dict', ctx=Load())), arg(arg='records', annotation=Subscript(value=Name(id='list', ctx=Load()), slice=Name(id='dict', ctx=Load()), ctx=Load())), arg(arg='lock', annotation=BinOp(left=Name(id='dict', ctx=Load()), op=BitOr(), right=Constant(value=None))), arg(arg='cost_ledger', annotation=BinOp(left=Name(id='dict', ctx=Load()), op=BitOr(), right=Constant(value=None)))], defaults=[Constant(value=None), Constant(value=None)])",
-      "evaluate_plugin_value": "arguments(args=[arg(arg='suite', annotation=Name(id='dict', ctx=Load())), arg(arg='records', annotation=Subscript(value=Name(id='list', ctx=Load()), slice=Name(id='dict', ctx=Load()), ctx=Load())), arg(arg='lock', annotation=BinOp(left=Name(id='dict', ctx=Load()), op=BitOr(), right=Constant(value=None))), arg(arg='cost_ledger', annotation=BinOp(left=Name(id='dict', ctx=Load()), op=BitOr(), right=Constant(value=None)))], defaults=[Constant(value=None), Constant(value=None)])",
-      "example_value_suite": "arguments()",
-      "inspect_claude_eval": "arguments(args=[arg(arg='result', annotation=Name(id='dict', ctx=Load()))])",
-      "plan_plugin_use": "arguments(args=[arg(arg='context', annotation=Name(id='dict', ctx=Load()))])",
-      "research_direction_advisor": "arguments(args=[arg(arg='action', annotation=Name(id='str', ctx=Load())), arg(arg='context', annotation=BinOp(left=Name(id='dict', ctx=Load()), op=BitOr(), right=Constant(value=None))), arg(arg='before', annotation=BinOp(left=Name(id='dict', ctx=Load()), op=BitOr(), right=Constant(value=None))), arg(arg='after', annotation=BinOp(left=Name(id='dict', ctx=Load()), op=BitOr(), right=Constant(value=None)))], defaults=[Constant(value=None), Constant(value=None), Constant(value=None)])",
-      "validate_value_suite": "arguments(args=[arg(arg='suite', annotation=Name(id='dict', ctx=Load())), arg(arg='samples', annotation=BinOp(left=Name(id='dict', ctx=Load()), op=BitOr(), right=Constant(value=None)))], defaults=[Constant(value=None)])"
+      "build_plugin_usage_card": {
+        "parameters": [
+          {
+            "name": "suite",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "Name",
+              "id": "dict"
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          },
+          {
+            "name": "records",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "Subscript",
+              "value": {
+                "node": "Name",
+                "id": "list"
+              },
+              "slice": {
+                "node": "Name",
+                "id": "dict"
+              }
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          },
+          {
+            "name": "lock",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "dict"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            }
+          },
+          {
+            "name": "cost_ledger",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "dict"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            }
+          }
+        ],
+        "returns": {
+          "node": "Name",
+          "id": "dict"
+        },
+        "async": false
+      },
+      "evaluate_plugin_value": {
+        "parameters": [
+          {
+            "name": "suite",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "Name",
+              "id": "dict"
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          },
+          {
+            "name": "records",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "Subscript",
+              "value": {
+                "node": "Name",
+                "id": "list"
+              },
+              "slice": {
+                "node": "Name",
+                "id": "dict"
+              }
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          },
+          {
+            "name": "lock",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "dict"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            }
+          },
+          {
+            "name": "cost_ledger",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "dict"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            }
+          }
+        ],
+        "returns": {
+          "node": "Name",
+          "id": "dict"
+        },
+        "async": false
+      },
+      "example_value_suite": {
+        "parameters": [],
+        "returns": {
+          "node": "Name",
+          "id": "dict"
+        },
+        "async": false
+      },
+      "inspect_claude_eval": {
+        "parameters": [
+          {
+            "name": "result",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "Name",
+              "id": "dict"
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          }
+        ],
+        "returns": {
+          "node": "Name",
+          "id": "dict"
+        },
+        "async": false
+      },
+      "plan_plugin_use": {
+        "parameters": [
+          {
+            "name": "context",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "Name",
+              "id": "dict"
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          }
+        ],
+        "returns": {
+          "node": "Name",
+          "id": "dict"
+        },
+        "async": false
+      },
+      "research_direction_advisor": {
+        "parameters": [
+          {
+            "name": "action",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "Name",
+              "id": "str"
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          },
+          {
+            "name": "context",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "dict"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            }
+          },
+          {
+            "name": "before",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "dict"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            }
+          },
+          {
+            "name": "after",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "dict"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            }
+          }
+        ],
+        "returns": {
+          "node": "Name",
+          "id": "dict"
+        },
+        "async": false
+      },
+      "validate_value_suite": {
+        "parameters": [
+          {
+            "name": "suite",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "Name",
+              "id": "dict"
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          },
+          {
+            "name": "samples",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "dict"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            }
+          }
+        ],
+        "returns": {
+          "node": "Name",
+          "id": "dict"
+        },
+        "async": false
+      }
     },
     "skills": [
       "extensions/research-directions/SKILL.md",

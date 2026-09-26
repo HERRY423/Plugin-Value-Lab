@@ -45,9 +45,10 @@ def diagnose(source, output, *, check=None, spec=None, audit=False, receipt=None
         result = verify_native_evidence(source, receipt)['diagnosis']
         findings = [dict(case_id=r['case_id'], arm=r['arm'], repetition=r['repetition'], **g)
                     for r in result['runs'] for g in r['grades'] if g['passed'] is not True]
-        from .native_hypotheses import skill_events
+        from .native_hypotheses import plugin_observations
         from .artifacts import confined
-        plugin = (load_json(source / 'plan.json').get('plugin_identity') or {}).get('name')
+        plan = load_json(source / 'plan.json')
+        plugin = (plan.get('plugin_identity') or {}).get('name')
         result['invocation_observations'] = []
         for index, run in enumerate(result['runs']):
             if run['status'] != 'completed':
@@ -55,14 +56,15 @@ def diagnose(source, output, *, check=None, spec=None, audit=False, receipt=None
             if run['arm'] != 'with':
                 continue
             trace = confined(source, f'runs/{index}/events.jsonl')
-            calls = skill_events(trace.read_text(encoding='utf-8-sig'), f'runs/{index}/events.jsonl') if trace.is_file() else []
-            matching = [c for c in calls if plugin and isinstance(c['skill'], str)
-                        and c['skill'].startswith(plugin + ':') and c['result_status'] == 'TOOL_REPORTED_SUCCESS']
-            result['invocation_observations'].append({'case_id': run['case_id'], 'repetition': run['repetition'], 'calls': matching})
-            if not matching:
+            observed = plugin_observations(trace.read_text(encoding='utf-8-sig') if trace.is_file() else '',
+                                           f'runs/{index}/events.jsonl', plugin, plan['plugin_files'])
+            result['invocation_observations'].append({'case_id': run['case_id'], 'repetition': run['repetition'],
+                'calls': observed['skill_calls'], **observed})
+            if observed['status'] == 'USE_UNKNOWN':
                 findings.append({'case_id': run['case_id'], 'arm': 'with', 'repetition': run['repetition'],
                                  'kind': 'invocation_evidence_gap',
-                                 'reason': 'Successful namespaced plugin Skill call not observed. Passing artifact checks cannot establish plugin use; other invocation mechanisms are not assessed.'})
+                                 'plugin_non_use_established': False,
+                                 'reason': 'No supported Skill invocation or read of pinned candidate bytes observed. Plugin use remains unknown; unsupported mechanisms and missing traces are not proof of non-use.'})
         result['next_action'] = ('Inspect runtime errors, missing evidence and invocation traces first. '
                                  'Establish whether the failure belongs to the host or plugin before changing plugin bytes. '
                                  'Then repeat the complete frozen natural-use study with the relevant correction; '
@@ -74,7 +76,9 @@ def diagnose(source, output, *, check=None, spec=None, audit=False, receipt=None
         if any(not (source / p).is_file() for p in required):
             raise ValidationError("Study needs suite.json, runs.jsonl and protocol.lock.json; alternatively supply an artifact with --check bh or --spec")
         card = build_usage_card(load_json(source / required[0]), load_records(source / required[1]),
-                                load_json(source / required[2]), artifact_root=artifact_root,
+                                load_json(source / required[2]),
+                                load_json(source / 'cost-ledger.json') if (source / 'cost-ledger.json').is_file() else None,
+                                artifact_root=artifact_root,
                                 verifier_root=verifier_root, corpus_root=corpus_root)
         result = {'status': card['status'], 'card': card, 'next_action': card['improvement_plan']['next_experiment']['action']}
         findings = card['improvement_plan']['queue']
@@ -129,6 +133,150 @@ _STATUSES = {
     "BOUNDED_LOCAL_GUIDANCE": "仅适用于已观察任务及固定条件的使用参考",
     "REVIEW_REQUIRED": "先复核缺失证据或回退，再作使用判断",
 }
+
+
+def _validate_usage_contract(suite):
+    """Validate optional scope and applicability declarations before freezing."""
+    families = {c['cluster'] for c in suite['cases']}
+    declarations = suite.get('metric_applicability', {})
+    if not isinstance(declarations, dict) or set(declarations) - families:
+        raise ValidationError('metric_applicability must name existing task families')
+    for family, metrics in declarations.items():
+        if not isinstance(metrics, dict) or set(metrics) != {'over_refusal'}:
+            raise ValidationError('Declare over_refusal applicability explicitly')
+        rule = metrics['over_refusal']
+        if not isinstance(rule, dict) or rule.get('status') not in ('required', 'not_applicable'):
+            raise ValidationError('Metric applicability must be required or not_applicable')
+        if rule['status'] == 'required':
+            if set(rule) != {'status'}:
+                raise ValidationError('Required metric declaration only accepts status')
+            continue
+        if (set(rule) != {'status', 'reason', 'review'} or not isinstance(rule['reason'], str) or not rule['reason'].strip()
+                or not isinstance(rule['review'], dict) or set(rule['review']) != {'reviewer', 'basis', 'accepted'}
+                or rule['review']['accepted'] is not True
+                or any(not isinstance(rule['review'][k], str) or not rule['review'][k].strip() for k in ('reviewer', 'basis'))):
+            raise ValidationError('Not-applicable metric requires a reason and an accepted named review with basis')
+        if ('decision_error_limits' in suite['policy'] or any(g['type'] in ('over_refusal', 'abstention_correct', 'scenario', 'sealed')
+                for c in suite['cases'] if c['cluster'] == family for g in c['graders'])):
+            raise ValidationError('Not-applicable declaration contradicts decision checks or frozen decision-error limits')
+    scopes = suite.get('usage_scopes', [])
+    if not isinstance(scopes, list):
+        raise ValidationError('usage_scopes must be a list frozen with the suite')
+    ids, used = set(), set()
+    for scope in scopes:
+        if (not isinstance(scope, dict) or set(scope) != {'id', 'families', 'rationale', 'min_clusters', 'min_complete_pairs'}
+                or not isinstance(scope['id'], str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]{0,99}', scope['id'])
+                or scope['id'] in ids or not isinstance(scope['rationale'], str) or not scope['rationale'].strip()
+                or not isinstance(scope['families'], list) or not scope['families']
+                or any(not isinstance(f, str) or f not in families for f in scope['families'])
+                or len(set(scope['families'])) != len(scope['families']) or used.intersection(scope['families'])
+                or type(scope['min_clusters']) is not int or scope['min_clusters'] < 1
+                or type(scope['min_complete_pairs']) is not int or scope['min_complete_pairs'] < 1):
+            raise ValidationError('Usage scopes require unique nonoverlapping whole families, rationale and positive evidence minima')
+        ids.add(scope['id'])
+        used.update(scope['families'])
+
+
+def _metric_state(suite, family, counts, unavailable=False):
+    rule = suite.get('metric_applicability', {}).get(family, {}).get('over_refusal', {'status': 'required'})
+    if rule['status'] == 'not_applicable':
+        state = 'NOT_APPLICABLE'
+    elif unavailable or counts['unknown']:
+        state = 'UNKNOWN'
+    elif not counts['planned']:
+        state = 'NOT_MEASURED'
+    else:
+        state = 'MEASURED'
+    return {'status': state, 'contract': copy.deepcopy(rule), 'review_authenticity_verified': False}
+
+
+def _scope_assessments(suite, records, report, envelope, artifact_root, verifier_root, corpus_root):
+    """Derive local gates from all original scored rows and original cost allocations.
+
+    No rehashing, rewritten records, subset freeze, or new observations.
+    """
+    result = []
+    from .methodology import assess_limits
+    from .scenarios import decision_metrics
+    rows = {r['family']: r for r in envelope['rows']}
+    policy = report['policy']
+    for spec in suite.get('usage_scopes', []):
+        cases = [c for c in report['cases'] if c['cluster'] in spec['families']]
+        selected = [rows[f] for f in spec['families']]
+        runs = [r for c in cases for r in c['runs']]
+        blockers = list(report['scope_integrity_blockers'])
+        if report['evidence_type'] == 'synthetic':
+            blockers.append('Synthetic evidence cannot support use')
+        if envelope['missing_identity']:
+            blockers.append('Plugin/host/model identity incomplete')
+        if len(spec['families']) < spec['min_clusters']:
+            blockers.append('Scope task-family minimum not met')
+        resolved = sum(r['resolved_pairs'] for r in selected)
+        if resolved < spec['min_complete_pairs']:
+            blockers.append('Scope complete-pair minimum not met')
+        if any(r['unknown_pairs'] for r in selected) or any(r['issues'] for r in runs):
+            blockers.append('Scope contains missing, unresolved or non-comparable observations')
+        if not report['cost_analysis']['allocation_coverage_complete'] or any(r['cost_usd'] is None for r in runs):
+            blockers.append('Full-study cost coverage incomplete; shared expenditure cannot be discarded')
+        if policy.get('require_settled_costs') and not report['cost_analysis']['cash_evidence']['settlement_references_complete']:
+            blockers.append('Frozen settlement requirement unmet')
+        if any(m['status'] not in ('MEASURED', 'NOT_APPLICABLE') for r in selected for m in r['metric_status']['over_refusal'].values()):
+            blockers.append('Required scope decision metric is unmeasured or unknown')
+        ids = {c['id'] for c in cases}
+        local_suite = {**suite, 'cases': [c for c in suite['cases'] if c['id'] in ids]}
+        scientific = decision_metrics(local_suite, records, verifier_root, artifact_root)
+        corpus = None
+        if report.get('corpus_errors') is not None:
+            from .corpus import load_material
+            _, truth = load_material(corpus_root)
+            counts = {}
+            for run in report['corpus_errors']['runs']:
+                if run['case_id'] not in ids:
+                    continue
+                expected = truth['answers'][run['case_id']]['decision']
+                metric = 'over_refusal' if expected == 'allow' else 'unsupported_acceptance'
+                key = (run['split'], run['arm'], metric)
+                row = counts.setdefault(key, {'split': key[0], 'arm': key[1], 'metric': key[2], 'planned': 0, 'errors': 0, 'unknown': 0})
+                row['planned'] += 1
+                row['unknown'] += run['decision'] is None
+                row['errors'] += run['decision'] is not None and run['decision'] != expected
+            for row in counts.values():
+                row['rate'] = row['errors'] / row['planned'] if not row['unknown'] else None
+            corpus = {'metrics': list(counts.values())}
+        methodology = assess_limits(policy, {'scientific': scientific, 'corpus': corpus})
+        blockers.extend(methodology['blockers'])
+        costs = {a: [r['cost_usd'] for r in runs if r['arm'] == a] for a in ('with', 'without')}
+        cost_delta = None if any(not v or None in v for v in costs.values()) else mean(costs['with']) - mean(costs['without'])
+        deltas = [c['delta'] for c in cases]
+        delta = None if None in deltas else mean(deltas)
+        floor_ok = all(c['with_score'] is not None and c['with_score'] + _EPSILON >= policy['quality_floor'] for c in cases)
+        objective_ok = delta is not None and (delta >= -_EPSILON if policy.get('objective') == 'efficiency'
+                         else delta > _EPSILON and delta + _EPSILON >= policy['min_quality_delta'])
+        cost_ok = cost_delta is not None and (cost_delta < -_EPSILON if policy.get('objective') == 'efficiency'
+                         or policy['require_cost_saving'] else True)
+        negatives = [n for r in selected for n in r['negative_evidence']]
+        if methodology['violations']:
+            negatives.append('Scope violates a frozen decision-error ceiling')
+        if any(c['delta'] is not None and c['delta'] < -policy['max_case_regression'] - _EPSILON for c in cases):
+            negatives.append('A scope case exceeds the frozen regression limit')
+        supported = not blockers and not negatives and floor_ok and objective_ok and cost_ok
+        baseline = (not blockers and not negatives and delta is not None and delta <= _EPSILON
+                    and all(c['without_score'] is not None and c['without_score'] + _EPSILON >= policy['quality_floor'] for c in cases)
+                    and not any(g['critical'] and g['passed'] is not True for r in runs if r['arm'] == 'without' for g in r['grades'])
+                    and (policy.get('objective') != 'efficiency' or cost_delta is not None and cost_delta >= -_EPSILON))
+        regression = any(r['decision_code'] == 'OBSERVED_REGRESSION' for r in selected) or any(
+            c['delta'] is not None and c['delta'] < -policy['max_case_regression'] - _EPSILON for c in cases)
+        decision = ('OBSERVED_REGRESSION' if regression else 'RISK_OBSERVED') if negatives else 'LIMITED_TRIAL' if supported else 'BASELINE_PREFERRED' if baseline else 'INSUFFICIENT_EVIDENCE'
+        result.append({'id': spec['id'], 'declaration': copy.deepcopy(spec), 'case_ids': [c['id'] for c in cases],
+            'decision_code': decision, 'supported': supported, 'baseline_preferred': baseline,
+            'blockers': list(dict.fromkeys(blockers)), 'negative_evidence': negatives,
+            'planned_pairs': sum(r['planned_pairs'] for r in selected), 'resolved_pairs': resolved,
+            'quality_delta': delta, 'cost_delta_usd': cost_delta, 'inherited_policy': copy.deepcopy(policy),
+            'methodology': methodology,
+            'source_suite_sha256': report['provenance']['suite_sha256'],
+            'source_records_sha256': report['provenance']['records_sha256'],
+            'cost_allocation': 'ORIGINAL_FULL_STUDY', 'preregistration_independently_verified': False})
+    return result
 
 
 def _counts(runs):
@@ -371,7 +519,53 @@ def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_ro
         ],
     }
     card["envelope"] = _usage_envelope(suite, records, report, card, artifact_root, verifier_root, corpus_root)
+    card['scope_assessments'] = _scope_assessments(suite, records, report, card['envelope'], artifact_root, verifier_root, corpus_root)
+    for assessment in card['scope_assessments']:
+        for key in ('use_when', 'prefer_baseline_when'):
+            card[key][:] = [item for item in card[key] if item['case_id'] not in assessment['case_ids']]
+        for row in card['envelope']['rows']:
+            if row['family'] not in assessment['declaration']['families']:
+                continue
+            row['scope_id'] = assessment['id']
+            row['scope_blockers'] = assessment['blockers']
+            if row['decision_code'] in ('NOT_TESTED', 'OBSERVED_REGRESSION', 'RISK_OBSERVED'):
+                continue
+            _set_decision(row, 'INSUFFICIENT_EVIDENCE' if assessment['negative_evidence'] else assessment['decision_code'])
+        if not (assessment['supported'] or assessment['baseline_preferred']):
+            continue
+        target = card['use_when'] if assessment['supported'] else card['prefer_baseline_when']
+        for case in report['cases']:
+            if case['id'] not in assessment['case_ids']:
+                continue
+            # Scope guidance replaces any conflicting whole-study recommendation.
+            for key in ('use_when', 'prefer_baseline_when'):
+                card[key][:] = [item for item in card[key] if item['case_id'] != case['id']]
+            reason = ('预先声明范围 ' + assessment['id'] + ' 的整体证据满足局部条件；'
+                      + ('限于该范围试用。' if assessment['supported'] else '该范围基线优先。')
+                      + '这是范围层结论，不宣称每个案例都有增益；整项研究的负面结果仍须查看。')
+            target.append({**_scenario(case, prompts[case['id']], reason, _case_cost_delta(case)), 'scope_id': assessment['id']})
+        for item in card['investigate']:
+            if item['case_id'] in assessment['case_ids']:
+                item['reason'] = '局部范围通过独立条件检查；整项研究的阻断与负向证据仍完整保留，不能外推。'
+    card['envelope']['scope_assessments'] = card['scope_assessments']
+    card['envelope']['study_verdict'] = report['verdict']
+    card['envelope']['rows'].sort(key=lambda r: (_DECISIONS[r['decision_code']][2], r['family']))
     return card
+
+
+_DECISIONS = {
+    'OBSERVED_REGRESSION': ('red', '观察到退步', 0),
+    'RISK_OBSERVED': ('red', '观察到风险', 0),
+    'INSUFFICIENT_EVIDENCE': ('yellow', '证据不足', 1),
+    'NOT_TESTED': ('gray', '尚未测试', 2),
+    'BASELINE_PREFERRED': ('blue', '基线优先', 3),
+    'LIMITED_TRIAL': ('green', '限域试用', 4),
+}
+
+
+def _set_decision(row, code):
+    color, label, _ = _DECISIONS[code]
+    row.update(decision_code=code, decision=label, color=color)
 
 
 def _usage_envelope(suite, records, report, card, artifact_root, verifier_root, corpus_root):
@@ -426,13 +620,15 @@ def _usage_envelope(suite, records, report, card, artifact_root, verifier_root, 
             counts = {k: sum(r[k] for r in rr) for k in ("planned", "errors", "unknown")}
             counts["rate"] = counts["errors"] / counts["planned"] if counts["planned"] and not counts["unknown"] else None
             refusals[arm] = counts
+        metric_status = {'over_refusal': {arm: _metric_state(suite, family, counts, bool(scientific['unavailable_cases']))
+                                        for arm, counts in refusals.items()}}
         arms = {}
         for arm in ("with", "without"):
             runs = [r for c in cases for r in c["runs"] if r["arm"] == arm]
             failed = sum(r["status"] in _FAILURES for r in runs)
             unknown = sum(r["status"] not in _FAILURES | {"completed"} for r in runs)
             costs = [r["cost_usd"] for r in runs]
-            complete_cost = (bool(costs) and None not in costs and report["cost_analysis"]["complete_category_coverage"])
+            complete_cost = (bool(costs) and None not in costs and report["cost_analysis"]["allocation_coverage_complete"])
             success = rates["arms"][arm]
             arms[arm] = {"observed": sum(r["status"] != "missing" for r in runs), "planned": len(runs),
                 "failed": failed, "unknown": unknown,
@@ -459,25 +655,26 @@ def _usage_envelope(suite, records, report, card, artifact_root, verifier_root, 
             negatives.append(f"启用组 {refusals['with']['errors']} 次误拒答")
         observed = sum(a["observed"] for a in arms.values())
         if not observed:
-            color, decision = "gray", "未测：无运行观察"
+            code = 'NOT_TESTED'
         elif negatives:
-            color, decision = "red", "暂不推广：先处理负向证据"
+            code = 'OBSERVED_REGRESSION' if rates['harmed'] or delta is not None and delta < -_EPSILON else 'RISK_OBSERVED'
         elif ids and ids <= baseline and not missing:
-            color, decision = "red", "基线优先：本目标下未见额外收益"
+            code = 'BASELINE_PREFERRED'
         elif (ids and ids <= supported and not missing and not rates["unknown_pairs"]
-              and all(r["rate"] is not None for r in refusals.values())
+              and all(r['status'] in ('MEASURED', 'NOT_APPLICABLE') for r in metric_status['over_refusal'].values())
               and report["cost_analysis"]["complete_category_coverage"]
               and arms["with"]["cost_per_success_usd"] is not None):
-            color, decision = "green", "可限域试用：仅限已测案例与绑定条件"
+            code = 'LIMITED_TRIAL'
         else:
-            color, decision = "yellow", "仅供调查／试用：证据不足或收益未明确"
-        rows.append({"family": family, "color": color, "decision": decision, "case_ids": sorted(ids),
+            code = 'INSUFFICIENT_EVIDENCE'
+        rows.append({"family": family, "case_ids": sorted(ids), 'metric_status': metric_status,
             "quality_delta": delta, "harmed_pairs": rates["harmed"],
             "unknown_pairs": rates["unknown_pairs"], "planned_pairs": rates["planned_pairs"],
             "resolved_pairs": rates["planned_pairs"] - rates["unknown_pairs"],
             "over_refusal": refusals, "arms": arms, "negative_evidence": negatives})
-    rows.sort(key=lambda r: ({"red": 0, "yellow": 1, "gray": 2, "green": 3}[r["color"]], r["family"]))
-    return {"schema_version": 1, "policy": "CONSERVATIVE_DISPLAY_V1", "binding": binding,
+        _set_decision(rows[-1], code)
+    rows.sort(key=lambda r: (_DECISIONS[r['decision_code']][2], r['family']))
+    return {"schema_version": 1, "policy": "EXPLICIT_DECISIONS_V2", "binding": binding,
         "binding_status": "INCOMPLETE" if missing else "DECLARED_BOUND_NOT_AUTHENTICATED",
         "missing_identity": missing, "rows": rows,
         "negative_evidence": [f"{r['family']}：{n}" for r in rows for n in r["negative_evidence"]],
@@ -486,8 +683,9 @@ def _usage_envelope(suite, records, report, card, artifact_root, verifier_root, 
         "invalidation": ["plugin_sha256 改变，即使版本号未变。", "host/model 名称或版本、工具、环境、配置或预算改变。",
             "任务族之外的新任务、输入分布、参考答案、质量目标或评分规则改变。",
             "新增失败、harmed pairs、误拒答、成本或人工复核证据；必须生成新修订，旧卡保留。"],
-        "limits": "颜色是保守展示规则，不是新统计检验。harmed pairs 为基线成功而启用失败的已观察配对，不证明因果伤害。"
-                  "重复不是独立任务族；未测误拒答与未知成本不填零；合成数据不能获绿灯。哈希不认证执行或来源。"}
+        "limits": "文字结论优先，颜色仅辅助。没有额外收益不等于插件有害；尚未证明收益不等于证明没有收益。"
+                  "harmed pairs 不证明因果伤害；重复不是独立任务族。不适用须事前声明并接受有名有据的复核；复核真实性未认证。"
+                  "未知成本不填零；合成数据不支持使用。范围声明与哈希不认证预注册时间、执行或来源。"}
 
 
 def check_usage_envelope(card, plugin_sha256, conditions):
@@ -517,9 +715,11 @@ def _markdown(value):
 def _envelope_cells(row):
     def number(value):
         return "未知" if value is None else f"{value:.3f}"
-    def refusal(r):
+    def refusal(r, state):
+        if state['status'] == 'NOT_APPLICABLE':
+            return '不适用：' + state['contract']['reason']
         if not r["planned"]:
-            return "未测"
+            return '未知：判据无法读取' if state['status'] == 'UNKNOWN' else '应测未测'
         return f"{r['errors']}/{r['planned']}" + (f"；{r['unknown']} 未知" if r["unknown"] else "")
     def failures(a):
         if not a["planned"]:
@@ -529,9 +729,13 @@ def _envelope_cells(row):
     w, b = row["arms"]["with"], row["arms"]["without"]
     def cost(a):
         return "无成功，未定义" if a["planned"] and not a["successes"] and not a["success_unknown"] else number(a["cost_per_success_usd"])
-    return [row["family"], {"red": "红", "yellow": "黄", "green": "绿", "gray": "灰"}[row["color"]] + " · " + row["decision"],
+    states = row['metric_status']['over_refusal']
+    refusal_cell = ('不适用（两组；声明复核）：' + states['with']['contract']['reason']
+                    if all(s['status'] == 'NOT_APPLICABLE' for s in states.values()) else
+                    refusal(row['over_refusal']['with'], states['with']) + ' / ' + refusal(row['over_refusal']['without'], states['without']))
+    return [row["family"], row["decision"] + (' · 范围 ' + row['scope_id'] if row.get('scope_id') else ''),
             number(row["quality_delta"]), f"{row['harmed_pairs']}/{row['planned_pairs']}；{row['unknown_pairs']} 未知",
-            refusal(row["over_refusal"]["with"]) + " / " + refusal(row["over_refusal"]["without"]),
+            refusal_cell,
             cost(w) + " / " + cost(b),
             failures(w) + " / " + failures(b),
             f"{len(row['case_ids'])} 案例；{w['observed']} / {b['observed']} 次；{row['resolved_pairs']}/{row['planned_pairs']} 配对可判"]
@@ -545,10 +749,15 @@ def _envelope_markdown(card):
     binding = env["binding"]
     lines = ["## 单页使用包络", "", "**负向证据优先**：" + _markdown("；".join(env["negative_evidence"]) or "未观察到负向项；不等于已证实无风险。"), "",
              f"证据：{_markdown(env['evidence_type'])}；研究阻断 {len(env['blockers'])} 项；身份缺口：{_markdown(env['missing_identity'])}。", "",
-             "绿：限域试用；黄：调查／证据不足；红：暂不推广或基线优先；灰：未测。", "",
+             "基线优先 ≠ 观察到退步；证据不足 ≠ 没有收益。限域试用仅适用于冻结范围。颜色只辅助阅读。", "",
              "| " + " | ".join(_ENVELOPE_HEADERS) + " |", "| " + " | ".join(["---"] * len(_ENVELOPE_HEADERS)) + " |"]
     for row in env["rows"]:
         lines.append("| " + " | ".join(_markdown(c) for c in _envelope_cells(row)) + " |")
+    lines += ['', '整项研究结论：' + _markdown(card['verdict']) + '；局部范围结论不能覆盖整项研究结果。', '']
+    for scope in card.get('scope_assessments', []):
+        lines += ['- 范围 ' + _markdown(scope['id']) + '：' + _markdown(_DECISIONS[scope['decision_code']][1])
+                  + '；完整配对 ' + str(scope['resolved_pairs']) + '/' + str(scope['planned_pairs'])
+                  + '；阻断：' + _markdown(scope['blockers'])]
     lines += ["", "W / B = 启用 / 基线；质量 Δ = 启用 − 基线；harmed 为已判定计数，未知配对不作零伤害。失败率范围保留缺失／跳过；每成功成本包含失败与分摊开销。", "",
               f"绑定 plugin_sha256：{_markdown(binding['plugin_sha256'])}；宿主 {_markdown(binding['host'])} / {_markdown(binding['host_version'])}；模型 {_markdown(binding['model'])} / {_markdown(binding['model_version'])}。", "",
               "**失效条件**：" + " ".join(_markdown(s) for s in env["invalidation"]), "",
@@ -567,6 +776,14 @@ def render_usage_envelope(card):
     rows = "".join('<tr class="' + row["color"] + '">' + "".join("<td>" + esc(c) + "</td>" for c in _envelope_cells(row)) + "</tr>" for row in env["rows"])
     identity = " · ".join(f"{key}: {esc(binding[key])}" for key in ("plugin_sha256", "host", "host_version", "model", "model_version"))
     provenance = " · ".join(f"{key}: {esc(binding[key])}" for key in ("suite_sha256", "records_sha256", "conditions_sha256", "cost_ledger_sha256"))
+    scope_details = ''.join('<details><summary>范围 ' + esc(s['id']) + ' · ' + esc(_DECISIONS[s['decision_code']][1])
+        + '</summary><p>冻结任务族：' + esc(', '.join(s['declaration']['families']))
+        + '；完整配对：' + str(s['resolved_pairs']) + '/' + str(s['planned_pairs'])
+        + '；要求至少 ' + str(s['declaration']['min_clusters']) + ' 个任务族、' + str(s['declaration']['min_complete_pairs'])
+        + ' 个完整配对。成本沿用全研究分摊。</p><p>阻断：' + esc('；'.join(s['blockers']) or '无')
+        + '</p><p>负向证据：' + esc('；'.join(s['negative_evidence']) or '未观察到') + '</p></details>'
+        for s in card.get('scope_assessments', []))
+    negative_class = 'negative' if env['negative_evidence'] else 'negative neutral'
     return f'''<!doctype html>
 <html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
@@ -577,14 +794,19 @@ body{{margin:0;padding:24px}}main{{max-width:1440px;margin:auto;background:white
 h1{{font-size:26px;margin:0 0 8px}}p{{line-height:1.5;margin:9px 0}}.sub,footer{{color:#475569;font-size:12px}}.negative{{border-left:5px solid #ad2431;background:#fff0f0;padding:12px;font-size:14px}}
 .identity{{font:12px ui-monospace,monospace;overflow-wrap:anywhere}}table{{width:100%;border-collapse:collapse;font-size:12px;margin:16px 0}}th,td{{border-bottom:1px solid #ccd5df;padding:11px 8px;text-align:left;vertical-align:top;overflow-wrap:anywhere}}th{{background:#172432;color:white}}
 tr.red{{background:#fff1f2}}tr.yellow{{background:#fffae4}}tr.green{{background:#edf8f0}}tr.gray{{background:#f1f3f5;color:#56616e}}tr.red td:first-child{{border-left:5px solid #b32131}}tr.yellow td:first-child{{border-left:5px solid #956000}}tr.green td:first-child{{border-left:5px solid #16743d}}tr.gray td:first-child{{border-left:5px solid #79818c}}.scroll{{overflow:auto}}
+tr.blue{{background:#eef5ff}}tr.blue td:first-child{{border-left:5px solid #3366a8}}td:nth-child(2){{font-weight:700;min-width:6em}}
+.negative.neutral{{border-color:#64748b;background:#f1f5f9}}details{{padding:10px 0;border-top:1px solid #ccd5df}}summary{{cursor:pointer;font-weight:600}}
+table{{table-layout:fixed;min-width:1050px}}th:nth-child(1){{width:9%}}th:nth-child(2){{width:15%}}th:nth-child(3){{width:6%}}th:nth-child(4){{width:9%}}th:nth-child(5){{width:21%}}th:nth-child(6){{width:13%}}th:nth-child(7){{width:13%}}th:nth-child(8){{width:14%}}td:nth-child(3){{white-space:nowrap;overflow-wrap:normal}}
 @media print{{@page{{size:A4 landscape;margin:10mm}}body{{padding:0;background:white}}main{{padding:0;border:0}}th,td{{padding:7px 5px}}*{{print-color-adjust:exact}}tr{{break-inside:avoid}}}}
 </style><main>
 <h1>何时值得用 · 使用包络卡</h1><p>{esc(plugin['name'])} · {esc(plugin['version'])} · {esc(card['study_id'])}</p>
-<div class="negative"><strong>先看负向证据</strong><br>{esc(negative)}</div>
+<div class="{negative_class}"><strong>先看负向证据</strong><br>{esc(negative)}</div>
 <p class="sub">证据类型：{esc(env['evidence_type'])} · 研究阻断：{len(env['blockers'])} · 身份缺口：{esc(', '.join(env['missing_identity']) or '无；仅核对声明，未认证来源')} · 所有未列任务均未测。</p>
 <p class="identity">{identity}</p>
-<p class="sub">🟢 限域试用　🟡 调查／证据不足　🔴 暂不推广／基线优先　⚪ 未测；文字与颜色同时编码。</p>
+<p><strong>基线优先 · 观察到退步／风险 · 证据不足 · 限域试用 · 尚未测试</strong></p>
+<p class="sub">整项研究：{esc(card['verdict'])}。范围结论不覆盖整项研究的负面结果。没有额外收益不等于有害；尚未证明收益不等于证明没有收益。颜色只辅助阅读。</p>
 <div class="scroll"><table><thead><tr>{''.join('<th scope="col">' + esc(h) + '</th>' for h in _ENVELOPE_HEADERS)}</tr></thead><tbody>{rows}</tbody></table></div>
+{scope_details}
 <p class="sub">W / B = 启用 / 基线；质量 Δ = 启用 − 基线（0–1）。harmed pairs = 基线成功、启用失败，未知配对单列。样本量为案例、观察运行与可判配对；重复不是独立任务族。执行失败率按计划次数，缺失／跳过给范围。每成功成本包含失败与分摊开销；未知不填零。成本依据：{esc(env['cost_basis'])}，不据此宣称已结算。</p>
 <p><strong>失效条件</strong>　{esc(' '.join(env['invalidation']))}</p>
 <footer>{esc(env['limits'])}<p>本卡离线静态生成；不监控环境，不执行安装、卸载或扩权。完整阻断与逐项来源见同目录 USAGE.md / card.json。</p><p class="identity">{provenance}</p></footer>

@@ -1,0 +1,46 @@
+{
+  "type": "LOCAL_ENGINEERING_ACCEPTANCE",
+  "version": "0.6.0",
+  "full_tests_passed": 591,
+  "full_test_seconds": 139.291,
+  "skipped": 0,
+  "targeted_pilot_tests_passed": 12,
+  "relocated_smoke": {
+    "unicode_and_spaces": true,
+    "empty_report": "AWAITING_REAL_PARTICIPANT",
+    "unfilled_input_retained_as_failure": true,
+    "manufactured_input_prepared": true,
+    "interactive_journal_and_summary": true,
+    "help_and_blocked_retained": true,
+    "counts_as_real_participant": false,
+    "private_work_excluded_from_distribution": true
+  },
+  "real_participants": 0,
+  "real_plugin_evaluation_performed": false,
+  "pvl_with_without_study_performed": false,
+  "pvl_benefit_established": false,
+  "new_model_calls": 0,
+  "new_paid_provider_invocations": 0,
+  "published": false,
+  "source_sha256": {
+    "examples/pseudobulk-author-pilot/prepare.py": "792eee4e80d1f1284c349937e047aaff0e5dd3a2cea0e33a972c51e575dc8f56",
+    "examples/pseudobulk-author-pilot/observe.py": "2964c0fd7aa3de568f5d894264942d1431c5547e0f3805834b4db506c150740a",
+    "examples/pseudobulk-author-pilot/report.py": "d5ccd2ea00f736134eeb582c09b5ffda1db27ba641099a23f5e4e553655f0702",
+    "examples/pseudobulk-author-pilot/author-input.json": "ca0b77bbded104579d761d9c3f01590261c76d51dafde721fb8d6e9940108b06",
+    "examples/pseudobulk-author-pilot/session.json": "50528c7c827df25231939851a4f9eb5e524fb045f0fc4bb67ad2c65a9460e5a6",
+    "examples/pseudobulk-author-pilot/RUNBOOK.md": "0e1a658c8e8f1a98a88d2f6831350b04fec06a7ce3bad988292385b2416d7307",
+    "examples/pseudobulk-author-pilot/STUDY-PLAN.md": "662e3f26dd7bd3cf6b2eae1e3d900f26354399247ed1123f1f4fe49d0c434a79",
+    "examples/pseudobulk-author-pilot/BASELINE.md": "2a8c22ec8f06b260d28d490ecc9dd703f3c4d0495d9807be1b5999877e1903e1",
+    "tests/test_author_pilot.py": "4b8028f59b6dd2378e0b03ded240913a03092b5e7c333f2d1348e8b0378bb017",
+    "docs/START.md": "c02cc2cf9bd32ac2ea4d5fa1f02e8983f3fb4402c6ea7f4e376ed137df0b385c",
+    "docs/OPERATIONS.md": "a6940b14e398eab037ff758b295db93d74ee761b1b9858eba62ec7f28da03beb"
+  },
+  "test_log_sha256": "9a0877730d03aedcc061eb490b3e6128b69e47a399b06ad3d548534f67f87058",
+  "limitations": [
+    "Author applicability statements and participant identity are not authenticated.",
+    "Stopwatch phases are declared, not independently observed activity.",
+    "Milestones remain pending adjudication; missing pre-journal time and interrupted tails remain unknown.",
+    "Real participant and private problem/data will be supplied later by the user.",
+    "Full suite preceded final output-location adjustment; relocated executable smoke covers final paths."
+  ]
+}

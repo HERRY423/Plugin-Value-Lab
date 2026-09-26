@@ -1,0 +1,64 @@
+{
+  "type": "LOCAL_ENGINEERING_ACCEPTANCE",
+  "version": "0.6.0",
+  "full_suite": {
+    "passed": 579,
+    "seconds": 180.008,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "final_ui_adjustment_recheck": {
+    "usage_tests_passed": 52,
+    "diagnosis_tests_passed": 8
+  },
+  "new_regression_tests": 14,
+  "tested_boundaries": [
+    "Baseline preferred is blue; regression and risk have distinct explicit labels",
+    "Required unmeasured, unknown, measured and reviewed not-applicable metric states remain distinct",
+    "Not-applicable declarations require a reason and named accepted review and cannot contradict decision checks",
+    "Frozen nonoverlapping whole-family scopes retain all planned cases and declared evidence minima",
+    "Post-hoc changes under an old lock and shared provenance failures block local support",
+    "Unrelated missing or negative outcomes remain in the full report without erasing eligible local scope evidence",
+    "Full-study cost allocations are retained without dropping shared setup expenditure",
+    "Scoped two-direction decision-error ceilings are recomputed using original observations",
+    "Synthetic data cannot establish supported use",
+    "Diagnose and usage-card produce identical cards with the same cost ledger, including unknown costs",
+    "Malformed cost-ledger input fails rather than silently omitting costs"
+  ],
+  "browser_check": {
+    "result": "PASS",
+    "source": "manufactured UI fixture",
+    "observed": [
+      "explicit labels and colors",
+      "not-applicable reason",
+      "scope detail expansion",
+      "numeric column readability"
+    ],
+    "real_study": false
+  },
+  "source_sha256": {
+    "value_lab/core.py": "9db338016127369d17b10fafd1bacf0865710768057ce172ebecc56061a24404",
+    "value_lab/costs.py": "241986361672bd34d12346b6db73b68d7207d40b647fe066127604f1cb0fa406",
+    "value_lab/usage.py": "929a14670c814a7e205655c8ddd17fad0a444b3c198c06ee91841f643dcdeeda",
+    "tests/test_usage_envelope.py": "6e3c1829b8fbed3509772bd459da8598ebc9c86e37b3303aa240b8df77f71274",
+    "tests/test_author_diagnosis.py": "03ec92846620bbbe039f0f9a5f0f6fabd817c64ba8bcc6dc38eecfb467eb0ffb",
+    "docs/OPERATIONS.md": "2fb3c24f461619a51b2bf6fd7ea667e91a9e7313cef1d5bf1beaeaf4dcbcdfda",
+    "docs/history/P2-REUSE-GUIDANCE.zh-CN.md": "95c9ce8459f54d08d11f701f652534ada72dc7748b91dabea308602393167ba6"
+  },
+  "test_log_sha256": "4d7e2b53ced87ea4c7602fdd492ffa0f0c9761d73f9acd8f8853bf31b9374e55",
+  "new_model_calls": 0,
+  "new_paid_provider_invocations": 0,
+  "real_user_benefit_study_performed": false,
+  "independent_preregistration_verified": false,
+  "review_identity_authenticated": false,
+  "remote_ci_run": false,
+  "published": false,
+  "limitations": [
+    "Regression observations and browser examples are manufactured fixtures.",
+    "Frozen declarations provide local tamper detection, not independently authenticated preregistration.",
+    "Named metric reviews are declarations, not authenticated independent review.",
+    "Scope guidance remains descriptive and bound to its declared cases and conditions; it does not imply general benefit.",
+    "Full-suite validation preceded the final presentation-only changes; all 52 usage tests were rerun on the final presentation."
+  ]
+}

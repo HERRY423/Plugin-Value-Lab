@@ -64,7 +64,44 @@ python scripts/value_lab.py compare-native-repair BEFORE_CAPTURE AFTER_CAPTURE -
 
 价值决策继续使用完整冻结研究和 [P2 条件化建议](P2-REUSE-GUIDANCE.zh-CN.md)。本接口始终保留 `comparison_eligible=false`，不会自动发布、认证、卸载插件或把本机复测计为独立采用。
 
-## 本次验收边界
+## 分类修复与作者过程记录（2026-09-26 修正）
+
+以下修正已有比较器行为，版本仍为 0.6.0。历史采集包不改写。每个新 case 可在准备前声明 `repair: {"kind": "execution", "skill": "plugin-name:skill-name"}`，该字段进入冻结合同，两轮必须一致；仅在修复记录中声称类型无效。不声明时沿用 `scientific_artifact`。
+
+| kind | 修复前要求 | 修复后及对照要求 |
+| --- | --- | --- |
+| `scientific_artifact` | 成功插件调用先于成功脚本执行；实际产物判据失败 | 相同规则下产物通过，调用与执行链完整 |
+| `execution` | 完整会话里的工具错误，或原生错误与终止错误相互支持；与被测插件调用尝试相连 | 成功插件调用、脚本成功、全部产物检查通过；失败保留在分母 |
+| `trigger` | 已加载被测插件、完整自然任务轨迹、被测插件确实未调用 | 正确技能成功调用且先于产物脚本；全部产物通过；必须包含负对照 |
+| `negative_control` | 冻结的不需要插件的自然任务 | 两轮两臂都检查未调用被测插件；调用失败也算多余调用 |
+
+执行观察区分 `OBSERVED_SUCCESS`、`OBSERVED_FAILURE`、`UNKNOWN`。`execution_observations` 保留逐次观察，`reliability_counts` 与 `reliability_denominators` 覆盖计划中的全部运行。缺终止事件、重复调用 ID、日志与汇总矛盾、模型漂移保持未知。仅有“timeout”文字不能替代完整错误轨迹。完整崩溃可以发生在脚本创建前，不要求凭空补出成功脚本。
+
+新增的 `$execution`、`$trigger` 是冻结类型对应的比较端点，不能用作自定义 grader ID；在 `repair_record.repairs[].grader_id` 中引用实际失败端点。原始产物评分单独保留，崩溃后缺产物不改写成科学错误。原生记录失败而产物看似正确也不会成为执行成功。比较状态仍需完整条件、无退步、无基线变化；`LOCAL_RETEST_IMPROVEMENT` 与 `TRACE_SUPPORTED_LOCAL_CHAIN` 不建立因果收益或科学真实性。
+
+这里的调用观察仅覆盖原生 `Skill` 协议。直接读取技能文件或其他调用方式不能据此判为插件未使用；适用性须在冻结任务时确定。自然措辞仍是作者声明，未被独立认证。
+
+作者修复记录现在可以引用仍未修好的失败检查；对应 link 的 `outcome` 为 `NOT_REPAIRED`，修复链保持 `OPEN`。不要删除失败尝试来获得完整链。
+
+可选 `repair_record.process` 包含 `origin` 和 `events`。`origin` 为 `previously_unknown`、`known_seed` 或 `retrospective`。每个事件严格包含：
+
+```json
+{
+  "stage": "diagnosis_seen",
+  "at": "2026-09-26T09:00:00+00:00",
+  "details": "实际作者当时看到的诊断与理解；示例不是观察证据",
+  "evidence_sha256": "<对应留存材料的真实 SHA-256>",
+  "outcome": null
+}
+```
+
+按 `diagnosis_seen → hypothesis → edit → retest` 记录；失败后追加 `hypothesis → edit → retest`，不覆盖原尝试。时间必须带时区、严格递增。首个摘要必须绑定修复前重新计算的诊断；最终 edit 摘要必须等于比较报告的 `selected_change_sha256`（所选文件两轮摘要映射），最终 retest 必须绑定本次 after receipt。`retest.outcome` 为 `failed`、`unknown` 或 `improved`，且最终改善声明必须符合比较结果，其他事件 outcome 为 null。
+
+作者应实际保留假设文字、有限代码差异和每次原生采集包，再填入相应摘要；先用不含 process 的记录离线比较即可取得 `selected_change_sha256`，随后另建输出目录生成完整过程报告。此操作不会产生新观察。中间尝试摘要和作者时间线当前只被留存，**没有逐包复核或独立时间认证**；字段 `intermediate_evidence_verified`、`all_attempts_independently_verified` 明确为 false。
+
+已知种子标为 `KNOWN_SEED_RESTORATION`，没有过程为 `NOT_RECORDED`，其他合规过程仅为 `AUTHOR_DECLARED_PROCESS`。`pvl_helped_author_established` 始终为 false。真正验证“PVL 帮助作者修复”还需要事前保留的未知缺陷诊断、真实作者假设与改动、完整自然复测及对照；本次软件修正和合成回归测试没有提供这种新实验。
+
+## 历史验收边界
 
 本机 WSL2 内核实 Claude Code 2.1.278、Python 3.14.4、bubblewrap、socat；无网络空命令可启动。四个用例的生成 scaffold 与操作者编写的对照脚本已实际执行，输入摘要一致，十项产物检查通过；两张有效表另外与 SciPy BH 结果交叉核算。此处不是 Claude 生成脚本或新的模型运行，未验证评分参考不可访问。
 

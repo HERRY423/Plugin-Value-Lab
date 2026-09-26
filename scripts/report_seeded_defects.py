@@ -60,12 +60,24 @@ def observed_rows(root, results):
             row['author_entry_alert']=row['alert']
             if h['hypotheses']:
                 row['alert']=True
+                if 'without_access_alert' in row:
+                    row['without_access_alert']=True
                 row['localization']=sorted(set(row['localization']+[x['stage']+'/hypothesis' for x in h['hypotheses']]))
             if row['family']=='trigger':
                 extra['invocation_route']=load_json(home/'workspaces'/row['arm']/'host-observation.json')['route']
             if row['runtime_backend']:
                 receipt=load_json(home/'workspaces'/row['arm']/'backend-receipt.json')
                 extra['backend']={k:receipt[k] for k in ('backend','version','entrypoint','fallback')}
+            if row.get('runtime_access'):
+                from validate_seeded_defects import assess_access
+                observation=home/'workspaces'/row['arm']/'access-observation.json'
+                if sha(observation)!=row['runtime_access']['observation_sha256']:
+                    raise ValueError('Access observation changed')
+                assessed=assess_access(load_json(observation),f'synthetic-{row["id"]}-{row["phase"]}-{row["arm"]}',
+                                      load_json(root/'cases'/row['id']/'oracle.json')['access_policy'])
+                if assessed!={k:v for k,v in row['runtime_access'].items() if k!='observation_sha256'}:
+                    raise ValueError('Access observation does not reproduce its assessment')
+                extra['access']=assessed
         row['control_identity']=suite_digest({'artifact_sha256':sha(artifact),'rules':declared,'observations':extra})
         output.append(row)
     return output
@@ -90,6 +102,8 @@ def fraction(n,d): return f'{n}/{d}（{100*n/d:.1f}%）' if d else '未覆盖'
 
 
 def build_report(root, summary, results):
+    if results.get('boundary_revision'):
+        return build_boundary_report(root, summary, results)
     basic=summary['metrics']['artifact_only']; full=summary['metrics']['configured_workflow']
     levels={'multiple-testing':'L2：BH／完整检验集合', 'id-alignment':'L2：ID 与数值绑定／覆盖',
         'pseudoreplication':'L2：独立单位数／标准误', 'reference-leakage':'L2：声明的训练 ID 列表；隐藏读取未定位',
@@ -148,6 +162,36 @@ def build_report(root, summary, results):
     return '\n'.join(lines)
 
 
+def build_boundary_report(root, summary, results):
+    """A new development retest; never rewrite the historical 22/24 vs 19/24."""
+    lines=['# 判定边界复测（2026-09-26）', '',
+        '这是已暴露反例上的开发集修正复测，未增加独立任务或获得独立标注。旧实验的 22/24 报警、19/24 配对净检出保持不变。', '',
+        '保留原八类、每类三个变异与合法对照；使用新的冻结契约和已修改检测器。96 次主要本地进程执行之外，另有 6 次只阻断评估文件访问的干预执行。无模型调用、真实宿主或付费。', '',
+        '| 类别 | 无访问观察：报警 | 无访问观察：配对净检出 | 加受控访问观察：报警 | 配对净检出 | 正常对照误报（去重） |',
+        '| --- | ---: | ---: | ---: | ---: | ---: |']
+    basic=summary['without_access_observer']['configured_workflow']
+    full=summary['metrics']['configured_workflow']
+    for family,title in FAMILIES.items():
+        a,b=basic[family],full[family]
+        lines.append(f'| {title} | {a["TP"]}/{a["defects"]} | {a["paired_specific_detections"]}/{a["defects"]} | {b["TP"]}/{b["defects"]} | {b["paired_specific_detections"]}/{b["defects"]} | {b["FP"]}/{b["distinct_controls"]} |')
+    lines += ['', '## 每项检查到底说明什么', '',
+        '- 决定、交付与正确性分开：over_refusal 保留 decision-only 语义；冻结的独立字段／任务答案检查负责发现空答案和错误答案。无有效 decision 时未知，不算确定拒答。',
+        '- 标签别名在运行前明确冻结；歧义或跨类碰撞拒绝。ARI/NMI 仍只检查划分，不改成字符串比较。',
+        '- 训练 ID 只在声明 unordered_paths 时按无重复集合检查；顺序变化不再报警，隐藏访问仍不能从声明判断。',
+        '- Skill 与读取候选内容分别记录。Read 必须有匹配的成功响应和冻结候选字节摘要；文件被读过不证明执行或因果贡献。未知传输仍未知。',
+        '- 受控 Python 宿主在插件之外设置访问 hook，记录指定资源的 open 尝试，并用新进程阻断评估资源。它不读插件自报 model-state 来下判据，也不把结果相同当无泄漏。',
+        '- 访问尝试不等于已传输数据；hook 只覆盖本受审阅 Python 样例，不是通用原生宿主监控、恶意代码防护或 OS 沙箱。缺失／未完成观察保持未知。', '',
+        '## 干预原始结果', '']
+    for case in results['access_interventions']:
+        for row in case['runs']:
+            lines.append(f'- {case["id"]} / {row["arm"]}: exit={row["returncode"]}, {row["access"]["status"]}, '
+                         f'同源={row["same_source"]}, 同输入={row["same_input"]}, 同输出={row["same_output"]}。')
+    lines += ['', '正常样例在阻断下仍应保持原结果；变异样例受阻只说明这段受控程序对该访问有依赖，不能外推真实插件泄漏覆盖率。', '',
+        f'协议摘要：`{results["protocol_sha256"]}`。原始目录：`{root.as_posix()}`。',
+        '作者主动时间、真实误报处理成本、未见事故检出能力、自然触发概率和 PVL 净收益均未建立。', '']
+    return '\n'.join(lines)
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--input',type=Path,required=True)
@@ -176,8 +220,15 @@ def main():
         'machine_timing':{'median_seconds':statistics.median(timing),'min_seconds':min(timing),'max_seconds':max(timing)},
         'human_time_to_first_diagnosis':None,'model_calls':0,'provider_cost_usd':0,
         'representative_accuracy':None,'independent_adjudication':False,'natural_trigger_probability':None}
+    if results.get('boundary_revision'):
+        ablated=deepcopy(rows)
+        for row in ablated:
+            row['alert']=row['without_access_alert']
+        summary.update(boundary_revision=results['boundary_revision'],without_access_observer=aggregate(ablated),
+                       access_intervention_processes=results['access_intervention_processes'],
+                       access_interventions=results['access_interventions'])
     output.mkdir(parents=True)
-    write_json(output/'detection-validity-20260925.json',summary)
+    write_json(output/('detection-boundaries-20260926.json' if results.get('boundary_revision') else 'detection-validity-20260925.json'),summary)
     (output/'DETECTION-VALIDITY.md').write_text(build_report(root,summary,results),encoding='utf-8')
     print(json.dumps({'output':str(output),'metrics':summary['metrics']},ensure_ascii=False,indent=2))
 

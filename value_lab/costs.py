@@ -273,6 +273,7 @@ def analyze_costs(suite, records, ledger=None, report=None, native_estimate=None
             "cash_evidence": cash_evidence(index, plan),
             "saving_fraction": -delta/totals[1] if delta is not None and totals[1] > 0 else None,
             "coverage": plan["coverage"], "complete_category_coverage": coverage_complete,
+            "allocation_coverage_complete": plan['coverage_complete'] and not plan['issues'] and not duplicates,
             "basis": "Declared base records plus explicitly additional entries; estimates and settlements are not interchangeable",
             "basis_counts": dict(Counter(e["basis"] for e in plan["entries"])),
             "entries": plan["entries"], "issues": plan["issues"] + ["重复执行成本记录: " + k for k in duplicates],

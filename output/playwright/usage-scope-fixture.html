@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>界面回归样例 · 全部为制造数据，不能据此选择插件 · 使用包络卡</title>
+<style>
+:root{font-family:system-ui,"Microsoft YaHei",sans-serif;color:#172432;background:#edf1f4}
+body{margin:0;padding:24px}main{max-width:1440px;margin:auto;background:white;padding:26px;border:1px solid #ccd5df;border-radius:14px}
+h1{font-size:26px;margin:0 0 8px}p{line-height:1.5;margin:9px 0}.sub,footer{color:#475569;font-size:12px}.negative{border-left:5px solid #ad2431;background:#fff0f0;padding:12px;font-size:14px}
+.identity{font:12px ui-monospace,monospace;overflow-wrap:anywhere}table{width:100%;border-collapse:collapse;font-size:12px;margin:16px 0}th,td{border-bottom:1px solid #ccd5df;padding:11px 8px;text-align:left;vertical-align:top;overflow-wrap:anywhere}th{background:#172432;color:white}
+tr.red{background:#fff1f2}tr.yellow{background:#fffae4}tr.green{background:#edf8f0}tr.gray{background:#f1f3f5;color:#56616e}tr.red td:first-child{border-left:5px solid #b32131}tr.yellow td:first-child{border-left:5px solid #956000}tr.green td:first-child{border-left:5px solid #16743d}tr.gray td:first-child{border-left:5px solid #79818c}.scroll{overflow:auto}
+tr.blue{background:#eef5ff}tr.blue td:first-child{border-left:5px solid #3366a8}td:nth-child(2){font-weight:700;min-width:6em}
+.negative.neutral{border-color:#64748b;background:#f1f5f9}details{padding:10px 0;border-top:1px solid #ccd5df}summary{cursor:pointer;font-weight:600}
+table{table-layout:fixed;min-width:1050px}th:nth-child(1){width:9%}th:nth-child(2){width:15%}th:nth-child(3){width:6%}th:nth-child(4){width:9%}th:nth-child(5){width:21%}th:nth-child(6){width:13%}th:nth-child(7){width:13%}th:nth-child(8){width:14%}td:nth-child(3){white-space:nowrap;overflow-wrap:normal}
+@media print{@page{size:A4 landscape;margin:10mm}body{padding:0;background:white}main{padding:0;border:0}th,td{padding:7px 5px}*{print-color-adjust:exact}tr{break-inside:avoid}}
+</style><main>
+<h1>何时值得用 · 使用包络卡</h1><p>界面回归样例 · 全部为制造数据，不能据此选择插件 · 0.0.0-demo · tutorial-value-study</p>
+<div class="negative"><strong>先看负向证据</strong><br>合成演示：以下数值不是实际插件收益。 harm-fixture：3 个 harmed pairs；harm-fixture：平均质量下降</div>
+<p class="sub">证据类型：synthetic · 研究阻断：0 · 身份缺口：无；仅核对声明，未认证来源 · 所有未列任务均未测。</p>
+<p class="identity">plugin_sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa · host: offline-tutorial · host_version: 1.2.3 · model: SIMULATED-NO-MODEL · model_version: revision-123</p>
+<p><strong>基线优先 · 观察到退步／风险 · 证据不足 · 限域试用 · 尚未测试</strong></p>
+<p class="sub">整项研究：REGRESSION_DETECTED。范围结论不覆盖整项研究的负面结果。没有额外收益不等于有害；尚未证明收益不等于证明没有收益。颜色只辅助阅读。</p>
+<div class="scroll"><table><thead><tr><th scope="col">任务族</th><th scope="col">决策</th><th scope="col">质量 Δ</th><th scope="col">harmed pairs</th><th scope="col">over-refusal W / B</th><th scope="col">每成功 USD W / B</th><th scope="col">执行失败率 W / B</th><th scope="col">样本量</th></tr></thead><tbody><tr class="red"><td>harm-fixture</td><td>观察到退步</td><td>-0.500</td><td>3/3；0 未知</td><td>应测未测 / 应测未测</td><td>无成功，未定义 / 2.010</td><td>0/3 (0%) / 0/3 (0%)</td><td>1 案例；3 / 3 次；3/3 配对可判</td></tr><tr class="yellow"><td>evidence-boundary</td><td>证据不足</td><td>0.667</td><td>0/3；0 未知</td><td>应测未测 / 应测未测</td><td>1.020 / 6.030</td><td>0/3 (0%) / 0/3 (0%)</td><td>1 案例；3 / 3 次；3/3 配对可判</td></tr><tr class="gray"><td>unmeasured</td><td>尚未测试</td><td>未知</td><td>0/0；0 未知</td><td>应测未测 / 应测未测</td><td>未知 / 未知</td><td>未测 / 未测</td><td>0 案例；0 / 0 次；0/0 配对可判</td></tr><tr class="blue"><td>negative-control</td><td>基线优先 · 范围 baseline-fixture</td><td>0.000</td><td>0/3；0 未知</td><td>不适用（两组；声明复核）：Fixture fixed transformation with no refusal decision interface</td><td>1.020 / 2.010</td><td>0/3 (0%) / 0/3 (0%)</td><td>1 案例；3 / 3 次；3/3 配对可判</td></tr><tr class="green"><td>delivery</td><td>限域试用 · 范围 delivery-only</td><td>0.833</td><td>0/3；0 未知</td><td>不适用（两组；声明复核）：Fixture fixed transformation with no refusal decision interface</td><td>1.020 / 无成功，未定义</td><td>0/3 (0%) / 0/3 (0%)</td><td>1 案例；3 / 3 次；3/3 配对可判</td></tr></tbody></table></div>
+<details><summary>范围 delivery-only · 限域试用</summary><p>冻结任务族：delivery；完整配对：3/3；要求至少 1 个任务族、3 个完整配对。成本沿用全研究分摊。</p><p>阻断：无</p><p>负向证据：未观察到</p></details><details><summary>范围 baseline-fixture · 基线优先</summary><p>冻结任务族：negative-control；完整配对：3/3；要求至少 1 个任务族、3 个完整配对。成本沿用全研究分摊。</p><p>阻断：无</p><p>负向证据：未观察到</p></details>
+<p class="sub">W / B = 启用 / 基线；质量 Δ = 启用 − 基线（0–1）。harmed pairs = 基线成功、启用失败，未知配对单列。样本量为案例、观察运行与可判配对；重复不是独立任务族。执行失败率按计划次数，缺失／跳过给范围。每成功成本包含失败与分摊开销；未知不填零。成本依据：CONDITIONAL_ON_SUBMITTED_ESTIMATES_OR_DECLARATIONS，不据此宣称已结算。</p>
+<p><strong>失效条件</strong>　plugin_sha256 改变，即使版本号未变。 host/model 名称或版本、工具、环境、配置或预算改变。 任务族之外的新任务、输入分布、参考答案、质量目标或评分规则改变。 新增失败、harmed pairs、误拒答、成本或人工复核证据；必须生成新修订，旧卡保留。</p>
+<footer>文字结论优先，颜色仅辅助。没有额外收益不等于插件有害；尚未证明收益不等于证明没有收益。harmed pairs 不证明因果伤害；重复不是独立任务族。不适用须事前声明并接受有名有据的复核；复核真实性未认证。未知成本不填零；合成数据不支持使用。范围声明与哈希不认证预注册时间、执行或来源。<p>本卡离线静态生成；不监控环境，不执行安装、卸载或扩权。完整阻断与逐项来源见同目录 USAGE.md / card.json。</p><p class="identity">suite_sha256: 278a7a97ce69a13b0290e0cd8f145c499eb0c5b6f2fc77bf4ae649dea1ef86c1 · records_sha256: c229c37074def5fe5c554b72b202b48d34581ad3eec6ae28579e024c01fddcb3 · conditions_sha256: 4545d1b9a66c3ef8074b841b73bb2270b8e6b5c41089a132a404019adab899ca · cost_ledger_sha256: 42c97b9fff93da8d15015cf51e7cb6504819185e9eae0bb50d98b64ab3779fa2</p></footer>
+</main></html>

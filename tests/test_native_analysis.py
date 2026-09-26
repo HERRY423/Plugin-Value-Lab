@@ -349,6 +349,191 @@ class NativeAnalysisTests(unittest.TestCase):
             expected = 'before artifact-producing script' if mode == 'late' else 'baseline invoked'
             self.assertTrue(any(expected in gap for gap in chain['gaps']), chain['gaps'])
 
+    @staticmethod
+    def add_skill(events, *, error=False):
+        events[1:1] = [
+            {'type': 'assistant', 'message': {'content': [{'type': 'tool_use', 'name': 'Skill',
+             'id': 'skill1', 'input': {'skill': 'fixture-analysis:analyze'}}]}},
+            {'type': 'user', 'message': {'content': [{'type': 'tool_result', 'tool_use_id': 'skill1',
+             'is_error': error, 'content': 'fixture only'}]}}]
+
+    def typed_recipe(self, kind, *, controls=False):
+        recipe = deepcopy(self.recipe)
+        recipe['cases'][0]['repair'] = {'kind': kind, 'skill': 'fixture-analysis:analyze'}
+        if controls:
+            control = deepcopy(recipe['cases'][0])
+            control.update(name='irrelevant', prompt='An ordinary task requiring no plugin.')
+            control['repair']['kind'] = 'negative_control'
+            recipe['cases'].append(control)
+        return recipe
+
+    def typed_record(self, before, report):
+        record = self.repair_record(before)
+        record['evidence_type'] = 'local'  # Declaration validation only; all streams here are synthetic.
+        record['repairs'] = [{**record['repairs'][0], 'case_id': key[0], 'grader_id': key[2]}
+                             for key in report['repaired_checks']]
+        return record
+
+    def test_observed_crash_enters_denominator_and_execution_chain(self):
+        recipe = self.typed_recipe('execution')
+        def failed(workspace, events, run, case, arm):
+            if arm == 'with':
+                self.add_skill(events, error=True)
+                events[-1].update(is_error=True, subtype='error_during_execution')
+                run['error'] = 'recorded crash'
+                (workspace / 'result.json').unlink()
+                (workspace / 'analysis.py').unlink()
+                del events[3:5]  # Crash preceded script creation; terminal failure is retained.
+        def success(workspace, events, run, case, arm):
+            if arm == 'with':
+                self.add_skill(events)
+        a = self.captured('before', recipe=recipe, mutate=failed)
+        (self.plugin / 'SKILL.md').write_text('fixed crash', encoding='utf-8')
+        b = self.captured('after', recipe=recipe, mutate=success)
+        report = self.compare(a, b)
+        self.assertEqual(report['status'], 'LOCAL_RETEST_IMPROVEMENT')
+        self.assertEqual(report['reliability_counts']['before'],
+                         {'OBSERVED_SUCCESS': 1, 'OBSERVED_FAILURE': 1, 'UNKNOWN': 0})
+        endpoint = next(r for r in report['checks'] if r['grader_id'] == '$execution' and r['arm'] == 'with')
+        self.assertEqual(endpoint['before'], {'pass': 0, 'fail': 1, 'unknown': 0})
+        record = self.typed_record(a, report)
+        linked = compare_native_repair(a[0], a[1], b[0], b[1], self.root/'linked', repair_record=record)['report']
+        self.assertEqual(linked['repair_chain']['status'], 'TRACE_SUPPORTED_LOCAL_CHAIN')
+
+    def test_execution_failure_is_not_inferred_from_truncation_or_aggregate_error(self):
+        recipe = self.typed_recipe('execution')
+        a = self.captured('before', recipe=recipe, correct=False)
+        for mode in ('truncated', 'contradictory', 'duplicate'):
+            def mutate(workspace, events, run, case, arm):
+                if arm != 'with':
+                    return
+                run['error'] = 'timeout'
+                if mode == 'truncated':
+                    events.pop()
+                elif mode == 'duplicate':
+                    events[-1].update(is_error=True, subtype='error')
+                    events.insert(2, deepcopy(events[1]))
+            b = self.captured(mode, recipe=recipe, mutate=mutate)
+            report = self.compare(a, b, mode + '-compare')
+            self.assertEqual(report['status'], 'INCOMPLETE_EVIDENCE')
+            self.assertEqual(report['reliability_counts']['after']['UNKNOWN'], 1)
+
+    def test_completed_tool_failure_is_observed_and_after_failure_cannot_pass(self):
+        recipe = self.typed_recipe('execution')
+        def fail(workspace, events, run, case, arm):
+            if arm == 'with':
+                events[2]['message']['content'][0]['is_error'] = True
+        a = self.captured('before', recipe=recipe, mutate=fail)
+        (self.plugin/'SKILL.md').write_text('changed', encoding='utf-8')
+        b = self.captured('after', recipe=recipe, mutate=fail)
+        report = self.compare(a, b)
+        self.assertEqual(report['status'], 'NO_COMPLETE_REPAIR_OBSERVED')
+        self.assertEqual(report['reliability_counts']['after']['OBSERVED_FAILURE'], 1)
+
+    def test_trigger_absence_to_success_and_negative_controls(self):
+        recipe = self.typed_recipe('trigger', controls=True)
+        a = self.captured('before', recipe=recipe)
+        (self.plugin/'SKILL.md').write_text('improved trigger', encoding='utf-8')
+        def success(workspace, events, run, case, arm):
+            if arm == 'with' and case['name'] == 'numeric':
+                self.add_skill(events)
+        b = self.captured('after', recipe=recipe, mutate=success)
+        report = self.compare(a, b)
+        self.assertEqual(report['status'], 'LOCAL_RETEST_IMPROVEMENT')
+        self.assertIn(('numeric', 'with', '$trigger'), report['repaired_checks'])
+        record = self.typed_record(a, report)
+        linked = compare_native_repair(a[0], a[1], b[0], b[1], self.root/'linked', repair_record=record)['report']
+        self.assertEqual(linked['repair_chain']['status'], 'TRACE_SUPPORTED_LOCAL_CHAIN')
+        self.assertEqual(linked['repair_chain']['links'][0]['defect_type'], 'trigger')
+        def overcall(workspace, events, run, case, arm):
+            if arm == 'with':
+                self.add_skill(events, error=case['name'] == 'irrelevant')
+        c = self.captured('overcall', recipe=recipe, mutate=overcall)
+        self.assertEqual(self.compare(a, c, 'overcall-compare')['status'], 'REGRESSION_OBSERVED')
+
+    def test_trigger_without_negative_controls_or_retyped_protocol_is_blocked(self):
+        recipe = self.typed_recipe('trigger')
+        a = self.captured('before', recipe=recipe)
+        def success(workspace, events, run, case, arm):
+            if arm == 'with':
+                self.add_skill(events)
+        b = self.captured('after', recipe=recipe, mutate=success)
+        self.assertEqual(self.compare(a, b)['status'], 'INCOMPLETE_EVIDENCE')
+        c = self.captured('retyped', recipe=self.typed_recipe('execution'), mutate=success)
+        self.assertEqual(self.compare(a, c, 'retyped-compare')['status'], 'PROTOCOL_CHANGED')
+
+    def test_trigger_failed_invocation_is_not_observed_non_invocation(self):
+        recipe = self.typed_recipe('trigger', controls=True)
+        def calls(workspace, events, run, case, arm):
+            if arm == 'with' and case['name'] == 'numeric':
+                self.add_skill(events, error=workspace.name.startswith('before'))
+        a = self.captured('before', recipe=recipe, mutate=calls)
+        (self.plugin/'SKILL.md').write_text('changed', encoding='utf-8')
+        b = self.captured('after', recipe=recipe, mutate=calls)
+        report = self.compare(a, b)
+        record = self.typed_record(a, report)
+        chain = compare_native_repair(a[0], a[1], b[0], b[1], self.root/'linked', repair_record=record)['report']['repair_chain']
+        self.assertEqual(chain['status'], 'OPEN')
+        self.assertTrue(any('non-invocation' in gap for gap in chain['gaps']))
+
+    def test_execution_reliability_keeps_every_repetition_and_unknown(self):
+        recipe = self.typed_recipe('execution')
+        recipe['cases'][0]['repetitions'] = 3
+        def mixed(workspace, events, run, case, arm):
+            if arm == 'with' and workspace.name.endswith('-2'):
+                run['error'] = 'crash'
+                events[-1].update(is_error=True, subtype='error')
+            elif arm == 'with' and workspace.name.endswith('-3'):
+                events.pop()
+        a = self.captured('before', recipe=recipe, mutate=mixed)
+        b = self.captured('after', recipe=recipe)
+        report = self.compare(a, b)
+        self.assertEqual(report['reliability_counts']['before'],
+                         {'OBSERVED_SUCCESS': 4, 'OBSERVED_FAILURE': 1, 'UNKNOWN': 1})
+        self.assertEqual(report['reliability_denominators']['before'], 6)
+        self.assertEqual(report['status'], 'INCOMPLETE_EVIDENCE')
+
+    def test_invalid_repair_policy_and_reserved_endpoints_are_rejected(self):
+        for mode in ('type', 'skill', 'endpoint'):
+            recipe = self.typed_recipe('execution')
+            if mode == 'type':
+                recipe['cases'][0]['repair']['kind'] = 'anything'
+            elif mode == 'skill':
+                recipe['cases'][0]['repair']['skill'] = 'unqualified'
+            else:
+                recipe['cases'][0]['graders'][0]['id'] = '$execution'
+            with self.subTest(mode=mode), self.assertRaises(ValidationError):
+                self.prepare(mode, recipe)
+
+    def test_failed_repair_record_retained_and_process_not_promoted(self):
+        a, b = self.revisions(correct=False)
+        record = self.repair_record(a)
+        report = self.compare(a, b)
+        events = []
+        for minute, (stage, digest, outcome) in enumerate([
+                ('diagnosis_seen', suite_digest(a[2]), None), ('hypothesis', '1'*64, None),
+                ('edit', report['selected_change_sha256'], None), ('retest', b[1], 'failed')]):
+            events.append({'stage': stage, 'at': f'2026-09-25T12:0{minute}:00+00:00',
+                           'details': 'Synthetic chronology validation only', 'evidence_sha256': digest, 'outcome': outcome})
+        record['process'] = {'origin': 'known_seed', 'events': events}
+        def linked(name):
+            return compare_native_repair(a[0], a[1], b[0], b[1], self.root/name, repair_record=record)['report']['repair_chain']
+        chain = linked('process')
+        self.assertEqual(chain['status'], 'OPEN')
+        self.assertEqual(chain['links'][0]['outcome'], 'NOT_REPAIRED')
+        self.assertEqual(chain['author_process']['status'], 'KNOWN_SEED_RESTORATION')
+        self.assertEqual(len(chain['author_process']['failed_attempts_retained']), 1)
+        self.assertFalse(chain['author_process']['pvl_helped_author_established'])
+        record['process']['origin'] = 'previously_unknown'
+        self.assertEqual(linked('unknown')['author_process']['status'], 'AUTHOR_DECLARED_PROCESS')
+        events[-1]['outcome'] = 'improved'
+        with self.assertRaises(ValidationError):
+            linked('fabricated-success')
+        events[-1]['outcome'] = 'failed'
+        events[1]['at'] = events[0]['at']
+        with self.assertRaises(ValidationError):
+            linked('wrong-order')
+
 
 if __name__ == '__main__':
     unittest.main()

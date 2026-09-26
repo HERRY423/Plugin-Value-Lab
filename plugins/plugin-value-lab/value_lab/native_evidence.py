@@ -93,12 +93,20 @@ def validate_contract(contract):
     seen = set()
     for case in contract["cases"]:
         required = {"name", "case_directory", "repetitions", "inputs", "artifacts", "graders"}
-        if not isinstance(case, dict) or not required <= set(case) or set(case) - required - {"input_sha256", "execution"}:
+        if not isinstance(case, dict) or not required <= set(case) or set(case) - required - {"input_sha256", "execution", "repair"}:
             raise ValidationError("Case requires name, case_directory, repetitions, inputs, artifacts and graders")
         name = case["name"]
         if not isinstance(name, str) or not name.strip() or name.casefold() in seen:
             raise ValidationError("Case names must be nonempty and unique")
         seen.add(name.casefold())
+        if "repair" in case:
+            policy = case["repair"]
+            if (not isinstance(policy, dict) or set(policy) != {"kind", "skill"}
+                    or policy["kind"] not in ("scientific_artifact", "execution", "trigger", "negative_control")
+                    or not isinstance(policy["skill"], str)
+                    or not re.fullmatch(r"[A-Za-z0-9_.-]+:[A-Za-z0-9_.:-]+", policy["skill"])
+                    or "execution" not in case):
+                raise ValidationError("repair requires a frozen kind, namespaced skill and execution contract")
         confined(Path.cwd(), case["case_directory"])
         if type(case["repetitions"]) is not int or not 1 <= case["repetitions"] <= 50:
             raise ValidationError("repetitions must be 1..50")
@@ -128,7 +136,7 @@ def validate_contract(contract):
             if not isinstance(grader, dict) or grader.get("type") not in ALLOWED:
                 raise ValidationError("Only built-in offline scientific graders are supported")
             gid = grader.get("id")
-            if not isinstance(gid, str) or not gid.strip() or gid in grader_ids:
+            if not isinstance(gid, str) or not gid.strip() or gid in grader_ids or gid in ("$execution", "$trigger"):
                 raise ValidationError("Grader IDs must be nonempty and unique")
             grader_ids.add(gid)
             if grader.get("artifact") not in case["artifacts"]:

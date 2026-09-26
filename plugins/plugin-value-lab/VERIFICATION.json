@@ -1,5 +1,45 @@
 {
   "version": "0.6.0",
+  "release_blocker_repair_20260926": {
+    "scope": "Local acceptance of interpreter-stable MCP signatures and encoding-safe CLI JSON; excludes concurrent native repair changes",
+    "base_commit": "41704e7b2a47b8d3238a60b7cc423e9f73e01226",
+    "details": "docs/history/RELEASE-BLOCKERS-20260926.md",
+    "product_version_unchanged": true,
+    "freeze_status": "FROZEN",
+    "freeze_format": "pvl-feature-freeze-2",
+    "old_parameters_preserved": true,
+    "release_tests": {
+      "platform": "Windows",
+      "python": "3.13.9",
+      "tests_run": 556,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 120.680,
+      "isolated_candidate": true
+    },
+    "identical_signature_environments": [
+      "Windows / Python 3.11.15",
+      "Windows / Python 3.12.13",
+      "Windows / Python 3.13.9",
+      "Linux WSL Ubuntu / Python 3.12.14",
+      "Linux WSL Ubuntu / Python 3.14.4"
+    ],
+    "surface_and_parameter_fixture_sha256": "63b65fa4a48a869ab9edf91cbacb3cc171f599bfe78d0cfa4404779a8a7f7dc0",
+    "redirected_encodings_tested": ["system default", "cp1252:strict", "ascii:strict", "utf-8:strict"],
+    "portable_zip_regression_tests_passed": 9,
+    "installed_wheel_five_commands_passed": true,
+    "offline_schema_validation": "PASS",
+    "hosted_ci": "NOT_RUN",
+    "published": false,
+    "source_sha256": {
+      "scripts/check_feature_freeze.py": "52414e7ef5e413324e11043daadc092389152f5158462a5c4aba137ee511a8eb",
+      "value_lab/cli.py": "f70443d2fc1243a75ed08d1593f82ec9858591d6bae17f784c5f893c96d3b983",
+      "tests/test_feature_freeze.py": "f2b308bde691acdc90a62ba02b229776b75689b82bc421db523d4666204c0c95",
+      "tests/test_cli.py": "bfad7c1f1ecba41399affbe404d2d4c7d038c7733fd625c136d966f0f1c53f62",
+      "docs/feature-freeze.json": "e7e8fe2a1239f05b427b4caefd673bceedcf5495cf3971bae6ff777a86819cf5"
+    }
+  },
   "p1_addendum_20260924": {
     "tests_run": 443,
     "failures": 0,

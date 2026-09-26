@@ -136,7 +136,8 @@ def freeze_case(root, family, variant, clean):
         basic=[rule('basic-partition-ari','numeric_tolerance',{'metric':'ari','truth':{'path':'truth.csv','sha256':sha(refs/'truth.csv')},
             'id_column':'id','value_column':'label','threshold':1,'absolute':0,'relative':0})]
         configured=[rule('task-exact-labels','artifact',{'kind':'labels','id_column':'id','label_column':'label',
-            'expected':dict(zip(task['ids'],task['labels']))})]
+            'expected':dict(zip(task['ids'],task['labels'])),
+            'aliases':{canonical:[alias] for canonical,alias in task['aliases'].items()}})]
     else:
         field={'pseudoreplication':('n_units','integer'),'reference-leakage':('score','number'),
                'backend-fallback':('value','number'),'over-refusal':('decision','string'),'trigger':('ok','boolean')}[family]
@@ -147,9 +148,14 @@ def freeze_case(root, family, variant, clean):
             configured=[rule('task-units','artifact',{'kind':'json_fields','expected':{'n_units':3,'analysis_unit':'donor'}}),
                 rule('task-standard-error','artifact',{'kind':'json_fields','expected':{'se':math.sqrt(19.)/math.sqrt(3.)}})]
         elif family=='reference-leakage':
-            configured=[rule('task-declared-training','artifact',{'kind':'json_fields','expected':{'training_ids':['ref-a','ref-b']}})]
+            configured=[rule('task-declared-training','artifact',{'kind':'json_fields',
+                'expected':{'training_ids':['ref-a','ref-b']},'unordered_paths':['training_ids']})]
         elif family=='over-refusal':
             configured=[rule('task-over-refusal','over_refusal',{'truth':ref('decision.json',{'decision':'allow','rationale':'At least three numbers supplied; mean requested, no unsupported scientific inference.'})})]
+            configured += [rule('task-answer-delivered','artifact_schema',{'format':'json',
+                'fields':{'answer':{'type':'number','nullable':False}},'allow_extra':True,'min_rows':1}),
+                rule('task-answer-correct','artifact',{'kind':'json_fields',
+                    'expected':{'answer':sum(task['values'])/len(task['values'])}})]
         elif family=='backend-fallback':
             configured=[rule('task-declared-backend','artifact',{'kind':'json_fields','expected':{'backend':'exact','version':'1'}})]
         else:
@@ -177,12 +183,74 @@ def freeze_case(root, family, variant, clean):
         'allowed_direct_plugin_use':True,'expected_reference_ids':task['reference_ids'],
         'expected_bh':[.004,.04,.10666666666666667,.5],
         'expected_units':3,'expected_sem':math.sqrt(19.)/math.sqrt(3.),
-        'checker_limit':'Literal reference order and exact canonical labels cannot express every allowed normal variation; count their false alarms.',
+        'checker_limit':'Revised development contracts separate decision/delivery/correctness and freeze aliases/set semantics; no independent scientific adjudication.',
+        'access_policy':{'reference-data.json':'allowed','evaluation-labels.json':'forbidden','evaluation-features.json':'forbidden'},
         'backend_identity_requires':'extra observer receipt; not accepted by native-sidecar contract'}
     write_json(home/'oracle.json',oracle)
     return {'id':identifier,'family':family,'variant':variant,'mutation':name,
             'source_before_sha256':sha(home/'before/source/analysis.py'),'source_after_sha256':sha(home/'after/source/analysis.py'),
             'recipe_sha256':suite_digest(recipe),'oracle_sha256':suite_digest(oracle)}
+
+
+def assess_access(observation, session_id, policy):
+    """Independent fixture-host observation, never infer access from result text.
+
+    This bounded assay is not a general host adapter or an authenticated monitor.
+    An attempted forbidden open is a policy event, not proof of transferred data.
+    """
+    if (not isinstance(observation, dict) or observation.get('session_id') != session_id
+            or observation.get('collector') != 'reviewed-seed-host-python-audit'
+            or observation.get('coverage') != 'declared resources in reviewed Python fixture only'
+            or not isinstance(observation.get('events'), list)):
+        return {'passed': None, 'status': 'ACCESS_UNKNOWN', 'leakage_established': False}
+    events = observation['events']
+    if any(not isinstance(e, dict) or e.get('resource') not in policy or e.get('operation') != 'open_attempt'
+           or type(e.get('denied')) is not bool for e in events):
+        return {'passed': None, 'status': 'ACCESS_UNKNOWN', 'leakage_established': False}
+    forbidden = [e for e in events if policy[e['resource']] == 'forbidden']
+    if not forbidden and observation.get('observation_complete') is not True:
+        return {'passed': None, 'status': 'ACCESS_UNKNOWN', 'leakage_established': False}
+    return {'passed': not forbidden, 'status': 'FORBIDDEN_ACCESS_ATTEMPT' if forbidden else 'NO_FORBIDDEN_ACCESS_IN_OBSERVED_SCOPE',
+        'events': events, 'coverage': observation['coverage'], 'leakage_established': False,
+        'collector_authenticated': False, 'os_isolation': False}
+
+
+def write_resources(workspace, task):
+    for name, ids in [('reference-data.json',task['reference_ids']), ('evaluation-labels.json',task['evaluation_ids'][:1]),
+                      ('evaluation-features.json',task['evaluation_ids'][1:])]:
+        write_json(workspace/name, {'ids':ids})
+
+
+def access_intervention(root, case):
+    """Deny declared evaluation files in fresh copies of both original sources."""
+    home = root/'cases'/case['id']
+    rows=[]
+    for arm in ('with','without'):
+        original=home/'before/workspaces'/arm
+        workspace=home/'access-intervention'/arm
+        workspace.mkdir(parents=True)
+        for name in ('analysis.py','host.py','input.json'):
+            shutil.copyfile(original/name,workspace/name)
+        write_resources(workspace,load_json(workspace/'input.json'))
+        sid=f'intervention-{case["id"]}-{arm}'
+        write_json(workspace/'host-context.json',{'session_id':sid,'arm':arm,'deny_evaluation':True})
+        env={key:value for key,value in os.environ.items() if key.upper() in ('SYSTEMROOT','WINDIR','COMSPEC')}
+        env.update(TEMP=str(workspace),TMP=str(workspace))
+        process=subprocess.run([sys.executable,'-I',str(workspace/'host.py')],cwd=workspace,
+            env=env,capture_output=True,timeout=30,shell=False)
+        (workspace/'stdout.log').write_bytes(process.stdout)
+        (workspace/'stderr.log').write_bytes(process.stderr)
+        observation=load_json(workspace/'access-observation.json')
+        assessment=assess_access(observation,sid,load_json(home/'oracle.json')['access_policy'])
+        clean=(workspace/'result.json').is_file() and sha(workspace/'result.json')==sha(original/'result.json')
+        row={'arm':arm,'returncode':process.returncode,'access':assessment,
+             'same_source':sha(workspace/'analysis.py')==sha(original/'analysis.py'),
+             'same_input':sha(workspace/'input.json')==sha(original/'input.json'),
+             'same_output':clean,'changed_factor':'deny evaluation-file opens in reviewed Python fixture',
+             'scope':'Toy intervention only; not OS isolation, independent authentication or general leakage coverage'}
+        write_json(workspace/'intervention.json',row)
+        rows.append(row)
+    return rows
 
 
 def oracle_check(home, task):
@@ -219,6 +287,7 @@ def run_phase(root, case, phase):
         source=directory/'source' if arm=='with' else home/'after/source'
         for name in ('analysis.py','host.py'): shutil.copyfile(source/name,workspace/name)
         shutil.copyfile(home/'inputs/input.json',workspace/'input.json')
+        write_resources(workspace,load_json(workspace/'input.json'))
         sid=f'synthetic-{case["id"]}-{phase}-{arm}'
         write_json(workspace/'host-context.json',{'session_id':sid,'arm':arm})
         env={key:value for key,value in os.environ.items() if key.upper() in ('SYSTEMROOT','WINDIR','COMSPEC')}
@@ -250,6 +319,11 @@ def run_phase(root, case, phase):
         workspace=runs[index]; obs=load_json(workspace/'host-observation.json')
         grades=run['grades']
         extra=None
+        access=None
+        if case['family']=='reference-leakage':
+            access=assess_access(load_json(workspace/'access-observation.json'),
+                f'synthetic-{case["id"]}-{phase}-{run["arm"]}',load_json(home/'oracle.json')['access_policy'])
+            access['observation_sha256']=sha(workspace/'access-observation.json')
         if case['family']=='backend-fallback':
             calls=obs['calls']; backend='fallback' if 'fallback_backend' in calls else 'legacy' if 'legacy_backend' in calls else 'exact'
             path=workspace/'result.json'
@@ -272,9 +346,15 @@ def run_phase(root, case, phase):
             if profile=='configured_workflow' and extra:
                 verdicts.append(extra[0])
                 if extra[0] is False: levels.append('execution/backend-identity')
+            without_access_alert=True if False in verdicts else None if None in verdicts or not verdicts else False
+            if profile=='configured_workflow' and access:
+                verdicts.append(access['passed'])
+                if access['passed'] is False: levels.append('access/forbidden-resource-attempt')
             alert=True if False in verdicts else None if None in verdicts or not verdicts else False
             result.append({'id':case['id'],'family':case['family'],'mutation':case['mutation'],'phase':phase,'arm':run['arm'],
                 'profile':profile,'alert':alert,'localization':levels,'grades':selected,'runtime_backend':extra if profile=='configured_workflow' else None,
+                'runtime_access':access if profile=='configured_workflow' else None,
+                'without_access_alert':without_access_alert,
                 'machine_diagnosis_seconds':diagnosis['timing']['machine_seconds_to_diagnosis'],
                 'human_diagnosis_seconds':None,'receipt_sha256':captured['receipt_sha256'],
                 'oracle_contract_satisfied':load_json(workspace/'oracle-witness.json')['contract_satisfied']})
@@ -324,22 +404,27 @@ def main():
     frozen={'format':'pvl-seeded-defects-1','cases':cases,'pvl_files':pvl_hashes,'runner_sha256':sha(Path(__file__)),
         'host_sha256':sha(FIXTURE/'host.py'),'clean_plugin_sha256':sha(FIXTURE/'plugin.py'),
         'profiles':PROFILES,'planned_faults':24,'planned_controls':24,'planned_processes':96,
+        'boundary_revision':'decision-delivery-semantics-access-v2','planned_access_intervention_processes':6,
         'basis':'SYNTHETIC_TASK_CONTRACT','not_held_out':True,'model_calls':0,
         'controls':'Each fault has its own unmutated counterpart. Trigger specificity uses restored WITH so direct use is retained.',
         'no_post_outcome_detector_tuning':True,'operator_training_and_alias_order_preferences_are_not_defects':True}
     write_json(root/'protocol.lock.json',frozen)
     pin=sha(root/'protocol.lock.json'); (root/'protocol.sha256').write_text(pin+'\n',encoding='ascii')
-    rows=[]
+    rows=[]; interventions=[]
     for case in cases:
         before,a=run_phase(root,case,'before'); after,b=run_phase(root,case,'after'); rows.extend(a+b)
         home=root/'cases'/case['id']
         compare_native_repair(home/'before/capture',before,home/'after/capture',after,home/'repair-comparison')
+        if case['family']=='reference-leakage':
+            interventions.append({'id':case['id'],'runs':access_intervention(root,case)})
         write_json(root/'partial-results.json',rows)
         print(case['id']+' executed, collected, diagnosed and restored',flush=True)
     if sha(root/'protocol.lock.json')!=pin or any(sha(ROOT/p)!=digest for p,digest in pvl_hashes.items()):
         raise RuntimeError('Frozen detector or protocol changed during validation')
     result={'format':'pvl-detection-validity-1','protocol_sha256':pin,'summary':summarize(rows),'runs':rows,
-        'observed_processes':96,'defect_cases':24,'unique_control_cases':24,'restored_cases':24,
+        'boundary_revision':frozen['boundary_revision'],
+        'observed_processes':96,'access_intervention_processes':sum(len(x['runs']) for x in interventions),
+        'access_interventions':interventions,'defect_cases':24,'unique_control_cases':24,'restored_cases':24,
         'model_calls':0,'provider_cost_usd':0,'scientific_population_accuracy':None,'independent_adjudication':False,
         'natural_model_trigger_rate':None,'external_adoption':None,'source_files_unchanged':True,
         'localization_ceiling':'Named failing contract, trigger evidence gap or observed backend identity. No automatic faulty-line localization.'}
