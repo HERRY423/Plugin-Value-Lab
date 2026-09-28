@@ -11,7 +11,7 @@ from pathlib import Path
 
 from . import __version__
 from .core import (ValidationError, demo_records, demo_suite, evaluate, freeze,
-                   load_json, load_records, suite_digest, write_json)
+                   load_json, load_records, load_suite, suite_digest, write_json)
 from .report import write_reports
 
 
@@ -58,7 +58,7 @@ def doctor():
             "optional_mcp_available": importlib.util.find_spec("mcp") is not None,
             "claude_executable": claude, "claude_version": version,
             "codex_executable": codex, "codex_version": codex_version,
-            "artifact_verifiers": ["json_fields", "de_table", "labels", "h5ad", "executable", "artifact_schema", "numeric_tolerance", "abstention_correct", "over_refusal", "backend_identity", "exec", "scenario", "replicate_effect", "pseudobulk_chain"],
+            "artifact_verifiers": ["json_fields", "de_table", "labels", "h5ad", "executable", "artifact_schema", "numeric_tolerance", "abstention_correct", "over_refusal", "backend_identity", "exec", "scenario", "replicate_effect", "pseudobulk_chain", "metamorphic", "equivalence"],
             "optional_pseudobulk_reference_available": importlib.util.find_spec("pydeseq2") is not None,
             "optional_h5ad_available": importlib.util.find_spec("anndata") is not None,
             "native_eval_executed": False, "host_plugin_installation_verified": False,
@@ -90,6 +90,20 @@ def main(argv=None):
     for name in ("init", "demo"):
         p = subs.add_parser(name)
         p.add_argument("--output", required=True)
+        if name == "init":
+            p.add_argument("--plugin", help="Local plugin directory; bounded manifest/skill/README context for the host Agent")
+            p.add_argument("--goal", help="Concrete task the plugin should improve")
+            p.add_argument("--interactive", action="store_true", help="Ask research goal, useful result and available materials for the host Agent")
+            p.add_argument("--format", choices=("directory", "json"), default="directory")
+            p.add_argument("--template", action="store_true", help="Explicit legacy blank scaffold; no semantic design")
+            p.add_argument("--proposal", help="Host-Agent-authored research design JSON to compile and calibrate")
+            p.add_argument("--materials", help="Root for explicitly selected proposal materials; no automatic data scan")
+    p = subs.add_parser("suite-check", help="Validate a JSON suite or declarative tree without running graders")
+    p.add_argument("suite")
+    p = subs.add_parser("suite-convert", help="Losslessly migrate between JSON and a reviewable file tree")
+    p.add_argument("suite")
+    p.add_argument("--output", required=True)
+    p.add_argument("--format", required=True, choices=("directory", "json"))
     p = subs.add_parser("freeze")
     p.add_argument("suite")
     p.add_argument("--lock", required=True)
@@ -115,6 +129,8 @@ def main(argv=None):
     p.add_argument("design")
     p.add_argument("data")
     p.add_argument("--output", required=True)
+    p.add_argument("--environment-lock", help="Reject installed scientific dependency drift before fitting")
+    p.add_argument("--environment-id", help="Expected environment lock SHA-256")
     p = subs.add_parser("pseudobulk-check", help="Verify a full donor-aware analysis artifact offline; no model fitting")
     p.add_argument("artifact")
     p.add_argument("--spec", required=True)
@@ -260,11 +276,12 @@ def main(argv=None):
     p.add_argument("--explicit-receipt", required=True)
     p.add_argument("--expectations", required=True)
     p.add_argument("--output", required=True)
-    p = subs.add_parser("prepare-native-session", help="Prepare isolated one-attempt collection around existing official cases; Linux/WSL")
+    p = subs.add_parser("prepare-native-session", help="Prepare a networkless model host and bounded provider broker; Linux or Windows Hyper-V")
     p.add_argument("study")
     p.add_argument("--plan-sha256", required=True)
     p.add_argument("--plugin", required=True)
     p.add_argument("--invocation", required=True, help="JSON argument array or object with argv")
+    p.add_argument("--sandbox", required=True, help="Explicit runtime/backend and fixed model gateway configuration JSON")
     p.add_argument("--references")
     p.add_argument("--timeout", type=int, default=1800)
     p.add_argument("--output", required=True)
@@ -426,31 +443,42 @@ def main(argv=None):
                 write_json(Path(args.output) / 'author-timing.json', timing)
                 result['author_timing'] = timing
             _emit(result)
-        elif args.command in ("init", "demo"):
+        elif args.command == "init":
+            from .authoring import create_project
+            _emit(create_project(args.output, plugin=args.plugin, goal=args.goal,
+                                 interactive=args.interactive, layout=args.format,
+                                 proposal=load_json(args.proposal) if args.proposal else None,
+                                 materials=args.materials, template=args.template))
+        elif args.command == "suite-check":
+            from .declarative import inspect_suite
+            _emit(inspect_suite(load_suite(args.suite)))
+        elif args.command == "suite-convert":
+            from .declarative import dump_evals, inspect_suite
+            suite = load_suite(args.suite)
+            result = inspect_suite(suite)
+            if args.format == "directory":
+                dump_evals(suite, args.output)
+            else:
+                path = Path(args.output)
+                path.parent.mkdir(parents=True, exist_ok=True)
+                with path.open("x", encoding="utf-8") as stream:
+                    json.dump(suite, stream, indent=2, ensure_ascii=False, allow_nan=False)
+                    stream.write("\n")
+            _emit(dict(result, output=args.output, format=args.format))
+        elif args.command == "demo":
             out = _new_directory(args.output)
             suite = demo_suite()
             write_json(out / "suite.json", suite)
-            if args.command == "init":
-                write_records(out / "runs.jsonl", [])
-                (out / "START.md").write_text(
-                    "# 先定义问题，再采集结果\n\n这是带教学用例的空观测项目，没有任何真实运行。\n"
-                    "编辑 suite.json 中插件版本、实际模型/宿主/工具/环境/预算、任务、阈值和评分规则。\n"
-                    "教学默认 evidence_type=synthetic；真实研究须在冻结前明确设置 local 或 external。\n"
-                    "冻结后再采集两组新会话；原始输出和失败都写入 runs.jsonl。不要复制模拟观察充当实测。\n",
-                    encoding="utf-8")
-                _emit({"suite": str(out / "suite.json"), "records": str(out / "runs.jsonl"),
-                       "observations": 0, "frozen": False})
-            else:
-                records = demo_records(suite)
-                write_records(out / "runs.jsonl", records)
-                lock = freeze(suite, out / "protocol.lock.json")
-                report = evaluate(suite, records, lock)
-                _emit({"verdict": report["verdict"], "files": write_reports(report, out),
-                       "real_model_calls": 0, "real_human_observations": 0})
+            records = demo_records(suite)
+            write_records(out / "runs.jsonl", records)
+            lock = freeze(suite, out / "protocol.lock.json")
+            report = evaluate(suite, records, lock)
+            _emit({"verdict": report["verdict"], "files": write_reports(report, out),
+                   "real_model_calls": 0, "real_human_observations": 0})
         elif args.command == "freeze":
-            _emit(freeze(load_json(args.suite), args.lock))
+            _emit(freeze(load_suite(args.suite), args.lock))
         elif args.command == "evaluate":
-            report = evaluate(load_json(args.suite), load_records(args.records), load_json(args.lock) if args.lock else None,
+            report = evaluate(load_suite(args.suite), load_records(args.records), load_json(args.lock) if args.lock else None,
                               load_json(args.cost_ledger) if args.cost_ledger else None,
                               artifact_root=args.artifacts, verifier_root=args.verifiers, corpus_root=args.corpus)
             _emit({"verdict": report["verdict"], "files": write_reports(report, args.output),
@@ -459,7 +487,8 @@ def main(argv=None):
                 return 0 if report["verdict"] == "PROMISING_LOCAL_SIGNAL" else (2 if report["verdict"] in ("SIMULATION_ONLY", "INSUFFICIENT_EVIDENCE") else 1)
         elif args.command == "pseudobulk-reference":
             from .pseudobulk import create_reference
-            _emit(create_reference(args.design, args.data, args.output))
+            _emit(create_reference(args.design, args.data, args.output,
+                environment_lock=args.environment_lock, environment_id=args.environment_id))
         elif args.command == "pseudobulk-scenario":
             from .pseudobulk_corpus import scenario_pack
             _emit(scenario_pack(args.spec, args.verifiers, args.output))
@@ -491,7 +520,7 @@ def main(argv=None):
             _emit(validate_pack(load_json(args.pack), args.inputs, args.scorers))
         elif args.command == "scenario-prepare":
             from .scenarios import prepare_suite
-            suite = prepare_suite(load_json(args.pack), load_json(args.template))
+            suite = prepare_suite(load_json(args.pack), load_suite(args.template))
             with Path(args.output).open("x", encoding="utf-8") as stream:
                 json.dump(suite, stream, ensure_ascii=False, indent=2, allow_nan=False)
             _emit({"suite_sha256": suite_digest(suite), "output": args.output, "scorer_material_included": False})
@@ -503,7 +532,7 @@ def main(argv=None):
             _emit(seed_corpus(args.output))
         elif args.command == "corpus-prepare":
             from .corpus import prepare_suite
-            suite = prepare_suite(load_json(args.corpus), load_json(args.template))
+            suite = prepare_suite(load_json(args.corpus), load_suite(args.template))
             with Path(args.output).open("x", encoding="utf-8") as stream:
                 json.dump(suite, stream, ensure_ascii=False, indent=2, allow_nan=False)
             _emit({"output": args.output, "suite_sha256": suite_digest(suite), "frozen": False, "answer_key_included": False})
@@ -563,11 +592,11 @@ def main(argv=None):
             return 0 if plan["status"] == "MATERIALS_READY" else 2
         elif args.command == "export-claude":
             from .native import export_claude
-            _emit(export_claude(load_json(args.suite), args.output, args.plugin))
+            _emit(export_claude(load_suite(args.suite), args.output, args.plugin))
         elif args.command == "import-claude":
             from .native import import_claude
             native_result = load_json(args.result)
-            records = import_claude(native_result, load_json(args.suite))
+            records = import_claude(native_result, load_suite(args.suite))
             sidecar = Path(str(args.output) + ".native-source.json")
             if sidecar.exists():
                 raise ValidationError("Native source sidecar already exists; choose a fresh import destination")
@@ -591,7 +620,7 @@ def main(argv=None):
             invocation = load_json(args.invocation)
             _emit(prepare_native_session(args.study, args.plan_sha256, args.plugin,
                   invocation.get("argv") if isinstance(invocation, dict) else invocation, args.output,
-                  references=args.references, timeout_seconds=args.timeout))
+                  references=args.references, timeout_seconds=args.timeout, sandbox=load_json(args.sandbox)))
         elif args.command == "run-native-session":
             from .native_session import run_native_session
             _emit(run_native_session(args.study, args.session_sha256, execute=args.execute))
@@ -627,7 +656,7 @@ def main(argv=None):
             _emit(verify_native_evidence(args.study, args.receipt_sha256))
         elif args.command == "prepare-claude-collection":
             from .claude_collection import prepare
-            _emit(prepare(load_json(args.suite), args.plugin, args.output, args.inputs, args.claude))
+            _emit(prepare(load_suite(args.suite), args.plugin, args.output, args.inputs, args.claude))
         elif args.command == "run-claude-collection":
             from .claude_collection import run
             _emit(run(args.study, args.plan_sha256, args.auth_home, continue_unstarted=args.continue_unstarted, previous_collector=args.previous_collector))
@@ -636,10 +665,10 @@ def main(argv=None):
             _emit(verify_collection(args.study))
         elif args.command == "prepare-codex":
             from .codex import prepare
-            _emit(prepare(load_json(args.suite), args.plugin, args.output, args.codex, args.inputs))
+            _emit(prepare(load_suite(args.suite), args.plugin, args.output, args.codex, args.inputs))
         elif args.command == "prepare-host-matrix":
             from .hosts import prepare_matrix
-            _emit(prepare_matrix(load_json(args.suite), load_json(args.hosts), args.output))
+            _emit(prepare_matrix(load_suite(args.suite), load_json(args.hosts), args.output))
         elif args.command == "run-codex":
             from .codex import run
             _emit(run(args.study, args.plan_sha256, args.auth_home))
@@ -658,10 +687,10 @@ def main(argv=None):
             _emit(result)
         elif args.command == "review-pack":
             from .review import review_pack
-            _emit(review_pack(load_json(args.suite), load_records(args.records), args.output))
+            _emit(review_pack(load_suite(args.suite), load_records(args.records), args.output))
         elif args.command == "apply-reviews":
             from .review import apply_reviews
-            records = apply_reviews(load_json(args.suite), load_records(args.records), load_json(args.mapping), load_records(args.decisions))
+            records = apply_reviews(load_suite(args.suite), load_records(args.records), load_json(args.mapping), load_records(args.decisions))
             write_records(args.output, records)
             _emit({"output": args.output, "records": len(records), "source_records_preserved": True})
         elif args.command == "doctor":
@@ -672,7 +701,7 @@ def main(argv=None):
             _emit({"route": plan["route"], "executed": False, "files": write_plan(plan, args.output)})
         elif args.command == "usage-card":
             from .usage import build_usage_card, write_usage_card
-            card = build_usage_card(load_json(args.suite), load_records(args.records), load_json(args.lock) if args.lock else None,
+            card = build_usage_card(load_suite(args.suite), load_records(args.records), load_json(args.lock) if args.lock else None,
                                     load_json(args.cost_ledger) if args.cost_ledger else None,
                                     artifact_root=args.artifacts, verifier_root=args.verifiers, corpus_root=args.corpus)
             _emit({"status": card["status"], "verdict": card["verdict"], "files": write_usage_card(card, args.output)})
@@ -702,7 +731,7 @@ def main(argv=None):
             _emit({"status": result["status"], "affected_direction_ids": result["affected_direction_ids"], "output": args.output})
         elif args.command == "team-card":
             from .team_record import build_team_record, write_team_record
-            record = build_team_record(load_json(args.suite), load_records(args.records),
+            record = build_team_record(load_suite(args.suite), load_records(args.records),
                                        load_json(args.lock) if args.lock else None, load_json(args.decision),
                                        previous=load_json(args.previous) if args.previous else None,
                                        research_context=load_json(args.research) if args.research else None,
@@ -714,7 +743,7 @@ def main(argv=None):
             workbench(args.data, args.port, args.claude, enable_extensions=args.enable_extensions)
         elif args.command == "check-rules":
             from .scoring import inspect_rules
-            result = inspect_rules(load_json(args.suite), load_json(args.samples) if args.samples else None)
+            result = inspect_rules(load_suite(args.suite), load_json(args.samples) if args.samples else None)
             if args.output:
                 if Path(args.output).exists():
                     raise ValidationError("Output exists; preserve previous rule checks")

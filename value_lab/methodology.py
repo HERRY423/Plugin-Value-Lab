@@ -37,8 +37,8 @@ def audit_detector(manifest_path, *, verifier_root=None):
         if case.get('origin') not in ('synthetic', 'replayed_real', 'external_incident'):
             raise ValidationError('Declare synthetic, replayed_real or external_incident origin')
         grader = case.get('grader')
-        if not isinstance(grader, dict) or grader.get('type') != 'artifact':
-            raise ValidationError('Detector audit accepts built-in artifact graders only')
+        if not isinstance(grader, dict) or grader.get('type') not in ('artifact', 'numeric_tolerance', 'replicate_effect'):
+            raise ValidationError('Detector audit accepts built-in artifact, numeric_tolerance and replicate_effect graders only; no submitted code')
         validate_verifier(grader)
         artifact = case.get('artifact')
         if (not isinstance(artifact, dict) or set(artifact) != {'path', 'sha256'}

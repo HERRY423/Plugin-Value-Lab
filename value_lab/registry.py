@@ -146,7 +146,8 @@ def _assessment(root):
 def register_study(study, metadata, registry, *, artifact_root=None, verifier_root=None, corpus_root=None,
                    parent=None, revision_reason=None):
     study = Path(study)
-    suite = load_json(study / "suite.json")
+    from .core import load_suite
+    suite = load_suite(study / "suite.json")
     records = load_records(study / "runs.jsonl")
     lock = load_json(study / "protocol.lock.json")
     ledger = load_json(study / "cost-ledger.json") if (study / "cost-ledger.json").exists() else None

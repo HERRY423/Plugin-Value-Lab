@@ -15,7 +15,7 @@ import uuid
 
 from .core import ValidationError, load_json
 
-KINDS = {"pseudobulk_chain", "artifact_schema", "numeric_tolerance", "abstention_correct", "over_refusal", "backend_identity", "exec", "replicate_effect"}
+KINDS = {"equivalence", "metamorphic", "pseudobulk_chain", "artifact_schema", "numeric_tolerance", "abstention_correct", "over_refusal", "backend_identity", "exec", "replicate_effect"}
 REFERENCE_FIELDS = ("truth", "program", "testing_family", "design", "data")
 
 
@@ -43,7 +43,13 @@ def reference(ref):
 
 
 def validate_spec(kind, spec):
-    if kind == "pseudobulk_chain":
+    if kind == "equivalence":
+        from .equivalence import validate_spec as validate_equivalence
+        validate_equivalence(spec)
+    elif kind == "metamorphic":
+        from .metamorphic import validate_spec as validate_metamorphic
+        validate_metamorphic(spec)
+    elif kind == "pseudobulk_chain":
         from .pseudobulk import validate_spec as validate_pseudobulk
         validate_pseudobulk(spec)
     elif kind == "replicate_effect":
@@ -293,6 +299,12 @@ def sandbox_check(path, spec, root):
 
 
 def check(kind, path, spec, root, record, artifact_sha):
+    if kind == "equivalence":
+        from .equivalence import check as check_equivalence
+        return check_equivalence(path, spec, root)
+    if kind == "metamorphic":
+        from .metamorphic import check as check_metamorphic
+        return check_metamorphic(path, spec, root)
     if kind == "pseudobulk_chain":
         from .pseudobulk import check as check_pseudobulk
         return check_pseudobulk(path, spec, root)

@@ -131,7 +131,8 @@ def _fact_block(value: Any, *, empty: str) -> str:
 def _case_state(case: dict[str, Any]) -> str:
     runs = [_mapping(run) for run in _items(case.get("runs"))]
     blocked = bool(case.get("issues") or case.get("blockers")) or any(
-        bool(run.get("issues")) or run.get("status") != "completed" for run in runs
+        bool(run.get("issues")) or run.get("status") != "completed"
+        or _mapping(run.get('task_outcome')).get('status') == 'UNKNOWN' for run in runs
     )
     if blocked or _number(case.get("with_score")) is None or _number(case.get("without_score")) is None:
         return "blocked"
@@ -139,11 +140,47 @@ def _case_state(case: dict[str, Any]) -> str:
     return "regression" if difference is not None and difference < 0 else "other"
 
 
+def _metamorphic_details(grades) -> str:
+    parts = []
+    for grade in _items(grades):
+        verification = _mapping(_mapping(grade).get('verification'))
+        if verification.get('format') == 'pvl-metamorphic-receipt-1':
+            rows = ''.join('<tr><td>' + _escape(row.get('id')) + '</td><td>' + _escape(row.get('relation'))
+                           + '</td><td>' + _escape(row.get('status')) + '</td><td>'
+                           + _escape(row.get('mismatch_count')) + '</td></tr>'
+                           for value in _items(verification.get('relations')) for row in [_mapping(value)])
+            parts.append('<h4>科学蜕变关系</h4><p class="muted">关系一致性不能单独证明任务正确；缺失变换保留为未知。</p>'
+                         '<table class="cost-table"><thead><tr><th>检查</th><th>关系</th><th>状态</th><th>不符合项</th></tr></thead><tbody>'
+                         + rows + '</tbody></table>')
+        if verification.get('format') == 'pvl-equivalence-receipt-1':
+            rows = ''.join('<tr>' + ''.join('<td>' + _escape(row.get(key)) + '</td>' for key in
+                           ('feature', 'n_units', 'mean_difference', 'confidence_interval', 'p_tost',
+                            'individual_agreement_passed', 'status')) + '</tr>'
+                           for value in _items(verification.get('features')) for row in [_mapping(value)])
+            parts.append('<h4>配对统计等价性</h4><p class="muted">均值 TOST 与逐项偏差分别检查；'
+                         '未证实等价不等于证实不同。独立单位和适用边界需研究者复核。</p>'
+                         '<table class="cost-table"><thead><tr><th>指标</th><th>单位数</th><th>平均差</th>'
+                         '<th>区间</th><th>TOST p</th><th>逐项偏差</th><th>均值检验状态</th></tr></thead><tbody>'
+                         + rows + '</tbody></table>')
+        if verification.get('grades'):
+            parts.append(_metamorphic_details(verification['grades']))
+    return ''.join(parts)
+
+
 def _run_details(case: dict[str, Any]) -> str:
     pieces = []
     for run_value in _items(case.get("runs")):
         run = _mapping(run_value)
         grades = run.get("grades")
+        outcome = run.get('task_outcome')
+        outcome_html = ''
+        if isinstance(outcome, dict):
+            labels = {'decision': '决策', 'delivery': '交付', 'correctness': '正确性'}
+            states = {'PASS': '通过', 'FAIL': '失败', 'UNKNOWN': '未知', 'NOT_REQUIRED': '不适用'}
+            layers = '；'.join(f"{labels.get(k, _text(k))}：{states.get(_mapping(v).get('status'), '未知')}"
+                               for k, v in _mapping(outcome.get('layers')).items())
+            outcome_html = (f'<p><strong>任务成功：{_escape(states.get(outcome.get("status"), "未知"))}</strong> · {_escape(layers)}</p>'
+                            '<p class="muted">部分质量分与任务成功分开；过程检查不计分，也不能证明交付或正确性。</p>')
         extra = {key: value for key, value in run.items() if key not in {
             "arm", "repetition", "status", "score", "cost_usd", "grades", "issues"
         }}
@@ -152,6 +189,8 @@ def _run_details(case: dict[str, Any]) -> str:
             f'<div class="run-title"><strong>{_escape(_ARM_LABELS.get(run.get("arm"), run.get("arm")))}</strong>'
             f'<span>重复 {_escape(run.get("repetition"))} · {_escape(run.get("status"))}</span></div>'
             f'<p>质量 {_escape(_score(run.get("score")))} · 成本 {_escape(_money(run.get("cost_usd")))}</p>'
+            + outcome_html
+            + _metamorphic_details(grades)
             + _bullet_list(run.get("issues"), empty="未记录运行问题。")
             + (f'<pre>{_escape(grades)}</pre>' if grades is not None else '<p class="muted">未提供评分明细。</p>')
             + (f'<details><summary>其他运行字段</summary><pre>{_escape(extra)}</pre></details>' if extra else "")
@@ -259,13 +298,21 @@ def _value_notes(report):
             f"观察到的改善比例（基线失败为分母）：{_score(success['rescue_rate'])}；观察到的退步比例（基线成功为分母）：{_score(success['harm_rate'])}。配对转移依赖重复编号的对应关系，不代表个体因果效应。",
             f"任务族均权质量差：{_delta(value['families']['equal_weight_quality_delta'])}；改善 {value['families']['improved']} 族，退步 {value['families']['regressed']} 族。",
             f"样本量规划：已有 {plan['planned_families']} 个任务族，目标 {_text(plan['required_families'])}，还需 {_text(plan['additional_families'])}。这是前瞻近似规划，不是事后功效或显著性检验；重复运行不增加独立任务族数。",
-            "成功须完成任务、达到冻结质量底线并通过全部关键检查；缺失保留在计划分母。人工分钟仅含运行计时，额外设置与复核投入计入完整成本。",
+            "成功须完成任务、满足必要结果证据、达到冻结质量底线并通过全部关键检查；过程检查不计分，部分分数不能替代交付与正确性。缺失保留在计划分母。人工分钟仅含运行计时，额外设置与复核投入计入完整成本。",
             "成本证据：" + report["cost_analysis"]["cash_evidence"]["status"] + "。结算引用仍由提交者提供，不能认证账单真实性；人工折算不是现金结算。"]
     interpretation = report.get("value_interpretation")
+    quality = report.get('quality_estimand')
+    if quality:
+        labels = {'case': '案例均权', 'family': '任务族均权'}
+        notes.append('总评质量门槛与区间的统一口径：' + labels[quality['weighting']] + '；案例均权差 ' +
+                     _delta(quality['sensitivity']['case']['quality_delta']) + '；任务族均权差 ' +
+                     _delta(quality['sensitivity']['family']['quality_delta']) + '。另一口径仅用于敏感性检查，不能看结果后切换。成本仍按计划执行计量。')
+        notes.append('推荐门槛：全部计划内插件运行都须满足任务成功契约，失败与未知容许数为 0。单次通过、本地受控试用线索、广泛采用是三层结论；广泛采用仍未建立。')
+        notes.append('样本量规划针对任务族均权质量差；当总评使用案例均权时，它不是总评门槛的功效保证。')
     if interpretation:
         plan = interpretation["frozen_plan"]
         labels = {"scientific_correctness": "科学产物正确性", "runtime_reliability": "运行可靠性", "full_delivery": "完整交付"}
-        notes.append("预先选定的主要评价目标：" + labels[plan["primary_estimand"]] + "。配对依据：" + plan["pairing_rationale"])
+        notes.append("解释性分析预先选定的主要评价目标：" + labels[plan["primary_estimand"]] + "。它不改写总评质量分及推荐门槛。配对依据：" + plan["pairing_rationale"])
         for name, endpoint in interpretation["endpoints"].items():
             notes.append(labels[name] + "：任务分布成功率差 " + _delta(endpoint["task_distribution_success_delta"]) +
                          "；任务族均权成功率差 " + _delta(endpoint["equal_family_success_delta"]) +
@@ -441,6 +488,10 @@ def _render_markdown(report: dict[str, Any]) -> str:
         for run_item in _items(case.get("runs")):
             run = _mapping(run_item)
             lines += [f"- {_markdown(_ARM_LABELS.get(run.get('arm'), run.get('arm')))} / 重复 {_markdown(run.get('repetition'))} / {_markdown(run.get('status'))}：质量 {_score(run.get('score'))}，成本 {_money(run.get('cost_usd'))}。"]
+            if isinstance(run.get('task_outcome'), dict):
+                outcome = run['task_outcome']
+                layers = '；'.join(f"{k}={v['status']}" for k, v in outcome['layers'].items())
+                lines += [f"  - 任务成功：{_markdown(outcome['status'])}；{_markdown(layers)}。部分分数不能替代必要结果证据。"]
             for issue in _items(run.get("issues")):
                 lines += [f"  - 问题：{_markdown(issue)}"]
             if run.get("grades") is not None:

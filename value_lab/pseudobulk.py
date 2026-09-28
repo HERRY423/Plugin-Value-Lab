@@ -232,7 +232,7 @@ def check(path, spec, root):
         return False, detail
 
 
-def create_reference(design_path, data_path, output):
+def create_reference(design_path, data_path, output, *, environment_lock=None, environment_id=None):
     """A new, portable scorer package and local execution receipt; never overwrite."""
     from .artifacts import sha
     import shutil
@@ -244,10 +244,21 @@ def create_reference(design_path, data_path, output):
         raise ValidationError("Reference output already exists")
     design, data = load_json(design_path), load_json(data_path)
     aggregate(design, data)  # validate before any expensive fitting
+    from .science_environment import capture_environment, require_environment, seal_reference
+    if (environment_lock is None) != (environment_id is None):
+        raise ValidationError('Supply both environment lock and its expected commitment')
+    environment = load_json(environment_lock) if environment_lock is not None else capture_environment(['pydeseq2'])
+    if environment_lock is not None:
+        if 'pydeseq2' not in environment.get('roots', []):
+            raise ValidationError('Scientific lock must cover pydeseq2')
+        require_environment(environment, environment_id)
     output.mkdir(parents=True)
+    write_json(output / 'environment.lock.json', environment)
     (output / "reference-runner.py").write_bytes(Path(__file__).read_bytes())
-    for source, name in ((design_path, "design.json"), (data_path, "data.json")):
-        shutil.copyfile(source, output / name)
+    # Freeze the exact parsed inputs used by this fit, even if source files
+    # change after loading. Original file formatting is not scientific input.
+    write_json(output / 'design.json', design)
+    write_json(output / 'data.json', data)
     write_json(output / "execution.json", {"status": "STARTED", "backend": "pydeseq2", "settlement": "no_model_calls"})
     try:
         with warnings.catch_warnings(record=True) as observed_warnings:
@@ -255,6 +266,7 @@ def create_reference(design_path, data_path, output):
             result = fit_reference(design, data)
         if sha(__file__) != sha(output / "reference-runner.py"):
             raise ValidationError("Reference runner changed during execution; preserve this failed attempt")
+        require_environment(environment, suite_digest(environment))
         write_json(output / "reference.json", result)
         session = "pseudobulk-" + uuid.uuid4().hex
         receipt = {"backend": "pydeseq2", "version": design["backend_version"], "entrypoint": "DeseqDataSet.deseq2/DeseqStats.summary",
@@ -267,12 +279,15 @@ def create_reference(design_path, data_path, output):
         write_json(output / "execution.json", {"status": "COMPLETED", "session_id": session,
                    "independent_expert_review": "PENDING", "scope": "local reference computation, not plugin benefit",
                    "spec_sha256": suite_digest(spec), "runner_sha256": sha(output / "reference-runner.py"),
+                   "environment_sha256": suite_digest(environment), "environment_check": "MATCH_BEFORE_AND_AFTER",
                    "libraries": {name: importlib.metadata.version(name) for name in ("pydeseq2", "numpy", "scipy", "pandas", "anndata", "formulaic")},
                    "warnings": [str(w.message) for w in observed_warnings],
                    "observed_method": result["method"],
                    "fallback_scope": "Receipt fallback=false means no substitute backend; internal fitting changes are retained in observed_method and warnings",
                    "backend_receipt": {"path": "backend-receipt.json", "sha256": sha(output / "backend-receipt.json")}})
-        return {"output": str(output.resolve()), "spec_sha256": suite_digest(spec), "session_id": session}
+        artifact_id = seal_reference(output)
+        return {"output": str(output.resolve()), "spec_sha256": suite_digest(spec), "session_id": session,
+                "environment_sha256": suite_digest(environment), "artifact_sha256": artifact_id}
     except Exception as exc:
         write_json(output / "execution.json", {"status": "FAILED", "error": str(exc), "independent_expert_review": "PENDING"})
         raise

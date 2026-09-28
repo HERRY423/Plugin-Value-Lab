@@ -1,0 +1,5 @@
+{
+  "unit_ids": ["dataset-1", "dataset-2", "dataset-3", "dataset-4", "dataset-5", "dataset-6"],
+  "features": ["mean_log2_effect"],
+  "values": [[-1.2], [-0.4], [0.0], [0.3], [0.8], [1.1]]
+}

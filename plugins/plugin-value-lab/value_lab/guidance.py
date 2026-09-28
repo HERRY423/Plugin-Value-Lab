@@ -46,6 +46,7 @@ def _target_matches(target, suite, context):
 
 
 def _case_observations(case):
+    from .scoring import run_success
     arms = {}
     index = {(r["repetition"], r["arm"]): r for r in case["runs"]}
     losses = []
@@ -53,6 +54,7 @@ def _case_observations(case):
         rows = [r for r in case["runs"] if r["arm"] == arm]
         scores, costs = [r["score"] for r in rows], [r["cost_usd"] for r in rows]
         arms[arm] = {"mean_quality": mean(scores) if scores and None not in scores else None,
+                     "task_outcomes_passed": all(run_success(r, 0) is True for r in rows),
                      "minimum_observed_quality": min(scores) if scores and None not in scores else None,
                      "mean_cost_usd": mean(costs) if costs and None not in costs else None,
                      "failure_rate": sum(r["status"] in ("error", "timeout", "aborted") for r in rows) / len(rows) if rows else None,
@@ -90,7 +92,7 @@ def conditional_guidance(before, after, target, *, axis, artifact_roots=None, ve
         w, b = obs["arms"]["with"], obs["arms"]["without"]
         status, reasons = "REVIEW_REQUIRED", []
         def quality_ready(arm):
-            return (arm["complete"] and arm["critical_checks_passed"] and arm["minimum_observed_quality"] is not None
+            return (arm["complete"] and arm["critical_checks_passed"] and arm['task_outcomes_passed'] and arm["minimum_observed_quality"] is not None
                     and arm["minimum_observed_quality"] >= suite["policy"]["quality_floor"]
                     and arm["failure_rate"] <= policy["maximum_failure_rate"])
         if not eligible:

@@ -144,10 +144,45 @@
       ],
       "init": [
         {
+          "name": "format",
+          "flags": [
+            "--format"
+          ],
+          "required": false,
+          "choices": [
+            "directory",
+            "json"
+          ]
+        },
+        {
+          "name": "goal",
+          "flags": [
+            "--goal"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
           "name": "help",
           "flags": [
             "--help",
             "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "interactive",
+          "flags": [
+            "--interactive"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "materials",
+          "flags": [
+            "--materials"
           ],
           "required": false,
           "choices": null
@@ -158,6 +193,30 @@
             "--output"
           ],
           "required": true,
+          "choices": null
+        },
+        {
+          "name": "plugin",
+          "flags": [
+            "--plugin"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "proposal",
+          "flags": [
+            "--proposal"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "template",
+          "flags": [
+            "--template"
+          ],
+          "required": false,
           "choices": null
         }
       ],
@@ -361,6 +420,22 @@
           "name": "design",
           "flags": [],
           "required": true,
+          "choices": null
+        },
+        {
+          "name": "environment_id",
+          "flags": [
+            "--environment-id"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "environment_lock",
+          "flags": [
+            "--environment-lock"
+          ],
+          "required": false,
           "choices": null
         },
         {
@@ -1683,6 +1758,14 @@
           "choices": null
         },
         {
+          "name": "sandbox",
+          "flags": [
+            "--sandbox"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
           "name": "study",
           "flags": [],
           "required": true,
@@ -2745,6 +2828,59 @@
           "required": false,
           "choices": null
         }
+      ],
+      "suite-check": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "suite",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
+      ],
+      "suite-convert": [
+        {
+          "name": "format",
+          "flags": [
+            "--format"
+          ],
+          "required": true,
+          "choices": [
+            "directory",
+            "json"
+          ]
+        },
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "output",
+          "flags": [
+            "--output"
+          ],
+          "required": true,
+          "choices": null
+        },
+        {
+          "name": "suite",
+          "flags": [],
+          "required": true,
+          "choices": null
+        }
       ]
     },
     "mcp_signatures": {
@@ -3145,19 +3281,25 @@
     "runtime_modules": [
       "value_lab/__init__.py",
       "value_lab/artifacts.py",
+      "value_lab/authoring.py",
       "value_lab/claude_collection.py",
       "value_lab/cli.py",
       "value_lab/codex.py",
       "value_lab/comparison.py",
+      "value_lab/component_studies.py",
       "value_lab/core.py",
       "value_lab/corpus.py",
       "value_lab/costs.py",
+      "value_lab/declarative.py",
+      "value_lab/equivalence.py",
       "value_lab/exchange.py",
       "value_lab/execution.py",
       "value_lab/guidance.py",
       "value_lab/hosts.py",
       "value_lab/interpretation.py",
+      "value_lab/live_recording.py",
       "value_lab/longitudinal.py",
+      "value_lab/metamorphic.py",
       "value_lab/methodology.py",
       "value_lab/native.py",
       "value_lab/native_analysis.py",
@@ -3167,6 +3309,7 @@
       "value_lab/native_repair.py",
       "value_lab/native_session.py",
       "value_lab/native_trigger.py",
+      "value_lab/online_sandbox.py",
       "value_lab/processes.py",
       "value_lab/pseudobulk.py",
       "value_lab/pseudobulk_corpus.py",
@@ -3179,8 +3322,10 @@
       "value_lab/reuse.py",
       "value_lab/review.py",
       "value_lab/review_policy.py",
+      "value_lab/saturation.py",
       "value_lab/scenarios.py",
       "value_lab/science.py",
+      "value_lab/science_environment.py",
       "value_lab/scoring.py",
       "value_lab/server.py",
       "value_lab/signatures.py",
@@ -3200,6 +3345,8 @@
       "schemas/registry/1/metadata.schema.json",
       "schemas/registry/1/review-packet-manifest.schema.json",
       "schemas/registry/1/review.schema.json",
+      "schemas/science/equivalence-design.schema.json",
+      "schemas/science/metamorphic-design.schema.json",
       "schemas/science/scenario-pack.schema.json"
     ],
     "grader_allowlists": [
@@ -3210,8 +3357,10 @@
           "artifact",
           "artifact_schema",
           "backend_identity",
+          "equivalence",
           "exec",
           "executable",
+          "metamorphic",
           "numeric_tolerance",
           "over_refusal",
           "pseudobulk_chain",
@@ -3236,8 +3385,10 @@
           "artifact",
           "artifact_schema",
           "backend_identity",
+          "equivalence",
           "exec",
           "executable",
+          "metamorphic",
           "numeric_tolerance",
           "over_refusal",
           "pseudobulk_chain",
@@ -3250,7 +3401,9 @@
           "abstention_correct",
           "artifact_schema",
           "backend_identity",
+          "equivalence",
           "exec",
+          "metamorphic",
           "numeric_tolerance",
           "over_refusal",
           "pseudobulk_chain",
@@ -3258,5 +3411,91 @@
         ]
       ]
     ]
+  },
+  "online_isolation_scope_change": {
+    "date": "2026-09-28",
+    "basis": "Explicit user request to close online isolation and native Windows gaps",
+    "changes": [
+      "prepare-native-session --sandbox",
+      "value_lab/online_sandbox.py",
+      "retire online root masking",
+      "Windows Hyper-V backend"
+    ],
+    "reference": "docs/history/ONLINE-ISOLATION.zh-CN.md",
+    "other_frozen_surfaces_unchanged": true
+  },
+  "research_authoring_scope_change": {
+    "date": "2026-09-28",
+    "basis": "Explicit user request for host-Agent semantic creation tailored to researchers",
+    "changes": [
+      "init --materials",
+      "init --proposal",
+      "init --template",
+      "default init handoff semantics"
+    ],
+    "reference": "docs/history/RESEARCH-AUTHORING.zh-CN.md",
+    "other_frozen_surfaces_unchanged": true
+  },
+  "authoring_scope_change": {
+    "date": "2026-09-27",
+    "basis": "User request to improve authoring and composable eval structure",
+    "changes": [
+      "init options",
+      "suite-check",
+      "suite-convert",
+      "authoring.py",
+      "declarative.py"
+    ],
+    "reference": "docs/history/AUTHORING.zh-CN.md",
+    "other_frozen_surfaces_unchanged": true
+  },
+  "environment_recording_scope_change": {
+    "date": "2026-09-28",
+    "basis": "Explicit user request for scientific environment drift controls and automatic live MCP recording",
+    "changes": [
+      "pseudobulk-reference --environment-lock/--environment-id",
+      "science_environment.py",
+      "live_recording.py"
+    ],
+    "reference": "docs/history/ENVIRONMENT-RECORDING.zh-CN.md",
+    "other_frozen_surfaces_unchanged": true
+  },
+  "metamorphic_scope_change": {
+    "date": "2026-09-28",
+    "basis": "Explicit user request for standard scientific metamorphic grader extensions",
+    "changes": [
+      "metamorphic grader and schema",
+      "reviewed five-relation registry",
+      "correctness-oracle gate",
+      "native evidence built-in allowlist",
+      "structured relation reports"
+    ],
+    "reference": "docs/history/METAMORPHIC-GRADERS.zh-CN.md",
+    "other_frozen_surfaces_unchanged": true
+  },
+  "p1_calibration_decision_burden_scope_change": {
+    "date": "2026-09-28",
+    "basis": "Explicit user request: continue and deeply complete the three P1 tasks",
+    "problem": "Unequal family sizes can reverse quality summaries; isolated stopwatch journals omit preparation, review and failed attempts; selected science checks lack a compact auditable calibration packet",
+    "bounded_changes": [
+      "Existing detector audit accepts existing deterministic numeric_tolerance and replicate_effect graders, no submitted code",
+      "Prospective optional policy.quality_weighting case/family aligns the quality gate, headline and bootstrap; legacy default and all-success gate retained",
+      "Existing example stopwatch/report supports frozen pair plans, complete burden ledger and outcome review"
+    ],
+    "reason": "Making weighting selectable before freezing and accepting pinned sidecars require explicit input-contract extensions; documentation alone cannot prevent contradictory calculations or missing costs",
+    "reference": "docs/history/P1-DELIVERY-20260928.zh-CN.md",
+    "unchanged": "0.7.0, frozen CLI/MCP/runtime-module/grader/schema surface, five golden commands, eight mainline documents, no automatic scientific or benefit certification"
+  },
+  "component_methodology_scope_change": {
+    "date": "2026-09-28",
+    "basis": "Explicit user request: component factorial ablation, prospective saturation diagnostics and scientific equivalence testing",
+    "added_runtime_modules": [
+      "component_studies",
+      "saturation",
+      "equivalence"
+    ],
+    "new_grader": "equivalence",
+    "limits": "Descriptive declared exposures; no automatic host component activation, causal attribution, case retirement or scientific validation",
+    "unchanged": "Version 0.7.0, five golden commands, MCP signatures, freeze status and all other frozen surfaces"
   }
 }

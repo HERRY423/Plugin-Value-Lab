@@ -15,6 +15,183 @@ from .native_evidence import (_fresh, _plan, _separate, capture_native_evidence,
                               discover_native_bindings, verify_native_evidence)
 
 
+def offline_namespace(command, inputs, outputs, bwrap):
+    """Allowlisted filesystem for OFFLINE workloads, not the online model host.
+
+    Do not bind /, HOME, /etc, /run, WSL mounts or a reference directory. A clean
+    network namespace plus closed inherited FDs prevents host socket reuse.
+    """
+    argv = [bwrap, '--unshare-all', '--unshare-user', '--uid', '65534', '--gid', '65534',
+            '--disable-userns', '--new-session',
+            '--die-with-parent', '--cap-drop', 'ALL', '--clearenv',
+            '--setenv', 'PATH', '/usr/bin:/bin', '--setenv', 'HOME', '/tmp',
+            '--setenv', 'LANG', 'C.UTF-8', '--setenv', 'PYTHONDONTWRITEBYTECODE', '1']
+    for path in ('/usr', '/bin', '/lib', '/lib64'):
+        if Path(path).exists():
+            argv.extend(['--ro-bind', path, path])
+    argv.extend(['--proc', '/proc', '--dev', '/dev', '--tmpfs', '/tmp',
+                 '--dir', '/etc', '--ro-bind', str(inputs), '/inputs',
+                 '--bind', str(outputs), '/output', '--chdir', '/output',
+                 '--remount-ro', '/', '--'])
+    return [*argv, *command]
+
+
+def run_offline(inputs, files, command, output, *, cassette=None, expected_id=None, timeout_seconds=30):
+    """One local attempt with an optional parent-side MCP replay broker.
+
+    The child gets only selected public inputs and a fresh output directory.
+    Cassette and scorer remain in the parent; only matched responses cross the
+    stdio boundary. There is no hook-only, online, or unsandboxed fallback.
+    """
+    import json
+    import math
+    import queue
+    import threading
+    import time
+    from .processes import close_tree
+    from .replay import ToolReplay, replay_message
+    if sys.platform != 'linux':
+        raise ValidationError('Offline OS isolation requires Linux/WSL2 with bubblewrap; no fallback')
+    bwrap = shutil.which('bwrap')
+    if not bwrap:
+        raise ValidationError('bubblewrap unavailable; no fallback or automatic installation')
+    if (type(timeout_seconds) not in (int, float) or not math.isfinite(timeout_seconds)
+            or not 1 <= timeout_seconds <= 300):
+        raise ValidationError('Offline timeout must be 1..300 seconds')
+    if (not isinstance(command, list) or not command
+            or any(not isinstance(s, str) or not s or '\x00' in s for s in command)):
+        raise ValidationError('Use an explicit command argument list, not a shell string')
+    if (not isinstance(files, list) or not files or any(not isinstance(s, str) for s in files)
+            or len(files) != len(set(files)) or len(files) > 1000):
+        raise ValidationError('Select 1..1000 unique public input files explicitly')
+    source, root = Path(inputs).resolve(), _fresh(output)
+    _separate(source, root)
+    runtime_roots = [Path(p).resolve() for p in ('/usr', '/bin', '/lib', '/lib64') if Path(p).exists()]
+    if any(root.is_relative_to(p) for p in runtime_roots):
+        raise ValidationError('Keep controller evidence outside mounted runtime directories')
+    replay = ToolReplay(cassette, expected_id) if cassette is not None else None
+    cassette_root = Path(cassette).resolve() if cassette is not None else None
+    if cassette_root is not None and any(cassette_root.is_relative_to(p) for p in runtime_roots):
+        raise ValidationError('Cassette would be visible through a runtime mount')
+    if cassette is None and expected_id is not None:
+        raise ValidationError('A cassette commitment needs a cassette')
+    selected, size = [], 0
+    for name in files:
+        path = confined(source, name)
+        if cassette_root is not None and path.resolve().is_relative_to(cassette_root):
+            raise ValidationError('Cassette cannot also be selected as a public input')
+        if '.replay' in Path(name).parts or not path.is_file() or path.stat().st_nlink != 1:
+            raise ValidationError('Select regular public files, not linked files or private .replay material')
+        size += path.stat().st_size
+        if size > 32 * 1024 * 1024:
+            raise ValidationError('Public inputs exceed 32 MiB')
+        selected.append((name, path))
+    root.mkdir(parents=True)
+    stage, artifacts = root / 'inputs', root / 'artifacts'
+    stage.mkdir()
+    artifacts.mkdir()
+    for name, path in selected:
+        target = stage / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(path, target)
+    plan = {'format': 'pvl-offline-isolation-1', 'command': command,
+            'inputs': {name: sha(stage / name) for name, _ in selected},
+            'timeout_seconds': timeout_seconds, 'bwrap_sha256': sha(bwrap),
+            'cassette_sha256': expected_id, 'network': 'DENIED',
+            'host_root_mounted': False, 'inherited_environment': False,
+            'model_calls': 0, 'mode': 'OFFLINE_CONTRACT_REPLAY' if replay else 'OFFLINE_EXECUTION'}
+    write_json(root / 'plan.json', plan)
+    # Apply resource limits before exec, in the namespace, without preexec_fn.
+    limits = ('import os,resource,sys; '
+              'resource.setrlimit(resource.RLIMIT_CORE,(0,0)); '
+              'resource.setrlimit(resource.RLIMIT_FSIZE,(8388608,8388608)); '
+              'resource.setrlimit(resource.RLIMIT_AS,(536870912,536870912)); '
+              'resource.setrlimit(resource.RLIMIT_NOFILE,(64,64)); '
+              'resource.setrlimit(resource.RLIMIT_NPROC,(64,64)); '
+              f'resource.setrlimit(resource.RLIMIT_CPU,({math.ceil(timeout_seconds)},{math.ceil(timeout_seconds)})); '
+              'os.execvp(sys.argv[1],sys.argv[1:])')
+    argv = offline_namespace(['/usr/bin/python3', '-I', '-c', limits, *command], stage, artifacts, bwrap)
+    started, error, returncode = time.monotonic(), None, None
+    write_json(root / 'started.json', {'plan_sha256': suite_digest(plan), 'automatic_retry': False})
+    with (root / 'stderr.txt').open('wb') as err, (root / 'stdout.txt').open('wb') as log:
+        process = None
+        stop = threading.Event()
+        try:
+            process = subprocess.Popen(argv, stdin=subprocess.PIPE if replay else subprocess.DEVNULL,
+                stdout=subprocess.PIPE if replay else log, stderr=err, cwd=root,
+                env={'PATH': '/usr/bin:/bin'}, close_fds=True, start_new_session=True, shell=False)
+            if replay:
+                messages = queue.Queue(maxsize=16)
+                def read_lines():
+                    while not stop.is_set():
+                        line = process.stdout.readline(1024 * 1024 + 1)
+                        while not stop.is_set():
+                            try:
+                                messages.put(line, timeout=.1)
+                                break
+                            except queue.Full:
+                                pass
+                        if not line or len(line) > 1024 * 1024:
+                            return
+                reader = threading.Thread(target=read_lines, daemon=True)
+                reader.start()
+                total, count = 0, 0
+                while True:
+                    if time.monotonic() - started > timeout_seconds:
+                        raise TimeoutError('Offline replay timed out')
+                    try:
+                        line = messages.get(timeout=.05)
+                    except queue.Empty:
+                        continue
+                    if not line:
+                        break
+                    total, count = total + len(line), count + 1
+                    if len(line) > 1024 * 1024 or total > 8 * 1024 * 1024 or count > 10000 or not line.endswith(b'\n'):
+                        raise ValidationError('MCP replay stream exceeds framing/resource limit')
+                    log.write(line)
+                    response = replay.handle(replay_message(line.decode('utf-8')))
+                    if response is not None:
+                        payload = (json.dumps(response, ensure_ascii=True, allow_nan=False) + '\n').encode('ascii')
+                        # Nonblocking writes ensure a child that never reads cannot
+                        # hold the trusted broker beyond the same wall deadline.
+                        os.set_blocking(process.stdin.fileno(), False)
+                        import select
+                        offset = 0
+                        while offset < len(payload):
+                            if time.monotonic() - started > timeout_seconds:
+                                raise TimeoutError('Offline replay response timed out')
+                            _, ready, _ = select.select([], [process.stdin.fileno()], [], .05)
+                            if ready:
+                                try:
+                                    offset += os.write(process.stdin.fileno(), payload[offset:])
+                                except BlockingIOError:
+                                    pass
+                    if replay.violations:
+                        raise ValidationError('MCP replay contract mismatch; no fallback')
+            remaining = max(.001, timeout_seconds - (time.monotonic() - started))
+            returncode = process.wait(timeout=remaining)
+        except (OSError, ValueError, subprocess.SubprocessError) as exc:
+            error = type(exc).__name__ + ': ' + str(exc)[:400]
+        finally:
+            stop.set()
+            if process is not None:
+                close_tree(process)
+                returncode = process.returncode
+                for stream in (process.stdin, process.stdout):
+                    if stream is not None:
+                        stream.close()
+    replay_receipt = replay.receipt() if replay else None
+    succeeded = returncode == 0 and error is None and (not replay or replay_receipt['status'] == 'REPLAY_COMPLETE')
+    receipt = {'status': 'COMPLETED' if succeeded else 'FAILED', 'returncode': returncode,
+               'error': error, 'replay': replay_receipt, 'plan_sha256': suite_digest(plan),
+               'isolation_requested': 'BUBBLEWRAP_OFFLINE_ALLOWLIST', 'network_policy': 'DENIED',
+               'independent_isolation_verification': False,
+               'new_observations': 0 if replay else None,
+               'claim_limit': 'Local isolation/execution only; no scientific validation or live backend evidence'}
+    write_json(root / 'receipt.json', receipt)
+    return receipt
+
+
 def _sources(plan_root, pin, plugin, references):
     _, plan = _plan(plan_root, pin)
     for field in ('case_files', 'plugin_files'):
@@ -103,147 +280,11 @@ def _invocation(argv, plugin, output, plan):
     return rebuilt, price
 
 
-def _namespace(command, private_roots, empty, bwrap, writable=()):
-    # A private PID/proc namespace prevents following the parent's /proc/PID/root.
-    argv = [bwrap, '--ro-bind', '/', '/', '--unshare-pid', '--proc', '/proc', '--dev', '/dev',
-            '--die-with-parent', '--cap-drop', 'ALL', '--unsetenv', 'WSL_INTEROP']
-    for root in writable:
-        argv.extend(['--bind', str(root), str(root)])
-    for root in private_roots:
-        argv.extend(['--ro-bind', str(empty / 'directory'), str(root)])
-    # WSL's interop interpreter could escape a Linux mount namespace.
-    if Path('/init').exists():
-        argv.extend(['--ro-bind', str(empty / 'file'), '/init'])
-    if Path('/run/WSL').is_dir():
-        argv.extend(['--ro-bind', str(empty / 'directory'), '/run/WSL'])
-    return [*argv, '--', *command]
-
-
-PROBE = r'''import json,os,subprocess,sys
-rows=[]
-for path in json.loads(sys.argv[1]):
-    row={'path':path}
-    for mode,label in [('rb','readable'),('r+b','writable_existing')]:
-        try:
-            with open(path,mode): pass
-            row[label]=True
-        except OSError: row[label]=False
-    target=os.path.join(os.path.dirname(path),'._pvl_namespace_probe')
-    try:
-        with open(target,'xb'): pass
-        row['replacement_creatable']=True
-    except OSError: row['replacement_creatable']=False
-    rows.append(row)
-interop=None
-if os.path.exists('/mnt/c/Windows/System32/cmd.exe'):
-    try:
-        result=subprocess.run(['/mnt/c/Windows/System32/cmd.exe','/c','exit','0'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=5)
-        interop=result.returncode==0
-    except (OSError,subprocess.SubprocessError): interop=False
-print(json.dumps({'files':rows,'windows_interop_succeeded':interop}))
-'''
-
-
-def probe_namespace(private_roots, targets, scratch, bwrap, writable=()):
-    import json
-    scratch = _fresh(scratch)
-    for root in private_roots:
-        _separate(root, scratch)
-    if any(not Path(path).is_file() for path in targets):
-        raise ValidationError('Isolation probe needs existing host-readable targets')
-    before = {str(path): sha(path) for path in targets}
-    (scratch / 'directory').mkdir(parents=True)
-    (scratch / 'file').write_bytes(b'')
-    command = _namespace([sys.executable, '-B', '-c', PROBE, json.dumps([str(p) for p in targets])], private_roots, scratch, bwrap, writable)
-    result = subprocess.run(command, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=30, shell=False)
-    if result.returncode:
-        raise ValidationError('Reference namespace unavailable; model was not launched: ' + result.stderr[:300])
-    observation = json.loads(result.stdout)
-    allowed = (len(observation['files']) == len(targets) and observation['windows_interop_succeeded'] is not True
-               and all(not any(row[k] for k in ('readable', 'writable_existing', 'replacement_creatable')) for row in observation['files'])
-               and before == {str(path): sha(path) for path in targets})
-    receipt = {'passed': allowed, 'observations': observation, 'host_bytes_unchanged': before == {str(p): sha(p) for p in targets},
-               'scope': 'These named roots denied read/write/replacement in the tested namespace; no assertion about undisclosed copies, prior exposure or independent scientific blinding.'}
-    write_json(scratch / 'probe.json', receipt)
-    if not allowed:
-        raise ValidationError('Reference isolation probe failed; model execution prohibited')
-    return receipt
-
-
-def prepare_native_session(directory, plan_digest, plugin, invocation, output, *, references=None, timeout_seconds=1800):
-    if sys.platform != 'linux':
-        raise ValidationError('Integrated isolated collection requires Linux/WSL; offline capture remains available on other platforms')
-    if type(timeout_seconds) is not int or not 1 <= timeout_seconds <= 86400:
-        raise ValidationError('Explicit session timeout must be 1..86400 seconds')
-    output, plugin, directory = _fresh(output), Path(plugin).resolve(), Path(directory).resolve()
-    references = Path(references).resolve() if references is not None else None
-    if references is not None:
-        _separate(directory, references)
-    private = [directory] + ([references] if references is not None else [])
-    for a in (output, plugin):
-        for b in private:
-            _separate(a, b)
-    _separate(plugin, output)
-    plan = _sources(directory, plan_digest, plugin, references)
-    argv, price = _invocation(invocation, plugin, output, plan)
-    executable = shutil.which(argv[0])
-    bwrap = shutil.which('bwrap')
-    if not executable or not bwrap:
-        raise ValidationError('Existing Claude executable and bubblewrap required; nothing is installed automatically')
-    executable, bwrap = str(Path(executable).resolve()), str(Path(bwrap).resolve())
-    for root in private:
-        if any(Path(path).is_relative_to(root) for path in (executable, bwrap, sys.executable)):
-            raise ValidationError('A private reference root contains a required executable')
-    version = subprocess.run([executable, '--version'], stdin=subprocess.DEVNULL, capture_output=True,
-                             text=True, timeout=20, shell=False)
-    if version.returncode or version.stdout.strip() != '2.1.278 (Claude Code)':
-        raise ValidationError('Automatic binding profile is limited to observed Claude Code 2.1.278; use offline capture for other versions')
-    argv[0] = executable
-    output.mkdir(parents=True)
-    writable = [output / 'native', output / 'retained']
-    for path in writable:
-        path.mkdir()
-    config = Path(os.environ.get('CLAUDE_CONFIG_DIR', str(Path.home() / '.claude'))).resolve()
-    if config.is_dir():
-        for other in (*private, plugin, output, Path(__file__).resolve().parent):
-            _separate(config, other)
-        writable.append(config)
-    targets = [directory / 'plan.json'] + [confined(references, name) for name in plan['references']]
-    isolation = probe_namespace(private, targets, output / 'isolation-preflight', bwrap, writable)
-    # Host-side --version can succeed via WSL interop while the isolated launch
-    # correctly denies that escape. Verify the real namespace before authorization.
-    isolated_version = subprocess.run(
-        _namespace([executable, '--version'], private, output / 'isolation-preflight', bwrap, writable),
-        stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=20, shell=False)
-    if isolated_version.returncode or isolated_version.stdout.strip() != '2.1.278 (Claude Code)':
-        raise ValidationError('Claude cannot start inside the reference-isolation namespace; use a compatible Linux executable. Model was not launched')
-    frozen = {'schema_version': 1, 'evidence_plan': str(directory), 'evidence_plan_sha256': plan_digest,
-              'plugin': str(plugin), 'references': str(references) if references else None, 'argv': argv,
-              'private_roots': [str(p) for p in private], 'probe_targets': [str(p) for p in targets],
-              'writable_roots': [str(p) for p in writable],
-              'bwrap': bwrap, 'bwrap_sha256': sha(bwrap), 'executable_sha256': sha(executable),
-              'python': sys.executable, 'python_sha256': sha(sys.executable),
-              'timeout_seconds': timeout_seconds, 'estimated_ceiling_usd': price,
-              'expected_sessions': sum(c['repetitions'] * 2 for c in plan['contract']['cases']),
-              'isolation_preflight': isolation, 'isolated_cli_version': isolated_version.stdout.strip(),
-              'automatic_retry': False, 'model_calls': 0}
-    write_json(output / 'session-plan.json', frozen)
-    disclosure = {'collected': ['selected case/plugin bytes and versions', 'available native session/load/Skill/tool events',
-                                'declared input and output files with hashes', 'original native result, errors and partial runs'],
-                  'purpose': 'Link the existing native execution to independent offline scientific checks without rewriting cases',
-                  'invocation': argv, 'expected_sessions': frozen['expected_sessions'],
-                  'reference_roots': frozen['private_roots'], 'host_profile': frozen['isolated_cli_version'],
-                  'cost': {'native_estimate_ceiling_usd': price, 'can_overrun_in_flight': True, 'settled_usd': None,
-                           'offline_grading_model_calls': 0}, 'authorization': 'Running requires --execute and this exact session digest',
-                  'limitations': ['No new observations are fabricated for old results', 'Local namespace checks are not independent review or full blinding',
-                                  'Native tools retain their original grants; no real MCP startup or publication is enabled'],
-                  'writable_roots': frozen['writable_roots']}
-    write_json(output / 'COLLECTION.json', disclosure)
-    (output / 'COLLECTION.md').write_text('# 原生附加采集\n\n沿用已有用例；采集范围与费用见 COLLECTION.json。\n\n'
-        '执行将使用既有 Claude 账户与配置，发送原任务和选定插件给其模型提供方；本工具不自动购买、重试或发布。\n'
-        '评分参考与冻结计划在执行子进程的挂载命名空间中隐藏；运行退出后父进程才收集、评分。\n'
-        '原始 stdout/stderr、失败和残缺结果保留；崩溃后使用 finish-native-session，不再次启动模型。\n', encoding='utf-8')
-    return {'output': str(output), 'session_sha256': suite_digest(frozen), 'model_calls': 0, 'disclosure': disclosure}
+def prepare_native_session(directory, plan_digest, plugin, invocation, output, *, references=None, timeout_seconds=1800, sandbox=None):
+    """Prepare a networkless host; legacy root masking is no longer executable."""
+    from .online_sandbox import prepare_session
+    return prepare_session(directory, plan_digest, plugin, invocation, output,
+                           references=references, timeout_seconds=timeout_seconds, sandbox=sandbox)
 
 
 def _session(directory, pin):
@@ -289,28 +330,5 @@ def run_native_session(directory, pin, *, execute=False):
     root, frozen = _session(directory, pin)
     if execute is not True:
         raise ValidationError('Use --execute with the exact session digest after reviewing collection, tools, data and estimate limits')
-    if sys.platform != 'linux' or (root / 'started.json').exists():
-        raise ValidationError('This frozen Linux/WSL session can be attempted only once; inspect or finish existing evidence')
-    if sys.executable != frozen['python'] or sha(sys.executable) != frozen['python_sha256']:
-        raise ValidationError('Collector Python changed after freeze')
-    for path, digest in ((frozen['argv'][0], frozen['executable_sha256']), (frozen['bwrap'], frozen['bwrap_sha256'])):
-        if sha(path) != digest:
-            raise ValidationError('Native executable or isolation backend changed')
-    _sources(frozen['evidence_plan'], frozen['evidence_plan_sha256'], frozen['plugin'], frozen['references'])
-    # Exclusive marker protects against concurrent execution and uncertain-result retries.
-    with (root / 'started.json').open('x', encoding='utf-8') as stream:
-        import json
-        json.dump({'session_sha256': pin, 'execute': True, 'automatic_retry': False}, stream)
-    probe_namespace(frozen['private_roots'], frozen['probe_targets'], root / 'isolation-execution', frozen['bwrap'], frozen['writable_roots'])
-    retained = root / 'retained'
-    command = _namespace(frozen['argv'], frozen['private_roots'], root / 'isolation-execution', frozen['bwrap'], frozen['writable_roots'])
-    env = dict(os.environ, TMPDIR=str(retained), TMP=str(retained), TEMP=str(retained))
-    from .codex import _run
-    try:
-        process = _run(command, env, frozen['plugin'], '', root / 'native-process', frozen['timeout_seconds'])
-    except (OSError, subprocess.SubprocessError) as exc:
-        # A launcher exception need not prove all descendants have terminated.
-        write_json(root / 'interrupted.json', {'error': str(exc), 'process_state': 'UNKNOWN', 'settled_usd': None})
-        raise
-    write_json(root / 'process.json', process)
-    return finish_native_session(root, pin)
+    from .online_sandbox import run_session
+    return run_session(root, frozen, pin)

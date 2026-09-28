@@ -56,7 +56,8 @@ def _fresh(output, sources):
 def prepare_reuse(study, output, *, artifact_root=None, verifier_root=None):
     study = Path(study).resolve()
     output = _fresh(output, (study, artifact_root, verifier_root))
-    suite = load_json(study / "suite.json")
+    from .core import load_suite
+    suite = load_suite(study / "suite.json")
     records = load_records(study / "runs.jsonl")
     lock = load_json(study / "protocol.lock.json")
     ledger = load_json(study / "cost-ledger.json") if (study / "cost-ledger.json").exists() else None

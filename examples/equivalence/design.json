@@ -1,0 +1,16 @@
+{
+  "format": "pvl-equivalence-design-1",
+  "unit_kind": "independent_dataset",
+  "independence_rationale": "Synthetic calibration: six independent manufactured datasets, one paired aggregate result per dataset. These rows are not genes or cells from one matrix.",
+  "unit_ids": ["dataset-1", "dataset-2", "dataset-3", "dataset-4", "dataset-5", "dataset-6"],
+  "minimum_units": 6,
+  "alpha": 0.05,
+  "features": {
+    "mean_log2_effect": {
+      "lower": -0.01,
+      "upper": 0.01,
+      "max_abs_difference": 0.02,
+      "rationale": "Manufactured engineering calibration bound only. A researcher must justify new bounds for an actual scientific endpoint before collecting observations."
+    }
+  }
+}

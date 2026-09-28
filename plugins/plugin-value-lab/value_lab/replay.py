@@ -1,9 +1,192 @@
-"""Read-only replay preflight and material inventory. Never execute a verifier."""
+"""Replay inventory and exact, offline MCP tool cassettes. No live fallback."""
 import importlib.metadata
 import platform
 import sys
 
 from .core import suite_digest
+
+
+def replay_message(line):
+    import json
+    from .core import ValidationError, _constant, _unique_object
+    try:
+        return json.loads(line, parse_constant=_constant, object_pairs_hook=_unique_object)
+    except RecursionError as exc:
+        raise ValidationError('Replay JSON nesting exceeds parser limit') from exc
+
+
+def _json_copy(value):
+    import json
+    from .core import ValidationError
+    try:
+        return json.loads(json.dumps(value, ensure_ascii=True, allow_nan=False))
+    except (TypeError, ValueError, RecursionError) as exc:
+        raise ValidationError('Replay values must be finite JSON') from exc
+
+
+def _validate_cassette(data):
+    from .core import ValidationError
+    if (not isinstance(data, dict) or set(data) != {'format', 'tools', 'exchanges', 'provenance'}
+            or data['format'] != 'pvl-tool-cassette-1'
+            or not isinstance(data['tools'], list) or not data['tools']
+            or not isinstance(data['exchanges'], list) or not data['exchanges']
+            or not isinstance(data['provenance'], dict)
+            or data['provenance'].get('origin') not in ('manufactured', 'recorded')
+            or not isinstance(data['provenance'].get('description'), str)
+            or not data['provenance']['description'].strip()):
+        raise ValidationError('Invalid tool cassette or missing origin/description')
+    names = set()
+    for tool in data['tools']:
+        if (not isinstance(tool, dict) or not isinstance(tool.get('name'), str)
+                or not tool['name'] or tool['name'] in names
+                or not isinstance(tool.get('inputSchema'), dict)):
+            raise ValidationError('Cassette needs unique MCP tools with inputSchema')
+        names.add(tool['name'])
+    for entry in data['exchanges']:
+        if not isinstance(entry, dict) or set(entry) != {'request', 'response'}:
+            raise ValidationError('Each exchange needs request and response')
+        request, response = entry['request'], entry['response']
+        if (not isinstance(request, dict) or set(request) != {'name', 'arguments'}
+                or not isinstance(request['name'], str) or request['name'] not in names
+                or not isinstance(request['arguments'], dict)
+                or not isinstance(response, dict) or len(response) != 1
+                or not set(response) <= {'result', 'error'}):
+            raise ValidationError('Invalid tools/call exchange')
+        if 'result' in response:
+            result = response['result']
+            if (not isinstance(result, dict) or not isinstance(result.get('content'), list)
+                    or any(not isinstance(c, dict) or not isinstance(c.get('type'), str) for c in result['content'])
+                    or ('isError' in result and type(result['isError']) is not bool)
+                    or ('structuredContent' in result and not isinstance(result['structuredContent'], dict))):
+                raise ValidationError('Invalid MCP CallToolResult')
+        else:
+            error = response['error']
+            if (not isinstance(error, dict) or type(error.get('code')) is not int
+                    or not isinstance(error.get('message'), str)):
+                raise ValidationError('Invalid recorded JSON-RPC error')
+    return data
+
+
+def record_tools(directory, tools, exchanges, *, provenance):
+    """Persist explicitly supplied, sanitized exchanges; never call a backend.
+
+    The caller owns consent/redaction. No environment, credentials or files are
+    discovered automatically. A cassette is test material, never a new study run.
+    """
+    from pathlib import Path
+    from .core import ValidationError, write_json
+    data = _validate_cassette(_json_copy({'format': 'pvl-tool-cassette-1',
+        'tools': tools, 'exchanges': exchanges, 'provenance': provenance}))
+    import json
+    if len(json.dumps(data, ensure_ascii=True).encode('ascii')) > 8 * 1024 * 1024:
+        raise ValidationError('Tool cassette exceeds 8 MiB')
+    root = Path(directory)
+    root.mkdir(parents=True, exist_ok=False)
+    write_json(root / 'cassette.json', data)
+    return {'cassette_sha256': suite_digest(data), 'exchanges': len(exchanges),
+            'new_observations': 0, 'backend_calls': 0, 'mode': 'OFFLINE_CONTRACT_REPLAY'}
+
+
+class ToolReplay:
+    """One ordered session, exact JSON arguments, no best-match or live lookup."""
+    def __init__(self, directory, expected_id):
+        from pathlib import Path
+        from .core import ValidationError, load_json
+        path = Path(directory) / 'cassette.json'
+        if path.is_symlink() or path.stat().st_size > 8 * 1024 * 1024:
+            raise ValidationError('Cassette must be a bounded regular snapshot')
+        data = _validate_cassette(load_json(path))
+        if not isinstance(expected_id, str) or suite_digest(data) != expected_id:
+            raise ValidationError('Cassette commitment missing or changed')
+        self.data, self.expected_id = _json_copy(data), expected_id
+        self.position, self.violations, self.ids = 0, [], set()
+        self.initialized, self.ready = False, False
+
+    def handle(self, message):
+        """Bounded MCP JSON-RPC subset; transport IDs are not semantic keys."""
+        from .core import ValidationError
+        message = _json_copy(message)
+        if (not isinstance(message, dict) or message.get('jsonrpc') != '2.0'
+                or not isinstance(message.get('method'), str)):
+            self.violations.append('invalid_message')
+            raise ValidationError('Invalid JSON-RPC message')
+        method, params = message['method'], message.get('params', {})
+        if 'id' not in message:
+            if method != 'notifications/initialized' or not self.initialized or self.ready:
+                self.violations.append('unsupported_notification')
+                raise ValidationError('Unsupported replay notification')
+            self.ready = True
+            return None
+        rid = message['id']
+        if type(rid) not in (int, str):
+            self.violations.append('invalid_id')
+            raise ValidationError('JSON-RPC id must be integer or string')
+        identity = suite_digest(rid)
+        if identity in self.ids:
+            self.violations.append('duplicate_id')
+            raise ValidationError('Duplicate JSON-RPC id')
+        self.ids.add(identity)
+        envelope = {'jsonrpc': '2.0', 'id': rid}
+        if not isinstance(params, dict):
+            self.violations.append('invalid_params')
+            return dict(envelope, error={'code': -32602, 'message': 'params must be an object'})
+        if method == 'initialize':
+            version = params.get('protocolVersion')
+            if not isinstance(version, str) or not version or self.initialized:
+                self.violations.append('unsupported_protocol')
+                return dict(envelope, error={'code': -32602, 'message': 'Missing protocol version or repeated initialization'})
+            if version not in ('2024-11-05', '2025-03-26', '2025-06-18'):
+                version = '2025-06-18'
+            self.initialized = True
+            return dict(envelope, result={'protocolVersion': version, 'capabilities': {'tools': {}},
+                        'serverInfo': {'name': 'pvl-offline-replay', 'version': '1'},
+                        'instructions': 'OFFLINE_CONTRACT_REPLAY. No backend, model, scientific validation or new observations.'})
+        if method == 'ping':
+            return dict(envelope, result={})
+        if not self.ready:
+            self.violations.append('not_initialized')
+            return dict(envelope, error={'code': -32600, 'message': 'Initialize and acknowledge before tool requests'})
+        if method == 'tools/list' and not params:
+            return dict(envelope, result={'tools': _json_copy(self.data['tools'])})
+        if method == 'tools/call':
+            # Only _meta is transport context. Do not drop default/null fields,
+            # normalize paths, reorder arrays or coerce booleans/numbers.
+            semantic = {k: v for k, v in params.items() if k != '_meta'}
+            if self.position < len(self.data['exchanges']):
+                entry = self.data['exchanges'][self.position]
+                if suite_digest(semantic) == suite_digest(entry['request']):
+                    self.position += 1
+                    return dict(envelope, **_json_copy(entry['response']))
+            self.violations.append('unexpected_call_at_' + str(self.position))
+            return dict(envelope, error={'code': -32602, 'message': 'Cassette mismatch/exhaustion; live fallback forbidden'})
+        self.violations.append('unsupported_method_or_params')
+        return dict(envelope, error={'code': -32601, 'message': 'Method/params outside frozen replay contract'})
+
+    def receipt(self):
+        complete = self.position == len(self.data['exchanges']) and not self.violations
+        return {'status': 'REPLAY_COMPLETE' if complete else 'REPLAY_INCOMPLETE',
+                'mode': 'OFFLINE_CONTRACT_REPLAY', 'cassette_sha256': self.expected_id,
+                'consumed': self.position, 'expected': len(self.data['exchanges']),
+                'violations': list(self.violations), 'new_observations': 0,
+                'backend_calls': 0, 'scientific_execution': False}
+
+
+def serve_tools(directory, expected_id, source, sink):
+    """JSON-lines stdio server using only the standard library; EOF must finish."""
+    import json
+    from .core import ValidationError
+    replay = ToolReplay(directory, expected_id)
+    while True:
+        line = source.readline(1024 * 1024 + 1)
+        if not line:
+            break
+        if len(line) > 1024 * 1024 or not line.endswith('\n'):
+            raise ValidationError('Incomplete or oversized replay message')
+        response = replay.handle(replay_message(line))
+        if response is not None:
+            sink.write(json.dumps(response, ensure_ascii=True, allow_nan=False) + '\n')
+            sink.flush()
+    return replay.receipt()
 
 
 def replay_contract(suite, records, *, verifier_root=None, corpus_root=None, artifact_root=None):

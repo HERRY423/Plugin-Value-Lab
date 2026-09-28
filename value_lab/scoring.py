@@ -55,6 +55,150 @@ def validate_rules(case):
                 raise ValidationError(f"{case['id']}: 同一个 JSON 路径有互斥目标值")
 
 
+def _outcome_roles(grader):
+    """Declared verifier capability, never keyword guesses about a prompt/output."""
+    if grader['dimension'] != 'outcome':
+        return []
+    if grader['type'] in ('over_refusal', 'abstention_correct'):
+        return ['decision']
+    if grader['type'] == 'artifact_schema':
+        return ['delivery']
+    if grader['type'] == 'backend_identity':
+        return []
+    return ['delivery', 'correctness']
+
+
+def success_requirements(case):
+    """Normalize the frozen acceptance contract without touching observations."""
+    from .core import ValidationError
+    contract = case.get('success_contract')
+    graders = {g['id']: g for g in case['graders']}
+    endpoints = ('decision', 'delivery', 'correctness')
+    roles = {e: sorted(g['id'] for g in graders.values() if e in _outcome_roles(g)) for e in endpoints}
+    schemas = sorted(g['id'] for g in graders.values() if g['dimension'] == 'outcome' and g['type'] == 'artifact_schema')
+    if schemas:
+        # A delivered, structurally valid answer can still be wrong. Do not
+        # let the correctness layer erase independent delivery evidence.
+        roles['delivery'] = schemas
+    scored = [g for g in graders.values() if g['dimension'] == 'outcome']
+    if contract is None:
+        # Existing text-only suites retain their frozen rubric/floor semantics.
+        # Typed artifact/decision checks use the evidence layers below.
+        mode = ('configured_checks' if all(g['type'] in ('contains', 'not_contains') for g in scored)
+                else 'decision' if case['kind'] == 'abstention' and roles['decision']
+                     and not roles['delivery'] and not roles['correctness'] else 'task')
+        return dict(roles, mode=mode, basis='INFERRED_FROM_FROZEN_GRADER_TYPES_AND_CASE_KIND')
+    if (not isinstance(contract, dict) or set(contract) - {'version', 'mode', *endpoints}
+            or type(contract.get('version')) is not int or contract['version'] != 1
+            or contract.get('mode') not in ('task', 'decision')):
+        raise ValidationError(f"{case['id']}: success_contract needs version 1 and task/decision mode")
+    for endpoint in endpoints:
+        if endpoint not in contract:
+            continue
+        ids = contract[endpoint]
+        if (not isinstance(ids, list) or any(not isinstance(gid, str) or gid not in graders for gid in ids)
+                or len(ids) != len(set(ids))):
+            raise ValidationError(f"{case['id']}: {endpoint} must list unique existing grader ids")
+        for gid in ids:
+            grader = graders[gid]
+            if (grader['dimension'] != 'outcome' or grader['type'] == 'backend_identity'
+                    or (endpoint == 'decision' and grader['type'] not in
+                        ('over_refusal', 'abstention_correct', 'human', 'json_equals', 'contains', 'not_contains'))
+                    or (grader['type'] in ('artifact_schema', 'over_refusal', 'abstention_correct')
+                        and endpoint not in _outcome_roles(grader))):
+                raise ValidationError(f"{case['id']}/{gid}: process or narrower evidence cannot establish {endpoint}")
+        # Declaring extra necessary checks must not disable existing decisive
+        # artifact evidence by supplying an empty list or a passing schema.
+        roles[endpoint] = sorted(set(roles[endpoint]) | set(ids))
+    if contract['mode'] == 'decision':
+        if not roles['decision']:
+            raise ValidationError(f"{case['id']}: decision mode needs a decision outcome grader")
+        if any(contract.get(e) for e in ('delivery', 'correctness')):
+            raise ValidationError(f"{case['id']}: use task mode when delivery/correctness are required")
+        if any(g['type'] not in ('over_refusal', 'abstention_correct', 'backend_identity',
+                                 'contains', 'not_contains') and g['id'] not in roles['decision'] for g in scored):
+            raise ValidationError(f"{case['id']}: result graders require task mode; decision mode cannot bypass them")
+    return dict(roles, mode=contract['mode'], basis='EXPLICIT_FROZEN_SUCCESS_CONTRACT')
+
+
+def _all_states(states):
+    """Order-independent conjunction: false dominates unknown; empty is unknown."""
+    states = list(states)
+    if any(s is False for s in states):
+        return False
+    if not states or any(s is not True for s in states):
+        return None
+    return True
+
+
+def assess_task_outcome(case, run, floor):
+    """Preserve partial scores while separately assessing necessary result evidence."""
+    required = success_requirements(case)
+    grades = {g['id']: g for g in run['grades']}
+    mode, layers = required['mode'], {}
+    for endpoint in ('decision', 'delivery', 'correctness'):
+        needed = ((endpoint == 'decision' and bool(required[endpoint]))
+                  or (mode == 'task' and endpoint in ('delivery', 'correctness')))
+        if mode == 'decision' and endpoint != 'decision':
+            needed = False
+        ids = required[endpoint] if needed else []
+        state = _all_states(grades.get(gid, {}).get('passed') for gid in ids) if needed else None
+        layers[endpoint] = {'required': needed, 'grader_ids': ids, 'passed': state,
+                            'status': 'PASS' if state is True else 'FAIL' if state is False
+                            else 'UNKNOWN' if needed else 'NOT_REQUIRED'}
+    # Invariant constant outputs can satisfy every relation. A relation pass
+    # alone must not become a correctness claim through the quality floor.
+    correctness = required['correctness']
+    definitions = {g['id']: g for g in case['graders']}
+    metamorphic = [gid for gid in correctness if definitions[gid]['type'] == 'metamorphic']
+    anchors = [gid for gid in correctness if definitions[gid]['type'] not in
+               ('metamorphic', 'contains', 'not_contains', 'artifact_schema', 'backend_identity')]
+    if metamorphic and not anchors and layers['correctness']['passed'] is True:
+        layers['correctness'].update(passed=None, status='UNKNOWN',
+            reason='Metamorphic consistency requires a separate task correctness oracle')
+    floor_met = run['score'] is not None and run['score'] + 1e-12 >= floor
+    critical = [g['passed'] for g in run['grades'] if g['critical']]
+    critical_state = _all_states(critical) if critical else True
+    checks = [v['passed'] for v in layers.values() if v['required']]
+    evidence = _all_states(checks) if checks else None
+    if mode == 'configured_checks':
+        evidence = floor_met
+    # Assessment evidence is kept separate from observation admissibility;
+    # cost-only gaps must not erase artifact checks in endpoint interpretation.
+    acceptance = _all_states([evidence, critical_state, floor_met])
+    if run['status'] in ('error', 'timeout', 'aborted'):
+        acceptance = False
+    elif run['status'] != 'completed':
+        acceptance = None
+    state = None if run['issues'] or run['score'] is None else acceptance
+    reasons = [f"{name}:{v['status']}" for name, v in layers.items()
+               if v['required'] and v['passed'] is not True]
+    if critical_state is not True:
+        reasons.append('critical_check_failed_or_unknown')
+    if not floor_met:
+        reasons.append('quality_floor_not_met_or_unknown')
+    if run['issues']:
+        reasons.append('observation_or_required_verification_issue')
+    return {'version': 1, 'mode': mode, 'basis': required['basis'], 'layers': layers,
+            'assessment_passed': acceptance, 'passed': state,
+            'status': 'PASS' if state is True else 'FAIL' if state is False else 'UNKNOWN',
+            'quality_floor_met': floor_met, 'critical_checks_passed': critical_state,
+            'reasons': reasons, 'claim_limit': 'Frozen submitted checks only; no independent scientific validation'}
+
+
+def run_success(run, floor):
+    """One success definition for metric, cost and recommendation denominators."""
+    if run is None or run.get('issues') or run.get('score') is None:
+        return None
+    if run['status'] != 'completed':
+        return False if run['status'] in ('error', 'timeout', 'aborted') else None
+    if 'task_outcome' in run:
+        return run['task_outcome']['passed']
+    # Legacy report rows remain readable; all new evaluations attach task_outcome.
+    return (run['score'] + 1e-12 >= floor
+            and all(g['passed'] is True for g in run['grades'] if g['critical']))
+
+
 def inspect_rules(suite, samples=None):
     from .core import ValidationError, _grade, validate_suite
     try:
@@ -98,7 +242,13 @@ def inspect_rules(suite, samples=None):
             score = None if unresolved else sum(g["weight"] for g, row in zip(case["graders"], grades) if g["dimension"] == "outcome" and row["passed"] is True) / total
             critical = [g["id"] for g, row in zip(case["graders"], grades) if g["critical"] and row["passed"] is False]
             sample_rows.append({"output": output, "score": score, "grades": grades, "critical_failures": critical})
-        cases.append({"id": case["id"], "rules": rules, "samples": sample_rows})
+        requirements = success_requirements(case)
+        if requirements['mode'] == 'task':
+            for endpoint in ('delivery', 'correctness'):
+                if not requirements[endpoint]:
+                    warnings.append(f"{case['id']}: 缺少 {endpoint} 结果判据；过程检查或决策通过不能填补该证据")
+        cases.append({"id": case["id"], "rules": rules, "samples": sample_rows,
+                      "success_requirements": requirements})
     if len({c["cluster"] for c in suite["cases"]}) < suite["policy"]["min_clusters"]:
         warnings.append("任务类别数低于方案门槛；重复运行不能代替独立任务类别")
     prompts = {}

@@ -12,7 +12,8 @@ def link_evidence(study, decision_artifact, reference, evidence_type):
     if not isinstance(reference, str) or not reference.strip():
         raise ValidationError("Provide a source reference")
     root = Path(study)
-    suite, lock = load_json(root / "suite.json"), load_json(root / "protocol.lock.json")
+    from .core import load_suite
+    suite, lock = load_suite(root / "suite.json"), load_json(root / "protocol.lock.json")
     records = load_records(root / "runs.jsonl") if (root / "runs.jsonl").exists() else []
     if suite_digest(suite) != lock.get("suite_sha256"):
         raise ValidationError("Host study protocol changed")

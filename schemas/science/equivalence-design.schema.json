@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PVL prospective paired equivalence design",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "unit_kind", "independence_rationale", "unit_ids", "features", "alpha", "minimum_units"],
+  "properties": {
+    "format": {"const": "pvl-equivalence-design-1"},
+    "unit_kind": {"enum": ["independent_dataset", "biological_replicate"]},
+    "independence_rationale": {"type": "string", "pattern": "\\S"},
+    "unit_ids": {"type": "array", "minItems": 3, "maxItems": 10000, "uniqueItems": true,
+      "items": {"type": "string", "pattern": "\\S", "maxLength": 200}},
+    "minimum_units": {"type": "integer", "minimum": 3, "maximum": 10000},
+    "alpha": {"type": "number", "minimum": 0.000001, "maximum": 0.05},
+    "features": {"type": "object", "minProperties": 1, "maxProperties": 1000,
+      "propertyNames": {"pattern": "\\S", "maxLength": 200},
+      "additionalProperties": {
+        "type": "object", "additionalProperties": false,
+        "required": ["lower", "upper", "max_abs_difference", "rationale"],
+        "properties": {
+          "lower": {"type": "number", "minimum": -1e100, "exclusiveMaximum": 0},
+          "upper": {"type": "number", "exclusiveMinimum": 0, "maximum": 1e100},
+          "max_abs_difference": {"type": "number", "exclusiveMinimum": 0, "maximum": 1e100},
+          "rationale": {"type": "string", "pattern": "\\S"}
+        }
+      }
+    }
+  }
+}

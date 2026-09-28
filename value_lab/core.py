@@ -20,7 +20,7 @@ from statistics import mean
 
 from . import __version__
 
-FILE_GRADERS = {"pseudobulk_chain", "artifact", "executable", "artifact_schema", "numeric_tolerance",
+FILE_GRADERS = {"equivalence", "metamorphic", "pseudobulk_chain", "artifact", "executable", "artifact_schema", "numeric_tolerance",
                 "abstention_correct", "over_refusal", "backend_identity", "exec", "replicate_effect"}
 
 
@@ -47,6 +47,28 @@ def load_json(path):
                           parse_constant=_constant, object_pairs_hook=_unique_object)
     except (ValueError, OSError) as exc:
         raise ValidationError(f"Cannot read JSON {path}: {exc}") from exc
+
+
+def load_suite(path):
+    p = Path(path)
+    if p.is_file():
+        data = load_json(p)
+        if isinstance(data, dict) and data.get("format") == "pvl-evals-v1":
+            from .declarative import _inside, load_evals
+            if set(data) != {"format", "evals"}:
+                raise ValidationError(f"{p}: authoring pointer may only contain format and evals")
+            return load_evals(_inside(p.parent, data["evals"]))
+        return data
+    if p.is_dir():
+        from .declarative import load_evals
+        if (p / "suite.json").is_file():
+            data = load_json(p / "suite.json")
+            if isinstance(data, dict) and ("cases" in data or "format" in data):
+                if "cases" in data and (p / "evals").is_dir():
+                    raise ValidationError(f"{p}: both JSON and evals exist; choose an explicit source path")
+                return load_suite(p / "suite.json")
+        return load_evals(p)
+    raise ValidationError(f"Suite path does not exist: {path}")
 
 
 def write_json(path, obj):
@@ -198,8 +220,9 @@ def validate_suite(suite):
                 raise ValidationError("grader.critical must be boolean")
         if not any(g["dimension"] == "outcome" for g in graders):
             raise ValidationError("Every case needs an outcome grader; activation alone is not value")
-        from .scoring import validate_rules
+        from .scoring import validate_rules, success_requirements
         validate_rules(case)
+        success_requirements(case)
     from .usage import _validate_usage_contract
     _validate_usage_contract(suite)
     return suite
@@ -262,7 +285,7 @@ def _grade(g, record):
         return False, "Invalid JSON or absent field"
 
 
-def _bootstrap(cases, seed=20260922):
+def _bootstrap(cases, seed=20260922, weighting='case'):
     groups = defaultdict(list)
     for case in cases:
         if case["delta"] is None:
@@ -274,11 +297,14 @@ def _bootstrap(cases, seed=20260922):
     # treated as independent tasks. Labels do not verify actual independence.
     clusters = list(groups.values())
     rng = random.Random(seed)
-    draws = sorted(mean([v for group in rng.choices(clusters, k=len(clusters)) for v in group])
-                   for _ in range(2000))
+    def draw():
+        sample = rng.choices(clusters, k=len(clusters))
+        return mean([mean(group) for group in sample] if weighting == 'family' else
+                    [v for group in sample for v in group])
+    draws = sorted(draw() for _ in range(2000))
     return {"status": "DESCRIPTIVE_ONLY", "method": "task-family cluster bootstrap, percentile 95%",
             "low": draws[49], "high": draws[1949], "resamples": 2000, "seed": seed,
-            "clusters": len(clusters),
+            "clusters": len(clusters), "quality_weighting": weighting,
             "caution": "Exploratory interval, unstable with few families; family independence is declared, not verified. No causal test."}
 
 
@@ -473,7 +499,8 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
                     if not scored and g["critical"] and passed is not True:
                         issues.append(f"Critical verification {g['id']} failed or is unresolved")
                     grades.append({"id": g["id"], "passed": passed, "rationale": rationale,
-                                   "scored": scored, "critical": g["critical"], "weight": g["weight"]})
+                                   "scored": scored, "dimension": g["dimension"],
+                                   "critical": g["critical"], "weight": g["weight"]})
                     if verification is not None:
                         grades[-1]["verification"] = verification
                     if scored:
@@ -504,6 +531,11 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
                 rows.append({"arm": arm, "repetition": rep, "status": status, "score": score,
                              "grades": grades, "cost_usd": item["cost_usd"], "issues": issues,
                              "duration_seconds": record.get("duration_seconds"), "error": record.get("error")})
+                from .scoring import assess_task_outcome
+                rows[-1]['task_outcome'] = assess_task_outcome(case, rows[-1], suite['policy']['quality_floor'])
+                if rows[-1]['task_outcome']['passed'] is None:
+                    blockers.append(f"{case['id']}/{rep}/{arm}: Task success is unresolved; inspect result evidence layers")
+                    comparable_pair = False
                 if "value_interpretation" in suite["policy"]:
                     rows[-1].update(observation_issues=item["observation_issues"],
                                     failure_observation=record.get("failure_observation"))
@@ -514,9 +546,10 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
         delta = None if with_score is None or without_score is None else with_score - without_score
         cases_out.append({"id": case["id"], "kind": case["kind"], "cluster": case["cluster"],
                           "with_score": with_score, "without_score": without_score, "delta": delta, "runs": rows})
-    with_score = full_mean([c["with_score"] for c in cases_out])
-    without_score = full_mean([c["without_score"] for c in cases_out])
-    quality_delta = None if with_score is None or without_score is None else with_score - without_score
+    from .value_metrics import quality_summary
+    quality = quality_summary(cases_out, suite['policy'].get('quality_weighting', 'case'))
+    with_score, without_score, quality_delta = (quality['primary'][k] for k in
+                                               ('with_score', 'without_score', 'quality_delta'))
     with_cost = full_mean(total_costs["with"])
     without_cost = full_mean(total_costs["without"])
     cost_delta = None if with_cost is None or without_cost is None else with_cost - without_cost
@@ -550,11 +583,14 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
     else:
         quality_ok = quality_delta is not None and quality_delta > 1e-12 and quality_delta + 1e-12 >= policy["min_quality_delta"] and with_score + 1e-12 >= policy["quality_floor"]
     cost_ok = cost_delta is not None and (not (policy["require_cost_saving"] or objective == "efficiency") or cost_delta < -1e-12)
+    from .scoring import run_success
+    task_success_ok = all(run_success(r, policy['quality_floor']) is True
+                          for c in cases_out for r in c['runs'] if r['arm'] == 'with')
     if blockers:
         verdict = "INSUFFICIENT_EVIDENCE"
     elif critical_failures or regression or methodology["violations"]:
         verdict = "REGRESSION_DETECTED"
-    elif quality_ok and cost_ok:
+    elif quality_ok and cost_ok and task_success_ok:
         verdict = "PROMISING_LOCAL_SIGNAL"
     else:
         verdict = "NO_DEMONSTRATED_GAIN"
@@ -584,12 +620,15 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
                     "cost_delta_usd": cost_delta, "with_cost_usd": with_cost, "without_cost_usd": without_cost,
                     "cost_unit": "mean per planned arm execution; positive delta costs more",
                     "quality_gate_met": quality_ok, "cost_gate_met": cost_ok,
+                    "task_success_gate_met": task_success_ok,
+                    "quality_weighting": quality['weighting'],
                     "objective": objective,
                     "critical_failures": critical_failures, "comparison_eligible": not blockers},
         "policy": policy, "blockers": blockers, "warnings": warnings, "cases": cases_out,
         "scope_integrity_blockers": list(dict.fromkeys(scope_integrity_blockers + cost_analysis['issues'])),
         "cost_analysis": cost_analysis, "methodology": methodology,
-        "uncertainty": _bootstrap(cases_out) if not blockers else {"status": "UNAVAILABLE", "reason": "Incomplete or confounded evidence"},
+        "quality_estimand": quality,
+        "uncertainty": _bootstrap(cases_out, weighting=quality['weighting']) if not blockers else {"status": "UNAVAILABLE", "reason": "Incomplete or confounded evidence"},
         "claim_limits": {"causal_benefit": "NOT_ESTABLISHED", "external_validation": "NOT_ESTABLISHED",
                          "scientific_authorization": "NONE", "independence": "DECLARED_NOT_VERIFIED",
                          "decision_scope": "Descriptive within the frozen submitted task suite only",
@@ -602,8 +641,9 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
         report["corpus_errors"] = corpus_errors
     if scientific_errors is not None:
         report["scientific_errors"] = scientific_errors
-    from .value_metrics import build_value_metrics
+    from .value_metrics import build_value_metrics, decision_review
     report["value_metrics"] = build_value_metrics(suite, report)
+    report['decision_review'] = decision_review(report)
     if "value_interpretation" in policy:
         from .interpretation import build_interpretation
         report["value_interpretation"] = build_interpretation(suite, report)

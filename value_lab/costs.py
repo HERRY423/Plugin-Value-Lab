@@ -237,8 +237,10 @@ def analyze_costs(suite, records, ledger=None, report=None, native_estimate=None
                 components[entry["category"]] += value
                 basis_totals[entry["basis"]] += value
         rows = [r for case in (report or {}).get("cases", []) for r in case["runs"] if r["arm"] == arm]
-        success = sum(r["status"] == "completed" and not r["issues"] and r["score"] is not None and r["score"] + 1e-12 >= suite["policy"]["quality_floor"] and
-                      not any(g["critical"] and g["passed"] is not True for g in r["grades"]) for r in rows)
+        from .scoring import run_success
+        success_states = [run_success(r, suite['policy']['quality_floor']) for r in rows]
+        success = sum(state is True for state in success_states)
+        success_unknown = sum(state is None for state in success_states)
         if not math.isfinite(subtotal):
             raise ValidationError("总成本溢出")
         complete = not unknown and not duplicates and not plan["issues"] and plan["coverage_complete"]
@@ -251,7 +253,8 @@ def analyze_costs(suite, records, ledger=None, report=None, native_estimate=None
                      "included_breakdown_usd": included,
                      "known_amounts_by_basis_usd": basis_totals,
                      "successful_outcomes": success if report else None,
-                     "cost_per_success_usd": total / success if total is not None and success and report else None,
+                     "success_unknown": success_unknown if report else None,
+                     "cost_per_success_usd": total / success if total is not None and success and not success_unknown and report else None,
                      "declared_human_minutes": sum(minutes), "human_time_complete": len(minutes) == len(expected),
                      "latency": {"observed_runs": len(durations), "median_seconds": median(durations) if durations else None,
                                  "p90_seconds": duration_sorted[max(0, math.ceil(.9 * len(durations)) - 1)] if durations else None},

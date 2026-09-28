@@ -358,3 +358,21 @@ def native_report(result) -> dict:
         "provenance": {"source": DOC_URL, "claude_version": result.get("claudeVersion"),
                        "native_duration_seconds": result.get("durationSeconds"), "native_result": deepcopy(result)},
     }
+
+
+def parse_frontmatter(content: str):
+    """Compatibility entry point for the strict PVL authoring format."""
+    from .declarative import parse_frontmatter as implementation
+    return implementation(content)
+
+
+def dump_evals(suite: dict, output_dir: Path | str, overwrite: bool = False):
+    """Compatibility entry point for the strict PVL authoring format."""
+    from .declarative import dump_evals as implementation
+    return implementation(suite, output_dir, overwrite)
+
+
+def load_evals(evals_dir: Path | str, suite_meta: dict | None = None):
+    """Compatibility entry point for the strict PVL authoring format."""
+    from .declarative import load_evals as implementation
+    return implementation(evals_dir, suite_meta)

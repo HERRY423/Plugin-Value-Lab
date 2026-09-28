@@ -1,5 +1,6 @@
 """Controlled event/launcher fixtures; never claim real model executions."""
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -11,7 +12,8 @@ from value_lab.core import ValidationError, load_json, write_json
 from value_lab.native_evidence import discover_native_bindings
 from value_lab.native_hypotheses import build_native_hypotheses, write_native_hypotheses, skill_events
 from value_lab.native_trigger import prepare_trigger_probe, compare_trigger_probe
-from value_lab.native_session import prepare_native_session, run_native_session, finish_native_session, _namespace
+from value_lab.native_session import prepare_native_session, run_native_session, finish_native_session
+from value_lab.online_sandbox import sandbox_command
 
 
 class HypothesisTests(unittest.TestCase):
@@ -176,7 +178,9 @@ class SessionTests(unittest.TestCase):
         self.addCleanup(self.fx.doCleanups)
         self.root = self.fx.root
         self.prep, self.result = self.fx.prepare()
-        self.cli = self.root / 'claude'
+        self.runtime = self.root / 'runtime'
+        self.runtime.mkdir()
+        self.cli = self.runtime / 'claude'
         self.bwrap = self.root / 'bwrap'
         self.cli.write_text('fixture executable', encoding='utf-8')
         self.bwrap.write_text('fixture isolation backend', encoding='utf-8')
@@ -184,13 +188,15 @@ class SessionTests(unittest.TestCase):
                      '--model', 'fixture-model', '--runs', '1', '--max-cost-usd', '0.1', '--ablation', 'with-without',
                      '--allow-tools', 'Write', 'Bash']
         self.output = self.root / 'session'
+        self.config = {'format': 'pvl-online-sandbox-1', 'backend': 'bubblewrap', 'runtime': str(self.runtime),
+            'executable': 'claude', 'gateway': {'endpoint': 'https://api.example.com', 'models': ['fixture-model'],
+                'api_key_env': 'PVL_MODEL_API_KEY', 'max_requests': 10, 'max_output_tokens': 1024, 'request_timeout_seconds': 10}}
 
     def prepare(self, argv=None):
         with patch('value_lab.native_session.sys.platform', 'linux'), \
-             patch('value_lab.native_session.shutil.which', side_effect=lambda name: str(self.bwrap) if name == 'bwrap' else str(self.cli)), \
-             patch('value_lab.native_session.subprocess.run', return_value=subprocess.CompletedProcess([], 0, '2.1.278 (Claude Code)\n', '')), \
-             patch('value_lab.native_session.probe_namespace', return_value={'passed': True, 'fixture': True}):
-            return prepare_native_session(self.prep / 'plan', self.result['plan_sha256'], self.prep / 'candidate', argv or self.argv, self.output)
+             patch('value_lab.online_sandbox.shutil.which', return_value=str(self.bwrap)), \
+             patch('value_lab.online_sandbox.probe_backend', return_value={'version': '2.1.278 (Claude Code)', 'fixture': True}):
+            return prepare_native_session(self.prep / 'plan', self.result['plan_sha256'], self.prep / 'candidate', argv or self.argv, self.output, sandbox=self.config)
 
     def test_preparation_preserves_case_bytes_and_does_not_launch_model(self):
         before = (self.prep / 'candidate/pvl-analysis-evals/numeric/prompt.md').read_bytes()
@@ -203,6 +209,9 @@ class SessionTests(unittest.TestCase):
             self.assertIn(flag, frozen['argv'])
         self.assertNotIn('--trust-plugin', frozen['argv'])
         self.assertEqual(frozen['expected_sessions'], 2)
+        self.assertFalse(frozen['host_root_mounted'])
+        self.assertTrue(frozen['network_isolated'])
+        self.assertFalse(frozen['credentials_in_child'])
         self.assertEqual(result['disclosure']['expected_sessions'], 2)
         self.assertEqual(result['disclosure']['invocation'], frozen['argv'])
         self.assertEqual(result['disclosure']['cost']['native_estimate_ceiling_usd'], 0.1)
@@ -215,15 +224,26 @@ class SessionTests(unittest.TestCase):
                 self.prepare(argv)
             self.assertFalse(self.output.exists())
 
-    def test_host_wrapper_that_fails_inside_namespace_blocks_preparation(self):
+    def test_unselected_plugin_files_are_not_mounted(self):
+        (self.prep / 'candidate/unlisted-private.txt').write_text('PRIVATE-CANARY')
+        self.prepare()
+        self.assertFalse((self.output / 'public-plugin/unlisted-private.txt').exists())
+        self.assertTrue((self.output / 'public-plugin/pvl-analysis-evals/numeric/prompt.md').is_file())
+
+    def test_modified_bridge_snapshot_blocks_before_model(self):
+        result = self.prepare()
+        (self.output / 'control/model_bridge.py').write_text('changed')
+        with patch('value_lab.native_session.sys.platform', 'linux'), self.assertRaisesRegex(ValidationError, 'Bridge snapshot'):
+            run_native_session(self.output, result['session_sha256'], execute=True)
+        self.assertFalse((self.output / 'started.json').exists())
+
+    def test_failed_networkless_runtime_blocks_preparation(self):
         with patch('value_lab.native_session.sys.platform', 'linux'), \
-             patch('value_lab.native_session.shutil.which', side_effect=lambda name: str(self.bwrap) if name == 'bwrap' else str(self.cli)), \
-             patch('value_lab.native_session.subprocess.run', side_effect=[
-                 subprocess.CompletedProcess([], 0, '2.1.278 (Claude Code)\n', ''),
-                 subprocess.CompletedProcess([], 126, '', 'Exec format error')]), \
-             patch('value_lab.native_session.probe_namespace', return_value={'passed': True}), \
-             self.assertRaisesRegex(ValidationError, 'compatible Linux executable'):
-            prepare_native_session(self.prep / 'plan', self.result['plan_sha256'], self.prep / 'candidate', self.argv, self.output)
+             patch('value_lab.online_sandbox.shutil.which', return_value=str(self.bwrap)), \
+             patch('value_lab.online_sandbox.probe_backend', side_effect=ValidationError('runtime unavailable')), \
+             self.assertRaisesRegex(ValidationError, 'runtime unavailable'):
+            prepare_native_session(self.prep / 'plan', self.result['plan_sha256'], self.prep / 'candidate',
+                                   self.argv, self.output, sandbox=self.config)
         self.assertFalse((self.output / 'session-plan.json').exists())
         self.assertFalse((self.output / 'started.json').exists())
 
@@ -259,11 +279,12 @@ class SessionTests(unittest.TestCase):
 
     def test_native_failure_without_aggregate_retains_unknown_cost(self):
         result = self.prepare()
-        def launch(*args):
+        def launch(*args, **kwargs):
             return {'exit_code': 2, 'timed_out': False, 'duration_seconds': .01}
         with patch('value_lab.native_session.sys.platform', 'linux'), \
-             patch('value_lab.native_session.probe_namespace', return_value={'passed': True}), \
-             patch('value_lab.codex._run', side_effect=launch) as run:
+             patch.dict(os.environ, {'PVL_MODEL_API_KEY': 'synthetic-test-key'}), \
+             patch('value_lab.online_sandbox.probe_backend', return_value={'passed': True}), \
+             patch('value_lab.online_sandbox.run_exchange', side_effect=launch) as run:
             observed = run_native_session(self.output, result['session_sha256'], execute=True)
             self.assertEqual(observed['status'], 'NATIVE_RESULT_MISSING')
             self.assertIsNone(observed['settled_usd'])
@@ -272,13 +293,14 @@ class SessionTests(unittest.TestCase):
 
     def test_automatic_capture_keeps_partial_missing_trace(self):
         result = self.prepare()
-        def launch(*args):
+        def launch(*args, **kwargs):
             write_json(self.output / 'native/result.json', {'schemaVersion': 1, 'claudeVersion': '2.1.278', 'partial': True,
                 'cases': [{'name': 'numeric', 'arms': {'with': [{'error': 'timeout', 'tracePath': str(self.output / 'retained/missing.jsonl')}], 'without': []}}]})
             return {'exit_code': 2, 'timed_out': False, 'duration_seconds': .01}
         with patch('value_lab.native_session.sys.platform', 'linux'), \
-             patch('value_lab.native_session.probe_namespace', return_value={'passed': True}), \
-             patch('value_lab.codex._run', side_effect=launch):
+             patch.dict(os.environ, {'PVL_MODEL_API_KEY': 'synthetic-test-key'}), \
+             patch('value_lab.online_sandbox.probe_backend', return_value={'passed': True}), \
+             patch('value_lab.online_sandbox.run_exchange', side_effect=launch):
             observed = run_native_session(self.output, result['session_sha256'], execute=True)
         self.assertEqual(observed['status'], 'COLLECTED')
         report = load_json(self.output / 'collected/diagnosis.json')
@@ -292,13 +314,14 @@ class SessionTests(unittest.TestCase):
         with self.assertRaises(ValidationError):
             finish_native_session(self.output, result['session_sha256'])
 
-    def test_isolation_command_masks_references_and_parent_proc(self):
-        command = _namespace(['claude'], ['/private/scorers'], Path('/safe/empty'), '/usr/bin/bwrap', ['/runs'])
-        self.assertEqual(command[1:4], ['--ro-bind', '/', '/'])
-        self.assertIn('--unshare-pid', command)
-        self.assertIn('WSL_INTEROP', command)
-        self.assertIn('/private/scorers', command)
-        self.assertNotIn('--unshare-net', command)  # Native model transport remains possible; native tool rules govern agent networking.
+    def test_isolation_command_uses_allowlist_and_private_network(self):
+        command = sandbox_command(self.config, self.prep / 'candidate', self.output,
+                                  self.root / 'control', ['claude'], str(self.bwrap))
+        self.assertNotIn(['--ro-bind', '/', '/'], [command[i:i+3] for i in range(len(command))])
+        self.assertIn('--unshare-all', command)
+        self.assertIn('--clearenv', command)
+        self.assertNotIn('--share-net', command)
+        self.assertNotIn(str(self.prep / 'plan'), command)
 
     def test_missing_retained_workspace_is_unknown_not_invented(self):
         retained = self.root / 'retained'

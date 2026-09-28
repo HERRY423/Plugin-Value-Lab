@@ -18,7 +18,7 @@ from .core import ValidationError, load_json, suite_digest, write_json
 from .native import _validate_result, _status
 
 
-ALLOWED = {"pseudobulk_chain", "artifact", "artifact_schema", "numeric_tolerance", "replicate_effect",
+ALLOWED = {"equivalence", "metamorphic", "pseudobulk_chain", "artifact", "artifact_schema", "numeric_tolerance", "replicate_effect",
            "abstention_correct", "over_refusal"}
 
 

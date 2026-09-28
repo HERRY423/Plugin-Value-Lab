@@ -6,6 +6,42 @@ on:
 permissions:
   contents: read
 jobs:
+  offline-contract:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      # No pip/scientific environment for the replay contract gate.
+      - run: python -S -m unittest discover -s tests -p test_offline_replay.py -v
+      - run: python -S -m unittest discover -s tests -p test_live_recording.py -v
+      - run: python -S -m unittest discover -s tests -p test_metamorphic.py -v
+      - run: python -S -m unittest discover -s tests -p test_component_studies.py -v
+      - run: python -S -m unittest discover -s tests -p test_authoring.py -v
+      - run: python -S -m unittest discover -s tests -p test_research_authoring.py -v
+      - run: python -S -m unittest discover -s tests -p test_online_sandbox.py -v
+  offline-kernel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y bubblewrap
+      # Required real namespace acceptance: unavailable isolation FAILS, not skips.
+      - run: /usr/bin/python3 -S scripts/check_offline_boundary.py --output "$RUNNER_TEMP/pvl-offline-acceptance"
+      - run: /usr/bin/python3 -S scripts/check_online_boundary.py --output "$RUNNER_TEMP/pvl-online-acceptance"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: offline-kernel-evidence
+          path: ${{ runner.temp }}/pvl-offline-acceptance
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: online-kernel-evidence
+          path: ${{ runner.temp }}/pvl-online-acceptance
   test:
     strategy:
       fail-fast: false

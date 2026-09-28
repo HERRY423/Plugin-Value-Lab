@@ -61,6 +61,20 @@ def _state(run, floor, endpoint, rules):
         return None
     if endpoint == "runtime_reliability":
         return True
+    if 'task_outcome' in run:
+        outcome = run['task_outcome']
+        # Monetary incompleteness does not erase observed artifact evidence.
+        # Observation identity issues were handled above; critical process
+        # checks remain necessary, independent of partial outcome scores.
+        if any(g['critical'] and not g['scored'] and g['passed'] is not True for g in run['grades']):
+            return None
+        if outcome['mode'] != 'configured_checks':
+            endpoint_name = 'delivery' if endpoint == 'full_delivery' else 'correctness'
+            layer = outcome['layers'][endpoint_name]
+            # Correctly making a decision is a valid decision-task success,
+            # but does not itself establish a delivered numerical result.
+            return layer['passed'] if layer['required'] else None
+        return outcome['assessment_passed']
     grades = [g for g in run["grades"] if g["scored"] or g["critical"]]
     if not grades or any(g["passed"] is None for g in grades):
         return None

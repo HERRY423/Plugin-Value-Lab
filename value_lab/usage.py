@@ -75,7 +75,8 @@ def diagnose(source, output, *, check=None, spec=None, audit=False, receipt=None
         required = ('suite.json', 'runs.jsonl', 'protocol.lock.json')
         if any(not (source / p).is_file() for p in required):
             raise ValidationError("Study needs suite.json, runs.jsonl and protocol.lock.json; alternatively supply an artifact with --check bh or --spec")
-        card = build_usage_card(load_json(source / required[0]), load_records(source / required[1]),
+        from .core import load_suite
+        card = build_usage_card(load_suite(source / required[0]), load_records(source / required[1]),
                                 load_json(source / required[2]),
                                 load_json(source / 'cost-ledger.json') if (source / 'cost-ledger.json').is_file() else None,
                                 artifact_root=artifact_root,
@@ -115,15 +116,56 @@ def diagnose(source, output, *, check=None, spec=None, audit=False, receipt=None
               'new_model_calls': 0}
     output.mkdir(parents=True)
     write_json(output / 'diagnosis.json', report)
-    lines = ['# 作者诊断', '', _markdown(result.get('status')), '',
-             f'待查看项：{len(findings)}。检查通过不代表插件整体正确。', '']
-    for finding in findings:
-        lines += ['- ' + _markdown(finding)]
-    lines += ['', '下一步：' + _markdown(result['next_action']), '',
-              '完整判据、证据和盲区见 diagnosis.json。机器耗时与作者首次定位耗时分开记录；后者仍未知。', '']
-    (output / 'DIAGNOSIS.md').write_text('\n'.join(lines), encoding='utf-8')
+    (output / 'DIAGNOSIS.md').write_text(_diagnosis_markdown(result, findings, source), encoding='utf-8')
     return {'status': result.get('status'), 'findings': len(findings), 'timing': report['timing'],
             'report': str(output / 'DIAGNOSIS.md'), 'json': str(output / 'diagnosis.json')}
+
+
+def _diagnosis_markdown(result, findings, source):
+    """Explain existing findings without changing grades or inventing a cause."""
+    lines = ['# 作者诊断', '', '状态：' + _markdown(result.get('status')), '',
+             '检查来源：' + _markdown(str(source)), '',
+             f'待查看项：{len(findings)}。这是所选任务判据的检查，不是插件整体正确性或收益认证。', '']
+    audit_labels = {'FP': '可能误报：先检查评测规则', 'FN': '漏检：保留检出边界',
+                    'UNKNOWN': '证据不足：暂时不能判定', 'EXCLUDED_LABEL': '标签争议或不适用'}
+    for number, finding in enumerate(findings, 1):
+        kind, passed = finding.get('kind'), finding.get('passed')
+        if kind == 'invocation_evidence_gap':
+            title = '插件参与证据缺失'
+            action = '核对完整调用日志和冻结插件内容的读取证据；未观察到调用不等于插件没有参与。'
+        elif kind == 'execution':
+            title = '运行未完成或运行记录不完整'
+            action = '先定位宿主、依赖、超时或采集问题；缺失产物不能直接判为科学错误。'
+        elif finding.get('classification') in audit_labels:
+            title = audit_labels[finding['classification']]
+            action = '核对真实任务要求、标签依据和合法变体；不要为提高检出率删除反例。'
+        else:
+            title = '未满足所选判据' if passed is False else '待复核的失败或缺失项'
+            action = '核对任务是否要求该规则、输入和允许的替代方法；确认问题后用相同规则复测，并保留正常对照。'
+        evidence = finding.get('receipt') or result.get('evidence') or {}
+        location = evidence.get('artifact_path') or (str(source) if not source.is_dir() else '见 diagnosis.json 中对应运行的产物与日志')
+        context = []
+        for key, label in (('case_id', '任务'), ('arm', '条件'), ('repetition', '重复'), ('id', '检查')):
+            if key in finding:
+                context.append(label + '：' + str(finding[key]))
+        reason = finding.get('rationale') or finding.get('reason') or finding.get('label_reason')
+        lines += [f'## {number}. {title}', '']
+        if context:
+            lines += [_markdown('；'.join(context)), '']
+        lines += ['观察：' + _markdown(reason or '详细失败及未知计数见 diagnosis.json 中对应 findings 项。'), '',
+                  '证据位置：' + _markdown(location) + '（采集包内相对路径以检查来源目录为基准）', '']
+        if finding.get('label_reason') and finding['label_reason'] != reason:
+            lines += ['标签依据：' + _markdown(finding['label_reason']), '']
+        if finding.get('arm') == 'without':
+            lines += ['归因边界：此项发生在无插件基线，不能将它写成被测插件的缺陷或插件修复前证据。', '']
+        lines += ['下一步：' + action, '']
+    if not findings:
+        lines += ['本次没有待查看项；只表示这次所选检查未报告问题，未测机制和科学有效性仍不由此确立。', '']
+    lines += ['## 复核与继续', '',
+              '先用自己的话说明问题、证据和替代解释；作者理解、人工时间和审阅结果由真实参与者记录。', '',
+              '原始下一步建议：' + _markdown(result['next_action']), '',
+              '完整判据、原始发现、摘要和盲区见 diagnosis.json。机器耗时不是作者首次定位耗时；后者仍未知。', '']
+    return '\n'.join(lines)
 
 
 _EPSILON = 1e-12
@@ -259,9 +301,14 @@ def _scope_assessments(suite, records, report, envelope, artifact_root, verifier
             negatives.append('Scope violates a frozen decision-error ceiling')
         if any(c['delta'] is not None and c['delta'] < -policy['max_case_regression'] - _EPSILON for c in cases):
             negatives.append('A scope case exceeds the frozen regression limit')
-        supported = not blockers and not negatives and floor_ok and objective_ok and cost_ok
+        from .scoring import run_success
+        success_ok = all(run_success(r, policy['quality_floor']) is True for r in runs if r['arm'] == 'with')
+        if not success_ok:
+            negatives.append('Required WITH task outcomes failed or remain unknown; partial scores cannot authorize use')
+        supported = not blockers and not negatives and floor_ok and objective_ok and cost_ok and success_ok
         baseline = (not blockers and not negatives and delta is not None and delta <= _EPSILON
                     and all(c['without_score'] is not None and c['without_score'] + _EPSILON >= policy['quality_floor'] for c in cases)
+                    and all(run_success(r, policy['quality_floor']) is True for r in runs if r['arm'] == 'without')
                     and not any(g['critical'] and g['passed'] is not True for r in runs if r['arm'] == 'without' for g in r['grades'])
                     and (policy.get('objective') != 'efficiency' or cost_delta is not None and cost_delta >= -_EPSILON))
         regression = any(r['decision_code'] == 'OBSERVED_REGRESSION' for r in selected) or any(
@@ -328,6 +375,11 @@ def _improvement_plan(suite, report):
             if run["issues"]:
                 queue.append({**ref, "priority": 0, "kind": "evidence", "evidence": run["issues"],
                     "action": "先补核来源、配对条件、成本或复核缺口；证据阻断不能直接归因于插件实现。"})
+            task_outcome = run.get('task_outcome')
+            if task_outcome and task_outcome['passed'] is not True:
+                queue.append({**ref, 'priority': 1, 'kind': 'task_outcome',
+                    'evidence': task_outcome['reasons'], 'status': task_outcome['status'],
+                    'action': '分别核查决策、交付和正确性；补齐缺失判据或修复实际结果，保留失败与未知，不降低阈值换取成功。'})
             for grade in run["grades"]:
                 if run["status"] != "completed" or grade["passed"] is True or not grade["scored"]:
                     continue
@@ -409,12 +461,15 @@ def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_ro
         else:
             objective_ok = delta is not None and delta > _EPSILON and delta + _EPSILON >= policy["min_quality_delta"]
         cost_ok = cost_delta is not None and (not cost_required or cost_delta < -_EPSILON)
-        supported = can_support and complete and floor_ok and regression_ok and not critical_failed and objective_ok and cost_ok
+        from .scoring import run_success
+        success_ok = all(run_success(r, policy['quality_floor']) is True for r in case['runs'] if r['arm'] == 'with')
+        baseline_success_ok = all(run_success(r, policy['quality_floor']) is True for r in case['runs'] if r['arm'] == 'without')
+        supported = can_support and complete and floor_ok and regression_ok and not critical_failed and objective_ok and cost_ok and success_ok
         baseline_ok = (
             can_describe and complete and case["without_score"] is not None
             and case["without_score"] + _EPSILON >= policy["quality_floor"]
             and delta is not None and delta <= _EPSILON
-            and not supported and not baseline_critical_failed
+            and not supported and not baseline_critical_failed and baseline_success_ok
             # Under an efficiency goal, a cheaper plugin remains a useful signal;
             # do not turn failure of some other gate into a baseline recommendation.
             and (objective != "efficiency" or (cost_delta is not None and cost_delta >= -_EPSILON))
@@ -435,6 +490,8 @@ def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_ro
             prefer_baseline.append(_scenario(case, prompts[case["id"]], reason, cost_delta))
 
         reasons = []
+        if not success_ok:
+            reasons.append('必要的任务结果失败或尚未知，部分分数不能替代交付与正确性证据')
         if synthetic:
             reasons.append("包含合成演示，不能转化为实际使用建议")
         elif not eligible:
@@ -505,6 +562,8 @@ def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_ro
             "measured_verdict": report["measured_verdict"],
             "provenance": copy.deepcopy(report["provenance"]),
             "summary": copy.deepcopy(summary), "run_counts": _counts(all_runs),
+            "quality_estimand": copy.deepcopy(report['quality_estimand']),
+            "decision_review": copy.deepcopy(report['decision_review']),
             "blockers": list(report["blockers"]), "warnings": list(report["warnings"]),
             "claim_limits": copy.deepcopy(report["claim_limits"]),
             "authenticity_verified": False,
@@ -513,6 +572,8 @@ def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_ro
             "使用卡是观察范围内的临时参考，不是插件的通用质量认证或长期有效承诺。",
             "来源、外部参与者、任务独立性与人工计时均为提交者声明；程序重算和哈希不证明数据真实性、实际执行或独立验证。",
             "本地增益信号不建立因果收益、外部适用性或科学与临床有效性；科研结论仍需领域证据和研究者判断。",
+            "总评质量、质量门槛与区间口径：" + ('任务族均权' if summary['quality_weighting'] == 'family' else '案例均权') +
+            "。单次任务契约通过、本地受控试用线索、广泛采用是不同结论；本轮全部 WITH 任务成功门槛保持，广泛采用仍未建立。",
             "成本来自提交记录及人工费率折算；均值按每个案例每组的计划运行计算，估算费用不等于已结算支出。",
             "基线足够的观察不构成自动停用、卸载、扩权或修改其他插件的授权。",
             "原始任务文字保留在本地卡片中；向他人分享前应由用户检查其中的私有资料。",
@@ -651,6 +712,10 @@ def _usage_envelope(suite, records, report, card, artifact_root, verifier_root, 
             negatives.append(f"{critical} 个关键判据失败")
         if arms["with"]["failed"]:
             negatives.append(f"启用组 {arms['with']['failed']} 次执行失败（未归因）")
+        task_failed = sum(r.get('task_outcome', {}).get('passed') is False
+                          for c in cases for r in c['runs'] if r['arm'] == 'with')
+        if task_failed:
+            negatives.append(f'启用组 {task_failed} 次必要任务结果未通过；部分质量分不构成成功')
         if refusals["with"]["errors"]:
             negatives.append(f"启用组 {refusals['with']['errors']} 次误拒答")
         observed = sum(a["observed"] for a in arms.values())

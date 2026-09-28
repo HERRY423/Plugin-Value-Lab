@@ -133,7 +133,10 @@ class UsageCardTests(unittest.TestCase):
     def test_case_quality_floor_cannot_hide_in_high_global_average(self):
         self.records[0]["output"] = "No grading tokens"
         card = self.card()
-        self.assertEqual(card["verdict"], "PROMISING_LOCAL_SIGNAL")
+        # A high suite mean no longer establishes success for failed runs.
+        self.assertEqual(card["verdict"], "NO_DEMONSTRATED_GAIN")
+        self.assertTrue(card['source']['summary']['quality_gate_met'])
+        self.assertFalse(card['source']['summary']['task_success_gate_met'])
         self.assertNotIn("structured-delivery", self.ids(card["use_when"]))
         self.assertIn("质量未达到下限", next(x["reason"] for x in card["investigate"] if x["case_id"] == "structured-delivery"))
 

@@ -9,7 +9,7 @@ import unittest
 
 from value_lab.core import ValidationError, load_json, write_json, demo_suite, demo_records, suite_digest
 from value_lab.methodology import audit_detector
-from value_lab.usage import diagnose
+from value_lab.usage import diagnose, _diagnosis_markdown
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / 'examples/detector-corpus/manifest.json'
@@ -52,6 +52,32 @@ class AuthorDiagnosisTests(unittest.TestCase):
         self.assertIn('confounding', report['blind_spots']['untested_families'])
         self.assertIsNone(report['representative_accuracy'])
         self.assertEqual(report['by_origin']['replayed_real']['cases'], 4)
+
+    def test_readable_diagnosis_preserves_baseline_attribution_and_unknown_use(self):
+        # Presentation must not promote a baseline failure or missing call into a plugin defect.
+        findings = [{'case_id': 'csv-bh', 'arm': 'without', 'id': 'bh', 'passed': False,
+                     'rationale': 'BH mismatch', 'receipt': {'artifact_path': 'runs/1/artifacts/result.csv'}},
+                    {'case_id': 'csv-bh', 'arm': 'with', 'kind': 'invocation_evidence_gap',
+                     'plugin_non_use_established': False, 'reason': 'No supported invocation observed'}]
+        original = deepcopy(findings)
+        text = _diagnosis_markdown({'status': 'LOCAL_ARTIFACT_DIAGNOSIS', 'next_action': 'Review'}, findings, self.root)
+        self.assertIn('无插件基线', text)
+        self.assertIn('未观察到调用不等于插件没有参与', text)
+        self.assertIn('runs/1/artifacts/result.csv', text)
+        self.assertNotIn('&quot;', text)
+        self.assertEqual(findings, original)
+
+    def test_actual_artifact_diagnosis_is_readable_without_false_certification(self):
+        for filename, title in (('wrong-bh.csv', '未满足所选判据'), ('correct-bh.csv', '没有待查看项')):
+            source = CORPUS.parent / filename
+            if not source.exists():
+                source = self.root / filename
+                source.write_text('gene,p_value,q_value,log2fc\ng1,0.1,0.1,0\n', encoding='utf-8')
+            output = diagnose(source, self.root / filename.replace('.csv', ''), check='bh')
+            text = Path(output['report']).read_text(encoding='utf-8')
+            self.assertIn(title, text)
+            self.assertIn('不是插件整体正确性或收益认证', text)
+            self.assertIsNone(load_json(output['json'])['timing']['human_time_to_first_diagnosis_seconds'])
 
     def test_audit_refuses_duplicate_denominator_and_executable_check(self):
         manifest = load_json(CORPUS)
