@@ -1,5 +1,5 @@
 {
-  "version": "0.6.0",
+  "version": "0.7.0",
   "release_blocker_repair_20260926": {
     "scope": "Local acceptance of interpreter-stable MCP signatures and encoding-safe CLI JSON; excludes concurrent native repair changes",
     "base_commit": "41704e7b2a47b8d3238a60b7cc423e9f73e01226",

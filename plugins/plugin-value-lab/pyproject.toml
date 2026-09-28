@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plugin-value-lab"
-version = "0.6.0"
+version = "0.7.0"
 description = "Evidence-bounded paired plugin value evaluation"
 requires-python = ">=3.11"
 dependencies = []

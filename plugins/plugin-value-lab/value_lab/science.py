@@ -312,8 +312,12 @@ def check(kind, path, spec, root, record, artifact_sha):
         decision = obj.get("decision") if isinstance(obj, dict) else None
         if decision not in ("allow", "withhold"):
             decision = None
-        return decision == expected, {"metric": "unsupported_acceptance" if expected == "withhold" else "over_refusal",
-                                     "decision": decision, "error": decision != expected if decision else None}
+        return decision == expected if decision else None, {
+            "metric": "unsupported_acceptance" if expected == "withhold" else "over_refusal",
+            "decision": decision, "error": decision != expected if decision else None,
+            "assessment_scope": "DECISION_ONLY", "delivery_assessed": False, "correctness_assessed": False,
+            "task_success_established": False,
+            "requires": "Separate frozen artifact_schema and task-specific correctness checks for useful delivery"}
     if kind == "backend_identity":
         ref = record.get("backend_receipt")
         try:

@@ -45,9 +45,10 @@ def diagnose(source, output, *, check=None, spec=None, audit=False, receipt=None
         result = verify_native_evidence(source, receipt)['diagnosis']
         findings = [dict(case_id=r['case_id'], arm=r['arm'], repetition=r['repetition'], **g)
                     for r in result['runs'] for g in r['grades'] if g['passed'] is not True]
-        from .native_hypotheses import skill_events
+        from .native_hypotheses import plugin_observations
         from .artifacts import confined
-        plugin = (load_json(source / 'plan.json').get('plugin_identity') or {}).get('name')
+        plan = load_json(source / 'plan.json')
+        plugin = (plan.get('plugin_identity') or {}).get('name')
         result['invocation_observations'] = []
         for index, run in enumerate(result['runs']):
             if run['status'] != 'completed':
@@ -55,14 +56,15 @@ def diagnose(source, output, *, check=None, spec=None, audit=False, receipt=None
             if run['arm'] != 'with':
                 continue
             trace = confined(source, f'runs/{index}/events.jsonl')
-            calls = skill_events(trace.read_text(encoding='utf-8-sig'), f'runs/{index}/events.jsonl') if trace.is_file() else []
-            matching = [c for c in calls if plugin and isinstance(c['skill'], str)
-                        and c['skill'].startswith(plugin + ':') and c['result_status'] == 'TOOL_REPORTED_SUCCESS']
-            result['invocation_observations'].append({'case_id': run['case_id'], 'repetition': run['repetition'], 'calls': matching})
-            if not matching:
+            observed = plugin_observations(trace.read_text(encoding='utf-8-sig') if trace.is_file() else '',
+                                           f'runs/{index}/events.jsonl', plugin, plan['plugin_files'], source / 'plugin')
+            result['invocation_observations'].append({'case_id': run['case_id'], 'repetition': run['repetition'],
+                'calls': observed['skill_calls'], **observed})
+            if observed['status'] == 'USE_UNKNOWN':
                 findings.append({'case_id': run['case_id'], 'arm': 'with', 'repetition': run['repetition'],
                                  'kind': 'invocation_evidence_gap',
-                                 'reason': 'Successful namespaced plugin Skill call not observed. Passing artifact checks cannot establish plugin use; other invocation mechanisms are not assessed.'})
+                                 'plugin_non_use_established': False,
+                                 'reason': 'No supported Skill invocation or read of pinned candidate bytes observed. Plugin use remains unknown; unsupported mechanisms and missing traces are not proof of non-use.'})
         result['next_action'] = ('Inspect runtime errors, missing evidence and invocation traces first. '
                                  'Establish whether the failure belongs to the host or plugin before changing plugin bytes. '
                                  'Then repeat the complete frozen natural-use study with the relevant correction; '

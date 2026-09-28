@@ -54,10 +54,10 @@ def skill_events(text, path):
             for c in _tool_events(text, path) if c['name'] == 'Skill']
 
 
-def plugin_observations(text, path, plugin_name, plugin_files):
+def plugin_observations(text, path, plugin_name, plugin_files, plugin_root=None):
     """Separate Skill invocation from a successful read of pinned candidate bytes.
 
-    Exact raw Read content is supported. Formatted/truncated responses, shell
+    Raw Read content and newline-normalized text bound to retained bytes are supported. Formatted/truncated responses, shell
     mentions and unsupported host transports stay unknown, never inferred reads.
     Reading is exposure evidence, not proof of execution or causal contribution.
     """
@@ -73,17 +73,36 @@ def plugin_observations(text, path, plugin_name, plugin_files):
             continue
         filename = filename.replace('\\', '/')
         digest = hashlib.sha256(content.encode('utf-8')).hexdigest()
-        matching = [p for p, expected in plugin_files.items()
-                    if expected == digest and (filename == p or filename.endswith('/' + p))]
+        matching = []
+        for p, expected in plugin_files.items():
+            if not (filename == p or filename.endswith('/' + p)):
+                continue
+            if expected == digest:
+                matching.append((p, 'EXACT_BYTES'))
+            elif plugin_root is not None:
+                try:
+                    retained = confined(plugin_root, p).read_bytes()
+                    if hashlib.sha256(retained).hexdigest() != expected:
+                        continue
+                    # Python/universal-text host reads can normalize CRLF/CR.
+                    # Compare the entire text; never strip whitespace, line
+                    # numbers, prefixes, trailing data or missing lines.
+                    normalize = lambda value: value.replace('\r\n', '\n').replace('\r', '\n')
+                    if normalize(retained.decode('utf-8')) == normalize(content):
+                        matching.append((p, 'FROZEN_TEXT_NEWLINE_NORMALIZATION'))
+                except (OSError, ValueError):
+                    continue
         if len(matching) == 1:
-            reads.append({'candidate_file': matching[0], 'sha256': digest,
+            candidate, basis = matching[0]
+            reads.append({'candidate_file': candidate, 'sha256': plugin_files[candidate],
+                          'observed_content_sha256': digest, 'match_basis': basis,
                           'tool_use_id': call['tool_use_id'], 'evidence': call['evidence'],
                           'result_evidence': call['result_evidence']})
     return {'skill_calls': skills, 'candidate_reads': reads,
             'status': 'SKILL_INVOCATION_OBSERVED' if skills else 'CANDIDATE_CONTENT_READ' if reads else 'USE_UNKNOWN',
             'skill_mechanism_observed': bool(skills), 'execution_established_by_read': False,
             'causal_contribution_established': False,
-            'coverage': 'Skill tool results and exact-content Read results only; absence is not non-use'}
+            'coverage': 'Skill tool results and full-content Read results bound to retained bytes, allowing text newline normalization only; absence is not non-use'}
 
 
 def validate_expectations(expectations, plan):
@@ -156,7 +175,7 @@ def build_native_hypotheses(directory, receipt_digest, expectations):
                 event = json.loads(raw)
                 if event.get('type') == 'system' and event.get('subtype') == 'init':
                     trace_refs.append({'path': events_path, 'line': line})
-        usage = plugin_observations(text, events_path, plugin_name, plan['plugin_files'])
+        usage = plugin_observations(text, events_path, plugin_name, plan['plugin_files'], root / 'plugin')
         supported = bool(obs.get('session_id'))
         plugins = obs.get('plugins')
         names = ([p['name'] for p in plugins] if isinstance(plugins, list) and

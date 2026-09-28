@@ -70,7 +70,7 @@ def validate_verifier(g):
         "labels": {"kind", "id_column", "label_column", "expected"},
         "h5ad": {"kind", "n_obs", "n_vars", "obs_columns", "var_names_unique"},
     }
-    optional = {"testing_family"} if kind == "de_table" else set()
+    optional = {"testing_family"} if kind == "de_table" else {"aliases"} if kind == "labels" else {"unordered_paths"} if kind == "json_fields" else set()
     if kind not in fields or set(spec) - optional != fields[kind]:
         raise ValidationError("Unsupported or incomplete artifact verifier contract")
     if "testing_family" in spec:
@@ -80,6 +80,16 @@ def validate_verifier(g):
         raise ValidationError("Expected values must be a nonempty mapping")
     if kind == "json_fields" and any(not isinstance(k, str) or not k or any(not p for p in k.split(".")) for k in spec["expected"]):
         raise ValidationError("Expected JSON paths must be nonempty")
+    if kind == 'json_fields' and 'unordered_paths' in spec:
+        paths = spec['unordered_paths']
+        if (not isinstance(paths, list) or any(not isinstance(p, str) or p not in spec['expected'] for p in paths)
+                or len(set(paths)) != len(paths)):
+            raise ValidationError('Unordered paths must uniquely name frozen expected fields')
+        for path in paths:
+            values = spec['expected'][path]
+            if (not isinstance(values, list) or any(not isinstance(v, str) or not v.strip() for v in values)
+                    or len(set(values)) != len(values)):
+                raise ValidationError('Unordered identity fields require unique nonempty strings')
     for key in ("id_column", "p_column", "q_column", "effect_column", "label_column"):
         if key in spec and (not isinstance(spec[key], str) or not spec[key].strip()):
             raise ValidationError("Table columns must be named")
@@ -94,6 +104,17 @@ def validate_verifier(g):
             raise ValidationError("BH tolerance must be finite and in 0..0.01")
     if kind == "labels" and any(not isinstance(k, str) or not k or not isinstance(v, str) or not v for k, v in spec["expected"].items()):
         raise ValidationError("Expected labels require nonempty string IDs and labels")
+    if kind == 'labels' and 'aliases' in spec:
+        aliases = spec['aliases']
+        canonical = set(spec['expected'].values())
+        if not isinstance(aliases, dict) or set(aliases) - canonical:
+            raise ValidationError('Aliases must name canonical labels in the frozen reference')
+        used = set(canonical)
+        for values in aliases.values():
+            if (not isinstance(values, list) or any(not isinstance(v, str) or not v.strip() for v in values)
+                    or len(set(values)) != len(values) or used.intersection(values)):
+                raise ValidationError('Label aliases must be unambiguous and cannot redefine a canonical label')
+            used.update(values)
     if kind == "h5ad":
         if any(type(spec[k]) is not int or spec[k] <= 0 for k in ("n_obs", "n_vars")):
             raise ValidationError("h5ad dimensions must be positive integers")
@@ -120,7 +141,11 @@ def _builtin(path, spec, verifier_root=None):
             value = obj
             for key in dotted.split("."):
                 value = value[int(key)] if isinstance(value, list) else value[key]
-            if suite_digest(value) != suite_digest(expected):
+            if dotted in spec.get('unordered_paths', []):
+                if (not isinstance(value, list) or any(not isinstance(v, str) for v in value)
+                        or len(set(value)) != len(value) or set(value) != set(expected)):
+                    return False, 'Unordered identity membership/uniqueness mismatch: ' + dotted
+            elif suite_digest(value) != suite_digest(expected):
                 return False, "JSON artifact field mismatch: " + dotted
     elif kind in ("de_table", "labels"):
         rows = _table(path)
@@ -129,7 +154,9 @@ def _builtin(path, spec, verifier_root=None):
             return False, "Missing or duplicate entity IDs"
         if kind == "labels":
             actual = {row[spec["id_column"]]: row[spec["label_column"]] for row in rows}
-            return actual == spec["expected"], "Exact per-entity label and coverage comparison"
+            mapping = {alias: canonical for canonical, aliases in spec.get('aliases', {}).items() for alias in aliases}
+            actual = {key: mapping.get(label, label) for key, label in actual.items()}
+            return actual == spec["expected"], "Per-entity semantic labels using only frozen aliases; exact coverage; biological truth not established"
         if "testing_family" in spec:
             from .science import reference_json
             family = reference_json(verifier_root, spec["testing_family"])

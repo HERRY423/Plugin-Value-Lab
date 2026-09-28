@@ -2,6 +2,26 @@
 
 # Artifact and executable outcome verification
 
+## Frozen semantic variants
+
+Current boundary correction, 2026-09-27, product version 0.6.0. Exact-label contracts may declare aliases before execution:
+
+```json
+{"kind":"labels","id_column":"id","label_column":"label","expected":{"c1":"T cell","c2":"B cell"},"aliases":{"T cell":["T lymphocyte"],"B cell":["B lymphocyte"]}}
+```
+
+Alias names cannot collide across canonical classes or replace a canonical label. No automatic case folding, fuzzy match, ontology lookup or biological endorsement is implied. Entity coverage remains exact; duplicate and missing IDs fail. Without aliases the old exact-label behavior remains. ARI/NMI separately retain invariance to arbitrary cluster-number permutations.
+
+An explicitly unordered identity set can use:
+
+```json
+{"kind":"json_fields","expected":{"training_ids":["ref-a","ref-b"]},"unordered_paths":["training_ids"]}
+```
+
+Only listed expected fields receive set semantics. Both expected and submitted values must be lists of unique strings; duplicates, omissions and additional IDs fail. This checks a declaration, not actual training access. An honest-looking declaration cannot certify absence of hidden leakage.
+
+For decision tasks, keep three independent checks: `over_refusal`/`abstention_correct` for the decision; `artifact_schema` with required nonnullable task fields for delivery; and a frozen task-specific correctness grader for the answer. A numeric answer of zero is a valid delivery, a wrong numeric answer can pass delivery but fail correctness, and `allow` with null cannot pass a required numeric delivery check. No automatic standard answer is invented. A required string field alone does not guarantee useful prose; use the task's actual validity rule or human review rather than treating schema validity as usefulness.
+
 The optional `de_table.testing_family` reference now binds a separate frozen `{ids:[...]}` JSON file and checks exact tested-entity coverage before BH. Missing or changed scorer material is unresolved; legacy tables without this reference verify submitted rows only. See the [rigor workflow](RIGOR.zh-CN.md) for configuration and portable replay preflight.
 
 Add an `artifact` or `executable` grader to the existing suite. Its `artifact` is a logical ID; each run maps that ID to collected bytes:

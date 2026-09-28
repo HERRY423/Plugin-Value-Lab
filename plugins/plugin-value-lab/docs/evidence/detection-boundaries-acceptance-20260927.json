@@ -1,0 +1,88 @@
+{
+  "type": "LOCAL_ENGINEERING_ACCEPTANCE",
+  "version": "0.6.0",
+  "full_suite": {
+    "passed": 606,
+    "seconds": 194.596,
+    "skipped": 0,
+    "errors": 0,
+    "failures": 0
+  },
+  "boundary_tests_passed": 15,
+  "ordinary_diagnostic_union": {
+    "TP": 22,
+    "FN": 2,
+    "FP": 0,
+    "TN": 18,
+    "UNKNOWN": 0,
+    "defects": 24,
+    "distinct_controls": 18,
+    "paired_specific_detections": 22
+  },
+  "with_controlled_access_observer": {
+    "TP": 24,
+    "FN": 0,
+    "FP": 0,
+    "TN": 18,
+    "UNKNOWN": 0,
+    "defects": 24,
+    "distinct_controls": 18,
+    "paired_specific_detections": 24
+  },
+  "previous_attempt": {
+    "path": "C:\\Test\\pvl-boundaries-report-20260926-r1",
+    "summary_sha256": "4dfc63bf3ca3c64a71b95b50a24298df109280b87af188c23e3ba373ab9980ee",
+    "metrics": {
+      "TP": 24,
+      "FN": 0,
+      "FP": 1,
+      "TN": 17,
+      "UNKNOWN": 0,
+      "defects": 24,
+      "distinct_controls": 18,
+      "paired_specific_detections": 23
+    },
+    "remaining_false_positive": "Windows Read newline transport of a valid candidate file",
+    "preserved": true
+  },
+  "historical_20260925": {
+    "defect_alerts": 22,
+    "paired_specific_detections": 19,
+    "planned_defects": 24,
+    "rewritten": false
+  },
+  "campaign": {
+    "path": "C:\\Test\\pvl-boundaries-20260927-r2",
+    "main_processes": 96,
+    "access_intervention_processes": 6,
+    "verified_captures": 48,
+    "protocol_sha256": "594fc146c602595a872c6f5159c612423dae951da47b4aedb32d85e124ab5549",
+    "source_manifest_sha256": "95d2c314c996a47d6a4b8be8aea5f943026121399836f9b3179bc50607300819"
+  },
+  "source_sha256": {
+    "value_lab/artifacts.py": "76ab40bb21068b6f8402a1806323b08014e71f1195e521a05f609840af93ba6b",
+    "value_lab/science.py": "a6af3269447fe4bbedd115ac79f66babb6097634af7c9ac8b531038b15414a91",
+    "value_lab/native_hypotheses.py": "a8cf68ec8f42806920b0bd3b7a215a73379b48c913ec1a31d40d4c69be8f1b3d",
+    "value_lab/usage.py": "3f96ae35425c1d1393847095d1636e563cc9249f3366ca260c090141936e2364",
+    "examples/seeded-defects/plugin.py": "f408a0df4f1e17bae7e306f02a668bac285675c4f7a6ed491d2f649607a4b9c6",
+    "examples/seeded-defects/host.py": "6a3977b00bbf21cd5846369d1af67742e118afac48b35be105f9a9b2d68ee2a0",
+    "scripts/validate_seeded_defects.py": "da84d212639e2166121ed13afbeffb7680ee566391a97afef9090a29af685896",
+    "scripts/report_seeded_defects.py": "9129ee75ca8ade06f4696b0b148201baff77ed3fd8ca3986ae0de2507049c27d",
+    "tests/test_detection_boundaries.py": "5f46ee78e96c6ca1b85aaf4fc8b5739322a8c09146f7c94041bce31ff9962516"
+  },
+  "test_log_sha256": "27e18cc84752afadb246a23d3cdea6ab56a678f348f775b41e77b2edc891c3b7",
+  "new_model_calls": 0,
+  "new_paid_provider_invocations": 0,
+  "published": false,
+  "heldout": false,
+  "independent_adjudication": false,
+  "real_author_benefit_study": false,
+  "limitations": [
+    "Known development counterexamples and revised frozen task contracts; not a blind or population comparison.",
+    "Leakage fixtures now open declared files rather than only return simulated IDs; instrumentation changes are explicit.",
+    "Controlled Python audit observations detect attempted access only, are not authenticated or an OS sandbox.",
+    "Without the additional observer, two hidden-access cases remain undetected.",
+    "Full-content Read matching permits only newline transport normalization against retained hash-verified bytes.",
+    "Reading candidate content does not prove execution, attribution or satisfaction of strict repair chains."
+  ]
+}

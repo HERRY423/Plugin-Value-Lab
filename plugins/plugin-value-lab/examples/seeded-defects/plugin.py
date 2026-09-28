@@ -32,15 +32,15 @@ def bh(values):
 
 
 def read_reference(task):
-    return task['reference_ids'][:]
+    return json.loads(Path('reference-data.json').read_text(encoding='utf-8'))['ids']
 
 
 def read_eval_reference(task):
-    return task['reference_ids'][:] + task['evaluation_ids'][:1]
+    return read_reference(task) + json.loads(Path('evaluation-labels.json').read_text(encoding='utf-8'))['ids']
 
 
 def read_eval_features(task):
-    return task['reference_ids'][:] + task['evaluation_ids'][1:]
+    return read_reference(task) + json.loads(Path('evaluation-features.json').read_text(encoding='utf-8'))['ids']
 
 
 def exact_backend(values):

@@ -57,7 +57,7 @@ def diagnose(source, output, *, check=None, spec=None, audit=False, receipt=None
                 continue
             trace = confined(source, f'runs/{index}/events.jsonl')
             observed = plugin_observations(trace.read_text(encoding='utf-8-sig') if trace.is_file() else '',
-                                           f'runs/{index}/events.jsonl', plugin, plan['plugin_files'])
+                                           f'runs/{index}/events.jsonl', plugin, plan['plugin_files'], source / 'plugin')
             result['invocation_observations'].append({'case_id': run['case_id'], 'repetition': run['repetition'],
                 'calls': observed['skill_calls'], **observed})
             if observed['status'] == 'USE_UNKNOWN':

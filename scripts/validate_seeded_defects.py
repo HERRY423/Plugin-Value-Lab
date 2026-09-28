@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 from copy import deepcopy
+from datetime import datetime, timezone
 import difflib
 import json
 import math
@@ -402,6 +403,7 @@ def main():
     cases=[freeze_case(root,f,v,clean) for f in FAMILIES for v in range(3)]
     pvl_hashes={p.relative_to(ROOT).as_posix():sha(p) for p in sorted((ROOT/'value_lab').glob('*.py'))}
     frozen={'format':'pvl-seeded-defects-1','cases':cases,'pvl_files':pvl_hashes,'runner_sha256':sha(Path(__file__)),
+        'started_at':datetime.now(timezone.utc).isoformat(),
         'host_sha256':sha(FIXTURE/'host.py'),'clean_plugin_sha256':sha(FIXTURE/'plugin.py'),
         'profiles':PROFILES,'planned_faults':24,'planned_controls':24,'planned_processes':96,
         'boundary_revision':'decision-delivery-semantics-access-v2','planned_access_intervention_processes':6,
@@ -422,6 +424,7 @@ def main():
     if sha(root/'protocol.lock.json')!=pin or any(sha(ROOT/p)!=digest for p,digest in pvl_hashes.items()):
         raise RuntimeError('Frozen detector or protocol changed during validation')
     result={'format':'pvl-detection-validity-1','protocol_sha256':pin,'summary':summarize(rows),'runs':rows,
+        'started_at':frozen['started_at'],'completed_at':datetime.now(timezone.utc).isoformat(),
         'boundary_revision':frozen['boundary_revision'],
         'observed_processes':96,'access_intervention_processes':sum(len(x['runs']) for x in interventions),
         'access_interventions':interventions,'defect_cases':24,'unique_control_cases':24,'restored_cases':24,
