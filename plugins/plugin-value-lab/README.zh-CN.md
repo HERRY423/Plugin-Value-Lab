@@ -6,6 +6,35 @@
 
 [English](README.md) · [当前证据](docs/EVIDENCE.md) · [详细评测操作](docs/OPERATIONS.md)
 
+### 🤖 路径 A：ChatGPT / Codex 或 Claude Code
+
+插件安装不包含 Python 本地包。运行 Plugin Value Lab 本地分析、`doctor` 环境检查或本地 stdio MCP 服务需要 Python 3.11+。
+
+#### 1. ChatGPT / Codex 仓库插件市场
+
+添加仓库插件市场：
+
+```bash
+codex plugin marketplace add HERRY423/Plugin-Value-Lab --ref main
+```
+
+重启 ChatGPT 桌面客户端，打开插件目录（Plugins Directory），选择 **Plugin Value Lab Marketplace** 并安装 **Plugin Value Lab**。仓库市场适用于开发、团队分发与测试，独立于通用的公共插件目录。
+
+当公开市场上架审核通过后，可直接在通用 Plugins Directory 中搜索 **Plugin Value Lab** 安装；支持的 ChatGPT 与 Codex 端共享同一公共条目。
+
+#### 2. Claude Code 插件市场
+
+```bash
+claude plugin marketplace add HERRY423/Plugin-Value-Lab
+claude plugin install plugin-value-lab@plugin-value-lab-marketplace
+```
+
+安装完成后开启新会话：
+
+```bash
+claude
+```
+
 ## 第一次使用：直接这样说
 
 将方括号替换为你的插件和任务：

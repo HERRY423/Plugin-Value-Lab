@@ -6,6 +6,35 @@
 
 [中文](README.zh-CN.md) · [Current evidence](docs/EVIDENCE.md) · [Detailed operations](docs/OPERATIONS.md)
 
+### 🤖 Path A: ChatGPT / Codex or Claude Code
+
+Plugin installation does not install the Python package. Running Plugin Value Lab analyses, `doctor` checks, or the local stdio MCP server requires Python 3.11+.
+
+#### 1. ChatGPT / Codex repo marketplace
+
+Add the repository marketplace:
+
+```bash
+codex plugin marketplace add HERRY423/Plugin-Value-Lab --ref main
+```
+
+Restart the ChatGPT desktop app, open the Plugins Directory, select **Plugin Value Lab Marketplace**, and install **Plugin Value Lab**. Repo marketplaces are for development, team distribution, and testing; they are separate from the universal public Plugins Directory.
+
+When the public submission is approved and published, search the universal Plugins Directory for **Plugin Value Lab** instead; one public listing is shared by supported ChatGPT and Codex surfaces.
+
+#### 2. Claude Code marketplace
+
+```bash
+claude plugin marketplace add HERRY423/Plugin-Value-Lab
+claude plugin install plugin-value-lab@plugin-value-lab-marketplace
+```
+
+Start a fresh session after installation:
+
+```bash
+claude
+```
+
 ## Start with this request
 
 Replace the bracketed values:
