@@ -2,7 +2,7 @@
 
 **Call Plugin Value Lab in ChatGPT to evaluate whether another plugin helps with your task.** Tell ChatGPT which plugin to assess, what you want to accomplish and what a useful result means. ChatGPT organizes the evaluation; PVL checks the plan, analyzes supplied records and produces evidence-bounded guidance.
 
-**Version 0.7.0.** This guide starts with PVL already installed and callable in the current conversation. Begin in chat—no repository paths, JSON forms or terminal commands are required to get started.
+**Version 0.8.0.** This guide starts with PVL already installed and callable in the current conversation. Begin in chat—no repository paths, JSON forms or terminal commands are required to get started.
 
 [中文](README.zh-CN.md) · [Current evidence](docs/EVIDENCE.md) · [Detailed operations](docs/OPERATIONS.md)
 
