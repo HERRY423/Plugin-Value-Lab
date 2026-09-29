@@ -1,4 +1,10 @@
-# 从零得到第一份使用卡
+# 已安装插件的对话入口与本地教程
+
+**已经在 ChatGPT 中安装并能调用 PVL：从 [README 的对话示例](../README.zh-CN.md)开始。** 告诉 ChatGPT 待评估的插件名称和实际任务，由它组织可行的评测并调用已暴露工具。无需先走下方终端教程。工具可调用不代表宿主具备独立两臂运行与完整证据采集能力；缺少条件时保留未知。
+
+## 本地复现：从零得到第一份使用卡
+
+只想先验证环境并看到一份报告：在解压目录执行 `python -m value_lab demo --output work/demo`，然后打开 `work/demo/REPORT.md`。它使用合成 BH 表，不运行模型。处理自己的 h5ad、嵌入 Python 或工作流时，直接看[简洁入口指南](history/ENGINEERING-USABILITY.zh-CN.md)。下方保留完整插件评估教学及非作者计时协议。
 
 目标：独立生成并读懂 `work/first-run/usage/USAGE.md`。随包记录是合成教学数据，不是你的插件测量结果。无需 API key、插件账户、MCP、WSL 或模型。
 

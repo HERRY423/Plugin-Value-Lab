@@ -123,7 +123,8 @@ async def tool(a: int, b: str = "中文", /, c: "list[dict]" = None,
 
     def test_added_command_tool_module_or_grader_fails(self):
         frozen = guard.surface()
-        for key in ('commands', 'mcp_signatures', 'runtime_modules', 'grader_allowlists'):
+        for key in ('commands', 'mcp_signatures', 'runtime_modules', 'grader_allowlists',
+                    'convenience_cli', 'public_sdk', 'public_sdk_types'):
             with self.subTest(key=key):
                 changed = copy.deepcopy(frozen)
                 if isinstance(changed[key], dict):

@@ -247,6 +247,16 @@ def assess(design, observations):
             return None, 'input_commitment_mismatch'
         return _output(run['output'], design['output']), None
     base, base_issue = resolved('baseline')
+    if base_issue is None:
+        try:
+            observations_digest = suite_digest(observations)
+        except (ValueError, TypeError) as exc:
+            raise ValidationError('Observations must contain finite JSON values') from exc
+        # Derived from validated identities, never a grader's self-declared role.
+        receipt['correctness_target'] = {
+            'path': f"runs.{next(i for i, run in enumerate(runs) if run['id'] == 'baseline')}.output",
+            'schema': deepcopy(design['output']),
+            'observations_sha256': observations_digest}
     for relation in design['relations']:
         row = {'id': relation['id'], 'relation': relation['relation'], 'passed': None,
                'source_input_sha256': suite_digest(inputs['baseline']),
@@ -269,6 +279,83 @@ def assess(design, observations):
     receipt['planned_relations'] = len(states)
     receipt['resolved_relations'] = sum(v is not None for v in states)
     return passed, receipt
+
+
+def _reference_qualification(definitions, grades):
+    """Bind a complete baseline proposition to each checked relation artifact.
+
+    This qualifies coverage, not the truth/independence of an author-supplied
+    reference. Unsupported oracle contracts stay unresolved, never inferred
+    from a successful status, grader name, type exclusion or another artifact.
+    """
+    indexed = {grade['id']: grade for grade in grades}
+    targets = []
+    for relation in definitions:
+        if relation['type'] != 'metamorphic':
+            continue
+        verification = indexed.get(relation['id'], {}).get('verification', {})
+        target = verification.get('correctness_target')
+        candidates = []
+        for rule in definitions:
+            if rule['id'] == relation['id']:
+                continue
+            grade = indexed.get(rule['id'], {})
+            checked = grade.get('verification', {})
+            row = {'grader_id': rule['id'], 'qualified': False}
+            candidates.append(row)
+            if not target:
+                row['reason'] = 'BASELINE_TARGET_UNAVAILABLE'
+                continue
+            expected = None
+            if rule['type'] == 'artifact' and rule['verifier']['kind'] == 'json_fields':
+                bound = (rule['artifact'] == relation['artifact']
+                         and verification.get('artifact_sha256') is not None
+                         and checked.get('artifact_sha256') == verification['artifact_sha256']
+                         and checked.get('artifact_path') == verification.get('artifact_path'))
+                expected = rule['verifier']['expected']
+                if any(path == target['path'] or path.startswith(target['path'] + '.')
+                       or target['path'].startswith(path + '.')
+                       for path in rule['verifier'].get('unordered_paths', [])):
+                    row['reason'] = 'UNORDERED_COMPARISON_DOES_NOT_BIND_RESULT_IDENTITIES'
+                    continue
+            elif rule['type'] == 'json_equals':
+                bound = checked.get('output_json_sha256') == target['observations_sha256']
+                expected = {rule['path']: rule['value']}
+            else:
+                row['reason'] = 'NO_SUPPORTED_COMPLETE_RESULT_PROPOSITION'
+                continue
+            if not bound:
+                row['reason'] = 'REFERENCE_NOT_BOUND_TO_RELATION_ARTIFACT'
+                continue
+            output = {}
+            for path, value in expected.items():
+                # Whole output, an ancestor object, or its complete immediate
+                # fields all express the same frozen result proposition.
+                if path == target['path'] or target['path'].startswith(path + '.'):
+                    try:
+                        for part in target['path'].split('.')[len(path.split('.')):]:
+                            value = value[int(part)] if isinstance(value, list) else value[part]
+                        output = value
+                        break
+                    except (KeyError, IndexError, TypeError, ValueError):
+                        continue
+                prefix = target['path'] + '.'
+                if path.startswith(prefix) and '.' not in path[len(prefix):]:
+                    output[path[len(prefix):]] = value
+            try:
+                _output(output, target['schema'])
+            except (ValueError, TypeError, KeyError, IndexError):
+                row['reason'] = 'REFERENCE_DOES_NOT_COVER_COMPLETE_BASELINE_RESULT'
+                continue
+            row.update(qualified=grade.get('passed') is True,
+                       reason='COMPLETE_BOUND_RESULT_REFERENCE' if grade.get('passed') is True
+                       else 'REFERENCE_CHECK_FAILED_OR_UNKNOWN',
+                       reference_sha256=suite_digest(output))
+        targets.append({'grader_id': relation['id'], 'target': target,
+                        'qualified': any(row['qualified'] for row in candidates), 'candidates': candidates})
+    return {'status': 'QUALIFIED' if targets and all(t['qualified'] for t in targets) else 'UNKNOWN',
+            'targets': targets, 'scope': 'Complete frozen baseline result coverage only',
+            'reference_truth': 'NOT_INDEPENDENTLY_VALIDATED'}
 
 
 def check(path, spec, root):

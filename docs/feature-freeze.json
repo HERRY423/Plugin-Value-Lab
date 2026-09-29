@@ -3280,17 +3280,23 @@
     ],
     "runtime_modules": [
       "value_lab/__init__.py",
+      "value_lab/__main__.py",
       "value_lab/artifacts.py",
       "value_lab/authoring.py",
+      "value_lab/blind_review.py",
+      "value_lab/claim_scope.py",
       "value_lab/claude_collection.py",
       "value_lab/cli.py",
       "value_lab/codex.py",
       "value_lab/comparison.py",
+      "value_lab/component_localization.py",
       "value_lab/component_studies.py",
       "value_lab/core.py",
       "value_lab/corpus.py",
       "value_lab/costs.py",
       "value_lab/declarative.py",
+      "value_lab/diagnostic_review.py",
+      "value_lab/easy_cli.py",
       "value_lab/equivalence.py",
       "value_lab/exchange.py",
       "value_lab/execution.py",
@@ -3310,9 +3316,12 @@
       "value_lab/native_session.py",
       "value_lab/native_trigger.py",
       "value_lab/online_sandbox.py",
+      "value_lab/preregistration.py",
       "value_lab/processes.py",
       "value_lab/pseudobulk.py",
+      "value_lab/pseudobulk_backed.py",
       "value_lab/pseudobulk_corpus.py",
+      "value_lab/pseudobulk_design.py",
       "value_lab/publication.py",
       "value_lab/registry.py",
       "value_lab/replay.py",
@@ -3326,10 +3335,14 @@
       "value_lab/scenarios.py",
       "value_lab/science.py",
       "value_lab/science_environment.py",
+      "value_lab/science_execution.py",
+      "value_lab/science_storage.py",
       "value_lab/scoring.py",
+      "value_lab/sdk.py",
       "value_lab/server.py",
       "value_lab/signatures.py",
       "value_lab/team_record.py",
+      "value_lab/trace_diagnostics.py",
       "value_lab/usage.py",
       "value_lab/value_metrics.py",
       "value_lab/workbench.py",
@@ -3410,7 +3423,1163 @@
           "replicate_effect"
         ]
       ]
-    ]
+    ],
+    "convenience_cli": {
+      "global_options": [
+        {
+          "name": "help",
+          "flags": [
+            "--help",
+            "-h"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "json",
+          "flags": [
+            "--json"
+          ],
+          "required": false,
+          "choices": null
+        },
+        {
+          "name": "version",
+          "flags": [
+            "--version"
+          ],
+          "required": false,
+          "choices": null
+        }
+      ],
+      "commands": {
+        "demo": [
+          {
+            "name": "help",
+            "flags": [
+              "--help",
+              "-h"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "json",
+            "flags": [
+              "--json"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "output",
+            "flags": [
+              "--output"
+            ],
+            "required": true,
+            "choices": null
+          }
+        ],
+        "doctor": [
+          {
+            "name": "help",
+            "flags": [
+              "--help",
+              "-h"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "json",
+            "flags": [
+              "--json"
+            ],
+            "required": false,
+            "choices": null
+          }
+        ],
+        "inspect": [
+          {
+            "name": "help",
+            "flags": [
+              "--help",
+              "-h"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "json",
+            "flags": [
+              "--json"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "source",
+            "flags": [],
+            "required": true,
+            "choices": null
+          }
+        ],
+        "aggregate": [
+          {
+            "name": "block_entries",
+            "flags": [
+              "--block-entries"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "cell_type",
+            "flags": [
+              "--cell-type"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "cell_type_key",
+            "flags": [
+              "--cell-type-key"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "condition_key",
+            "flags": [
+              "--condition-key"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "config",
+            "flags": [
+              "--config"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "control",
+            "flags": [
+              "--control"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "disk_budget",
+            "flags": [
+              "--disk-budget"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "donor_key",
+            "flags": [
+              "--donor-key"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "dry_run",
+            "flags": [
+              "--dry-run"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "help",
+            "flags": [
+              "--help",
+              "-h"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "json",
+            "flags": [
+              "--json"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "matrix",
+            "flags": [
+              "--matrix"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "metadata_mb",
+            "flags": [
+              "--metadata-mb"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "min_cells",
+            "flags": [
+              "--min-cells"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "min_total_count",
+            "flags": [
+              "--min-total-count"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "output",
+            "flags": [
+              "--output"
+            ],
+            "required": true,
+            "choices": null
+          },
+          {
+            "name": "reserve_bytes",
+            "flags": [
+              "--reserve-bytes"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "reuse",
+            "flags": [
+              "--reuse"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "sample_key",
+            "flags": [
+              "--sample-key"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "selection",
+            "flags": [
+              "--select-design"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "source",
+            "flags": [],
+            "required": true,
+            "choices": null
+          },
+          {
+            "name": "treatment",
+            "flags": [
+              "--treatment"
+            ],
+            "required": false,
+            "choices": null
+          }
+        ],
+        "check": [
+          {
+            "name": "help",
+            "flags": [
+              "--help",
+              "-h"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "json",
+            "flags": [
+              "--json"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "output",
+            "flags": [
+              "--output"
+            ],
+            "required": true,
+            "choices": null
+          },
+          {
+            "name": "reuse",
+            "flags": [
+              "--reuse"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "rule",
+            "flags": [
+              "--rule"
+            ],
+            "required": true,
+            "choices": [
+              "bh"
+            ]
+          },
+          {
+            "name": "source",
+            "flags": [],
+            "required": true,
+            "choices": null
+          }
+        ],
+        "verify": [
+          {
+            "name": "directory",
+            "flags": [],
+            "required": true,
+            "choices": null
+          },
+          {
+            "name": "expected_id",
+            "flags": [
+              "--expected-id"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "help",
+            "flags": [
+              "--help",
+              "-h"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "json",
+            "flags": [
+              "--json"
+            ],
+            "required": false,
+            "choices": null
+          }
+        ]
+      }
+    },
+    "public_sdk": {
+      "doctor": {
+        "parameters": [],
+        "returns": {
+          "node": "Name",
+          "id": "dict"
+        },
+        "async": false
+      },
+      "inspect_counts": {
+        "parameters": [
+          {
+            "name": "source",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "str"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Name",
+                "id": "Path"
+              }
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          }
+        ],
+        "returns": {
+          "node": "Name",
+          "id": "dict"
+        },
+        "async": false
+      },
+      "verify_run": {
+        "parameters": [
+          {
+            "name": "directory",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "str"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Name",
+                "id": "Path"
+              }
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          },
+          {
+            "name": "expected_id",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "str"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            }
+          }
+        ],
+        "returns": {
+          "node": "Name",
+          "id": "RunResult"
+        },
+        "async": false
+      },
+      "aggregate_counts": {
+        "parameters": [
+          {
+            "name": "source",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "str"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Name",
+                "id": "Path"
+              }
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          },
+          {
+            "name": "output",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "str"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Name",
+                "id": "Path"
+              }
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          },
+          {
+            "name": "cell_type",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "Name",
+              "id": "str"
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          },
+          {
+            "name": "control",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "Name",
+              "id": "str"
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          },
+          {
+            "name": "treatment",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "Name",
+              "id": "str"
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          },
+          {
+            "name": "matrix",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "Name",
+              "id": "str"
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "str",
+                "value": "layers/counts"
+              }
+            }
+          },
+          {
+            "name": "sample_key",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "Name",
+              "id": "str"
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "str",
+                "value": "sample"
+              }
+            }
+          },
+          {
+            "name": "donor_key",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "Name",
+              "id": "str"
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "str",
+                "value": "donor"
+              }
+            }
+          },
+          {
+            "name": "condition_key",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "Name",
+              "id": "str"
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "str",
+                "value": "condition"
+              }
+            }
+          },
+          {
+            "name": "cell_type_key",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "Name",
+              "id": "str"
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "str",
+                "value": "cell_type"
+              }
+            }
+          },
+          {
+            "name": "min_cells",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "Name",
+              "id": "int"
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "int",
+                "value": 10
+              }
+            }
+          },
+          {
+            "name": "min_total_count",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "Name",
+              "id": "int"
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "int",
+                "value": 10
+              }
+            }
+          },
+          {
+            "name": "selection",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "Name",
+              "id": "str"
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "str",
+                "value": "strict"
+              }
+            }
+          },
+          {
+            "name": "block_entries",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "Name",
+              "id": "int"
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "int",
+                "value": 262144
+              }
+            }
+          },
+          {
+            "name": "metadata_mb",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "Name",
+              "id": "int"
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "int",
+                "value": 128
+              }
+            }
+          },
+          {
+            "name": "disk_budget",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "Name",
+              "id": "int"
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "BinOp",
+                "left": {
+                  "node": "Constant",
+                  "type": "int",
+                  "value": 4
+                },
+                "op": {
+                  "node": "Mult"
+                },
+                "right": {
+                  "node": "BinOp",
+                  "left": {
+                    "node": "Constant",
+                    "type": "int",
+                    "value": 1024
+                  },
+                  "op": {
+                    "node": "Pow"
+                  },
+                  "right": {
+                    "node": "Constant",
+                    "type": "int",
+                    "value": 3
+                  }
+                }
+              }
+            }
+          },
+          {
+            "name": "reserve_bytes",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "Name",
+              "id": "int"
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "BinOp",
+                "left": {
+                  "node": "Constant",
+                  "type": "int",
+                  "value": 256
+                },
+                "op": {
+                  "node": "Mult"
+                },
+                "right": {
+                  "node": "BinOp",
+                  "left": {
+                    "node": "Constant",
+                    "type": "int",
+                    "value": 1024
+                  },
+                  "op": {
+                    "node": "Pow"
+                  },
+                  "right": {
+                    "node": "Constant",
+                    "type": "int",
+                    "value": 2
+                  }
+                }
+              }
+            }
+          },
+          {
+            "name": "reuse",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "Name",
+              "id": "bool"
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "bool",
+                "value": false
+              }
+            }
+          },
+          {
+            "name": "dry_run",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "Name",
+              "id": "bool"
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "bool",
+                "value": false
+              }
+            }
+          },
+          {
+            "name": "progress",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Subscript",
+                "value": {
+                  "node": "Name",
+                  "id": "Callable"
+                },
+                "slice": {
+                  "node": "Tuple",
+                  "elts": [
+                    {
+                      "node": "List",
+                      "elts": [
+                        {
+                          "node": "Name",
+                          "id": "str"
+                        }
+                      ]
+                    },
+                    {
+                      "node": "Constant",
+                      "type": "NoneType",
+                      "value": null
+                    }
+                  ]
+                }
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            }
+          }
+        ],
+        "returns": {
+          "node": "BinOp",
+          "left": {
+            "node": "Name",
+            "id": "RunResult"
+          },
+          "op": {
+            "node": "BitOr"
+          },
+          "right": {
+            "node": "Name",
+            "id": "dict"
+          }
+        },
+        "async": false
+      },
+      "check_bh": {
+        "parameters": [
+          {
+            "name": "source",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "str"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Name",
+                "id": "Path"
+              }
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          },
+          {
+            "name": "output",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "str"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Name",
+                "id": "Path"
+              }
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          },
+          {
+            "name": "reuse",
+            "kind": "KEYWORD_ONLY",
+            "annotation": {
+              "node": "Name",
+              "id": "bool"
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "bool",
+                "value": false
+              }
+            }
+          }
+        ],
+        "returns": {
+          "node": "Name",
+          "id": "RunResult"
+        },
+        "async": false
+      },
+      "demo": {
+        "parameters": [
+          {
+            "name": "output",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "str"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Name",
+                "id": "Path"
+              }
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          }
+        ],
+        "returns": {
+          "node": "Name",
+          "id": "RunResult"
+        },
+        "async": false
+      }
+    },
+    "public_sdk_types": {
+      "PVLError": {
+        "fields": {},
+        "methods": {
+          "__init__": {
+            "parameters": [
+              {
+                "name": "self",
+                "kind": "POSITIONAL_OR_KEYWORD",
+                "annotation": null,
+                "default": {
+                  "present": false,
+                  "value": null
+                }
+              },
+              {
+                "name": "code",
+                "kind": "POSITIONAL_OR_KEYWORD",
+                "annotation": {
+                  "node": "Name",
+                  "id": "str"
+                },
+                "default": {
+                  "present": false,
+                  "value": null
+                }
+              },
+              {
+                "name": "message",
+                "kind": "POSITIONAL_OR_KEYWORD",
+                "annotation": {
+                  "node": "Name",
+                  "id": "str"
+                },
+                "default": {
+                  "present": false,
+                  "value": null
+                }
+              },
+              {
+                "name": "hint",
+                "kind": "POSITIONAL_OR_KEYWORD",
+                "annotation": {
+                  "node": "Name",
+                  "id": "str"
+                },
+                "default": {
+                  "present": false,
+                  "value": null
+                }
+              }
+            ],
+            "returns": null,
+            "async": false
+          },
+          "to_dict": {
+            "parameters": [
+              {
+                "name": "self",
+                "kind": "POSITIONAL_OR_KEYWORD",
+                "annotation": null,
+                "default": {
+                  "present": false,
+                  "value": null
+                }
+              }
+            ],
+            "returns": null,
+            "async": false
+          }
+        }
+      },
+      "RunResult": {
+        "fields": {
+          "directory": {
+            "node": "Name",
+            "id": "Path"
+          },
+          "status": {
+            "node": "Name",
+            "id": "str"
+          },
+          "commitment": {
+            "node": "Name",
+            "id": "str"
+          },
+          "reused": {
+            "node": "Name",
+            "id": "bool"
+          }
+        },
+        "methods": {
+          "report": {
+            "parameters": [
+              {
+                "name": "self",
+                "kind": "POSITIONAL_OR_KEYWORD",
+                "annotation": null,
+                "default": {
+                  "present": false,
+                  "value": null
+                }
+              }
+            ],
+            "returns": {
+              "node": "Name",
+              "id": "Path"
+            },
+            "async": false
+          },
+          "counts": {
+            "parameters": [
+              {
+                "name": "self",
+                "kind": "POSITIONAL_OR_KEYWORD",
+                "annotation": null,
+                "default": {
+                  "present": false,
+                  "value": null
+                }
+              }
+            ],
+            "returns": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "Path"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            },
+            "async": false
+          },
+          "manifest": {
+            "parameters": [
+              {
+                "name": "self",
+                "kind": "POSITIONAL_OR_KEYWORD",
+                "annotation": null,
+                "default": {
+                  "present": false,
+                  "value": null
+                }
+              }
+            ],
+            "returns": {
+              "node": "Name",
+              "id": "dict"
+            },
+            "async": false
+          },
+          "to_dict": {
+            "parameters": [
+              {
+                "name": "self",
+                "kind": "POSITIONAL_OR_KEYWORD",
+                "annotation": null,
+                "default": {
+                  "present": false,
+                  "value": null
+                }
+              }
+            ],
+            "returns": {
+              "node": "Name",
+              "id": "dict"
+            },
+            "async": false
+          }
+        }
+      }
+    }
   },
   "online_isolation_scope_change": {
     "date": "2026-09-28",
@@ -3486,6 +4655,41 @@
     "reference": "docs/history/P1-DELIVERY-20260928.zh-CN.md",
     "unchanged": "0.7.0, frozen CLI/MCP/runtime-module/grader/schema surface, five golden commands, eight mainline documents, no automatic scientific or benefit certification"
   },
+  "scientific_execution_scope_change": {
+    "date": "2026-09-29",
+    "basis": "Explicit user request for executable science verification, separate blind reference labels and pseudobulk covariates; user selected Grok 4.7 model review",
+    "added_runtime_modules": [
+      "blind_review",
+      "pseudobulk_design",
+      "science_execution"
+    ],
+    "reference": "docs/history/SCIENTIFIC-EXECUTION.zh-CN.md",
+    "limits": "Explicit sandbox execution; model review is not human expertise; no external rebuild or scientific validity claim",
+    "unchanged": "Version 0.7.0, frozen main CLI and MCP signatures, grader inventory, five golden commands and eight mainline documents"
+  },
+  "trace_diagnostics_scope_change": {
+    "date": "2026-09-29",
+    "basis": "Explicit user request for artifact lineage, executed component interventions and actual Grok report-only testing; human testing deferred by user",
+    "added_runtime_modules": [
+      "trace_diagnostics",
+      "component_localization",
+      "diagnostic_review"
+    ],
+    "reference": "docs/history/TRACE-DIAGNOSTICS.zh-CN.md",
+    "limits": "Event-level L2.5 only; conditional local file interventions; model review does not establish human usability or independent science",
+    "unchanged": "Version 0.7.0, main CLI/MCP signatures, grader inventory and eight mainline documents"
+  },
+  "value_evidence_scope_change": {
+    "date": "2026-09-29",
+    "basis": "Explicit user request for external registration time, separately signed reviews and machine-enforced per-conclusion scope",
+    "added_runtime_modules": [
+      "claim_scope",
+      "preregistration"
+    ],
+    "reference": "docs/history/VALUE-EVIDENCE-20260929.zh-CN.md",
+    "limits": "Timestamp proves existence only; signed review needs independent key trust; scope declarations do not authenticate observations",
+    "unchanged": "Version 0.7.0, main CLI/MCP signatures, grader inventory and eight mainline documents"
+  },
   "component_methodology_scope_change": {
     "date": "2026-09-28",
     "basis": "Explicit user request: component factorial ablation, prospective saturation diagnostics and scientific equivalence testing",
@@ -3497,5 +4701,24 @@
     "new_grader": "equivalence",
     "limits": "Descriptive declared exposures; no automatic host component activation, causal attribution, case retirement or scientific validation",
     "unchanged": "Version 0.7.0, five golden commands, MCP signatures, freeze status and all other frozen surfaces"
+  },
+  "engineering_usability_scope_change": {
+    "date": "2026-09-29",
+    "authorization": "Explicit user request to deeply improve engineering usability",
+    "reason": "A small installed CLI and typed Python interface require new public surfaces.",
+    "allowed": [
+      "pvl six-command convenience CLI",
+      "public value_lab.sdk and module entry point",
+      "Nextflow, Snakemake and Jupyter examples",
+      "README one-command entry alongside original five-command tutorial"
+    ],
+    "preserved": [
+      "original CLI surface checked unchanged",
+      "MCP and grader inventories unchanged",
+      "eight mainline documents",
+      "version 0.7.0",
+      "scientific validity and non-author adoption remain unestablished"
+    ],
+    "validation": "docs/evidence/engineering-usability-20260929.json; new surfaces frozen independently, original snapshot preserved."
   }
 }

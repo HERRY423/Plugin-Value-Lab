@@ -165,6 +165,8 @@ def validate_suite(suite):
     cases = suite.get("cases")
     if not isinstance(cases, list) or not cases:
         raise ValidationError("cases must be a nonempty list")
+    from .claim_scope import validate_context as validate_claim_context
+    validate_claim_context(suite)
     ids = set()
     for case in cases:
         if not isinstance(case, dict):
@@ -495,6 +497,13 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
                         passed, rationale, verification = grade_artifact(g, record, artifact_root, verifier_root)
                     else:
                         passed, rationale = _grade(g, record)
+                        if g['type'] == 'json_equals' and passed is True:
+                            # Bind text JSON predicates to collected metamorphic
+                            # observations without retaining a second raw payload.
+                            try:
+                                verification = {'output_json_sha256': suite_digest(json.loads(record['output']))}
+                            except (ValueError, TypeError, KeyError):
+                                verification = {}
                     scored = g["dimension"] == "outcome"
                     if not scored and g["critical"] and passed is not True:
                         issues.append(f"Critical verification {g['id']} failed or is unresolved")
@@ -647,7 +656,8 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
     if "value_interpretation" in policy:
         from .interpretation import build_interpretation
         report["value_interpretation"] = build_interpretation(suite, report)
-    return report
+    from .claim_scope import attach as attach_claim_scope
+    return attach_claim_scope(suite, report)
 
 
 def demo_suite():

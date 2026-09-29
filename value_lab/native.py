@@ -337,22 +337,40 @@ def native_report(result) -> dict:
         if not case["arms"].get("without"):
             blockers.append(f"{case['name']}: no native baseline runs present")
         aggregates = case.get("aggregates", {})
+        # The documented delta is WITH minus W/OUT. Derive per case only:
+        # overallScore and meanDelta may have different case denominators.
+        baseline = None
+        if (case["arms"].get("without") and aggregates.get("score") is not None
+                and aggregates.get("delta") is not None):
+            candidate = aggregates["score"] - aggregates["delta"]
+            if -1e-12 <= candidate <= 1 + 1e-12:
+                baseline = min(1.0, max(0.0, candidate))
+            else:
+                blockers.append(f"{case['name']}: native score and delta imply an invalid baseline")
         cases.append({"id": case["name"], "kind": "native_diagnostic", "cluster": None,
-                      "with_score": aggregates.get("score"), "without_score": None,
+                      "with_score": aggregates.get("score"), "without_score": baseline,
+                      "without_score_source": "native score minus native delta" if baseline is not None else None,
                       "delta": aggregates.get("delta"), "runs": runs})
     aggregates = result.get("aggregates", {})
+    baseline_cases = [c for c in cases if c["without_score"] is not None]
+    # Do not silently turn the observed comparable subset into the whole suite.
+    baseline = (sum(c["without_score"] for c in baseline_cases) / len(cases)
+                if cases and len(baseline_cases) == len(cases) else None)
     return {
         "schema_version": 1, "study_id": "native-diagnostic", "plugin": {"name": "unbound native result", "version": "unknown"},
         "evidence_type": "unverified_native", "verdict": "insufficient_evidence",
-        "summary": {"with_score": aggregates.get("overallScore"), "without_score": None,
+        "summary": {"with_score": aggregates.get("overallScore"), "without_score": baseline,
                     "quality_delta": aggregates.get("meanDelta"), "expected_runs": None,
                     "observed_runs": observed, "complete_pairs": 0, "clusters": 0,
                     "cost_delta_usd": None, "with_cost_usd": None, "without_cost_usd": None,
-                    "native_total_estimated_cost_usd": result.get("costUsd")},
+                    "native_total_estimated_cost_usd": result.get("costUsd"),
+                    "native_reported_cases": len(cases), "native_baseline_cases": len(baseline_cases)},
         "blockers": blockers, "warnings": [
             "Displayed aggregate scores are native diagnostics; Value Lab has not recomputed or validated their grader semantics.",
             "Native costUsd is a list-price estimate including judges, not a settled bill or a per-arm total.",
             "Unknown native fields are preserved, not interpreted. No human review or scientific validity is established.",
+            "Native WITH/W/OUT/delta diagnostics already compare a baseline. The native threshold gates WITH only; delta does not gate its exit code.",
+            "Baseline is derived per case from documented score minus delta, not by subtracting means with potentially different denominators. Planned missing cases require a separately frozen schedule.",
         ], "cases": cases, "uncertainty": {"status": "unavailable"},
         "claim_limits": ["Diagnostic native result only; cannot establish plugin benefit."],
         "provenance": {"source": DOC_URL, "claude_version": result.get("claudeVersion"),

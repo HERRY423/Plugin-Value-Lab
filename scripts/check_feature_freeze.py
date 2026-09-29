@@ -131,6 +131,24 @@ def surface(root=ROOT):
                 and n.func.func.attr in ('tool', 'resource', 'prompt')):
             names.update(a.id for a in n.args if isinstance(a, ast.Name))
     result['mcp_signatures'] = {name: signature(functions[name]) for name in sorted(names)}
+    from value_lab.easy_cli import parser as easy_parser
+    old = dict(result)
+    try:
+        capture(easy_parser())
+    except Captured:
+        pass
+    convenience = {key: result[key] for key in ('global_options', 'commands')}
+    result.update(old)
+    result['convenience_cli'] = convenience
+    sdk_tree = ast.parse((root / 'value_lab/sdk.py').read_text(encoding='utf-8'))
+    result['public_sdk'] = {n.name: signature(n) for n in sdk_tree.body
+                            if isinstance(n, ast.FunctionDef) and not n.name.startswith('_')}
+    result['public_sdk_types'] = {
+        n.name: {'fields': {v.target.id: annotation(v.annotation) for v in n.body
+                           if isinstance(v, ast.AnnAssign) and isinstance(v.target, ast.Name)},
+                 'methods': {v.name: signature(v) for v in n.body if isinstance(v, ast.FunctionDef)
+                             and (not v.name.startswith('_') or v.name == '__init__')}}
+        for n in sdk_tree.body if isinstance(n, ast.ClassDef) and not n.name.startswith('_')}
     result['skills'] = sorted(p.relative_to(root).as_posix() for d in ('skills', 'extensions') for p in (root / d).rglob('SKILL.md'))
     result['runtime_modules'] = sorted(p.relative_to(root).as_posix() for p in (root / 'value_lab').rglob('*.py'))
     result['schemas'] = sorted(p.relative_to(root).as_posix() for p in (root / 'schemas').rglob('*.json'))

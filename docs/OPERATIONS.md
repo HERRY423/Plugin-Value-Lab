@@ -1,5 +1,7 @@
 # 五步之后，如何做真实评估
 
+文件处理与已有产物检查可直接使用[简洁 CLI / Python SDK](history/ENGINEERING-USABILITY.zh-CN.md)：`pvl aggregate`、`pvl check`、`pvl verify`，无需先创建插件研究。完整插件收益评估继续使用下方五步流程。
+
 主路径固定为 `doctor → freeze → evaluate → usage-card → compare-studies`。首次使用只读 [START](START.md)，字段查 [CONTRACT](../CONTRACT.md)，不为第一份卡安装宿主或登记研究。
 
 ## 准备与冻结

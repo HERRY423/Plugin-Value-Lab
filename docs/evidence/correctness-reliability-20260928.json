@@ -1,0 +1,33 @@
+{
+  "format": "pvl-correctness-reliability-1",
+  "as_of": "2026-09-28",
+  "version": "0.7.0",
+  "baseline_commit": "344a7239744bf100ff5b5e736a5958f2ebb6d6b9",
+  "status": "LOCAL_FIX_HOSTED_KERNEL_REVALIDATION_PENDING",
+  "oracle_regression": {
+    "original_tests": 8,
+    "before_failed_assertions": 10,
+    "after_original_tests_passed": 8,
+    "expanded_tests_passed": 16,
+    "synthetic_only": true,
+    "independent_reference_truth": "NOT_ESTABLISHED"
+  },
+  "full_tests": {"status": "PASS", "passed": 832, "skipped": 0, "seconds": 192.075, "exit_code": 0},
+  "kernel": {
+    "original_ci_run": "https://github.com/HERRY423/Plugin-Value-Lab/actions/runs/36435367083",
+    "original_offline_gate": "FAILED",
+    "original_online_gate": "SKIPPED",
+    "original_upload_failure": "Canary filename contains a line feed rejected by upload-artifact",
+    "original_namespace_root_cause": "UNKNOWN_ORIGINAL_STDERR_NOT_RETAINED",
+    "local_wsl_before": "PASS",
+    "local_wsl_after": "PASS_BOTH_OFFLINE_AND_ONLINE",
+    "hosted_revalidation": "NOT_RUN_USER_REQUESTED_NO_PUSH",
+    "isolation_policy_relaxed": false,
+    "real_model_calls": 0,
+    "missing_backend_control": "BOTH_GATES_FAIL_WITH_ARCHIVE_AND_EXIT_1",
+    "local_archive_tests": "PASS_WINDOWS_AND_LINUX"
+  },
+  "published": false,
+  "pushed": false,
+  "local_evidence_directory": "C:\\Test\\pvl-reliability-20260928"
+}

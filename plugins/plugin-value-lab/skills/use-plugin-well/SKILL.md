@@ -5,7 +5,7 @@ description: Help choose the simplest available capability for a task and explai
 
 # Use a plugin well
 
-For first-run onboarding, follow the five-command [README](../../README.md) and [START](../../docs/START.md). The [0.6.x freeze](../../docs/FREEZE.md) permits fixes and usability simplification, not new features. Never treat a maintainer or AI smoke run as non-author timing.
+For users with PVL installed and callable in ChatGPT, follow the conversational [README](../../README.md): start with the named plugin and actual task, use available tools, and do not require terminal setup or file paths by default. The five-command local tutorial is a developer appendix; [START](../../docs/START.md) covers its timing. The [freeze](../../docs/FREEZE.md) permits this onboarding clarification without new interfaces. Never treat a maintainer or AI smoke run as non-author timing.
 
 Help the user complete their task with the smallest useful amount of setup. A routine task does not need a value study. Keep advice proportional to the decision: a one-time summary may need a direct answer; adopting a plugin across a team may justify a matched trial.
 

@@ -178,11 +178,13 @@ def grade_scenario(g, record, artifact_root, scorer_root):
                 verification.setdefault("error", None)
             grades.append({"id": child["id"], "passed": passed, "rationale": rationale, "verification": verification})
         receipt["grades"] = grades
-        passed = None if any(g["passed"] is None for g in grades) else all(g["passed"] for g in grades)
-        if passed is True and any(child['type'] == 'metamorphic' for child in private['graders']):
-            anchors = [child for child in private['graders'] if child['type'] not in
-                       ('metamorphic', 'artifact_schema', 'backend_identity', 'over_refusal', 'abstention_correct')]
-            if not anchors:
+        from .scoring import _all_states
+        passed = _all_states(g['passed'] for g in grades)
+        if any(child['type'] == 'metamorphic' for child in private['graders']):
+            from .metamorphic import _reference_qualification
+            qualification = _reference_qualification(private['graders'], grades)
+            receipt['reference_qualification'] = qualification
+            if passed is True and qualification['status'] != 'QUALIFIED':
                 passed = None
                 receipt['correctness_oracle'] = 'REQUIRED_BEYOND_METAMORPHIC_CONSISTENCY'
         return passed, "All private scientific criteria are required; missing evidence stays unresolved", receipt

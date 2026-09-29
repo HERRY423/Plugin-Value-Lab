@@ -1,0 +1,152 @@
+{
+  "format": "pvl-trace-diagnostics-evidence-1",
+  "date": "2026-09-29",
+  "source_version": "0.7.0",
+  "native_lineage": {
+    "source": "Historical 2026-09-24 real host public CSV canary; no new host execution",
+    "sessions": 2,
+    "distinct_tasks": 1,
+    "failed_grades": 1,
+    "direct_writer_links": 2,
+    "source_receipt_file_sha256": "7924a52840263b9ed741263b2dd756d7200587f99c4a2e6c95bb596e61aa13d3",
+    "report_sha256": "5a1025cb78f2fbc9953f6c180d35a807c8295d089fefefcb20e3b94a0fe0621c",
+    "native_skill_parent_observed": false,
+    "level": "L2.5",
+    "L3": "NOT_ESTABLISHED"
+  },
+  "component_interventions": {
+    "status": "PASS",
+    "results": {
+      "2": {
+        "executions": 8,
+        "resolved_conditional_contrasts": 2,
+        "components": [
+          "method"
+        ]
+      },
+      "3": {
+        "executions": 16,
+        "resolved_conditional_contrasts": 4,
+        "components": [
+          "method",
+          "selection"
+        ]
+      }
+    },
+    "evidence_kind": "AUTHOR_CONSTRUCTED_ACTUAL_SANDBOX_EXECUTIONS",
+    "native_plugin_activation": false,
+    "human_validation": "PENDING"
+  },
+  "failed_runtime_preflight": {
+    "retained": true,
+    "path": "intervention/runtime/sandbox/receipt.json",
+    "reason": "System packaging has no installed-file inventory; no submitted pipeline ran"
+  },
+  "blind_review": {
+    "cases": 8,
+    "fields": 24,
+    "key_origin": "AUTHOR_CONSTRUCTED",
+    "source_mix": {
+      "historical_real_host_reports": 2,
+      "controlled_transport_reports": 3,
+      "actual_local_intervention_reports": 2,
+      "actual_preflight_failure_report": 1
+    },
+    "independent_samples": false,
+    "commitment": {
+      "packet_sha256": "c4d00342b73b905afac3dc538b0ac9e7f7df8605dd6802427a7d79012ea4088c",
+      "key_sha256": "04ad24ab49067854593aafe75df74cb5fd3d8fdae0fdad4c9e787e019f6fc024",
+      "human_validation": "PENDING",
+      "human_accuracy": null,
+      "human_reading_seconds": null,
+      "blindness": "Report only; fresh model session with tool access denied; no knowledge independence attestation"
+    },
+    "attempts": [
+      {
+        "status": "NO_VALID_RESPONSE",
+        "requested_model": "grok-4.7",
+        "returned_models": [
+          "grok-4.7-build"
+        ],
+        "session_id": "dc858442-5512-4da3-aafe-8552b0209bd7",
+        "request_id": "acc11abb-0880-4ee2-81d2-adf57a35bd59",
+        "stop_reason": "cancelled",
+        "exit_code": 1,
+        "reported_cost_usd": 0.0334594,
+        "settled_cost_usd": null,
+        "usage": {
+          "input_tokens": 47834,
+          "cache_read_input_tokens": 1152,
+          "cache_creation_input_tokens": 0,
+          "output_tokens": 361,
+          "reasoning_tokens": 246,
+          "total_tokens": 49347
+        },
+        "model_calls": 1,
+        "final_response_sha256": "bd1e50b6db80cdbcebd699c52c3ac2dea8b57abd0f5ee39a3da2686f45e3afe1",
+        "request_wall_seconds": 35.22320370003581,
+        "returned_cases": 0,
+        "exact_case_accuracy": 0.0
+      },
+      {
+        "status": "COMPLETE",
+        "requested_model": "grok-4.7",
+        "returned_models": [
+          "grok-4.7-build"
+        ],
+        "session_id": "71c2a3e1-01f4-4e8e-a010-531f60fe2b50",
+        "request_id": "4ca5c1b2-5df0-4f9e-a373-c48ca9e4a34e",
+        "stop_reason": "end_turn",
+        "exit_code": 0,
+        "reported_cost_usd": 0.0417214,
+        "settled_cost_usd": null,
+        "usage": {
+          "input_tokens": 55439,
+          "cache_read_input_tokens": 1152,
+          "cache_creation_input_tokens": 0,
+          "output_tokens": 1876,
+          "reasoning_tokens": 1610,
+          "total_tokens": 58467
+        },
+        "model_calls": 1,
+        "final_response_sha256": "7b6fcb263f5d93134a0c6e8920ca66a7f5e86564830f8c3452c1a46c2542b124",
+        "request_wall_seconds": 102.26168739999412,
+        "returned_cases": 8,
+        "exact_case_accuracy": 1.0
+      }
+    ],
+    "successful_attempt_exact_case_accuracy": 1.0,
+    "human_participants": 0,
+    "human_accuracy": null,
+    "human_reading_seconds": null,
+    "human_validation": "PENDING"
+  },
+  "cost": {
+    "agentmuxer_paid_invocations": 0,
+    "current_review_reported_usd": 0.07518079999999999,
+    "previous_science_review_reported_usd": 0.0673166,
+    "task_reported_total_usd": 0.1424974,
+    "settled_usd": null,
+    "cost_limit_enforced_by_cli": false
+  },
+  "engineering": {
+    "tests": 867,
+    "skipped": 0,
+    "full_suite": "PASS",
+    "freeze": "PASS",
+    "plugin_structure": "PASS",
+    "mirror": "PASS",
+    "hosted_ci": "NOT_RUN",
+    "version_bumped": false,
+    "published": false
+  },
+  "limits": [
+    "Event lines are not source-code defect lines.",
+    "Real Skill causal chain absent in the retained native sessions.",
+    "Component runs use constructed BH programs; native plugin activation not established.",
+    "Hidden-access monitoring still needs controlled instrumentation.",
+    "backend_identity remains outside native-sidecar allowed graders.",
+    "Grok service time is not human reading time; no independent human expertise claim.",
+    "CI artifact upload addition rejected by automatic approval and omitted. Existing prior CI work preserved."
+  ]
+}

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plugin-value-lab"
-version = "0.7.0"
+version = "0.8.0"
 description = "Evidence-bounded paired plugin value evaluation"
 requires-python = ">=3.11"
 dependencies = []
@@ -13,11 +13,12 @@ dependencies = []
 mcp = ["mcp>=1.12,<2"]
 dev = ["jsonschema>=4.22,<5"]
 registry = ["cryptography>=41"]
-science = ["anndata>=0.10,<0.13", "scipy>=1.11,<2"]
+science = ["anndata>=0.10,<0.14", "scipy>=1.11,<2", "h5py>=3.10,<4", "numpy>=1.26,<3"]
 pseudobulk = ["anndata>=0.11,<0.14", "pydeseq2==0.5.4"]
 
 [project.scripts]
 plugin-value-lab = "value_lab.cli:main"
+pvl = "value_lab.easy_cli:main"
 
 [tool.setuptools]
 packages = ["value_lab"]

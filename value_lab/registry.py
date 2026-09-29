@@ -133,6 +133,11 @@ def _assessment(root):
     canonical_records = suite_digest(values["runs.jsonl"])
     def normalize(value):
         if isinstance(value, dict):
+            if value.get('format') == 'pvl-scoped-conclusions-1':
+                # A report-byte commitment changes when JSONL order changes.
+                # Retain all semantic scope/claim fields in this revision-only
+                # fingerprint; keep original signed/committed bytes untouched.
+                value = {k: v for k, v in value.items() if k != 'source_report_sha256'}
             return {k: canonical_records if k == "records_sha256" else normalize(v) for k, v in value.items()}
         if isinstance(value, list):
             return [normalize(v) for v in value]

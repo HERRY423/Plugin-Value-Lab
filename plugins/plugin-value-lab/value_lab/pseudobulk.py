@@ -21,14 +21,18 @@ def validate_spec(spec):
 
 
 def validate_design(design):
-    keys(design, "format task_mode cell_type control treatment min_cells min_total_count backend_version reference_workflow")
-    if design["format"] != "pvl-pseudobulk-design-1" or design["task_mode"] not in ("fixed_method", "acceptable_solution"):
+    v2 = isinstance(design, dict) and design.get('format') == 'pvl-pseudobulk-design-2'
+    keys(design, "format task_mode cell_type control treatment min_cells min_total_count backend_version reference_workflow" + (' covariates' if v2 else ''))
+    if design["format"] not in ("pvl-pseudobulk-design-1", "pvl-pseudobulk-design-2") or design["task_mode"] not in ("fixed_method", "acceptable_solution"):
         raise ValidationError("Unknown pseudobulk task mode")
     for field in ("cell_type", "control", "treatment", "backend_version", "reference_workflow"):
         if not isinstance(design[field], str) or not design[field].strip():
             raise ValidationError("Pseudobulk design fields must be nonempty strings")
     if design["control"] == design["treatment"]:
         raise ValidationError("Contrast needs two distinct conditions")
+    if v2:
+        from .pseudobulk_design import validate_covariates
+        validate_covariates(design)
     for field in ("min_cells", "min_total_count"):
         if type(design[field]) is not int or design[field] < 1:
             raise ValidationError("Filtering thresholds must be positive integers")
@@ -41,7 +45,8 @@ No automatic row dropping, donor imputation, rounding, or pooled-cell inference.
 Raw counts and identities are still supplied measurements, not authenticated facts.
 """
     validate_design(design)
-    keys(data, "format genes cells provenance")
+    v2 = design['format'] == 'pvl-pseudobulk-design-2'
+    keys(data, "format genes cells provenance" + (' sample_covariates' if v2 else ''))
     if data["format"] != "pvl-cell-counts-1" or not isinstance(data["provenance"], dict):
         raise ValidationError("Expected sparse raw-cell-count input and provenance")
     genes = data["genes"]
@@ -69,7 +74,7 @@ Raw counts and identities are still supplied measurements, not authenticated fac
         pairs[donor][condition] = sample
         if sample not in groups:
             if (len(groups) + 1) * len(genes) > 2000000:
-                raise ValidationError("Pseudobulk matrix exceeds bounded budget")
+                raise ValidationError("Legacy in-memory JSON matrix exceeds bounded budget; use scripts/science_scale.py with a pinned h5ad plan for disk-backed aggregation")
             groups[sample], metadata[sample] = [0] * len(genes), [donor, condition, 0]
         metadata[sample][2] += 1
         seen = set()
@@ -94,6 +99,10 @@ Raw counts and identities are still supplied measurements, not authenticated fac
                 "counts": [groups[s][i] for i in kept]} for s in sorted(groups)]
     if any(sum(s["counts"]) == 0 for s in samples):
         raise ValidationError("Zero-library pseudobulk sample")
+    if v2:
+        from .pseudobulk_design import attach_covariates, design_matrix
+        attach_covariates(design, data, samples)
+        design_matrix(design, samples)
     return {"genes": [genes[i] for i in kept], "samples": samples,
             "excluded_genes": sorted(set(genes) - {genes[i] for i in kept}),
             "raw_input_sha256": suite_digest(data), "design_sha256": suite_digest(design),
@@ -103,6 +112,11 @@ Raw counts and identities are still supplied measurements, not authenticated fac
 
 def fit_reference(design, data):
     """Explicit local reference execution using the installed, version-pinned backend."""
+    return _fit_aggregated(design, aggregate(design, data))
+
+
+def _fit_aggregated(design, pb, *, counts_reference=None):
+    """Shared model contract for bounded JSON and backed aggregation adapters."""
     import importlib.metadata
     try:
         import pandas as pd
@@ -113,13 +127,26 @@ def fit_reference(design, data):
     version = importlib.metadata.version("pydeseq2")
     if version != design["backend_version"]:
         raise ValidationError("Installed PyDESeq2 version differs from frozen design")
-    pb = aggregate(design, data)
     metadata = pd.DataFrame([{k: row[k] for k in ("id", "donor", "condition")} for row in pb["samples"]]).set_index("id")
+    from .pseudobulk_design import formula, design_matrix
+    v2 = design['format'] == 'pvl-pseudobulk-design-2'
+    matrix_audit = design_matrix(design, pb['samples']) if v2 else None
+    if v2:
+        metadata['condition'] = pd.Categorical(metadata['condition'], categories=[design['control'], design['treatment']])
+        for name, spec in design['covariates'].items():
+            values = [row['covariates'][name] for row in pb['samples']]
+            metadata[name] = pd.Categorical(values, categories=spec['levels']) if spec['kind'] == 'categorical' else values
     counts = pd.DataFrame([row["counts"] for row in pb["samples"]], index=metadata.index, columns=pb["genes"])
     if not ratio_supported(pb):
         raise ValidationError("Frozen ratio normalization is unavailable: every gene contains a zero; choose and freeze a different method instead of silently switching")
-    dds = DeseqDataSet(counts=counts, metadata=metadata, design="~donor + condition", n_cpus=1,
+    dds = DeseqDataSet(counts=counts, metadata=metadata, design=formula(design), n_cpus=1,
                       refit_cooks=True, size_factors_fit_type="ratio", quiet=True)
+    if v2:
+        actual = dds.obsm['design_matrix']
+        if (set(actual.columns) != set(matrix_audit['columns']) or any(
+                [float(actual.loc[s, c]) for c in matrix_audit['columns']] != values
+                for s, values in matrix_audit['rows'].items())):
+            raise ValidationError('Backend design matrix differs from frozen covariate coding')
     dds.deseq2()
     stats = DeseqStats(dds, contrast=["condition", design["treatment"], design["control"]],
                       alpha=0.05, independent_filter=False, cooks_filter=True, n_cpus=1, quiet=True)
@@ -134,14 +161,15 @@ def fit_reference(design, data):
                         "ci95_upper": effect + 1.959963984540054 * se if effect is not None and se is not None else None,
                         "p_value": finite(row["pvalue"]), "q_value": finite(row["padj"])})
     matrix = dds.obsm["design_matrix"]
-    return {"format": "pvl-pseudobulk-result-1", "pseudobulk": pb,
-            "method": {"backend": "pydeseq2", "version": version, "formula": "~donor + condition",
+    return {"format": "pvl-backed-pseudobulk-result-1" if counts_reference else "pvl-pseudobulk-result-1",
+            "pseudobulk": counts_reference if counts_reference else pb,
+            "method": {"backend": "pydeseq2", "version": version, "formula": formula(design),
                        "contrast": ["condition", design["treatment"], design["control"]],
                        "normalization": "median_of_ratios", "independent_filter": False,
                        "cooks_filter": True, "refit_cooks": True, "alpha": 0.05,
                        "requested_dispersion_trend": "parametric", "observed_dispersion_trend": str(dds.uns["disp_function_type"])},
             "normalization": {str(i): float(v) for i, v in dds.obs["size_factors"].items()},
-            "design_matrix": {"columns": list(map(str, matrix.columns)),
+            "design_matrix": matrix_audit if v2 else {"columns": list(map(str, matrix.columns)),
                               "rows": {str(i): [float(x) for x in row] for i, row in matrix.iterrows()}},
             "testing_family": list(pb["genes"]), "results": results,
             "conclusion_scope": "within_supplied_donors_and_cell_type",
@@ -192,12 +220,15 @@ def check(path, spec, root):
         design, data, truth = (reference_json(root, spec[k]) for k in ("design", "data", "truth"))
         pb = aggregate(design, data)
         expected = _canonical(truth)
+        from .pseudobulk_design import formula, design_matrix
         keys(expected, "format pseudobulk method normalization design_matrix testing_family results conclusion_scope uncertainty")
         if (expected["format"] != "pvl-pseudobulk-result-1" or expected["method"].get("backend") != "pydeseq2"
                 or expected["method"].get("version") != design["backend_version"]
-                or expected["method"].get("formula") != "~donor + condition"
+                or expected["method"].get("formula") != formula(design)
                 or expected["method"].get("contrast") != ["condition", design["treatment"], design["control"]]):
             raise ValidationError("Frozen reference method differs from design")
+        if design['format'] == 'pvl-pseudobulk-design-2' and expected['design_matrix'] != design_matrix(design, pb['samples']):
+            raise ValidationError('Reference covariate matrix differs from independently reconstructed design')
         if (set(expected["normalization"]) != {s["id"] for s in pb["samples"]}
                 or any(number(v) <= 0 for v in expected["normalization"].values())):
             raise ValidationError("Reference needs positive size factors for every sample")

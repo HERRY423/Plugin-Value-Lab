@@ -15,7 +15,7 @@ from .native_evidence import (_fresh, _plan, _separate, capture_native_evidence,
                               discover_native_bindings, verify_native_evidence)
 
 
-def offline_namespace(command, inputs, outputs, bwrap):
+def offline_namespace(command, inputs, outputs, bwrap, runtime=None):
     """Allowlisted filesystem for OFFLINE workloads, not the online model host.
 
     Do not bind /, HOME, /etc, /run, WSL mounts or a reference directory. A clean
@@ -29,6 +29,8 @@ def offline_namespace(command, inputs, outputs, bwrap):
     for path in ('/usr', '/bin', '/lib', '/lib64'):
         if Path(path).exists():
             argv.extend(['--ro-bind', path, path])
+    if runtime is not None:
+        argv.extend(['--ro-bind', str(runtime), '/runtime'])
     argv.extend(['--proc', '/proc', '--dev', '/dev', '--tmpfs', '/tmp',
                  '--dir', '/etc', '--ro-bind', str(inputs), '/inputs',
                  '--bind', str(outputs), '/output', '--chdir', '/output',
@@ -36,7 +38,8 @@ def offline_namespace(command, inputs, outputs, bwrap):
     return [*argv, *command]
 
 
-def run_offline(inputs, files, command, output, *, cassette=None, expected_id=None, timeout_seconds=30):
+def run_offline(inputs, files, command, output, *, cassette=None, expected_id=None, timeout_seconds=30,
+                runtime=None, memory_mb=512, resources=None):
     """One local attempt with an optional parent-side MCP replay broker.
 
     The child gets only selected public inputs and a fresh output directory.
@@ -50,14 +53,21 @@ def run_offline(inputs, files, command, output, *, cassette=None, expected_id=No
     import time
     from .processes import close_tree
     from .replay import ToolReplay, replay_message
+    from .science_storage import validate_resources, disk_preflight, stream_file
+    large = resources is not None
+    budget = validate_resources(resources) if large else {
+        'input_bytes': 32 * 1048576, 'output_bytes': 32 * 1048576,
+        'file_bytes': 8 * 1048576, 'reserve_bytes': 0}
     if sys.platform != 'linux':
         raise ValidationError('Offline OS isolation requires Linux/WSL2 with bubblewrap; no fallback')
     bwrap = shutil.which('bwrap')
     if not bwrap:
         raise ValidationError('bubblewrap unavailable; no fallback or automatic installation')
     if (type(timeout_seconds) not in (int, float) or not math.isfinite(timeout_seconds)
-            or not 1 <= timeout_seconds <= 300):
-        raise ValidationError('Offline timeout must be 1..300 seconds')
+            or not 1 <= timeout_seconds <= (604800 if large else 300)):
+        raise ValidationError('Offline timeout exceeds the selected resource profile')
+    if type(memory_mb) is not int or not 128 <= memory_mb <= (1048576 if large else 4096):
+        raise ValidationError('Offline memory exceeds the selected resource profile')
     if (not isinstance(command, list) or not command
             or any(not isinstance(s, str) or not s or '\x00' in s for s in command)):
         raise ValidationError('Use an explicit command argument list, not a shell string')
@@ -66,6 +76,12 @@ def run_offline(inputs, files, command, output, *, cassette=None, expected_id=No
         raise ValidationError('Select 1..1000 unique public input files explicitly')
     source, root = Path(inputs).resolve(), _fresh(output)
     _separate(source, root)
+    if runtime is not None:
+        runtime = Path(runtime).resolve()
+        from .online_sandbox import runtime_inventory
+        runtime_inventory(runtime)  # curated, bounded, no links or host-root mount
+        _separate(runtime, source)
+        _separate(runtime, root)
     runtime_roots = [Path(p).resolve() for p in ('/usr', '/bin', '/lib', '/lib64') if Path(p).exists()]
     if any(root.is_relative_to(p) for p in runtime_roots):
         raise ValidationError('Keep controller evidence outside mounted runtime directories')
@@ -83,9 +99,10 @@ def run_offline(inputs, files, command, output, *, cassette=None, expected_id=No
         if '.replay' in Path(name).parts or not path.is_file() or path.stat().st_nlink != 1:
             raise ValidationError('Select regular public files, not linked files or private .replay material')
         size += path.stat().st_size
-        if size > 32 * 1024 * 1024:
-            raise ValidationError('Public inputs exceed 32 MiB')
+        if size > budget['input_bytes']:
+            raise ValidationError('Public inputs exceed declared byte budget (default 32 MiB)')
         selected.append((name, path))
+    disk_preflight(root.parent, size + budget['output_bytes'], budget['reserve_bytes'])
     root.mkdir(parents=True)
     stage, artifacts = root / 'inputs', root / 'artifacts'
     stage.mkdir()
@@ -93,33 +110,65 @@ def run_offline(inputs, files, command, output, *, cassette=None, expected_id=No
     for name, path in selected:
         target = stage / name
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(path, target)
+        stream_file(path, target=target, maximum=budget['input_bytes'], reserve=budget['reserve_bytes'])
     plan = {'format': 'pvl-offline-isolation-1', 'command': command,
             'inputs': {name: sha(stage / name) for name, _ in selected},
             'timeout_seconds': timeout_seconds, 'bwrap_sha256': sha(bwrap),
             'cassette_sha256': expected_id, 'network': 'DENIED',
             'host_root_mounted': False, 'inherited_environment': False,
             'model_calls': 0, 'mode': 'OFFLINE_CONTRACT_REPLAY' if replay else 'OFFLINE_EXECUTION'}
+    if runtime is not None:
+        plan['runtime_sha256'] = suite_digest(runtime_inventory(runtime))
+    plan['memory_mb'] = memory_mb
+    if large:
+        plan['resources'] = budget
+        plan['disk_enforcement'] = 'PER_FILE_RLIMIT_AND_POLLED_TOTAL_NOT_FILESYSTEM_QUOTA'
     write_json(root / 'plan.json', plan)
     # Apply resource limits before exec, in the namespace, without preexec_fn.
     limits = ('import os,resource,sys; '
               'resource.setrlimit(resource.RLIMIT_CORE,(0,0)); '
-              'resource.setrlimit(resource.RLIMIT_FSIZE,(8388608,8388608)); '
-              'resource.setrlimit(resource.RLIMIT_AS,(536870912,536870912)); '
+              f'resource.setrlimit(resource.RLIMIT_FSIZE,({budget["file_bytes"]},{budget["file_bytes"]})); '
+              f'resource.setrlimit(resource.RLIMIT_AS,({memory_mb * 1048576},{memory_mb * 1048576})); '
               'resource.setrlimit(resource.RLIMIT_NOFILE,(64,64)); '
               'resource.setrlimit(resource.RLIMIT_NPROC,(64,64)); '
               f'resource.setrlimit(resource.RLIMIT_CPU,({math.ceil(timeout_seconds)},{math.ceil(timeout_seconds)})); '
               'os.execvp(sys.argv[1],sys.argv[1:])')
-    argv = offline_namespace(['/usr/bin/python3', '-I', '-c', limits, *command], stage, artifacts, bwrap)
+    argv = offline_namespace(['/usr/bin/python3', '-I', '-c', limits, *command], stage, artifacts, bwrap, runtime)
     started, error, returncode = time.monotonic(), None, None
     write_json(root / 'started.json', {'plan_sha256': suite_digest(plan), 'automatic_retry': False})
     with (root / 'stderr.txt').open('wb') as err, (root / 'stdout.txt').open('wb') as log:
         process = None
         stop = threading.Event()
+        monitor = None
+        resource_errors = []
         try:
             process = subprocess.Popen(argv, stdin=subprocess.PIPE if replay else subprocess.DEVNULL,
                 stdout=subprocess.PIPE if replay else log, stderr=err, cwd=root,
                 env={'PATH': '/usr/bin:/bin'}, close_fds=True, start_new_session=True, shell=False)
+            if large:
+                def check_disk():
+                    try:
+                        total, count = 0, 0
+                        for base, directories, names in os.walk(artifacts, followlinks=False):
+                            count += len(directories) + len(names)
+                            if count > 100000:
+                                raise ValidationError('Output entry count exceeds 100000')
+                            for name in names:
+                                info = (Path(base) / name).lstat()
+                                total += info.st_size
+                        if total > budget['output_bytes']:
+                            raise ValidationError('Output exceeds total byte budget')
+                        disk_preflight(root, 0, budget['reserve_bytes'])
+                    except (OSError, ValueError) as exc:
+                        resource_errors.append(str(exc))
+                        close_tree(process)
+                def watch_disk():
+                    while not stop.wait(.25):
+                        check_disk()
+                        if resource_errors:
+                            break
+                monitor = threading.Thread(target=watch_disk, daemon=True)
+                monitor.start()
             if replay:
                 messages = queue.Queue(maxsize=16)
                 def read_lines():
@@ -170,10 +219,14 @@ def run_offline(inputs, files, command, output, *, cassette=None, expected_id=No
                         raise ValidationError('MCP replay contract mismatch; no fallback')
             remaining = max(.001, timeout_seconds - (time.monotonic() - started))
             returncode = process.wait(timeout=remaining)
+            if large:
+                check_disk()
         except (OSError, ValueError, subprocess.SubprocessError) as exc:
             error = type(exc).__name__ + ': ' + str(exc)[:400]
         finally:
             stop.set()
+            if monitor is not None:
+                monitor.join()
             if process is not None:
                 close_tree(process)
                 returncode = process.returncode
@@ -181,6 +234,8 @@ def run_offline(inputs, files, command, output, *, cassette=None, expected_id=No
                     if stream is not None:
                         stream.close()
     replay_receipt = replay.receipt() if replay else None
+    if resource_errors:
+        error = 'RESOURCE_LIMIT: ' + resource_errors[0][:400]
     succeeded = returncode == 0 and error is None and (not replay or replay_receipt['status'] == 'REPLAY_COMPLETE')
     receipt = {'status': 'COMPLETED' if succeeded else 'FAILED', 'returncode': returncode,
                'error': error, 'replay': replay_receipt, 'plan_sha256': suite_digest(plan),

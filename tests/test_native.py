@@ -174,6 +174,41 @@ class NativeTests(unittest.TestCase):
         self.assertEqual(report["provenance"]["native_result"], before)
         self.assertEqual(result, before)
 
+    def test_native_baseline_is_displayed_without_promoting_the_verdict(self):
+        result = result_fixture()
+        result['cases'][0]['aggregates'].update(score=1, delta=0)
+        report = native_report(result)
+        self.assertEqual(report['cases'][0]['without_score'], 1)
+        self.assertEqual(report['summary']['without_score'], 1)
+        self.assertEqual(report['summary']['native_baseline_cases'], 1)
+        self.assertEqual(report['verdict'], 'insufficient_evidence')
+        self.assertEqual(report['summary']['complete_pairs'], 0)
+
+    def test_baseline_does_not_mix_comparable_and_whole_suite_denominators(self):
+        result = result_fixture()
+        result['cases'][0]['aggregates'].update(score=0.8, delta=0.2)
+        missing = deepcopy(result['cases'][0])
+        missing.update(name='not-comparable', aggregates={'score': 0.1})
+        result['cases'].append(missing)
+        result['aggregates'].update(overallScore=0.45, meanDelta=0.2)
+        report = native_report(result)
+        self.assertAlmostEqual(report['cases'][0]['without_score'], 0.6)
+        self.assertIsNone(report['summary']['without_score'])
+        self.assertEqual(report['summary']['native_baseline_cases'], 1)
+        self.assertEqual(report['summary']['native_reported_cases'], 2)
+
+    def test_impossible_baseline_is_unknown_with_blocker(self):
+        result = result_fixture()
+        result['cases'][0]['aggregates'].update(score=0.1, delta=0.5)
+        report = native_report(result)
+        self.assertIsNone(report['cases'][0]['without_score'])
+        self.assertTrue(any('invalid baseline' in b for b in report['blockers']))
+
+    def test_negative_delta_can_derive_stronger_baseline(self):
+        result = result_fixture()
+        result['cases'][0]['aggregates'].update(score=0.4, delta=-0.5)
+        self.assertAlmostEqual(native_report(result)['summary']['without_score'], 0.9)
+
 
 if __name__ == "__main__":
     unittest.main()

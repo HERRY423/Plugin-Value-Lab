@@ -182,7 +182,7 @@ def prepare_native_evidence(plugin, contract, output, *, references=None):
             metadata = json.loads(plugin_files[relative])
             plugin_identity = {"name": metadata.get("name"), "version": metadata.get("version")}
             break
-    plan = {"schema_version": 1, "kind": "native-artifact-sidecar", "created_at": _now(),
+    plan = {"schema_version": 1, "diagnostic_schema": "pvl-trace-diagnosis-1", "kind": "native-artifact-sidecar", "created_at": _now(),
             "contract": deepcopy(contract), "contract_sha256": suite_digest(contract),
             "case_files": {}, "plugin_files": {}, "plugin_identity": plugin_identity,
             "plugin_inventory_scope": "Explicit allowlist plus first plugin manifest; other dependencies are not frozen",
@@ -230,6 +230,9 @@ def _diagnose(root, plan, records, native):
                         "status": record["status"], "grades": grades, "issues": record["issues"],
                         "binding": record.get("binding"), "observations": record.get("observations")})
         case = cases[record["case_id"]]
+        if plan.get('diagnostic_schema') == 'pvl-trace-diagnosis-1':
+            from .trace_diagnostics import link_run
+            results[-1]['lineage'] = link_run(root, case, record, len(results)-1)
         if "input_sha256" in case:
             results[-1]["input_integrity"] = {
                 key: "MISSING" if key not in record["inputs"] else
@@ -269,18 +272,30 @@ def _diagnose(root, plan, records, native):
 
 def render_diagnosis(report):
     """Human-readable facts and bounded repair hypotheses, linked to receipts."""
+    prefix = report.get('source_root', '').replace('\\', '/').rstrip('/')
+    def location(path):
+        return prefix + '/' + path if prefix else path
     lines = ["# Native scientific artifact diagnosis", "", "Local computational diagnosis; plugin benefit is not established.",
-             "", "[Raw native result](native-result.json) · [Run and file bindings](records.json) · [Machine-readable diagnosis](diagnosis.json)", ""]
+             "", f"[Raw native result](<{location('native-result.json')}>) · [Run and file bindings](<{location('records.json')}>) · [Machine-readable diagnosis](diagnosis.json)", ""]
     for run in report["runs"]:
         lines.extend([f"## {run['case_id']} / {run['arm']} / {run['repetition']}", "", f"Observed execution status: {run['status']}", ""])
         for grade in run["grades"]:
             status = "PASS" if grade["passed"] is True else "FAIL" if grade["passed"] is False else "UNKNOWN"
             artifact = grade["receipt"].get("artifact_path")
-            link = f" — [collected artifact]({artifact})" if artifact else ""
+            link = f" — [collected artifact](<{location(artifact)}>)" if artifact else ""
             # Use prose rather than a table: grader rationales may contain pipes.
             lines.append(f"- {grade['id']}: **{status}** — {grade['rationale']}{link}")
         for issue in run["issues"]:
             lines.append("- Evidence gap: " + issue)
+        for link in run.get('lineage', []):
+            producer = link.get('producer')
+            trace = (f"{producer['name']} {producer['tool_use_id']} at "
+                     f"[call line {producer['evidence']['line']}](<{location(producer['evidence']['path'])}:{producer['evidence']['line']}>) "
+                     f"/ result line {producer['result_evidence']['line']}"
+                     if producer else 'UNKNOWN')
+            lines.append(f"- Lineage {link['grader_id']} → {link['artifact_id']} → {trace}; "
+                         f"{link['level']} / {link['status']}; Skill: {link['skill']['status']}.")
+            lines.append('- ' + link.get('reason', '') + '. Source-code root cause: UNKNOWN.')
         if "input_integrity" in run:
             lines.append("- Frozen input integrity: " + json.dumps(run["input_integrity"]))
         if "execution" in run:

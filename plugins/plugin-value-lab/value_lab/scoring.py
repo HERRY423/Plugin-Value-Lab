@@ -151,11 +151,13 @@ def assess_task_outcome(case, run, floor):
     correctness = required['correctness']
     definitions = {g['id']: g for g in case['graders']}
     metamorphic = [gid for gid in correctness if definitions[gid]['type'] == 'metamorphic']
-    anchors = [gid for gid in correctness if definitions[gid]['type'] not in
-               ('metamorphic', 'contains', 'not_contains', 'artifact_schema', 'backend_identity')]
-    if metamorphic and not anchors and layers['correctness']['passed'] is True:
-        layers['correctness'].update(passed=None, status='UNKNOWN',
-            reason='Metamorphic consistency requires a separate task correctness oracle')
+    if metamorphic:
+        from .metamorphic import _reference_qualification
+        qualification = _reference_qualification([definitions[gid] for gid in correctness], run['grades'])
+        layers['correctness']['reference_qualification'] = qualification
+        if qualification['status'] != 'QUALIFIED' and layers['correctness']['passed'] is True:
+            layers['correctness'].update(passed=None, status='UNKNOWN',
+                reason='Metamorphic consistency requires a complete reference bound to each baseline result')
     floor_met = run['score'] is not None and run['score'] + 1e-12 >= floor
     critical = [g['passed'] for g in run['grades'] if g['critical']]
     critical_state = _all_states(critical) if critical else True

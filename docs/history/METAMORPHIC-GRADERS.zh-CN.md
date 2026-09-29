@@ -84,7 +84,13 @@ python -S scripts/metamorphic_eval.py check DESIGN.json --expected-id DESIGN_CAN
 
 每条关系返回 PASS / FAIL / UNKNOWN、变换输入摘要、完整分母、最多 20 个具体反例、错误数及最大绝对误差。已有失败优先于未完成；缺运行、执行失败、输入摘要不匹配保持 UNKNOWN；提交了结构/数值错误的结果则 FAIL。坏的私有设计属于评测不可用，不归咎于被测 Agent。
 
-关系通过只说明一致性。必须另配任务正确性 oracle，例如完整基准结果、受限解析解、已有 `pseudobulk_chain` / `replicate_effect` / 数值参考或真实人工判断。仅含 metamorphic 的案例与私有 scenario，即使质量分 100%，正确性也保留 UNKNOWN；额外加一条文字匹配不能解除这一限制。关系失败也不会因其他 Grader 提供 99% 分数而被掩盖。
+关系通过只说明一致性。2026-09-28 的判据组合修复要求：每份 metamorphic 产物必须有覆盖其完整 baseline 输出的参考，并且参考确实绑定该产物。不能仅按 grader 类型推定 oracle 资格。仅有状态、格式、文字、局部数值、另一份产物、另一个变换结果或人工通过声明时，即使质量分 100%，正确性仍是 UNKNOWN。关系失败也不会因其他 Grader 提供 99% 分数而被掩盖。
+
+当前支持 `artifact/json_fields` 对同一 artifact 的完整 baseline output（包括实体 ID、列 ID、全部数值或全部分区标签）作精确比较；支持整个 output、包含它的祖先对象，或完整的直接子字段组合。例：`expected: {"runs.0.output": {"row_ids": ["sum"], "columns": ["gene-x", "gene-y"], "values": [[12, 21]]}}`。baseline 位置依据实际 `id == "baseline"` 确定，不假定永远是第 0 条。
+
+`json_equals` 也可保留资格：它比较相同完整结果，且运行输出 JSON 的内容摘要与已收集的 observations 一致。仅在文本里放一份正确答案、实际文件仍错误，不具备资格。对数值/标签/身份做无序精确比较不能证明逐实体对应。尚未支持的其他 oracle 组合保持 UNKNOWN；不自动推定 `pseudobulk_chain`、可执行检查或人工评分已经验证这份关系产物。
+
+每次判定记录 `reference_qualification`，列出各关系检查、baseline 目标、候选参考、内容摘要与拒绝原因。QUALIFIED 只说明完整覆盖和绑定，不证明作者提供的参考是真值、已独立校准或具有科学有效性；受限解析解、数值参考与人工审查仍需要相应来源和独立验证。现有非 metamorphic 的传统规则口径在本次修复中不变。
 
 对无完整标准答案的问题，可将关系作为错误探测与缩小审查范围的工具，保留正确性未定。未知比伪造 oracle 更合适。
 

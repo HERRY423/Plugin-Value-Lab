@@ -1,0 +1,322 @@
+{
+  "format": "pvl-engineering-usability-acceptance-1",
+  "date": "2026-09-29",
+  "status": "PASS_WITH_DECLARED_SCOPE",
+  "version": "0.7.0",
+  "published": false,
+  "implementation_sha256": {
+    "value_lab/sdk.py": "0ccd3e35174cb8f4a4516b5955cb00cbc49c5aaf2fdbe9baa228949cb822b95d",
+    "value_lab/easy_cli.py": "28fd2aa1924c98baa96e35048d066bbff44d9f4b139250430fff833aacf8459b",
+    "value_lab/__main__.py": "e6a0beed2fe0828ef3f83e959cb74454e04236f7795132dc0f706d8c24e735e0",
+    "value_lab/pseudobulk_backed.py": "62d841b518ae2c399ed21c4f73879832c1d7fdf26917a44b5957c3415de95bdc",
+    "scripts/check_engineering_usability.py": "4b206d5e8a9becb80e872c9aa4e834be53295c8c3e5ac023a57f096c1815fe87",
+    "scripts/check_workflow_integration.py": "8b5d0950629e9853d17b3173223194950ab8c791b149b4c0f45ac022717f2a5a",
+    "scripts/check_feature_freeze.py": "1a91f730865a3e631e714a5a9ed89d553ca49ad7ebef9b06a95e0a02b9e89417",
+    "tests/test_sdk.py": "7158caf213c1b781c34db8e9ba00f980bba484436ac8c3f8534ed393940f618d",
+    "tests/test_science_scale.py": "697576d80dd79556b696629526bc68dab3b530d1124b3560ec3514204786a6f4",
+    "tests/test_feature_freeze.py": "f0c9f8f37c1d01d52124ae3a45120e968e814748a5a390a4d628698089994a8e",
+    "examples/workflow-integration/main.nf": "c679102a97b61745b3f0b900f57da75391dba88e0701304dd9fe6c646cf29553",
+    "examples/workflow-integration/Snakefile": "a7e30321eba9388e673a3e41710b0b3e5e3c164db874320d42dd5a7e7a78cf1a",
+    "examples/workflow-integration/notebook.ipynb": "5ef3551fb253a3376f3db0160de9ca70ec246fe680d6dbbd48fb5a0ee0f74658",
+    ".github/workflows/ci.yml": "3e772657d166a72ef4c69215de9a8777e937fa51f11face67b81d04ef393c1cb",
+    "pyproject.toml": "264f9335f854f0c6ccfd0a5ab7e4f74a0a1c299725646f5b587f4f3826381191"
+  },
+  "wheel": {
+    "sha256": "d73b7de6678300385d4bb0b00608c01e5b261d8144b3a30a99b52ae4f1c1a30c",
+    "all_runtime_bytes_equal_current_source": true,
+    "path": "C:\\Test\\pvl-usability-20260929\\wheels-current\\plugin_value_lab-0.7.0-py3-none-any.whl"
+  },
+  "full_suite": {
+    "status": "PASS",
+    "tests": 914,
+    "seconds": 237.827,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "log_sha256": "7d6150e4c93a0cec7ae9a3b61c84dbec6286c8c97f8604785d1c4e91930896cc"
+  },
+  "installed_cli_and_notebook": {
+    "format": "pvl-usability-acceptance-1",
+    "wheel_sha256": "d73b7de6678300385d4bb0b00608c01e5b261d8144b3a30a99b52ae4f1c1a30c",
+    "tests": [
+      {
+        "name": "core-install",
+        "exit_code": 0,
+        "expected": 0,
+        "seconds": 3.093
+      },
+      {
+        "name": "core-identity",
+        "exit_code": 0,
+        "expected": 0,
+        "seconds": 0.075
+      },
+      {
+        "name": "installed-demo",
+        "exit_code": 0,
+        "expected": 0,
+        "seconds": 0.32
+      },
+      {
+        "name": "installed-module-verify",
+        "exit_code": 0,
+        "expected": 0,
+        "seconds": 0.164
+      },
+      {
+        "name": "missing-science",
+        "exit_code": 2,
+        "expected": 2,
+        "seconds": 0.173
+      },
+      {
+        "name": "science-install",
+        "exit_code": 0,
+        "expected": 0,
+        "seconds": 4.195
+      },
+      {
+        "name": "science-identity",
+        "exit_code": 0,
+        "expected": 0,
+        "seconds": 0.075
+      },
+      {
+        "name": "generate-fixture",
+        "exit_code": 0,
+        "expected": 0,
+        "seconds": 3.629
+      },
+      {
+        "name": "installed-aggregate",
+        "exit_code": 0,
+        "expected": 0,
+        "seconds": 0.632
+      },
+      {
+        "name": "installed-reuse",
+        "exit_code": 0,
+        "expected": 0,
+        "seconds": 0.498
+      },
+      {
+        "name": "expected-counts",
+        "exit_code": 0,
+        "expected": 0,
+        "seconds": 3.661
+      },
+      {
+        "name": "notebook-kernel",
+        "exit_code": 0,
+        "expected": 0,
+        "seconds": 6.653
+      },
+      {
+        "name": "notebook-verify",
+        "exit_code": 0,
+        "expected": 0,
+        "seconds": 0.188
+      },
+      {
+        "name": "notebook-counts",
+        "exit_code": 0,
+        "expected": 0,
+        "seconds": 4.07
+      }
+    ],
+    "non_author_participants": 0,
+    "human_first_use_time": null,
+    "scientific_validity": "NOT_ESTABLISHED",
+    "science_dependencies": "Inherited from host; not a clean dependency-resolution test",
+    "status": "PASS"
+  },
+  "native_workflows": {
+    "synthetic": true,
+    "non_author_participants": 0,
+    "scientific_validity": "NOT_ESTABLISHED",
+    "steps": [
+      {
+        "name": "snakemake-version",
+        "exit_code": 0,
+        "seconds": 2.066
+      },
+      {
+        "name": "snakemake-fixture",
+        "exit_code": 0,
+        "seconds": 6.666
+      },
+      {
+        "name": "snakemake-run",
+        "exit_code": 0,
+        "seconds": 6.621
+      },
+      {
+        "name": "snakemake-resume",
+        "exit_code": 0,
+        "seconds": 2.31
+      },
+      {
+        "name": "nextflow-version",
+        "exit_code": 0,
+        "seconds": 1.005
+      },
+      {
+        "name": "nextflow-fixture",
+        "exit_code": 0,
+        "seconds": 6.406
+      },
+      {
+        "name": "nextflow-run",
+        "exit_code": 0,
+        "seconds": 3.729
+      },
+      {
+        "name": "nextflow-resume",
+        "exit_code": 0,
+        "seconds": 2.419
+      }
+    ],
+    "snakemake_version": "9.27.0",
+    "snakemake": {
+      "status": "PASS",
+      "output_shape": [
+        6,
+        2
+      ],
+      "exact_counts_match": true,
+      "rerun_preserved_commitment": true,
+      "commitment": "0feec0dc049980c2d448dfdd2edf3dc9816cb2949327b992d37f1fbe72dd86ec"
+    },
+    "nextflow_version": "N E X T F L O W\n      version 25.10.4 build 11173\n      created 10-02-2026 15:17 UTC (07:17 PDT)\n      cite doi:10.1038/nbt.3820\n      http://nextflow.io",
+    "nextflow": {
+      "status": "PASS",
+      "output_shape": [
+        6,
+        2
+      ],
+      "exact_counts_match": true,
+      "rerun_preserved_commitment": true,
+      "commitment": "85b6a4894f8a62927c62f445197ea4b993a29836ab55c05ea2dc710e7b9a088f"
+    },
+    "status": "PASS"
+  },
+  "large_matrix_convenience_cli": {
+    "status": "PASS",
+    "synthetic": true,
+    "input_shape": [
+      50000,
+      20000
+    ],
+    "input_bytes": 91933152,
+    "output_shape": [
+      200,
+      20000
+    ],
+    "all_counts_and_axes_match_previous_oracle_checked_output": true,
+    "seconds": 6.935205599998881,
+    "peak_tree_rss_bytes": 93310976,
+    "memory_measurement": "Process tree summed RSS sampled every 20 ms; shared pages may be counted more than once",
+    "scientific_validity": "NOT_ESTABLISHED",
+    "non_author_participants": 0
+  },
+  "research_derivative": {
+    "status": "PASS",
+    "source": "local cached GSE96583 derivative",
+    "input_shape": [
+      1301,
+      14053
+    ],
+    "output_shape": [
+      16,
+      7877
+    ],
+    "exact_counts_and_axes_match": true,
+    "raw_source_revalidated": false,
+    "scientific_validity": "NOT_ESTABLISHED",
+    "resource_override": {
+      "disk_budget": 16777216,
+      "reserve_bytes": 16777216
+    }
+  },
+  "unicode_terminal": {
+    "status": "PASS",
+    "terminal_encoding": "ascii:strict",
+    "unicode_output_path": true,
+    "human_output_escaped_without_crash": true,
+    "machine_json_roundtrip": true
+  },
+  "interface_compatibility": {
+    "original_cli_snapshot_preserved": true,
+    "mcp_and_grader_inventories_unchanged": true,
+    "mainline_documents": 8,
+    "feature_freeze_check": "PASS",
+    "plugin_schema_check": "PASS",
+    "hosted_ci": "CONFIGURED_NOT_RUN"
+  },
+  "windows_science_versions": {
+    "anndata": "0.13.1",
+    "pandas": "2.3.3",
+    "h5py": "3.15.1",
+    "numpy": "2.3.5"
+  },
+  "linux_science_versions": {
+    "anndata": "0.13.4",
+    "pandas": "3.0.6",
+    "h5py": "3.16.0"
+  },
+  "failure_history": [
+    {
+      "attempt": "demo-initial",
+      "issue": "Diagnosis wrapper field access",
+      "resolution": "Fixed before acceptance; failure retained"
+    },
+    {
+      "attempt": "installed-acceptance",
+      "issue": "Sandbox denied localhost Jupyter socket",
+      "resolution": "Retested with approved local socket access; original logs retained"
+    },
+    {
+      "attempt": "workflow-failures/nullable-string-acceptance.json",
+      "issue": "Nullable-string HDF5 encoding unsupported",
+      "resolution": "Reader repaired; 3 regression tests; native engine and wheel retests passed"
+    },
+    {
+      "attempt": "kang-sdk",
+      "issue": "Insufficient disk reserve",
+      "resolution": "Failure retained; explicit 16 MiB output budget and 16 MiB reserve for small cached derivative"
+    },
+    {
+      "attempt": "scale-sdk-acceptance-initial-invalid.json",
+      "issue": "Only Windows venv redirector memory was sampled",
+      "resolution": "Invalid measurement retained separately; final receipt includes process tree"
+    }
+  ],
+  "evidence_directory": "C:\\Test\\pvl-usability-20260929",
+  "non_author_participants": 0,
+  "human_first_use_time": null,
+  "natural_use_benefit": "NOT_ESTABLISHED",
+  "independent_scientific_validation": "NOT_ESTABLISHED",
+  "paid_service_invocations": 0,
+  "limits": [
+    "Synthetic fixtures and cached derivatives are not independent biological validation.",
+    "Science dependencies inherited existing environments; not an independent clean rebuild.",
+    "Reuse verifies completed results; no interrupted-run checkpoint resume.",
+    "Convenience aggregation covers paired raw-count h5ad; no DE fitting or FASTQ/BAM/VCF processing.",
+    "Local tests do not establish cluster deployment, universal version compatibility or hosted CI acceptance."
+  ],
+  "followup_workspace_tests": {
+    "reason": "Other workspace changes added tests after the 914-test suite was discovered; preserved and checked separately.",
+    "native_tests": 14,
+    "research_execution_tests": 10,
+    "status": "PASS",
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "current_discovered_count": 928,
+    "not_claimed_as_single_928_test_run": true,
+    "logs_sha256": {
+      "native-followup-tests.log": "c350c1ef8f5b3ce3a9a3040edeaba6cabe3d0b9ec2fdb8f87daa055664c8eb56",
+      "research-followup-tests.log": "bc1c04b70f672d912b2ee1df1dbd2264dbfecf9064f35ef703a27cc1ea131172"
+    }
+  }
+}

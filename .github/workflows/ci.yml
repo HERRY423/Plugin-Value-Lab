@@ -20,28 +20,31 @@ jobs:
       - run: python -S -m unittest discover -s tests -p test_offline_replay.py -v
       - run: python -S -m unittest discover -s tests -p test_live_recording.py -v
       - run: python -S -m unittest discover -s tests -p test_metamorphic.py -v
+      - run: python -S -m unittest discover -s tests -p test_correctness_references.py -v
+      - run: python -S -m unittest discover -s tests -p test_kernel_acceptance.py -v
       - run: python -S -m unittest discover -s tests -p test_component_studies.py -v
       - run: python -S -m unittest discover -s tests -p test_authoring.py -v
       - run: python -S -m unittest discover -s tests -p test_research_authoring.py -v
       - run: python -S -m unittest discover -s tests -p test_online_sandbox.py -v
   offline-kernel:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get update && sudo apt-get install -y bubblewrap
       # Required real namespace acceptance: unavailable isolation FAILS, not skips.
-      - run: /usr/bin/python3 -S scripts/check_offline_boundary.py --output "$RUNNER_TEMP/pvl-offline-acceptance"
-      - run: /usr/bin/python3 -S scripts/check_online_boundary.py --output "$RUNNER_TEMP/pvl-online-acceptance"
+      - run: /usr/bin/python3 -S scripts/check_kernel_acceptance.py --output "$RUNNER_TEMP/pvl-kernel-acceptance"
+      - run: /usr/bin/python3 -S scripts/check_storage_limits.py --output "$RUNNER_TEMP/pvl-storage-limits"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: offline-kernel-evidence
-          path: ${{ runner.temp }}/pvl-offline-acceptance
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: online-kernel-evidence
-          path: ${{ runner.temp }}/pvl-online-acceptance
+          name: kernel-evidence
+          if-no-files-found: error
+          path: |
+            ${{ runner.temp }}/pvl-kernel-acceptance.tar.gz
+            ${{ runner.temp }}/pvl-kernel-acceptance/acceptance.json
+            ${{ runner.temp }}/pvl-kernel-acceptance/manifest.json
+            ${{ runner.temp }}/pvl-storage-limits/acceptance.json
   test:
     strategy:
       fail-fast: false
@@ -54,15 +57,86 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - run: python -m pip install ".[dev,mcp,science,registry]" wheel "setuptools>=68"
+      - run: python -m pip install ".[dev,mcp,science,registry]" wheel "setuptools>=68" nbclient ipykernel
       - run: python scripts/build_marketplace.py --check
       - run: python scripts/check_feature_freeze.py
       - run: python scripts/check_release_tests.py
       - run: python scripts/validate_agent_plugin.py
       - run: python scripts/build_marketplace.py --package
       - run: python -m pip wheel . --no-deps --no-build-isolation --wheel-dir dist
+      - run: python scripts/check_engineering_usability.py --wheel dist/plugin_value_lab-0.7.0-py3-none-any.whl --output "${{ runner.temp }}/pvl-usability"
       - uses: actions/upload-artifact@v4
         with:
           name: packages-${{ matrix.os }}-${{ matrix.python }}
           path: dist/*
+  scientific-execution:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y bubblewrap python3-pip
+      - run: /usr/bin/python3 scripts/prepare_science_runtime.py --output "$RUNNER_TEMP/pvl-science-runtime"
+      # Actual backend fitting inside the networkless sandbox; no skipped/mock acceptance.
+      - run: /usr/bin/python3 scripts/check_science_execution.py --runtime "$RUNNER_TEMP/pvl-science-runtime" --output "$RUNNER_TEMP/pvl-science-execution"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scientific-execution-evidence
+          if-no-files-found: error
+          path: ${{ runner.temp }}/pvl-science-execution
+  data-scale:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install ".[science]" psutil
+      # Full-matrix independent oracle and child RSS, not shape-only acceptance.
+      - run: python scripts/check_data_scale.py --output "$RUNNER_TEMP/pvl-scale-50k"
+      - run: python scripts/check_data_scale.py --output "$RUNNER_TEMP/pvl-scale-100200" --cells 100200
+      - run: sudo apt-get update && sudo apt-get install -y bubblewrap python3-pip
+      - run: /usr/bin/python3 scripts/prepare_science_runtime.py --output "$RUNNER_TEMP/pvl-scale-runtime"
+      - run: $RUNNER_TEMP/pvl-scale-runtime/bin/python scripts/check_data_scale_execution.py --scale-directory "$RUNNER_TEMP/pvl-scale-50k" --runtime "$RUNNER_TEMP/pvl-scale-runtime" --output "$RUNNER_TEMP/pvl-scale-sandbox"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: data-scale-evidence
+          if-no-files-found: error
+          path: |
+            ${{ runner.temp }}/pvl-scale-*/acceptance.json
+            ${{ runner.temp }}/pvl-scale-*/result/receipt.json
+            ${{ runner.temp }}/pvl-scale-*/stderr.txt
+            ${{ runner.temp }}/pvl-scale-sandbox/execution/receipt.json
+  workflow-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: python -m pip install ".[science]" snakemake==9.27.0
+      - name: Prepare pinned Nextflow
+        run: |
+          curl --fail --location --retry 2 --max-time 120 -o "$RUNNER_TEMP/nextflow" https://github.com/nextflow-io/nextflow/releases/download/v25.10.4/nextflow
+          chmod +x "$RUNNER_TEMP/nextflow"
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/nextflow" -version
+      # Runs native engines and resumes; absent engines or mismatched counts fail.
+      - run: python scripts/check_workflow_integration.py --engine all --output "$RUNNER_TEMP/pvl-workflows"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: workflow-integration-evidence
+          if-no-files-found: error
+          path: |
+            ${{ runner.temp }}/pvl-workflows/acceptance.json
+            ${{ runner.temp }}/pvl-workflows/*.stdout
+            ${{ runner.temp }}/pvl-workflows/*.stderr
   # No model calls, account credentials or published releases in CI.

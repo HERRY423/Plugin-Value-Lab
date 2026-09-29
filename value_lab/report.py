@@ -164,7 +164,30 @@ def _metamorphic_details(grades) -> str:
                          + rows + '</tbody></table>')
         if verification.get('grades'):
             parts.append(_metamorphic_details(verification['grades']))
+        if verification.get('reference_qualification'):
+            parts.append(_reference_details(verification['reference_qualification']))
     return ''.join(parts)
+
+
+def _reference_details(qualification) -> str:
+    rows = []
+    reasons = {'BASELINE_TARGET_UNAVAILABLE': '基准结果缺失或无法核验',
+               'REFERENCE_NOT_BOUND_TO_RELATION_ARTIFACT': '参考未绑定这份关系产物',
+               'REFERENCE_DOES_NOT_COVER_COMPLETE_BASELINE_RESULT': '没有覆盖完整基准结果',
+               'UNORDERED_COMPARISON_DOES_NOT_BIND_RESULT_IDENTITIES': '无序比较无法核对数值与实体对应',
+               'NO_SUPPORTED_COMPLETE_RESULT_PROPOSITION': '该检查未提供受支持的完整结果参考',
+               'REFERENCE_CHECK_FAILED_OR_UNKNOWN': '参考检查失败或未知',
+               'COMPLETE_BOUND_RESULT_REFERENCE': '已核对同一产物的完整基准结果'}
+    for target in _items(_mapping(qualification).get('targets')):
+        for candidate in _items(_mapping(target).get('candidates')):
+            row = _mapping(candidate)
+            rows.append('<tr>' + ''.join('<td>' + _escape(value) + '</td>' for value in
+                (_mapping(target).get('grader_id'), row.get('grader_id'), row.get('qualified'),
+                 reasons.get(row.get('reason'), row.get('reason')))) + '</tr>')
+    return ('<h4>正确性参考资格</h4><p>每份关系产物都需要覆盖完整基准结果的参考。'
+            '状态或格式通过不能补足；资格不代表参考已经独立验证。</p>'
+            '<table><thead><tr><th>关系检查</th><th>候选参考</th><th>具备资格</th><th>依据</th></tr></thead><tbody>'
+            + ''.join(rows) + '</tbody></table>')
 
 
 def _run_details(case: dict[str, Any]) -> str:
@@ -181,6 +204,9 @@ def _run_details(case: dict[str, Any]) -> str:
                                for k, v in _mapping(outcome.get('layers')).items())
             outcome_html = (f'<p><strong>任务成功：{_escape(states.get(outcome.get("status"), "未知"))}</strong> · {_escape(layers)}</p>'
                             '<p class="muted">部分质量分与任务成功分开；过程检查不计分，也不能证明交付或正确性。</p>')
+            qualification = _mapping(_mapping(outcome.get('layers')).get('correctness')).get('reference_qualification')
+            if qualification:
+                outcome_html += _reference_details(qualification)
         extra = {key: value for key, value in run.items() if key not in {
             "arm", "repetition", "status", "score", "cost_usd", "grades", "issues"
         }}
@@ -414,13 +440,23 @@ def _render_html(report: dict[str, Any]) -> str:
 <div class="filters" role="group" aria-label="筛选案例"><button type="button" data-filter="all" aria-pressed="true">全部案例</button><button type="button" data-filter="regression" aria-pressed="false">存在回退</button><button type="button" data-filter="blocked" aria-pressed="false">缺失 / 有问题</button></div>
 <div class="table-wrap"><table class="cases-table"><thead><tr><th scope="col">案例 / 类型</th><th scope="col">任务簇</th><th scope="col">{table_without}</th><th scope="col">{table_with}</th><th scope="col">{table_delta}</th><th scope="col">记录状态</th></tr></thead>{case_rows}</table></div><p class="empty" id="filter-empty"{'' if not cases else ' hidden'}>当前筛选下没有案例。</p><p class="muted small">“存在回退”表示案例差值为负，是否触及停止阈值由评估方案决定。失败和缺失记录始终保留。</p></section>
 <div class="grid"><section class="panel"><h2>不确定性</h2>{_fact_block(report.get("uncertainty"), empty="未提供区间或不确定性估计。")}</section><section class="panel"><h2>排除与未纳入项</h2>{_fact_block(exclusions, empty="未提供单独的排除汇总；请同时检查阻断项和逐次运行记录。")}</section></div>
-<section class="panel full"><h2>结论能支持到哪里</h2>{_fact_block(report.get("claim_limits"), empty="未提供特定结论范围。仅凭本报告，不能认定外部收益或科学有效性。")}<p class="muted small">方案锁用于一致性核验，不构成独立见证的预注册。来源标为外部也不自动表示独立评审、因果归因或科学认证。</p></section>
+<section class="panel full"><h2>结论能支持到哪里</h2>{_fact_block(report.get("claim_limits"), empty="未提供特定结论范围。仅凭本报告，不能认定外部收益或科学有效性。")}{_fact_block(_scope_summary(report), empty="此旧报告未绑定机器可检查的范围卡。")}<p class="muted small">方案锁用于一致性核验，不构成独立见证的预注册。来源标为外部也不自动表示独立评审、因果归因或科学认证。</p></section>
 {('<section class="panel full"><h2>预设双向错误上限</h2>' + _fact_block(report.get('methodology'), empty='未设置') + '</section>') if report.get('methodology', {}).get('limits') is not None else ''}
 <section class="panel full"><details><summary>来源与评估记录</summary><h3>来源信息</h3>{_fact_block(report.get("provenance"), empty="未提供来源信息。")}<h3 style="margin-top:22px">完整评估记录</h3><p class="muted small">保留全部字段，以便复核报告摘要和新增评估字段。</p><pre>{html.escape(raw_json, quote=True)}</pre></details></section>
 {_cost_detail_html(report)}
 {_corpus_error_html(report)}
 <footer class="footer"><span>离线报告 · 无外部脚本、字体或网络请求</span><span><a href="report.json">完整 JSON</a> · <a href="report.md">Markdown 报告</a></span></footer>
 </main><script>{_SCRIPT}</script></body></html>'''
+
+
+def _scope_summary(report):
+    bound = report.get('scoped_conclusions')
+    if not isinstance(bound, dict):
+        return {}
+    return {'逐项绑定结论数': len(bound['claims']), '声明的模型与宿主': bound['context']['conditions'],
+            '案例与数据规模': bound['context']['cases'], '缺失维度': bound['missing_dimensions'],
+            '明确不支持': bound['context']['excluded_uses'],
+            '引用要求': '引用须提交相同证据单位、版本、数据规模及报告摘要；扩大范围报 OUT_OF_SCOPE。未知维度不得补全。'}
 
 
 def _render_markdown(report: dict[str, Any]) -> str:
@@ -468,6 +504,7 @@ def _render_markdown(report: dict[str, Any]) -> str:
         ("不确定性", report.get("uncertainty"), "未提供区间或不确定性估计。"),
         ("排除与未纳入项", report.get("exclusions", summary.get("exclusions")), "未提供单独的排除汇总。"),
         ("结论边界", report.get("claim_limits"), "未提供特定结论范围；不能据此认定外部收益或科学有效性。"),
+        ("机器检查的结论范围", _scope_summary(report), "此旧报告未绑定机器可检查的范围卡。"),
     ]:
         lines += [f"## {title}", ""]
         if isinstance(value, dict) and value:
@@ -492,6 +529,9 @@ def _render_markdown(report: dict[str, Any]) -> str:
                 outcome = run['task_outcome']
                 layers = '；'.join(f"{k}={v['status']}" for k, v in outcome['layers'].items())
                 lines += [f"  - 任务成功：{_markdown(outcome['status'])}；{_markdown(layers)}。部分分数不能替代必要结果证据。"]
+                qualification = _mapping(outcome['layers'].get('correctness')).get('reference_qualification')
+                if qualification:
+                    lines += [f"  - 正确性参考资格：{_markdown(qualification['status'])}；须覆盖同一产物的完整基准结果，参考真值仍需独立验证。"]
             for issue in _items(run.get("issues")):
                 lines += [f"  - 问题：{_markdown(issue)}"]
             if run.get("grades") is not None:
@@ -519,6 +559,9 @@ def write_reports(report: dict[str, Any], output_dir: str | Path) -> dict[str, s
     Unknown extension fields are retained in JSON and the HTML evidence panel.
     JSON is serialized first, so non-JSON values cannot leave a partial report.
     """
+    if 'scoped_conclusions' in report:
+        from .claim_scope import verify_report
+        verify_report(report)
     json_text = json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
     markdown_text = _render_markdown(report)
     html_text = _render_html(report)

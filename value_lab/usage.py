@@ -564,6 +564,7 @@ def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_ro
             "summary": copy.deepcopy(summary), "run_counts": _counts(all_runs),
             "quality_estimand": copy.deepcopy(report['quality_estimand']),
             "decision_review": copy.deepcopy(report['decision_review']),
+            "scoped_conclusions": copy.deepcopy(report['scoped_conclusions']),
             "blockers": list(report["blockers"]), "warnings": list(report["warnings"]),
             "claim_limits": copy.deepcopy(report["claim_limits"]),
             "authenticity_verified": False,

@@ -19,7 +19,9 @@
 
 ## 落地约束
 
-README 与默认帮助只推荐 `doctor → freeze → evaluate → usage-card → compare-studies`。旧高级接口不删除，完整帮助按需查阅，研究／团队扩展仍默认关闭。兼容不等于继续扩展。
+2026-09-29 用户明确要求“深度改进工程易用性”，授权本次限定例外：新增 `pvl` 六命令入口与 `value_lab.sdk`、三个工作流示例；README 增加一命令起步。旧 CLI、五条完整评估命令、MCP、评分语义与八份主线文档保持。新增接口独立加入冻结检查，不覆盖旧接口基线；细节见 `engineering_usability_scope_change` 和[工程易用性记录](history/ENGINEERING-USABILITY.zh-CN.md)。下段的默认推荐约束对新增便捷入口按本例外执行。
+
+2026-09-29 用户明确将首次使用场景纠正为“PVL 已作为插件安装在 ChatGPT 中，并可被调用以评估其他插件”。据此，README 和技能引导优先使用自然语言任务及已有 MCP 工具；五条 `doctor → freeze → evaluate → usage-card → compare-studies` 命令保留在开发者补充中，默认 CLI 帮助保持原样。本次只调整既有入口的说明顺序，不新增接口，不把对话理解或可调用状态当作真实两臂采集。旧高级接口不删除，研究／团队扩展仍默认关闭。
 
 `docs/feature-freeze.json` 固定 CLI 命令／参数、MCP 工具、技能、运行时模块和评分类型清单；CI 检查功能面扩张、主线文档超限及五步入口漂移。检查不因日期自动失效。它不能理解所有代码语义，既有函数内新增产品行为仍需人工审阅，不能宣称机械禁止全部新功能。
 
