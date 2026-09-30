@@ -160,6 +160,7 @@ def probe_backend(config, plugin, output, control, backend_path, targets, public
     bridge = r'C:\pvl-control\model_bridge.py' if windows else '/pvl-control/model_bridge.py'
     executable = prefix + ('\\' if windows else '/') + config['executable'].replace('/', '\\' if windows else '/')
     payload = {'targets': [str(p) for p in targets], 'executable': executable, 'windows': windows,
+               'allowed_mounts': [str(plugin), str(output / 'native'), str(output / 'retained')],
                'parent_net_ns': None if windows else os.stat('/proc/self/ns/net').st_ino}
     name = 'pvl-' + uuid.uuid4().hex
     argv = sandbox_command(config, plugin, output, control,
@@ -179,7 +180,7 @@ def probe_backend(config, plugin, output, control, backend_path, targets, public
                 or len(receipt['checks']) < len(targets) + 4):
             raise ValueError('boundary or native CLI version check failed')
     except (KeyError, ValueError, TypeError) as exc:
-        raise ValidationError('Sandbox boundary preflight did not pass') from exc
+        raise ValidationError('Sandbox boundary preflight did not pass; check private paths, mount ancestors, network namespace and CLI version') from exc
     return receipt
 
 

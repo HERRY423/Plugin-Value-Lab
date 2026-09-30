@@ -23,6 +23,30 @@ def emit(value):
         sys.stdout.flush()
 
 
+def visible_tree_is_allowlisted(root, allowed):
+    """Allow only mount roots and the empty directory scaffolding reaching them.
+
+    A guest /home can exist because a selected /home/runner/... plugin is
+    mounted there. Its existence alone does not expose the host's home tree.
+    Never traverse an allowed mount's contents; reject every unlisted sibling,
+    including hidden files and symlinks in the scaffolding.
+    """
+    root = Path(root)
+    allowed = [Path(p) for p in allowed]
+    if root.is_symlink():
+        return False
+    if not root.exists():
+        return True
+    if root in allowed:
+        return True
+    if not root.is_dir() or not any(p.is_relative_to(root) for p in allowed):
+        return False
+    try:
+        return all(visible_tree_is_allowlisted(p, allowed) for p in root.iterdir())
+    except OSError:
+        return False
+
+
 def probe(spec):
     checks = {}
     for i, name in enumerate(spec['targets']):
@@ -48,7 +72,9 @@ def probe(spec):
         devices = {line.split(':', 1)[0].strip() for line in Path('/proc/net/dev').read_text().splitlines() if ':' in line}
         checks['only_loopback'] = devices == {'lo'}
         checks['private_network_namespace'] = os.stat('/proc/self/ns/net').st_ino != spec['parent_net_ns']
-        checks['no_host_mounts'] = not Path('/init').exists() and not Path('/run/WSL').exists() and not Path('/home').exists()
+        allowed = spec.get('allowed_mounts', [])
+        checks['no_host_mounts'] = (not Path('/init').exists() and not Path('/run/WSL').exists()
+            and '/home' not in allowed and visible_tree_is_allowlisted('/home', allowed))
     with socket.socket() as server:
         server.bind(('127.0.0.1', 0))
         server.listen()
