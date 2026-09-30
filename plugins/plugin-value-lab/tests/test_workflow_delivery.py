@@ -74,6 +74,25 @@ class WorkflowDeliveryTests(unittest.TestCase):
         self.assertNotIn('<script>', text)
         self.assertNotIn('@team', text)
 
+    def test_native_aggregate_import_remains_diagnostic(self):
+        from test_native import suite_fixture, result_fixture
+        self.suite = suite_fixture()
+        self.records = []
+        self.save()
+        native = self.root / 'native.json'
+        write_json(native, result_fixture())
+        result = run(self.root / 'suite.json', self.root / 'lock.json', self.root / 'native-gate', claude_result=native)
+        self.assertEqual(result['exit_code'], 2)
+        self.assertTrue((self.root / 'native-gate/imported.jsonl.native-source.json').is_file())
+
+    def test_artifact_failure_cannot_turn_positive_or_synthetic_green(self):
+        result = run(self.root / 'suite.json', self.root / 'lock.json', self.root / 'artifact-gate',
+                     records=self.root / 'runs.jsonl', verify_results=[self.root / 'missing-result'])
+        self.assertEqual(result['exit_code'], 2)
+        self.assertTrue((self.root / 'artifact-gate/report.json').is_file())
+        from value_lab.claim_scope import verify_report
+        verify_report(load_json(self.root / 'artifact-gate/report.json'))
+
     def test_portable_crate_has_scoped_unsigned_statement_and_missing_evidence(self):
         result = self.crate()
         self.assertEqual(result['anchor'], 'EXTERNAL_COMMITMENT_MATCHED')
