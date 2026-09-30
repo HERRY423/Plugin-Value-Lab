@@ -3284,6 +3284,7 @@
       "value_lab/artifacts.py",
       "value_lab/authoring.py",
       "value_lab/blind_review.py",
+      "value_lab/ci_gate.py",
       "value_lab/claim_scope.py",
       "value_lab/claude_collection.py",
       "value_lab/cli.py",
@@ -3298,6 +3299,7 @@
       "value_lab/diagnostic_review.py",
       "value_lab/easy_cli.py",
       "value_lab/equivalence.py",
+      "value_lab/evidence_crate.py",
       "value_lab/exchange.py",
       "value_lab/execution.py",
       "value_lab/guidance.py",
@@ -4701,6 +4703,14 @@
     "new_grader": "equivalence",
     "limits": "Descriptive declared exposures; no automatic host component activation, causal attribution, case retirement or scientific validation",
     "unchanged": "Version 0.7.0, five golden commands, MCP signatures, freeze status and all other frozen surfaces"
+  },
+  "workflow_delivery_scope_change": {
+    "date": "2026-09-30",
+    "authorization": "User explicitly requested continuing the pictured L1-L3 workflow integration improvements",
+    "added_runtime_modules": ["ci_gate", "evidence_crate"],
+    "allowed": ["offline reusable CI action", "community module and wrapper candidates", "RO-Crate packaging and verification via module entry points", "hash-pinned release recipe preparation"],
+    "preserved": ["version 0.8.0", "main CLI and SDK signatures", "MCP and grader inventory", "eight mainline documents", "paid native execution budget block"],
+    "reference": "../examples/community/README.md"
   },
   "engineering_usability_scope_change": {
     "date": "2026-09-29",

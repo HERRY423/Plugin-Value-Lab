@@ -6,7 +6,7 @@
 
 | Boundary | Current evidence and remaining work |
 | --- | --- |
-| Hosted CI | Has run, and failed: [run 36580804328](https://github.com/HERRY423/Plugin-Value-Lab/actions/runs/36580804328). These fixes require a new run on their exact commit before claiming green CI. Local success does not replace it. |
+| Hosted CI | Onboarding fixes passed all 10 jobs at `f39e491`: [run 36723158638](https://github.com/HERRY423/Plugin-Value-Lab/actions/runs/36723158638), including 933 tests and actual Linux isolation. Later workflow-delivery changes require their own exact-commit CI evidence. The earlier [failed run](https://github.com/HERRY423/Plugin-Value-Lab/actions/runs/36580804328) is retained. |
 | HPC | Slurm, PBS Pro/OpenPBS and LSF templates run the existing real kernel gates on allocated nodes. No target cluster has been supplied or validated. See [HPC operations](OPERATIONS.md#hpc-compute-node-acceptance). |
 | Paid native eval | A historical official run reported $0.114 against a $0.09 estimate. Direct and sandboxed native launches now fail before a paid request because neither adapter supplies an independently enforced USD boundary. Export, import and offline analysis remain available. This blocking fix is not a completed metered execution adapter. |
 | Scientific execution | Requires working Linux/WSL2 bubblewrap isolation. An installed binary or a passing login-node probe does not establish compute-node compatibility. Windows kernel acceptance remains unestablished. |

@@ -2,6 +2,8 @@
 
 ## English operating guide
 
+For L1 community workflow candidates, the L2 offline GitHub Action, and L3 RO-Crate evidence export, use the [workflow delivery guide](../examples/community/README.md). Module entry points preserve the frozen main CLI and SDK. Community acceptance, package publication and scientific replication remain separate gates.
+
 Start with the [synthetic tutorial](START.md). For a real study, define the task, plugin version, outcome rules, negative controls, comparison conditions and budget before collecting results. Freeze the plan, retain independent WITH/WITHOUT sessions and original failures, then evaluate supplied records and read the usage card. Repeated prompts in one chat do not create independent arms. Cost, plugin loading, missing baselines and human review remain unknown when their records are absent.
 
 For existing artifacts, `pvl check`, `pvl aggregate` and `pvl verify` avoid creating a plugin study. Use `pvl --help` and each command's `--help` for inputs. An analysis result supports the declared computational check, not general biological correctness. Preserve old outputs and use fresh directories for revisions.

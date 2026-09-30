@@ -1,0 +1,54 @@
+# Copy to your repository's .github/workflows/pvl.yml after replacing the pin.
+name: PVL comparison gate
+on: pull_request
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  gate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - id: pvl
+        continue-on-error: true
+        uses: HERRY423/Plugin-Value-Lab/.github/actions/pvl-gate@REPLACE_WITH_REVIEWED_COMMIT
+        with:
+          suite: evidence/suite.json
+          lock: evidence/protocol.lock.json
+          records: evidence/runs.jsonl
+          output: ${{ runner.temp }}/pvl-gate-result
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pvl-gate
+          path: ${{ runner.temp }}/pvl-gate-result
+          if-no-files-found: error
+      # Optional: remove this step and pull-requests:write to use summaries only.
+      - uses: actions/github-script@v7
+        if: always() && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          PVL_SUMMARY: ${{ runner.temp }}/pvl-gate-result/summary.md
+        with:
+          script: |
+            const fs = require('fs');
+            const file = process.env.PVL_SUMMARY;
+            if (!fs.existsSync(file)) return;
+            const body = fs.readFileSync(file, 'utf8').slice(0, 60000);
+            await github.rest.issues.createComment({
+              ...context.repo, issue_number: context.issue.number, body
+            });
+      - name: Enforce the comparison verdict
+        if: always()
+        env:
+          PVL_CODE: ${{ steps.pvl.outputs.exit-code }}
+        run: |
+          case "$PVL_CODE" in
+            0) exit 0 ;;
+            1|2) exit "$PVL_CODE" ;;
+            *) echo 'PVL did not return a valid verdict'; exit 2 ;;
+          esac

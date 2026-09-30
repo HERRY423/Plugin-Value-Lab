@@ -16,6 +16,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--engine', choices=['snakemake', 'nextflow', 'all'], default='all')
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--community', action='store_true', help='Exercise reusable community module/wrapper candidates')
     args = p.parse_args()
     root = args.output.absolute()
     root.mkdir(parents=True, exist_ok=False)
@@ -41,6 +42,9 @@ def main():
                 raise RuntimeError(f'{engine} is required, but absent from PATH')
             example = root / engine
             shutil.copytree(ROOT / 'examples/workflow-integration', example)
+            if args.community:
+                source = ROOT / 'examples/community' / ('snakemake' if engine == 'snakemake' else 'nf-core')
+                shutil.copytree(source, example, dirs_exist_ok=True)
             receipt[engine + '_version'] = call(engine + '-version', [executable, '-version' if engine == 'nextflow' else '--version'], example)
             call(engine + '-fixture', [sys.executable, str(example / 'generate_fixture.py'), '--output', str(example / 'counts.h5ad')], example)
             command = ([executable, '--snakefile', 'Snakefile', '--cores', '1', '--keep-incomplete'] if engine == 'snakemake'
@@ -53,8 +57,22 @@ def main():
             np.testing.assert_array_equal(counts.X, np.tile([78, 36], (6, 1)))
             call(engine + '-resume', command + (['-resume'] if engine == 'nextflow' else []), example)
             verify_run(output, expected_id=result.commitment)
+            # Cache hits alone cannot detect mutations in published result files.
+            report_path = output / 'REPORT.md'
+            original = report_path.read_bytes()
+            report_path.write_bytes(original + b'\nmodified after engine resume\n')
+            try:
+                try:
+                    verify_run(output, expected_id=result.commitment)
+                except ValueError:
+                    pass
+                else:
+                    raise AssertionError('Post-resume mutation escaped PVL verification')
+            finally:
+                report_path.write_bytes(original)
             receipt[engine] = {'status': 'PASS', 'output_shape': [6, 2], 'exact_counts_match': True,
-                               'rerun_preserved_commitment': True, 'commitment': result.commitment}
+                               'rerun_preserved_commitment': True, 'post_resume_tamper_rejected': True,
+                               'community_candidate': args.community, 'commitment': result.commitment}
         receipt['status'] = 'PASS'
     except Exception as exc:
         receipt.update(status='FAIL', error=str(exc))
