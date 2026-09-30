@@ -27,11 +27,11 @@ jobs:
       - run: python -S -m unittest discover -s tests -p test_research_authoring.py -v
       - run: python -S -m unittest discover -s tests -p test_online_sandbox.py -v
   offline-kernel:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y bubblewrap
+      - uses: ./.github/actions/setup-isolation
       # Required real namespace acceptance: unavailable isolation FAILS, not skips.
       - run: /usr/bin/python3 -S scripts/check_kernel_acceptance.py --output "$RUNNER_TEMP/pvl-kernel-acceptance"
       - run: /usr/bin/python3 -S scripts/check_storage_limits.py --output "$RUNNER_TEMP/pvl-storage-limits"
@@ -64,17 +64,27 @@ jobs:
       - run: python scripts/validate_agent_plugin.py
       - run: python scripts/build_marketplace.py --package
       - run: python -m pip wheel . --no-deps --no-build-isolation --wheel-dir dist
-      - run: python scripts/check_engineering_usability.py --wheel dist/plugin_value_lab-0.7.0-py3-none-any.whl --output "${{ runner.temp }}/pvl-usability"
+      - name: Resolve current wheel version
+        id: wheel
+        shell: python
+        run: |
+          import os, pathlib, tomllib
+          version = tomllib.loads(pathlib.Path('pyproject.toml').read_text(encoding='utf-8'))['project']['version']
+          wheel = pathlib.Path('dist') / f'plugin_value_lab-{version}-py3-none-any.whl'
+          assert wheel.is_file(), wheel
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as stream:
+              print(f'path={wheel.as_posix()}', file=stream)
+      - run: python scripts/check_engineering_usability.py --wheel "${{ steps.wheel.outputs.path }}" --output "${{ runner.temp }}/pvl-usability"
       - uses: actions/upload-artifact@v4
         with:
           name: packages-${{ matrix.os }}-${{ matrix.python }}
           path: dist/*
   scientific-execution:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y bubblewrap python3-pip
+      - uses: ./.github/actions/setup-isolation
       - run: /usr/bin/python3 scripts/prepare_science_runtime.py --output "$RUNNER_TEMP/pvl-science-runtime"
       # Actual backend fitting inside the networkless sandbox; no skipped/mock acceptance.
       - run: /usr/bin/python3 scripts/check_science_execution.py --runtime "$RUNNER_TEMP/pvl-science-runtime" --output "$RUNNER_TEMP/pvl-science-execution"
@@ -85,7 +95,7 @@ jobs:
           if-no-files-found: error
           path: ${{ runner.temp }}/pvl-science-execution
   data-scale:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -96,7 +106,7 @@ jobs:
       # Full-matrix independent oracle and child RSS, not shape-only acceptance.
       - run: python scripts/check_data_scale.py --output "$RUNNER_TEMP/pvl-scale-50k"
       - run: python scripts/check_data_scale.py --output "$RUNNER_TEMP/pvl-scale-100200" --cells 100200
-      - run: sudo apt-get update && sudo apt-get install -y bubblewrap python3-pip
+      - uses: ./.github/actions/setup-isolation
       - run: /usr/bin/python3 scripts/prepare_science_runtime.py --output "$RUNNER_TEMP/pvl-scale-runtime"
       - run: $RUNNER_TEMP/pvl-scale-runtime/bin/python scripts/check_data_scale_execution.py --scale-directory "$RUNNER_TEMP/pvl-scale-50k" --runtime "$RUNNER_TEMP/pvl-scale-runtime" --output "$RUNNER_TEMP/pvl-scale-sandbox"
       - uses: actions/upload-artifact@v4

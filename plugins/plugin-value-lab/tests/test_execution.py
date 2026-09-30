@@ -47,7 +47,9 @@ class ExecutionTests(unittest.TestCase):
         state = detail["state"]
         def launch(argv, **kwargs):
             return REAL_POPEN([sys.executable, str(FIXTURE), *argv[1:]], **kwargs)
-        with patch("value_lab.execution.subprocess.Popen", side_effect=launch):
+        # Explicitly substitute the paid boundary only for a local synthetic
+        # process; production admission is separately tested without this mock.
+        with patch("value_lab.execution.require_budget_boundary"), patch("value_lab.execution.subprocess.Popen", side_effect=launch):
             self.engine.start(state["id"], {"authorize_execution": True, "frozen_sha256": state["frozen_sha256"]})
             # Keep the fixture substitution live until launch is observed.
             deadline = time.monotonic() + 5
@@ -76,6 +78,32 @@ class ExecutionTests(unittest.TestCase):
             self.assertIn(flag, cmd)
         self.assertNotIn("--allow-real-servers", cmd)
         self.assertFalse(self.engine.processes)
+
+    def test_unbounded_budget_refused_before_authorization_or_process(self):
+        detail = self.prepare()
+        state = detail['state']
+        path = self.engine.directory(state['id'])
+        for _ in range(2):
+            with patch('value_lab.execution.subprocess.Popen') as launch:
+                with self.assertRaisesRegex(ValidationError, 'BUDGET_BOUNDARY_UNAVAILABLE'):
+                    self.engine.start(state['id'], {'authorize_execution': True,
+                        'frozen_sha256': state['frozen_sha256'], 'budget_enforced': True})
+                launch.assert_not_called()
+        self.assertFalse((path / 'authorization.json').exists())
+        self.assertFalse((path / 'stdout.log').exists())
+        self.assertEqual(self.engine.detail(state['id'])['state']['status'], 'frozen')
+
+    def test_legacy_plan_cannot_bypass_budget_gate(self):
+        detail = self.prepare()
+        state = detail['state']
+        path = self.engine.directory(state['id'])
+        frozen = read(path / 'frozen.json')
+        frozen.pop('budget_gate')
+        save(path / 'frozen.json', frozen)
+        state['frozen_sha256'] = digest(path / 'frozen.json')
+        save(path / 'state.json', state)
+        with self.assertRaisesRegex(ValidationError, 'BUDGET_BOUNDARY_UNAVAILABLE'):
+            self.engine.start(state['id'], {'authorize_execution': True, 'frozen_sha256': state['frozen_sha256']})
 
     def test_launch_collects_raw_failure_sensitive_evidence_and_remains_incomplete(self):
         detail = self.prepare()

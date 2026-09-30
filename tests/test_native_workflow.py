@@ -282,6 +282,7 @@ class SessionTests(unittest.TestCase):
         def launch(*args, **kwargs):
             return {'exit_code': 2, 'timed_out': False, 'duration_seconds': .01}
         with patch('value_lab.native_session.sys.platform', 'linux'), \
+             patch('value_lab.native.require_budget_boundary'), \
              patch.dict(os.environ, {'PVL_MODEL_API_KEY': 'synthetic-test-key'}), \
              patch('value_lab.online_sandbox.probe_backend', return_value={'passed': True}), \
              patch('value_lab.online_sandbox.run_exchange', side_effect=launch) as run:
@@ -291,6 +292,17 @@ class SessionTests(unittest.TestCase):
             self.assertEqual(run.call_count, 1)
             self.assertEqual(finish_native_session(self.output, result['session_sha256']), observed)
 
+    def test_budget_refuses_before_credentials_probe_or_provider(self):
+        result = self.prepare()
+        with patch('value_lab.native_session.sys.platform', 'linux'), \
+             patch('value_lab.online_sandbox.ModelGateway') as gateway, \
+             patch('value_lab.online_sandbox.probe_backend') as probe:
+            with self.assertRaisesRegex(ValidationError, 'BUDGET_BOUNDARY_UNAVAILABLE'):
+                run_native_session(self.output, result['session_sha256'], execute=True)
+            gateway.assert_not_called()
+            probe.assert_not_called()
+        self.assertFalse((self.output / 'started.json').exists())
+
     def test_automatic_capture_keeps_partial_missing_trace(self):
         result = self.prepare()
         def launch(*args, **kwargs):
@@ -298,6 +310,7 @@ class SessionTests(unittest.TestCase):
                 'cases': [{'name': 'numeric', 'arms': {'with': [{'error': 'timeout', 'tracePath': str(self.output / 'retained/missing.jsonl')}], 'without': []}}]})
             return {'exit_code': 2, 'timed_out': False, 'duration_seconds': .01}
         with patch('value_lab.native_session.sys.platform', 'linux'), \
+             patch('value_lab.native.require_budget_boundary'), \
              patch.dict(os.environ, {'PVL_MODEL_API_KEY': 'synthetic-test-key'}), \
              patch('value_lab.online_sandbox.probe_backend', return_value={'passed': True}), \
              patch('value_lab.online_sandbox.run_exchange', side_effect=launch):

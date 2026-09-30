@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import os
+from datetime import datetime, timezone
 from pathlib import Path
 import platform
 import shutil
@@ -21,12 +22,20 @@ from value_lab.core import write_json
 
 def environment():
     result = {'platform': sys.platform, 'kernel': platform.release(),
+              'observed_at': datetime.now(timezone.utc).isoformat(),
+              'node': platform.node(), 'machine': platform.machine(),
               'python': platform.python_version(), 'uid': os.getuid() if hasattr(os, 'getuid') else None,
               'bubblewrap': shutil.which('bwrap'), 'runner_image': os.environ.get('ImageOS'),
               'runner_image_version': os.environ.get('ImageVersion')}
+    # Explicit scheduler identifiers only; never dump the job environment (it
+    # may contain credentials). Login-node success is not compute-node evidence.
+    result['scheduler'] = {key: os.environ[key] for key in (
+        'SLURM_JOB_ID', 'SLURM_JOB_PARTITION', 'SLURM_CLUSTER_NAME',
+        'PBS_JOBID', 'PBS_QUEUE', 'LSB_JOBID', 'LSB_QUEUE') if key in os.environ}
     for path in ('/etc/os-release', '/proc/sys/kernel/unprivileged_userns_clone',
                  '/proc/sys/kernel/apparmor_restrict_unprivileged_userns',
-                 '/proc/sys/user/max_user_namespaces', '/proc/self/limits'):
+                 '/proc/sys/user/max_user_namespaces', '/proc/self/limits',
+                 '/proc/self/attr/current', '/proc/self/cgroup'):
         try:
             result[path] = Path(path).read_text(encoding='utf-8')[:8192]
         except OSError:

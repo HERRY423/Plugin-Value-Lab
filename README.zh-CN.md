@@ -6,6 +6,8 @@
 
 [English](README.md) · [当前证据](docs/EVIDENCE.md) · [详细评测操作](docs/OPERATIONS.md)
 
+当前付费原生 eval 启动已由 PVL 预算闸门阻断：官方费用参数不能保证硬上限；离线分析和导入导出仍可用。Slurm、PBS、LSF 计算节点验收模板及英文操作说明见 [OPERATIONS](docs/OPERATIONS.md)，尚无真实集群验收。
+
 ### 🤖 路径 A：ChatGPT / Codex 或 Claude Code
 
 插件安装不包含 Python 本地包。运行 Plugin Value Lab 本地分析、`doctor` 环境检查或本地 stdio MCP 服务需要 Python 3.11+。

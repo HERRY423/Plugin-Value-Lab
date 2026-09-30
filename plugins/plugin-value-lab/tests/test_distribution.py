@@ -74,6 +74,17 @@ class DistributionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "version drift"):
             validate(self.root)
 
+    def test_current_documentation_version_drift_rejected(self):
+        for name in ('README.md', 'README.zh-CN.md', 'docs/EVIDENCE.md', 'docs/FREEZE.md'):
+            path = self.root / name
+            original = path.read_text(encoding='utf-8')
+            version = json.loads((self.root / 'plugin.json').read_text(encoding='utf-8'))['version']
+            with self.subTest(name=name):
+                path.write_text(original.replace(version, '99.0.0'), encoding='utf-8')
+                with self.assertRaisesRegex(ValueError, 'documentation version drift'):
+                    validate(self.root)
+                path.write_text(original, encoding='utf-8')
+
     def test_runtime_version_drift_rejected(self):
         (self.root / "value_lab/__init__.py").write_text('__version__ = "99.0.0"\n', encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "version drift"):

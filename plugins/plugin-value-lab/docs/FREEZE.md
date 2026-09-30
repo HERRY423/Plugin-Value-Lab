@@ -1,6 +1,12 @@
-# 六周范围冻结（当前版本 0.7.0）
+# Scope freeze / 六周范围冻结（当前版本 0.8.0）
 
-生效 **2026-09-25**，计划复盘 **2026-11-06**，共 42 天。冻结最初针对 **0.6.0**，当前项目版本为 **0.7.0**。到期不自动解冻，需要项目负责人明确记录决定。
+**Version 0.8.0.** The freeze started on 2026-09-25, with review planned for 2026-11-06. Expiry does not automatically authorize new features. The `version_series: 0.6.x` field in `feature-freeze.json` identifies the original freeze, not the current package.
+
+Correctness, security, compatibility, tests, translations and simpler instructions for existing behavior are allowed. New CLI/MCP surfaces, graders, runtime modules or product scope require an explicitly recorded scope decision. Run `python scripts/check_feature_freeze.py`; passing that structural check does not replace semantic review. Keep the eight main documents and historical receipts; do not update historical versions to imply newer validation.
+
+The 2026-09-30 onboarding repairs keep version 0.8.0 and existing interfaces: correct current version declarations, add English sections and scheduler examples for existing acceptance scripts, block unbounded native paid execution, and repair hosted CI failures. Kernel probes remain mandatory and cannot fall back to unsandboxed execution. The budget gate blocks launches pending a genuinely bounded transport; it does not claim to meter requests. These are fixes to existing paths requested by the project owner.
+
+生效 **2026-09-25**，计划复盘 **2026-11-06**，共 42 天。冻结最初针对 **0.6.0**，当前项目版本为 **0.8.0**。到期不自动解冻，需要项目负责人明确记录决定。
 
 `docs/feature-freeze.json` 的 `version_series: 0.6.x` 保留冻结的起始身份，不代表当前软件版本。后续经明确授权的范围变化分别记录在该文件的 `*_scope_change` 中；当前允许的接口以其中 `surface` 与检查结果为准。历史验收不随版本或范围变化自动升级。2026-09-28 的 P0 工作只整理证据、简化现有交接与重验已有路径，不增加运行时接口、评分器或版本号。
 

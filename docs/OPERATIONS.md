@@ -1,4 +1,55 @@
-# 五步之后，如何做真实评估
+# Real-study operations / 五步之后，如何做真实评估
+
+## English operating guide
+
+Start with the [synthetic tutorial](START.md). For a real study, define the task, plugin version, outcome rules, negative controls, comparison conditions and budget before collecting results. Freeze the plan, retain independent WITH/WITHOUT sessions and original failures, then evaluate supplied records and read the usage card. Repeated prompts in one chat do not create independent arms. Cost, plugin loading, missing baselines and human review remain unknown when their records are absent.
+
+For existing artifacts, `pvl check`, `pvl aggregate` and `pvl verify` avoid creating a plugin study. Use `pvl --help` and each command's `--help` for inputs. An analysis result supports the declared computational check, not general biological correctness. Preserve old outputs and use fresh directories for revisions.
+
+### Native eval budget gate
+
+The official `--max-cost-usd` parameter is an estimate checked after requests; it cannot bound one in-flight request. The observed $0.114 / $0.09 overrun is retained in [historical evidence](history/VALUE-EVIDENCE-20260929.zh-CN.md). PVL now refuses both direct workbench and sandboxed native paid launches with `BUDGET_BOUNDARY_UNAVAILABLE`, before credentials are read for a model request or a model process starts. Legacy frozen plans and UI/API consent cannot bypass this gate. Exported commands are planning material, not budget-safe execution instructions; manually running one outside PVL bypasses its gate.
+
+This deliberately leaves paid native execution unavailable. A future transport must intercept every model/judge/tool charge, verify an upper bound before each request, reserve it durably against a shared task budget, serialize concurrent admission and keep uncertain reservations until reconciled. Restart, retry and additional study IDs must not reset that budget. Request counts, token limits, reduced estimates and process cancellation alone do not establish a dollar cap. Offline inspection/import remains usable, and historical unsettled costs stay unknown.
+
+### HPC compute-node acceptance
+
+Core scoring and supplied-record analysis work on Windows, macOS and Linux. Scientific re-execution requires Linux (including WSL2) with working bubblewrap user, mount, PID and network namespaces. Slurm, PBS Pro/OpenPBS and LSF are submission integrations, not alternative isolation backends. Apptainer/Singularity, Docker and privileged execution are not automatic fallbacks. If site policy disables required namespaces, retain a blocked result and ask the cluster administrator for an approved execution node; PVL does not change site policy.
+
+Use a checkout visible to the compute node and Python 3.11+ plus a site-provided bubblewrap supporting `--disable-userns`. Load any site modules yourself before submission. Put output on storage that will survive the allocation; account for quotas and scratch cleanup. Run as the ordinary cluster user. No model account, API key, patient data or provider call is needed by these manufactured probes.
+
+```sh
+export PVL_SOURCE="$PWD"
+export PVL_RESULTS_ROOT="$PWD/work/hpc-acceptance"
+mkdir -p "$PVL_RESULTS_ROOT"
+# Choose ONE scheduler. Add your site's account and partition/queue flags.
+sbatch --export=ALL examples/hpc/slurm.sh
+qsub -v PVL_SOURCE,PVL_RESULTS_ROOT examples/hpc/pbs.sh
+bsub < examples/hpc/lsf.sh
+```
+
+The examples request one node, two CPUs and ten minutes. LSF memory resource units/policies and PBS resource syntax may differ by site; review them before submitting. `PVL_PYTHON` may select an absolute Python executable (also export it via PBS `-v` if used). No modules, queues, accounts or cluster names are guessed. Each job runs both real boundary gates and retains `acceptance.json`, a SHA-256 manifest, raw logs and a `.tar.gz` archive. Receipts record only selected scheduler IDs/queue, node, OS/kernel, UID, bubblewrap version, namespace settings and process restrictions; review node names/paths before sharing externally.
+
+Submission references: [Slurm sbatch](https://slurm.schedmd.com/sbatch.html), [OpenPBS qsub manual](https://github.com/openpbs/openpbs/blob/master/doc/man1/qsub.1B), [IBM LSF resource usage](https://www.ibm.com/docs/en/spectrum-lsf/10.1.0?topic=strings-usage-string). These define submission syntax; site compatibility still requires the actual probe.
+
+Check the scheduler's terminal exit status **and** `acceptance.json`: both `offline` and `online` gates must say `PASS`. A killed job, missing receipt, missing binary, permission denial or nonzero exit is not a pass. A passing compute-node probe applies only to that node image, partition, user and time; rerun after policy/runtime changes and separately run the scientific execution gate with the chosen curated runtime. A login-node test, WSL result or hosted CI result cannot certify a cluster. At present no real Slurm/PBS/LSF cluster has been validated.
+
+### Contributing and verifying CI
+
+From the source root, install `python -m pip install ".[dev,mcp,science,registry]"`, regenerate the shipped mirror with `python scripts/build_marketplace.py --generate`, then run `python scripts/check_feature_freeze.py`, `python scripts/validate_agent_plugin.py` and `python scripts/check_release_tests.py`. The release check rejects skips. Optional scientific fitting, data-scale, notebook installation and workflow-engine checks run separately in CI.
+
+The [hosted workflow](https://github.com/HERRY423/Plugin-Value-Lab/actions/workflows/ci.yml) has mandatory Windows/Linux tests and Linux kernel/science gates, with retained evidence artifacts. A red gate remains a failure. The ephemeral Ubuntu runner explicitly loads the distribution's scoped bubblewrap AppArmor profile, consistent with [Ubuntu's administrator guidance](https://discourse.ubuntu.com/t/understanding-apparmor-user-namespace-restriction/58007); it does not turn off AppArmor globally or run probes as root. This runner setup is not permission to change an HPC site's security policy. New fixes need a green run on their exact commit before acceptance is claimed.
+
+| Symptom | Next action |
+| --- | --- |
+| Output already exists | Preserve it and choose a new output directory. |
+| `SIMULATION_ONLY` | Expected for the tutorial; collect real evidence for a real claim. |
+| `INSUFFICIENT_EVIDENCE` | Read blockers and retain missing/failed observations. |
+| `BUDGET_BOUNDARY_UNAVAILABLE` | Use export/import/offline analysis; paid execution needs a bounded transport. |
+| `Operation not permitted`, userns or `RTM_NEWADDR` error | Preserve kernel logs; request administrator review of the compute-node policy. |
+| No scheduler receipt / killed job | Mark acceptance incomplete; inspect scheduler logs and allocation limits. |
+
+## 中文详细操作
 
 文件处理与已有产物检查可直接使用[简洁 CLI / Python SDK](history/ENGINEERING-USABILITY.zh-CN.md)：`pvl aggregate`、`pvl check`、`pvl verify`，无需先创建插件研究。完整插件收益评估继续使用下方五步流程。
 

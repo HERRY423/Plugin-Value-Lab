@@ -141,4 +141,8 @@ Start with `work/first-run/usage/USAGE.md` or `ENVELOPE.html`. Full scores are i
 - [Online isolation](docs/history/ONLINE-ISOLATION.zh-CN.md) · [Environment locks and replay](docs/history/ENVIRONMENT-RECORDING.zh-CN.md)
 - [Scientific metamorphic checks](docs/history/METAMORPHIC-GRADERS.zh-CN.md) · [Component comparisons](docs/history/COMPONENT-METHODOLOGY.zh-CN.md) · [Interface freeze](docs/FREEZE.md)
 
-Detailed supporting guides are currently primarily in Chinese.
+English onboarding, cost controls, HPC job templates, contributor checks and evidence limits are in [START](docs/START.md), [OPERATIONS](docs/OPERATIONS.md), [EVIDENCE](docs/EVIDENCE.md) and [FREEZE](docs/FREEZE.md). Detailed historical research records remain primarily in Chinese.
+
+[![CI](https://github.com/HERRY423/Plugin-Value-Lab/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/HERRY423/Plugin-Value-Lab/actions/workflows/ci.yml)
+
+The badge reports the main branch, not unpushed changes. Paid native eval launches are currently blocked until an independent spend boundary is available; offline analysis and export/import remain usable. See [budget and HPC requirements](docs/OPERATIONS.md).

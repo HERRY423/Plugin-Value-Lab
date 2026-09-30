@@ -19,7 +19,7 @@ import time
 import uuid
 
 from .core import ValidationError, demo_records, demo_suite, evaluate, freeze, validate_suite, load_records, load_json, suite_digest
-from .native import EVAL_DIR, build_command, export_claude, import_claude, native_report
+from .native import EVAL_DIR, build_command, export_claude, import_claude, native_report, require_budget_boundary, BUDGET_BLOCK_REASON
 from .report import write_reports
 from .usage import build_usage_card, write_usage_card
 
@@ -258,7 +258,8 @@ class Engine:
                     "suite.json": digest(path / "suite.json"), "protocol.lock.json": digest(path / "protocol.lock.json")},
                     "timeout_seconds": min(86400, len(suite["cases"]) * suite["runs_per_case"] * 2 *
                                            (suite["conditions"]["budget"].get("timeout_seconds", 180) + 120)),
-                    "warnings": export["warnings"], "estimated_ceiling_usd": maximum}
+                    "warnings": export["warnings"], "estimated_ceiling_usd": maximum,
+                    "budget_gate": {"status": "BLOCKED", "reason": BUDGET_BLOCK_REASON}}
                 save(path / "frozen.json", frozen, exclusive=True)
                 state = {"id": job, "created_at": now(), "status": "frozen", "mode": "claude",
                          "plugin": suite["plugin"], "planned_runs": len(suite["cases"]) * suite["runs_per_case"] * 2,
@@ -324,6 +325,13 @@ class Engine:
             if approval.get("frozen_sha256") != state["frozen_sha256"] or approval.get("authorize_execution") is not True:
                 raise ValidationError("启动需要针对当前冻结方案的明确授权")
             frozen = self.verify(path, state)
+            # Do not authorize or spawn an unbounded paid request, even for an
+            # old frozen plan or an API caller bypassing the workbench UI.
+            try:
+                require_budget_boundary()
+            except ValidationError:
+                self.event(path, "budget_blocked", reason=BUDGET_BLOCK_REASON, model_calls=0)
+                raise
             save(path / "authorization.json", {"at": now(), "frozen_sha256": state["frozen_sha256"],
                  "estimated_ceiling_usd": frozen["estimated_ceiling_usd"], "plugin_trust": True,
                  "scope": "Run this snapshot once using the configured Claude account; prompts/plugin sent to its model provider; hooks may execute locally; estimate may overrun; no publishing"}, exclusive=True)
@@ -361,6 +369,7 @@ class Engine:
         error = None
         started = time.monotonic()
         try:
+            require_budget_boundary()
             (path / "tmp").mkdir()
             environment = dict(os.environ)
             environment.update(TMP=str(path / "tmp"), TEMP=str(path / "tmp"), TMPDIR=str(path / "tmp"))

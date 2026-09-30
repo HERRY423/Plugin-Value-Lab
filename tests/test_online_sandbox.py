@@ -204,7 +204,9 @@ print('BRIDGE_OK')
         source = 'import time\nprint(' + repr(json.dumps(request())) + ',flush=True)\ntime.sleep(10)'
         result = self.exchange(source, gateway=gateway, timeout=.4)
         self.assertEqual(result['status'], 'FAILED')
-        self.assertTrue(result['timed_out'])
+        # Windows may report a closed pipe before the deadline. Both must
+        # terminate with retained failure; never accept an unrelated failure.
+        self.assertTrue(result['timed_out'] or result['error'] == 'Broker pipe stalled or closed', result)
         self.assertEqual(result['gateway_requests'], 1)
 
     def test_runtime_mutation_is_detectable_and_links_rejected(self):

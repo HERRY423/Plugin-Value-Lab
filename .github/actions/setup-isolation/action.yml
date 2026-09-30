@@ -1,0 +1,17 @@
+name: Prepare Ubuntu isolation prerequisites
+description: Enable the distribution's scoped bubblewrap policy on an ephemeral hosted runner
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        set -euo pipefail
+        sudo apt-get update
+        sudo apt-get install -y bubblewrap python3-pip apparmor
+        # Ubuntu's maintained profile grants namespace setup to bwrap and
+        # restricts capabilities in children. Do not disable AppArmor/userns
+        # protections globally or run PVL probes as root.
+        test -f /etc/apparmor.d/bwrap-userns-restrict
+        sudo apparmor_parser -r /etc/apparmor.d/bwrap-userns-restrict
+        bwrap --version
+        # Existing real kernel and science gates remain mandatory.
