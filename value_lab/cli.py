@@ -380,6 +380,8 @@ def main(argv=None):
     p.add_argument("--output", required=True)
     p = subs.add_parser("plan-use")
     p.add_argument("context")
+    p.add_argument("--artifacts", help="Collected files for evidence-backed task selection")
+    p.add_argument("--verifiers", help="Separate references; task planning never executes verifier programs")
     p.add_argument("--output", required=True)
     p = subs.add_parser("usage-card")
     p.add_argument("--corpus")
@@ -702,7 +704,7 @@ def main(argv=None):
             _emit(doctor())
         elif args.command == "plan-use":
             from .workflow import plan_plugin_use, write_plan
-            plan = plan_plugin_use(load_json(args.context))
+            plan = plan_plugin_use(load_json(args.context), artifact_root=args.artifacts, verifier_root=args.verifiers)
             _emit({"route": plan["route"], "executed": False, "files": write_plan(plan, args.output)})
         elif args.command == "usage-card":
             from .usage import build_usage_card, write_usage_card

@@ -561,6 +561,13 @@ def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_ro
             "evaluation_recomputed": True, "comparison_eligible": eligible,
             "measured_verdict": report["measured_verdict"],
             "provenance": copy.deepcopy(report["provenance"]),
+            "verification_receipts": [
+                {"case_id": case["id"], "arm": run["arm"], "repetition": run["repetition"],
+                 "grade_id": grade["id"], "passed": grade["passed"], "rationale": grade["rationale"],
+                 "verification": copy.deepcopy(grade["verification"])}
+                for case in report["cases"] for run in case["runs"] for grade in run["grades"]
+                if "verification" in grade
+            ],
             "summary": copy.deepcopy(summary), "run_counts": _counts(all_runs),
             "quality_estimand": copy.deepcopy(report['quality_estimand']),
             "decision_review": copy.deepcopy(report['decision_review']),

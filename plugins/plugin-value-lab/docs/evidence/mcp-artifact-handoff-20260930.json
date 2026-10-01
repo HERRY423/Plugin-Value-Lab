@@ -1,0 +1,52 @@
+{
+  "format": "pvl-local-repair-acceptance-1",
+  "date": "2026-09-30",
+  "version": "0.8.0",
+  "base_commit": "d4e0bcd82ec7fe4c5d9b3bcc4e3d076707c2d32f",
+  "scope": "Existing MCP evaluation and usage-card controlled artifact handoff",
+  "status": "LOCAL_ACCEPTANCE_PASSED",
+  "source_sha256": {
+    "value_lab/server.py": "6fcbe139ef3e0826235a603ae8594eb4026f0c2bdb54cea0c07edbbbcfc0206f",
+    "value_lab/artifacts.py": "06b86aa0f0ddef00224116f242bff674d8afad8614dbd968a82762f8072b131f",
+    "value_lab/usage.py": "fc85acd46da9b9eb9730c03476fe8ae16e427b498f28c15f8b2b0290228d2bff",
+    "tests/test_mcp_artifacts.py": "b999f650fbe6fcb0ce5a3ef2c1f5558c393b0481cb90c2adeea01f5400ae6313"
+  },
+  "validation": {
+    "full_suite_command": "python scripts/check_release_tests.py",
+    "tests_run": 953,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "elapsed_seconds": 244.768,
+    "new_handoff_tests": 9,
+    "real_local_stdio": true,
+    "fixture_origin": "Manufactured CSV/reference files; actual bytes and MCP transport, not real scientific observations",
+    "checks": [
+      "Both existing tools expose optional roots and recompute real artifact bytes",
+      "Usage cards retain per-grade verification receipts and input provenance",
+      "Correct BH arithmetic passes; freshly collected incorrect BH arithmetic fails",
+      "Changed artifacts or scorer hashes and missing files stay unresolved",
+      "Tool parameters cannot authorize absent roots or escape configured roots",
+      "Private scenario receipts survive the complete MCP path",
+      "Executable and container graders remain unresolved, including nested scenarios",
+      "Legacy object-only calls remain compatible",
+      "Local executable verification outside MCP retains its existing behavior",
+      "Feature-freeze, plugin manifest, distribution mirror and whitespace checks pass"
+    ]
+  },
+  "deployment": {
+    "repository_distribution_mirror_updated": true,
+    "installed_host_updated": false,
+    "requires_host_material_roots_and_restart": true,
+    "github_pushed": false,
+    "release_published": false
+  },
+  "limits": {
+    "chatgpt_cloud_host_acceptance": "NOT_TESTED",
+    "scientific_validity": "NOT_ESTABLISHED",
+    "independent_validation": false,
+    "plugin_benefit": "NOT_ESTABLISHED",
+    "host_wide_filesystem_isolation": "NOT_CLAIMED"
+  },
+  "paid_capability_invocations": 0
+}

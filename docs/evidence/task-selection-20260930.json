@@ -1,0 +1,75 @@
+{
+  "format": "pvl-local-task-selection-acceptance-1",
+  "date": "2026-09-30",
+  "version": "0.8.0",
+  "base_commit": "d4e0bcd82ec7fe4c5d9b3bcc4e3d076707c2d32f",
+  "scope": "Evidence-backed minimum-dependency task plans through the existing planning entry point and controlled artifact handoff",
+  "status": "LOCAL_ACCEPTANCE_PASSED",
+  "validation": {
+    "full_suite_command": "python scripts/check_release_tests.py",
+    "new_selection_tests": 31,
+    "real_local_stdio": true,
+    "fixture_origin": "Manufactured task inputs, records and reference files; non-synthetic labels used only inside gate tests are not real-world evidence",
+    "checks": [
+      "Native and existing-script sufficiency; partial-plugin plan versus full plugin",
+      "Whole-plan integration evidence; no composition from unrelated stage passes",
+      "Frozen catalog/input/conditions/policy/component bindings and original paired engine",
+      "All planned rows, failed observations, cost unknowns and conflicts preserved",
+      "No hidden cost tie-break, missing baseline exclusion or truncated catalog search",
+      "Transitive workflow dependencies counted once; missing/cyclic dependencies rejected",
+      "Actual artifact receipts via CLI and real local MCP transport; unauthorized roots denied",
+      "Synthetic records cannot select a real adoption plan",
+      "Prior artifact handoff and legacy workflow regressions included in full suite"
+    ],
+    "tests_run": 984,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "elapsed_seconds": 296.119,
+    "log": "pvl-task-selection-final-tests.log (local workspace)",
+    "checks_static": [
+      "Feature freeze PASS",
+      "Agent Plugins manifest PASS, version 0.8.0",
+      "Marketplace mirror verified",
+      "git diff --check PASS"
+    ],
+    "intermediate_run": "An earlier 982-test run overlapped an identity-format edit and failed two CLI/MCP cross-process binding assertions; after source and mirror stabilization, the final 984-test run passed."
+  },
+  "demonstration": {
+    "command": "python examples/task-selection/demo.py --output NEW_DIRECTORY",
+    "stages": 2,
+    "complete_plans": 9,
+    "paired_studies": 5,
+    "status": "SIMULATION_ONLY",
+    "selected_plan_sha256": null,
+    "synthetic_passing_plan": "plugin preparation + existing script verification",
+    "real_scientific_observations": 0
+  },
+  "deployment": {
+    "repository_distribution_mirror_updated": true,
+    "installed_host_updated": false,
+    "github_pushed": false,
+    "release_published": false
+  },
+  "limits": {
+    "minimum_scope": "Declared finite catalog and exact frozen task only; objective is distinct new plugins then distinct total plugins",
+    "observations": "Submitted identity and execution declarations are not authenticated",
+    "chatgpt_cloud_host_acceptance": "NOT_TESTED",
+    "scientific_validity": "NOT_ESTABLISHED",
+    "independent_validation": false,
+    "researcher_time_saving": "NOT_ESTABLISHED",
+    "plugin_causal_benefit": "NOT_ESTABLISHED"
+  },
+  "paid_capability_invocations": 0,
+  "source_sha256": {
+    "value_lab/cli.py": "dde6717e750bc00c96e669aa2369246702bd1bb9fa0cf3a37fac838ec565f622",
+    "tests/test_mcp_artifacts.py": "b999f650fbe6fcb0ce5a3ef2c1f5558c393b0481cb90c2adeea01f5400ae6313",
+    "value_lab/task_selection.py": "b15fa95ae8f5afc65c4e0538c8e0cd9f5e23c39d480f287122ba3d93fc10586a",
+    "value_lab/artifacts.py": "06b86aa0f0ddef00224116f242bff674d8afad8614dbd968a82762f8072b131f",
+    "value_lab/usage.py": "fc85acd46da9b9eb9730c03476fe8ae16e427b498f28c15f8b2b0290228d2bff",
+    "value_lab/workflow.py": "a4f0f703289eb44d9669d15c2b35049fb71b8ed3e91a8efe0ecf9285e3291cd7",
+    "value_lab/server.py": "9bf00b943c7f573a8c4866c3baf0675a2b712412c8b99d5a5c1c4c3b7830fe96",
+    "examples/task-selection/demo.py": "f51d1fe9539670317916e0287c0389c9adf3da695bad6b5c881657e8cd26ae41",
+    "tests/test_task_selection.py": "a3b8850170ad856dea21a187148cf24b4ae98f9c109a49bdf4d0f0dcb61cd7ed"
+  }
+}
