@@ -89,7 +89,10 @@ class BackedTests(unittest.TestCase):
         source = self.source()
         with self.h5.File(source, 'r+') as f:
             for name in ('obs/_index', 'var/_index', 'obs/sample/categories'):
-                labels = f[name].asstr()[:]
+                node = f[name]
+                # New anndata/pandas may already encode nullable strings as a
+                # group. Read via its public encoding reader in either case.
+                labels = self.np.asarray(self.ad.io.read_elem(node), dtype=object)
                 del f[name]
                 group = f.create_group(name)
                 group.attrs.update({'encoding-type': 'nullable-string-array', 'encoding-version': '0.1.0', 'na-value': 'NaN'})

@@ -1,0 +1,7 @@
+name: pvl-aggregate
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python >=3.11
+  - plugin-value-lab =0.8.0

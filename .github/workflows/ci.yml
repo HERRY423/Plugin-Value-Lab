@@ -27,11 +27,11 @@ jobs:
       - run: python -S -m unittest discover -s tests -p test_research_authoring.py -v
       - run: python -S -m unittest discover -s tests -p test_online_sandbox.py -v
   offline-kernel:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y bubblewrap
+      - uses: ./.github/actions/setup-isolation
       # Required real namespace acceptance: unavailable isolation FAILS, not skips.
       - run: /usr/bin/python3 -S scripts/check_kernel_acceptance.py --output "$RUNNER_TEMP/pvl-kernel-acceptance"
       - run: /usr/bin/python3 -S scripts/check_storage_limits.py --output "$RUNNER_TEMP/pvl-storage-limits"
@@ -64,17 +64,27 @@ jobs:
       - run: python scripts/validate_agent_plugin.py
       - run: python scripts/build_marketplace.py --package
       - run: python -m pip wheel . --no-deps --no-build-isolation --wheel-dir dist
-      - run: python scripts/check_engineering_usability.py --wheel dist/plugin_value_lab-0.7.0-py3-none-any.whl --output "${{ runner.temp }}/pvl-usability"
+      - name: Resolve current wheel version
+        id: wheel
+        shell: python
+        run: |
+          import os, pathlib, tomllib
+          version = tomllib.loads(pathlib.Path('pyproject.toml').read_text(encoding='utf-8'))['project']['version']
+          wheel = pathlib.Path('dist') / f'plugin_value_lab-{version}-py3-none-any.whl'
+          assert wheel.is_file(), wheel
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as stream:
+              print(f'path={wheel.as_posix()}', file=stream)
+      - run: python scripts/check_engineering_usability.py --wheel "${{ steps.wheel.outputs.path }}" --output "${{ runner.temp }}/pvl-usability"
       - uses: actions/upload-artifact@v4
         with:
           name: packages-${{ matrix.os }}-${{ matrix.python }}
           path: dist/*
   scientific-execution:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y bubblewrap python3-pip
+      - uses: ./.github/actions/setup-isolation
       - run: /usr/bin/python3 scripts/prepare_science_runtime.py --output "$RUNNER_TEMP/pvl-science-runtime"
       # Actual backend fitting inside the networkless sandbox; no skipped/mock acceptance.
       - run: /usr/bin/python3 scripts/check_science_execution.py --runtime "$RUNNER_TEMP/pvl-science-runtime" --output "$RUNNER_TEMP/pvl-science-execution"
@@ -85,7 +95,7 @@ jobs:
           if-no-files-found: error
           path: ${{ runner.temp }}/pvl-science-execution
   data-scale:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -96,7 +106,7 @@ jobs:
       # Full-matrix independent oracle and child RSS, not shape-only acceptance.
       - run: python scripts/check_data_scale.py --output "$RUNNER_TEMP/pvl-scale-50k"
       - run: python scripts/check_data_scale.py --output "$RUNNER_TEMP/pvl-scale-100200" --cells 100200
-      - run: sudo apt-get update && sudo apt-get install -y bubblewrap python3-pip
+      - uses: ./.github/actions/setup-isolation
       - run: /usr/bin/python3 scripts/prepare_science_runtime.py --output "$RUNNER_TEMP/pvl-scale-runtime"
       - run: $RUNNER_TEMP/pvl-scale-runtime/bin/python scripts/check_data_scale_execution.py --scale-directory "$RUNNER_TEMP/pvl-scale-50k" --runtime "$RUNNER_TEMP/pvl-scale-runtime" --output "$RUNNER_TEMP/pvl-scale-sandbox"
       - uses: actions/upload-artifact@v4
@@ -130,6 +140,7 @@ jobs:
           "$RUNNER_TEMP/nextflow" -version
       # Runs native engines and resumes; absent engines or mismatched counts fail.
       - run: python scripts/check_workflow_integration.py --engine all --output "$RUNNER_TEMP/pvl-workflows"
+      - run: python scripts/check_workflow_integration.py --engine all --community --output "$RUNNER_TEMP/pvl-community-workflows"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -139,4 +150,48 @@ jobs:
             ${{ runner.temp }}/pvl-workflows/acceptance.json
             ${{ runner.temp }}/pvl-workflows/*.stdout
             ${{ runner.temp }}/pvl-workflows/*.stderr
+            ${{ runner.temp }}/pvl-community-workflows/acceptance.json
+            ${{ runner.temp }}/pvl-community-workflows/*.stdout
+            ${{ runner.temp }}/pvl-community-workflows/*.stderr
+  community-delivery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install build twine roc-validator==0.11.2 pyshacl==0.30.1
+      - run: python -m build --outdir "$RUNNER_TEMP/community-release"
+      - run: python -m twine check "$RUNNER_TEMP/community-release/"*
+      - run: python scripts/prepare_community_release.py --sdist "$RUNNER_TEMP/community-release/plugin_value_lab-0.8.0.tar.gz" --output "$RUNNER_TEMP/community-recipe"
+      - run: python scripts/value_lab.py demo --output delivery-demo
+      - id: gate
+        uses: ./.github/actions/pvl-gate
+        continue-on-error: true
+        with:
+          suite: delivery-demo/suite.json
+          lock: delivery-demo/protocol.lock.json
+          records: delivery-demo/runs.jsonl
+          output: delivery-gate
+      - name: Synthetic evidence must return 2
+        env:
+          PVL_CODE: ${{ steps.gate.outputs.exit-code }}
+        run: test "$PVL_CODE" = 2
+      - run: python scripts/check_evidence_crate.py --study delivery-demo --output delivery-crate
+      - run: python scripts/check_crate_standard.py --crate delivery-crate --output delivery-standard
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: community-delivery
+          if-no-files-found: error
+          path: |
+            delivery-gate
+            delivery-crate
+            delivery-crate.acceptance.json
+            delivery-standard/acceptance.json
+            delivery-standard/valid.json
+            delivery-standard/invalid.json
+            ${{ runner.temp }}/community-release
+            ${{ runner.temp }}/community-recipe
   # No model calls, account credentials or published releases in CI.

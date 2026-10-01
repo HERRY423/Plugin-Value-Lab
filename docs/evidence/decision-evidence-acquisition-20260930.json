@@ -1,0 +1,92 @@
+{
+  "format": "pvl-local-evidence-acquisition-acceptance-1",
+  "date": "2026-09-30",
+  "version": "0.8.0",
+  "base_commit": "d4e0bcd82ec7fe4c5d9b3bcc4e3d076707c2d32f",
+  "scope": "Prospective decision-relevant batch planning with separate screening and whole-task confirmation through the existing planner",
+  "status": "LOCAL_ACCEPTANCE_PASSED",
+  "validation": {
+    "command": "python scripts/check_release_tests.py",
+    "new_tests": 32,
+    "real_local_stdio": true,
+    "fixture_origin": "Manufactured records and files. Local labels inside unit tests exercise gates only; they are not actual researcher or plugin observations.",
+    "checks": [
+      "Frozen mother protocol/catalog/rules/budget and prospective per-batch suite lock",
+      "Next batch selected from current smallest unresolved candidates using observed gates and a declared cost/relevance rule",
+      "Resolved identical gates and irrelevant full comparisons deferred; ties retained",
+      "Started matrices, negative controls, failures, cost unknowns and full history preserved",
+      "Pending batch reservation, cumulative budget fitting, cap overruns and valid stop-without-success",
+      "Disjoint screening/confirmation declared input hashes and case identities, renamed copies rejected",
+      "Full held-out stage/integration confirmation with actual files over local MCP; screening closes on confirmation",
+      "Screen/confirmation conflicts halt advice; synthetic trajectories never authorize adoption",
+      "CLI, original planner, controlled file roots and no-program-execution policy retained"
+    ],
+    "tests_run": 1016,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "elapsed_seconds": 294.314,
+    "full_test_log": "pvl-evidence-acquisition-tests.log (local workspace)",
+    "full_test_workflow_sha256": "9ae619606b56ce13ca309237127f303cb67e3bbf64e7f085e648be2d3a86b7f8",
+    "final_presentation_followup": {
+      "change": "State-specific next-step text and explicit synthetic heading after the full run; acquisition decisions unchanged.",
+      "tests_run": 88,
+      "groups": {
+        "evidence_acquisition": 32,
+        "legacy_workflow": 25,
+        "task_selection": 31
+      },
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "static_checks": [
+      "Feature freeze PASS",
+      "Agent Plugins manifest PASS at version 0.8.0",
+      "Marketplace mirror verified",
+      "git diff --check PASS"
+    ]
+  },
+  "demonstration": {
+    "command": "python examples/task-selection/acquisition_demo.py --output NEW_DIRECTORY",
+    "screening_checks_declared": 5,
+    "confirmation_checks_declared": 5,
+    "screening_batches_started": 5,
+    "confirmation_batches_started": 1,
+    "planned_runs_started": 26,
+    "whole_confirmation_only_full_matrix_runs": 30,
+    "never_started_confirmation_checks": 4,
+    "state": "STOP_CHOICE_STABLE",
+    "evidence_status": "SIMULATION_ONLY",
+    "selected_plan_sha256": null,
+    "cost_saving": "NOT_ESTABLISHED",
+    "same_error_risk": "NOT_ESTABLISHED"
+  },
+  "deployment": {
+    "repository_mirror_updated": true,
+    "installed_host_updated": false,
+    "github_pushed": false,
+    "release_published": false,
+    "default_mcp_tools": 6
+  },
+  "limits": {
+    "priority": "Deterministic cost cap per affected frontier plan; not probability or expected information gain",
+    "minimum_scope": "Observed held-out confirmation among screening survivors, not a global or full-catalog optimum",
+    "statistical_guarantee": "NONE",
+    "researcher_efficiency": "NOT_ESTABLISHED",
+    "scientific_validity": "NOT_ESTABLISHED",
+    "independent_validation": false,
+    "chatgpt_cloud_acceptance": "NOT_TESTED",
+    "pre_registration_and_non_exposure": "DECLARED_NOT_AUTHENTICATED",
+    "billing": "Submitted full-cost totals or reservations, not authenticated settlements",
+    "cross_task_transfer": "Not implemented by relabeling old studies; new acquisition starts prospectively"
+  },
+  "paid_capability_invocations": 0,
+  "source_sha256": {
+    "value_lab/server.py": "f3968a6a576bfb3df6ee846fbfa9f81723e95d53a01c6f48654c1edaf6096a24",
+    "value_lab/workflow.py": "6718c18fc39c44cfa1e49a6bc9dab556ece408ddae94bf2524ba15ca7ebfc2de",
+    "examples/task-selection/acquisition_demo.py": "006fd70ff5c949dae11acd1cf2d1cebf6fbeac4eb957ab661987e6e9bcb5a495",
+    "tests/test_evidence_acquisition.py": "5a298f96c94e7666c0773bb20004dfacce3e727c485693227177030ab5053fb1",
+    "value_lab/evidence_acquisition.py": "724976d9dfd4afbc17426e3b440e6102f0e70e1555efcf920f26d583b49121f9"
+  }
+}

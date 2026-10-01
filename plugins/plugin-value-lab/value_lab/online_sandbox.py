@@ -160,6 +160,7 @@ def probe_backend(config, plugin, output, control, backend_path, targets, public
     bridge = r'C:\pvl-control\model_bridge.py' if windows else '/pvl-control/model_bridge.py'
     executable = prefix + ('\\' if windows else '/') + config['executable'].replace('/', '\\' if windows else '/')
     payload = {'targets': [str(p) for p in targets], 'executable': executable, 'windows': windows,
+               'allowed_mounts': [str(plugin), str(output / 'native'), str(output / 'retained')],
                'parent_net_ns': None if windows else os.stat('/proc/self/ns/net').st_ino}
     name = 'pvl-' + uuid.uuid4().hex
     argv = sandbox_command(config, plugin, output, control,
@@ -179,7 +180,7 @@ def probe_backend(config, plugin, output, control, backend_path, targets, public
                 or len(receipt['checks']) < len(targets) + 4):
             raise ValueError('boundary or native CLI version check failed')
     except (KeyError, ValueError, TypeError) as exc:
-        raise ValidationError('Sandbox boundary preflight did not pass') from exc
+        raise ValidationError('Sandbox boundary preflight did not pass; check private paths, mount ancestors, network namespace and CLI version') from exc
     return receipt
 
 
@@ -502,6 +503,9 @@ def prepare_session(directory, plan_digest, plugin, invocation, output, *, refer
 
 def run_session(root, frozen, pin):
     from .native_session import _sources, finish_native_session
+    from .native import require_budget_boundary
+    # Network/request/token limits alone do not enforce dollars. Refuse before
+    # reading credentials, starting a child or contacting a model provider.
     if frozen.get('isolation_profile') != PROFILE:
         raise ValidationError('Legacy online masking plans cannot execute; prepare a networkless revision')
     config = validate_config(frozen['sandbox'])
@@ -520,6 +524,7 @@ def run_session(root, frozen, pin):
     if runtime_pin != frozen['runtime_pin']:
         raise ValidationError('Frozen runtime changed')
     _sources(frozen['evidence_plan'], frozen['evidence_plan_sha256'], frozen['plugin'], frozen['references'])
+    require_budget_boundary()
     gateway = ModelGateway(config['gateway'], os.environ.get(config['gateway']['api_key_env']))
     probe_backend(config, frozen['plugin'], root, root / 'control', frozen['backend'], frozen['probe_targets'], root / 'public-plugin')
     # Reserve the entire session exclusively before any model request.

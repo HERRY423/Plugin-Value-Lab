@@ -1,0 +1,57 @@
+name: PVL evidence gate
+description: Offline frozen comparison and SDK artifact verification; no paid host execution
+inputs:
+  suite:
+    description: Frozen suite JSON or declarative directory
+    required: true
+  lock:
+    description: Retained protocol lock
+    required: true
+  records:
+    description: Existing observed records (exclusive with claude-result)
+  claude-result:
+    description: Existing official eval JSON (diagnostic import only)
+  output:
+    description: Fresh output directory
+    default: pvl-gate-result
+  artifacts:
+    description: Collected artifact root
+  corpus:
+    description: Separately retained answer-key root
+  cost-ledger:
+    description: Complete cost ledger if applicable
+  verify-result:
+    description: Optional SDK result directory to independently verify
+outputs:
+  exit-code:
+    description: 0 positive local signal, 1 no gain or regression, 2 insufficient or simulation
+    value: ${{ steps.gate.outputs.exit-code }}
+runs:
+  using: composite
+  steps:
+    - id: gate
+      shell: bash
+      env:
+        PVL_ACTION: ${{ github.action_path }}
+        PVL_SUITE: ${{ inputs.suite }}
+        PVL_LOCK: ${{ inputs.lock }}
+        PVL_RECORDS: ${{ inputs.records }}
+        PVL_CLAUDE: ${{ inputs.claude-result }}
+        PVL_OUTPUT: ${{ inputs.output }}
+        PVL_ARTIFACTS: ${{ inputs.artifacts }}
+        PVL_CORPUS: ${{ inputs.corpus }}
+        PVL_LEDGER: ${{ inputs.cost-ledger }}
+        PVL_VERIFY: ${{ inputs.verify-result }}
+      run: |
+        args=(--suite "$PVL_SUITE" --lock "$PVL_LOCK" --output "$PVL_OUTPUT")
+        if [[ -n "$PVL_RECORDS" ]]; then args+=(--records "$PVL_RECORDS"); fi
+        if [[ -n "$PVL_CLAUDE" ]]; then args+=(--claude-result "$PVL_CLAUDE"); fi
+        if [[ -n "$PVL_ARTIFACTS" ]]; then args+=(--artifacts "$PVL_ARTIFACTS"); fi
+        if [[ -n "$PVL_CORPUS" ]]; then args+=(--corpus "$PVL_CORPUS"); fi
+        if [[ -n "$PVL_LEDGER" ]]; then args+=(--cost-ledger "$PVL_LEDGER"); fi
+        if [[ -n "$PVL_VERIFY" ]]; then args+=(--verify-result "$PVL_VERIFY"); fi
+        code=0
+        python -I "$PVL_ACTION/../../../scripts/run_ci_gate.py" "${args[@]}" || code=$?
+        echo "exit-code=$code" >> "$GITHUB_OUTPUT"
+        if [[ -f "$PVL_OUTPUT/summary.md" ]]; then cat "$PVL_OUTPUT/summary.md" >> "$GITHUB_STEP_SUMMARY"; fi
+        exit "$code"

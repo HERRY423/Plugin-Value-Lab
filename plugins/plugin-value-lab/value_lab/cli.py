@@ -62,8 +62,13 @@ def doctor():
             "optional_pseudobulk_reference_available": importlib.util.find_spec("pydeseq2") is not None,
             "optional_h5ad_available": importlib.util.find_spec("anndata") is not None,
             "native_eval_executed": False, "host_plugin_installation_verified": False,
+            "native_paid_execution": "BLOCKED_BUDGET_BOUNDARY_UNAVAILABLE",
+            "kernel_isolation_verified": False,
+            "kernel_acceptance_command": "python3 -S scripts/check_kernel_acceptance.py --output FRESH_OUTPUT_DIRECTORY",
             "notes": ["Core, reports and review packets use only the Python standard library.",
-                      "Native Windows shell-granting Claude evals need WSL2; read-only cases do not grant shell."]}
+                      "Re-execution requires Linux/WSL2 and working bubblewrap namespaces; no host-execution fallback.",
+                      "On HPC run kernel acceptance inside the allocated compute job; doctor is not a kernel probe.",
+                      "Native paid launches are blocked: official cost estimates cannot enforce a hard USD cap."]}
 
 
 def main(argv=None):
@@ -375,6 +380,8 @@ def main(argv=None):
     p.add_argument("--output", required=True)
     p = subs.add_parser("plan-use")
     p.add_argument("context")
+    p.add_argument("--artifacts", help="Collected files for evidence-backed task selection")
+    p.add_argument("--verifiers", help="Separate references; task planning never executes verifier programs")
     p.add_argument("--output", required=True)
     p = subs.add_parser("usage-card")
     p.add_argument("--corpus")
@@ -697,7 +704,7 @@ def main(argv=None):
             _emit(doctor())
         elif args.command == "plan-use":
             from .workflow import plan_plugin_use, write_plan
-            plan = plan_plugin_use(load_json(args.context))
+            plan = plan_plugin_use(load_json(args.context), artifact_root=args.artifacts, verifier_root=args.verifiers)
             _emit({"route": plan["route"], "executed": False, "files": write_plan(plan, args.output)})
         elif args.command == "usage-card":
             from .usage import build_usage_card, write_usage_card

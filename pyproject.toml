@@ -6,8 +6,15 @@ build-backend = "setuptools.build_meta"
 name = "plugin-value-lab"
 version = "0.8.0"
 description = "Evidence-bounded paired plugin value evaluation"
+readme = "README.md"
+license = {file = "LICENSE"}
 requires-python = ">=3.11"
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/HERRY423/Plugin-Value-Lab"
+Repository = "https://github.com/HERRY423/Plugin-Value-Lab"
+Issues = "https://github.com/HERRY423/Plugin-Value-Lab/issues"
 
 [project.optional-dependencies]
 mcp = ["mcp>=1.12,<2"]

@@ -86,4 +86,25 @@ This is trusted local code, **not a security sandbox**: review it and its depend
 python scripts/value_lab.py evaluate suite.json runs.jsonl --lock protocol.lock.json --artifacts collected-files --verifiers trusted-checks --output report
 ```
 
-`report.json` includes per-rule verification receipts. Re-evaluation reads the bytes again. `usage-card` accepts the same `--artifacts` and `--verifiers` options; `compare-studies` accepts `--before-artifacts`, `--after-artifacts` and `--verifiers`. The MCP object-only interface, text calibration, and other APIs without explicit artifact roots leave these rules unresolved; they never execute arbitrary files. The older Claude aggregate export refuses these unsupported graders rather than lowering them to text checks. The separate [read-only Claude collector](CLAUDE-COLLECTION.md) captures native final output as artifact ID `answer`. Codex collection also captures the final answer as `answer`; additional file outputs can be declared in its suite.
+`report.json` includes per-rule verification receipts. Re-evaluation reads the bytes again. `usage-card` accepts the same `--artifacts` and `--verifiers` options; `compare-studies` accepts `--before-artifacts`, `--after-artifacts` and `--verifiers`. Text calibration and APIs without artifact roots leave file checks unresolved. The older Claude aggregate export refuses these unsupported graders rather than lowering them to text checks. The separate [read-only Claude collector](CLAUDE-COLLECTION.md) captures native final output as artifact ID `answer`. Codex collection also captures the final answer as `answer`; additional file outputs can be declared in its suite.
+
+## Controlled MCP file handoff (0.8.0)
+
+The two existing tools, `evaluate_plugin_value` and `build_plugin_usage_card`, now accept optional `artifact_root` and `verifier_root` selectors. Before starting the local MCP server, the host must authorize existing absolute directories through its server environment:
+
+```json
+{
+  "PVL_ARTIFACT_ROOT": "C:/research/pvl-handoff/artifacts",
+  "PVL_VERIFIER_ROOT": "C:/research/pvl-handoff/scorers"
+}
+```
+
+These are illustrative paths, not shipped defaults. The host stages the actual authorized output bytes and collected hashes under the artifact directory, and separately retained frozen references under the scorer directory. Configure these variables on the MCP server process (alongside its existing environment) and restart the connection. Do not use the whole home directory or drive. The directories must be non-overlapping. Keep scorer material outside the evaluated Agent's inputs; this filesystem boundary is not a claim of host-wide blinding. Embedded use can pass the same roots to `create_server(artifact_root=..., verifier_root=...)`.
+
+The task-selection increment also uses these same optional selectors on the existing `plan_plugin_use` tool when recomputing `context.task_selection` evidence. It grants no additional filesystem or execution authority; see [task selection](TASK-SELECTION.zh-CN.md).
+
+Omitting selectors uses the host-configured directories. A selector can narrow to a relative POSIX subdirectory (for example `study-1`) or an absolute path inside its corresponding authorized root. Tool arguments cannot grant file access, select a parent/outside directory, or follow linked descendants. Do not send a workstation path to a remote server and assume it can read it: the files must exist in the server's authorized filesystem. If the host cannot provide that handoff, explain the missing access and retain UNKNOWN; output text and pasted success Booleans are not substitutes.
+
+Run artifact entries still use relative paths and collected SHA-256 digests as above. Reference paths remain relative to the selected scorer directory and bind frozen SHA-256 digests. Both tools read the files afresh on every call. Evaluation returns per-grade `verification` receipts; usage cards retain them in `source.verification_receipts` with case, arm, repetition, grade, outcome and rationale. Card `source.provenance` binds the suite, records and supplied cost ledger. Receipts bind checked artifact bytes and rule hashes, with reference hashes where the existing verifier supplies them. They do not authenticate the producer, establish independent truth or certify biological validity.
+
+Unconfigured object-only calls remain compatible and unresolved file checks remain unresolved. Invalid selectors produce a tool error; missing files, stale artifact/reference digests and unavailable dependencies remain unknown. A validly collected file that fails a computational rule remains a measured failure. MCP never runs `executable` or `exec` graders, including private scenario children; those grades stay unknown even if scorer files are available. Use the separate, explicitly authorized local workflow for program execution. No uploads, model calls or new MCP tools are added.

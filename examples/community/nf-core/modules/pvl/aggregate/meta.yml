@@ -1,0 +1,28 @@
+name: pvl_aggregate
+description: Aggregate raw donor-paired counts and verify retained PVL result bytes
+keywords: [pseudobulk, provenance]
+tools:
+  - plugin-value-lab:
+      description: Evidence-bounded scientific checks
+      homepage: https://github.com/HERRY423/Plugin-Value-Lab
+      licence: [Apache-2.0]
+input:
+  - meta:
+      type: map
+      description: Sample metadata map with an id
+  - counts:
+      type: file
+      description: Raw counts h5ad; staged by copy
+  - settings:
+      type: file
+      description: Explicit biological settings JSON
+output:
+  - result:
+      type: directory
+      description: Complete SDK result with byte commitment and report
+  - versions:
+      type: file
+      description: Software version
+      pattern: versions.yml
+authors: ["@HERRY423"]
+maintainers: ["@HERRY423"]

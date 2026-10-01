@@ -1,4 +1,14 @@
-# 已安装插件的对话入口与本地教程
+# Getting started / 已安装插件的对话入口与本地教程
+
+## English tutorial
+
+If PVL is installed and callable in ChatGPT, start with the [README conversation example](../README.md). Give the plugin name, real task and success criteria. The host organizes available evidence; PVL does not automatically launch paired sessions.
+
+For a local demonstration, unpack the project, open a terminal at its root and use Python 3.11+. Run `python -m value_lab demo --output work/demo` and open `work/demo/REPORT.md`. This uses synthetic BH data and makes no model calls. For a complete synthetic plugin comparison, follow the five commands in the [developer appendix](../README.md#developer-appendix-local-reproduction-and-file-reports). Read `usage/USAGE.md`, `report/report.md` and `comparison.json`; the expected tutorial verdict is `SIMULATION_ONLY`. Reuse a fresh output directory for every attempt.
+
+Windows, macOS and Linux can analyze supplied records with the standard library. Optional science/MCP dependencies are separate. This tutorial needs no API key, model account, WSL or sandbox. Re-execution has stricter requirements: read [operations](OPERATIONS.md) before a real study.
+
+For a non-author usability trial, ask a person who did not build PVL to start from the README and produce their first usage card without a demonstration. Record package hash, OS/Python, first-open time, installation time, first-file time, time to explain a negative finding, every error, help request and intervention. Stop after 30 minutes if stuck; retain failure and abandonment. Report assisted completion separately. Maintainer/AI timings are not non-author observations, and generating a card is not evidence of plugin benefit. The table below can be used as the participant record; missing observations remain unknown.
 
 **已经在 ChatGPT 中安装并能调用 PVL：从 [README 的对话示例](../README.zh-CN.md)开始。** 告诉 ChatGPT 待评估的插件名称和实际任务，由它组织可行的评测并调用已暴露工具。无需先走下方终端教程。工具可调用不代表宿主具备独立两臂运行与完整证据采集能力；缺少条件时保留未知。
 

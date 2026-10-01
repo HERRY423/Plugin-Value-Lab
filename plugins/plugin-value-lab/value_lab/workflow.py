@@ -66,12 +66,102 @@ def _selected(value):
             "version": value.get("version"), "observed_at": value.get("observed_at")}
 
 
-def plan_plugin_use(context, now=None):
+def plan_plugin_use(context, now=None, *, artifact_root=None, verifier_root=None):
     if not isinstance(context, dict) or type(context.get("schema_version")) is not int or context["schema_version"] != 1:
         raise ValidationError("context.schema_version must be 1")
     intent = context.get("intent")
     if intent not in ("choose", "use", "evaluate", "manage"):
         raise ValidationError("intent must be choose, use, evaluate or manage")
+    if "evidence_acquisition" in context and "task_selection" not in context:
+        raise ValidationError("Evidence acquisition requires an explicit task_selection catalog")
+    if "evidence_bridge" in context and ("task_selection" not in context or "evidence_acquisition" in context):
+        raise ValidationError("Evidence bridge requires a target task_selection and a separate mode from screening acquisition")
+    if "task_selection" in context:
+        if intent != "choose" or context.get("selected_plugin") is not None:
+            raise ValidationError("Task selection requires a general choose request; do not replace an explicit provider or management request")
+        from .task_selection import select_task_plan
+        if "evidence_bridge" in context:
+            from .evidence_bridge import plan_bridge
+            bridge = plan_bridge(context["task_selection"], context["evidence_bridge"], artifact_root=artifact_root, verifier_root=verifier_root)
+            labels = {"NEW_STUDY_REQUIRED": "研究设计或证据条件已改变，需要新建研究",
+                      "INPUT_EVIDENCE_REQUIRED": "先核实新旧输入的真实差异", "SOURCE_EVIDENCE_REQUIRED": "旧证据尚不足以作为桥接起点",
+                      "SAME_SCOPE_REPLAY": "可继续引用原范围证据；重放不增加新观察", "BRIDGE_REQUIRED": "已定位差异并生成独立桥接协议",
+                      "BRIDGE_EVIDENCE_REQUIRED": "桥接记录尚不完整，保留未知", "BRIDGE_REJECTED": "新输入上的桥接未通过，不能迁移原采用结论",
+                      "TARGET_OBSERVATION_SUPPORTED": "新输入上的完整观察通过，支持范围单独记录"}
+            purpose = ("在新研究中重新规定任务、判据和对照；保留旧记录，不沿用原采用结论。" if bridge["state"] == "NEW_STUDY_REQUIRED" else
+                       "独立保存返回的桥接协议与摘要，再采集目标输入的完整两臂记录及成本。" if bridge["state"] == "BRIDGE_REQUIRED" else
+                       "核对差异、原始验证收据和当前证据状态；旧观察与目标观察保持分开。")
+            return {"schema_version": 1, "type": "plugin_use_plan", "route": "BRIDGE_TASK_EVIDENCE", "owner": "host",
+                    "headline": ("合成演示：" if bridge["evidence_status"] == "SIMULATION_ONLY" else "") + labels[bridge["state"]],
+                    "task_summary": context["task_selection"]["task"]["summary"], "reasons": [bridge["state"], *bridge["new_study_barriers"]],
+                    "steps": [{"owner": LAB, "action": "review_bridge_scope", "purpose": purpose}]
+                             + [{"owner": "researcher", "action": "required_review", "purpose": r} for r in bridge["required_reviews"]],
+                    "handoff": {"kind": "none", "status": "PROPOSED_NOT_EXECUTED", "execute": False},
+                    "evidence_status": bridge["evidence_status"], "bridge": bridge, "limitations": bridge["limits"]}
+        if "evidence_acquisition" in context:
+            from .evidence_acquisition import plan_acquisition
+            acquisition = plan_acquisition(context["task_selection"], context["evidence_acquisition"],
+                                           artifact_root=artifact_root, verifier_root=verifier_root)
+            labels = {"NEXT_BATCH": "只补当前可能改变选择的一批证据", "STOP_CHOICE_STABLE": "当前筛选范围内选择已稳定，停止追加筛选",
+                      "STOP_BUDGET": "已到预先规定的预算边界，停止并保留不确定性",
+                      "STOP_NO_RELEVANT_CHECK": "没有剩余检查能改变当前候选去留，停止并报告缺口",
+                      "WAIT_FOR_BATCH": "已有一批检查待完成，保留原批次与费用预留",
+                      "REPAIR_EVIDENCE": "先补齐已有批次的证据，不启动新试验", "REPAIR_CATALOG": "先补齐候选目录",
+                      "CLARIFY_TASK": "先核实会改变适用性的任务条件", "STOP_BUDGET_OVERRUN": "观察成本超过冻结上限，停止新增检查",
+                      "REVIEW_CONFLICT": "候选证据存在冲突，先复核再作选择"}
+            if acquisition["state"] == "NEXT_BATCH":
+                action, purpose = "review_next_batch", "核对下方补证据计划、不同结果的影响及剩余预算；并列批次只选一个。"
+            elif acquisition["state"] == "WAIT_FOR_BATCH":
+                action, purpose = "wait_for_original_batch", "等待原批次完成，保留费用预留和已有记录。"
+            elif acquisition["state"] in ("REPAIR_EVIDENCE", "REPAIR_CATALOG", "CLARIFY_TASK", "REVIEW_CONFLICT"):
+                action, purpose = "resolve_acquisition_blocker", "核对缺失材料、任务条件或冲突；保留已有证据，解决前不启动新批次。"
+            else:
+                action, purpose = "retain_stopped_decision", "保留停止结果、未解决候选和剩余不确定性；当前不启动额外检查。"
+            acquisition_steps = [{"owner": LAB, "action": action, "purpose": purpose}]
+            chosen = next((p for p in acquisition["candidate_plans"] if p["plan_sha256"] == acquisition["selected_plan_sha256"]), None)
+            if chosen:
+                acquisition_steps.extend({"owner": s["component_id"], "action": "proposed_stage", "purpose": f"{s['stage_id']}：{s['capability']}"}
+                                         for s in chosen["manifest"]["steps"])
+            acquisition_steps.extend({"owner": "researcher", "action": "required_review", "purpose": r} for r in acquisition["required_reviews"])
+            return {"schema_version": 1, "type": "plugin_use_plan", "route": "ACQUIRE_DECISION_EVIDENCE", "owner": "host",
+                    "headline": ("合成演示：" if acquisition["evidence_status"] == "SIMULATION_ONLY" else "") + labels[acquisition["state"]],
+                    "task_summary": context["task_selection"]["task"]["summary"],
+                    "reasons": [acquisition["state"], "先比较当前最精简候选；只把有可能改变去留的检查列入下一批。"],
+                    "steps": acquisition_steps,
+                    "handoff": {"kind": "none", "status": "PROPOSED_NOT_EXECUTED", "execute": False},
+                    "evidence_status": acquisition["evidence_status"], "acquisition": acquisition,
+                    "limitations": acquisition["limits"]}
+        selection = select_task_plan(context["task_selection"], artifact_root=artifact_root, verifier_root=verifier_root)
+        selected = next((p for p in selection["plans"] if p["plan_sha256"] == selection["selected_plan_sha256"]), None)
+        headlines = {
+            "MINIMUM_IN_DECLARED_CATALOG": "在当前任务和已声明候选中，找到有证据支持的最小方案",
+            "SUPPORTED_OPTION_MINIMUM_UNRESOLVED": "已有可用方案的局部证据，更简单的候选仍待核验",
+            "CHOICE_REQUIRED": "多个同样精简的方案通过检查，保留选择而不任意排名",
+            "SIMULATION_ONLY": "已完成方案选择演示；合成记录不能支持真实推荐",
+            "EVIDENCE_REQUIRED": "目前证据不足以推荐完整方案，先补齐具体缺口",
+        }
+        steps = [{"owner": "host", "action": "verify_current_capabilities",
+                  "purpose": "核对候选的当前工具、版本、输入访问和权限；计划不代表已连接或获准执行。"}]
+        if selected:
+            steps.extend({"owner": step["component_id"], "action": "proposed_stage",
+                          "purpose": f"{step['stage_id']}：{step['capability']}"} for step in selected["manifest"]["steps"])
+        else:
+            steps.append({"owner": LAB, "action": "resolve_evidence_gaps",
+                          "purpose": "按保留的失败、未知项及完整流程检查准备补测；不从局部通过推断组合有效。"})
+        steps.extend({"owner": "researcher", "action": "required_review", "purpose": review}
+                     for review in selection["required_reviews"])
+        reasons = [selection["status"], *selection["baseline_coverage_gaps"]]
+        if selected:
+            reasons.append(f"所选完整方案在提交记录中通过任务与整合检查；新增插件 {selected['size'][0]} 个，全部插件 {selected['size'][1]} 个。")
+            reasons.append("依赖数量按预先指定的政策比较；这不证明费用更低、速度更快或科学结论成立。")
+        if selection["unbound_studies"]:
+            reasons.append(f"仍有 {len(selection['unbound_studies'])} 份未绑定研究，不能确认最小性。")
+        return {"schema_version": 1, "type": "plugin_use_plan", "route": "SELECT_TASK_PLAN", "owner": "host",
+                "headline": headlines[selection["status"]], "task_summary": context["task_selection"]["task"]["summary"],
+                "reasons": reasons, "steps": steps,
+                "handoff": {"kind": "none", "status": "PROPOSED_NOT_EXECUTED", "execute": False},
+                "evidence_status": selection["status"], "selection": selection,
+                "limitations": selection["limits"]}
     task = context.get("task")
     if not isinstance(task, dict):
         raise ValidationError("task must be an object")
@@ -231,13 +321,79 @@ def write_plan(plan, output_dir):
     json.dumps(plan, allow_nan=False)
     root.mkdir(parents=True, exist_ok=True)
     write_json(root / "plan.json", plan)
-    lines = ["# 插件使用计划", "", f"**{_md(plan['headline'])}**", "",
-             f"任务：{_md(plan['task_summary'])}", "", "此计划没有搜索、安装、连接、评测或修改账户。", "",
+    notice = ("本计划重算已有记录与授权产物；没有运行新的模型或插件、搜索、安装、连接或修改账户。"
+              if any(k in plan for k in ("selection", "acquisition", "bridge")) else "此计划没有搜索、安装、连接、评测或修改账户。")
+    lines = ["# 证据迁移与桥接" if "bridge" in plan else "# 最小补证据计划" if "acquisition" in plan else "# 任务方案选择" if "selection" in plan else "# 插件使用计划", "", f"**{_md(plan['headline'])}**", "",
+             f"任务：{_md(plan['task_summary'])}", "", notice, "",
              "## 下一步", ""]
     lines.extend(f"{i}. {_md(step['purpose'])}（{_md(step['owner'])}）" for i, step in enumerate(plan["steps"], 1))
     if not plan["steps"]:
         lines.append("先澄清具体请求，不创建账户操作。")
     lines.extend(["", "## 判断依据", ""] + [f"- {_md(r)}" for r in plan["reasons"]])
+    if "bridge" in plan:
+        bridge = plan["bridge"]
+        labels = {"DESCRIPTIVE_ONLY": "描述变化，保留原范围", "VERIFY_INPUT_DIFFERENCE": "核验输入变化",
+                  "BRIDGE_REQUIRED": "需要目标输入桥接", "NEW_STUDY_REQUIRED": "必须新建研究"}
+        lines += ["", "## 差异与行动", "", "变化位置 | 处理", "--- | ---"]
+        lines.extend(f"{_md(d['path'])} | {labels[d['classification']]}" for d in bridge["changes"])
+        lines += ["", f"实际输入检查：{_md(bridge['input_check']['status'])}",
+                  "行重排或编码等价只说明输入身份、内容可复核；不能证明插件运行与顺序无关。",
+                  "旧证据重算新增观察数：0。旧采用结论不会自动迁移。"]
+        if bridge["input_check"].get("reason"):
+            lines.append(f"待恢复的输入证据：{_md(bridge['input_check']['reason'])}")
+        for side, failures in bridge["input_reference_issues"].items():
+            lines.append(f"{'旧任务' if side == 'source' else '目标任务'}的输入派生参考与实际文件不符：{_md(', '.join(failures))}。先核实参考，不据此判定方案失败。")
+        for failures in bridge["target_applicability_issues"].values():
+            lines.append(f"目标数据不满足原方案或对照的声明适用条件：{_md('; '.join(failures))}。需要重新设计研究。")
+        if bridge["proposed_protocol"]:
+            lines += [f"独立桥接批次：{bridge['proposed_protocol']['planned_runs']} 个计划运行，保留两臂、所有任务阶段及整合检查。",
+                      "完整协议、摘要、原始收据和目标范围保留在 plan.json；执行前独立保存协议。"]
+        if bridge["bridge_result"]:
+            lines.append(f"目标输入上的样本检查：{_md(bridge['bridge_result']['sample_outcome'])}；证据：{_md(bridge['evidence_status'])}。")
+        lines.append("桥接只覆盖此次新输入与条件，未测候选仍未知，不证明目标任务中的最小方案或普遍科学有效。")
+    if "acquisition" in plan:
+        acquisition = plan["acquisition"]
+        budget = acquisition["budget"]
+        lines += ["", "## 下一批与停止条件", "", f"证据：{_md(acquisition['evidence_status'])}；已启动 {budget['batches_started']} 批。",
+                  f"累计记录或预留 {budget['spent_or_reserved_usd']} USD，剩余 {budget['remaining_usd']} USD。不是已核实账单或付费授权。",
+                  "", "检查 | 用途 | 涉及当前候选数 | 整批费用上限（USD） | 安排", "--- | --- | --- | --- | ---"]
+        proposed = {b["check_id"] for b in acquisition["next_batch_options"]}
+        reasons = {"already_observed": "已有记录，不重复", "screening_closed": "已进入确认，筛选关闭",
+                   "cannot_change_current_frontier": "不影响当前最精简候选，暂缓"}
+        for row in acquisition["agenda"]:
+            decision = "下一批候选（并列时仅选一批）" if row["check_id"] in proposed else reasons.get(row["deferred_reason"], "暂缓，保留候选")
+            lines.append(f"{_md(row['check_id'])} | {'筛选' if row['phase'] == 'screening' else '完整确认'} | {len(row['affected_plans'])} | {row['cost_upper_bound_usd']} | {decision}")
+        lines += ["", "筛选通过：保留候选，尚不能采用。筛选失败：只从本次筛选名单移除。结果未知：先修复已有批次。",
+                  "完整确认必须保留所有任务阶段及整合检查；首次确认后不再使用确认结果安排新的筛选。",
+                  "达到预算、选择稳定或没有相关检查时均可停止，不要求得到绿色结论。完整批次锁、结果分支与未解决候选见 plan.json。"]
+    if "selection" in plan:
+        selection = plan["selection"]
+        labels = {"SUPPORTED": "完整观察支持", "FAILED": "未通过", "UNKNOWN": "尚未确定", "INAPPLICABLE": "声明条件不适用",
+                  "CONFLICTING_EVIDENCE": "证据冲突", "SIMULATION_ONLY": "仅合成演示"}
+        lines += ["", "## 方案比较", "", "编号 | 阶段能力 | 新增插件 / 全部插件 | 证据状态 | 各次试验本臂总成本（USD）", "--- | --- | --- | --- | ---"]
+        for index, row in enumerate(selection["plans"], 1):
+            label = "；".join(f"{s['stage_id']} → {s['component_id']} ({s['capability']})" for s in row["manifest"]["steps"])
+            costs = "；".join("未知" if o["observed_total_evaluation_cost_usd"] is None else str(o["observed_total_evaluation_cost_usd"])
+                              for o in row["observations"]) or "未知"
+            status = labels[row["status"]]
+            if row["status"] == "SIMULATION_ONLY":
+                status += "（样例" + {"SUPPORTED": "通过", "FAILED": "失败", "UNKNOWN": "未知", "CONFLICTING_EVIDENCE": "冲突"}[row["sample_outcome"]] + "）"
+            lines.append(f"{index} | {_md(label)} | {row['size'][0]} / {row['size'][1]}{'（下界）' if row['size_is_lower_bound'] else ''} | {_md(status)} | {_md(costs)}")
+        lines += ["", "只在声明的候选范围内比较新增插件数，再比较全部插件数；未证明最低费用或最快速度。",
+                  "成本是各份研究完整计划运行的总额，不是下一次任务的费用预测；估算和声明不代表已结算。",
+                  "完整方案标识、成本、逐项收据、原始研究绑定与阶段结果保留在 plan.json。", "", "## 使用条件与复核", ""]
+        for row in selection["plans"]:
+            if row["plan_sha256"] not in selection["choice_plan_sha256s"]:
+                continue
+            for option in row["manifest"]["steps"]:
+                conditions = "；".join(f"{key} ∈ {json.dumps(values, ensure_ascii=False)}" for key, values in option["requires"].items())
+                lines.append(f"- {_md(option['stage_id'])} / {_md(option['component_id'])}：{_md(conditions) or '按冻结任务契约'}")
+        lines.extend(f"- 仍需复核：{_md(review)}" for review in selection["required_reviews"])
+        lines += ["", "## 尚需核验", ""]
+        for gap in selection["evidence_gaps"]:
+            lines.append(f"- {_md(gap['plan_sha256'][:12])}：{_md('; '.join(gap['needed']))}")
+        if not selection["evidence_gaps"]:
+            lines.append("本轮没有生成具体补测项；请同时核对候选覆盖缺口、未绑定研究与最低范围声明。")
     lines.extend(["", "## 可交接的信息", "", f"状态：{_md(plan['handoff']['status'])}"])
     for key in ("capability_query", "plugin_reference", "requested_action", "requested_permission_mode"):
         if key in plan["handoff"]:

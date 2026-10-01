@@ -100,6 +100,14 @@ Read the result this way:
 
 The default MCP tools return structured results that ChatGPT can explain as tables and prose. Saving files or providing downloadable reports requires appropriate host capabilities; it is not an automatic output of every tool call.
 
+For real output files, the host can now connect both evaluation and usage cards to authorized artifact and scorer directories. The tools recheck the bytes and return digest-bound verification receipts. Host setup and missing-access behavior are described in [the controlled MCP handoff](docs/history/ARTIFACTS.md#controlled-mcp-file-handoff-080); no file access is enabled by default, and MCP does not execute verifier programs.
+
+You can also ask whether a task needs any new plugin, or only one stage of a plugin. The existing planner compares native capabilities, existing scripts/workflows and complete plugin plans using recomputed frozen evidence. It minimizes new plugins, then total plugins, subject to the declared task requirements. Conditions, human reviews, ties, failures and untested simpler alternatives remain visible; passing separate stages does not validate their composition. See [task-plan selection](docs/history/TASK-SELECTION.zh-CN.md). Local engineering acceptance does not establish real researcher efficiency or benefit.
+
+For “what evidence could change this choice?”, the same planner supports prospective batches under a frozen candidate catalog, selection rule, stopping rule and budget. Actual batch outcomes determine the next relevant check; unaffected alternatives are deferred. Every started batch retains its complete matrix and costs. Screening cannot authorize adoption: separate held-out whole-plan confirmation remains required. Budget exhaustion and no relevant remaining check are valid stopping outcomes, including with unresolved choices. The cost/relevance priority is not a success probability, expected information gain or a statistical stopping guarantee.
+
+For “does prior evidence apply to this new input?”, the existing planner supports a reviewed matrix-task bridge: compare design, data, rubric and runtime differences, verify real input bytes, preserve the original study and freeze a separate target comparison for one previously supported plan. Input-content equivalence only qualifies the corresponding content checks; design, inference-goal, arbitrary rubric, model/host or plugin-content changes require a new study. Existing exact-scope citations remain unchanged. See [evidence bridging](docs/history/TASK-SELECTION.zh-CN.md#证据迁移与桥接).
+
 ## Common questions
 
 **PVL is installed, but ChatGPT says it cannot call it.**
@@ -141,4 +149,8 @@ Start with `work/first-run/usage/USAGE.md` or `ENVELOPE.html`. Full scores are i
 - [Online isolation](docs/history/ONLINE-ISOLATION.zh-CN.md) · [Environment locks and replay](docs/history/ENVIRONMENT-RECORDING.zh-CN.md)
 - [Scientific metamorphic checks](docs/history/METAMORPHIC-GRADERS.zh-CN.md) · [Component comparisons](docs/history/COMPONENT-METHODOLOGY.zh-CN.md) · [Interface freeze](docs/FREEZE.md)
 
-Detailed supporting guides are currently primarily in Chinese.
+English onboarding, cost controls, HPC job templates, contributor checks and evidence limits are in [START](docs/START.md), [OPERATIONS](docs/OPERATIONS.md), [EVIDENCE](docs/EVIDENCE.md) and [FREEZE](docs/FREEZE.md). Detailed historical research records remain primarily in Chinese.
+
+[![CI](https://github.com/HERRY423/Plugin-Value-Lab/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/HERRY423/Plugin-Value-Lab/actions/workflows/ci.yml)
+
+The badge reports the main branch, not unpushed changes. Paid native eval launches are currently blocked until an independent spend boundary is available; offline analysis and export/import remain usable. See [budget and HPC requirements](docs/OPERATIONS.md).

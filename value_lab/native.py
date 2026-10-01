@@ -21,6 +21,25 @@ from .core import ValidationError, suite_digest, validate_suite
 DOC_URL = "https://code.claude.com/docs/en/plugin-evals"
 JUDGE_MODEL = "claude-haiku-4-5"
 EVAL_DIR = "value-lab-evals"
+BUDGET_BLOCK_REASON = (
+    "BUDGET_BOUNDARY_UNAVAILABLE: Claude eval --max-cost-usd is a post-request "
+    "estimate, not an enforced spend cap. PVL refuses paid execution before launch. "
+    "Export/import and offline analysis remain available. A request-level budget "
+    "transport with verified upper bounds and durable reservations is required; "
+    "lowering the estimate, consent, or a timeout cannot supply that boundary."
+)
+
+
+def require_budget_boundary():
+    """Fail closed for the current native adapters, including legacy frozen plans.
+
+    Neither the direct CLI nor the model broker has a verified USD ceiling for
+    one in-flight request (including judges/tools). Do not trust a caller's claim
+    of enforcement or silently reinterpret a hard budget as a soft estimate.
+    """
+    raise ValidationError(BUDGET_BLOCK_REASON)
+
+
 NATIVE_IMPORT_LIMIT = (
     "The documented native v1 result does not establish observed session IDs, "
     "frozen conditions, suite hash, plugin load receipts, final output, or an "
@@ -178,11 +197,13 @@ def export_claude(suite, output_dir, plugin_path):
             if judge.startswith("-"):
                 raise ValidationError("judge_model must not start with '-'")
             command[command.index("--judge-model") + 1] = judge
+    warnings.append(BUDGET_BLOCK_REASON)
     manifest = {
         "schema_version": 1, "suite_sha256": suite_digest(suite), "native_schema_version": 1,
         "docs": DOC_URL, "evals_dir": str(output / "evals"),
         "install_directory": str(plugin / EVAL_DIR), "command": command,
         "executed": False, "mappings": mappings, "warnings": warnings,
+        "budget_gate": {"status": "BLOCKED", "reason": BUDGET_BLOCK_REASON},
         "next_step": f"Review and copy the contents of evals into {plugin / EVAL_DIR}, then review the planned command. No files have been installed into the target plugin.",
     }
     files["export-manifest.json"] = json.dumps(manifest, indent=2, ensure_ascii=False) + "\n"

@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import csv
+from contextlib import contextmanager
+from contextvars import ContextVar
 import hashlib
 import io
 import math
@@ -16,6 +18,17 @@ from .core import ValidationError, load_json, suite_digest
 
 KINDS = {"equivalence", "metamorphic", "pseudobulk_chain", "artifact", "executable", "artifact_schema", "numeric_tolerance", "abstention_correct", "over_refusal", "backend_identity", "exec", "replicate_effect"}
 MAX_BYTES = 64 * 1024 * 1024
+_EXECUTION_ALLOWED = ContextVar("pvl_verifier_execution_allowed", default=True)
+
+
+@contextmanager
+def read_only_verification():
+    """Disable executable graders, including private scenario children, per call."""
+    token = _EXECUTION_ALLOWED.set(False)
+    try:
+        yield
+    finally:
+        _EXECUTION_ALLOWED.reset(token)
 
 
 def confined(root, relative):
@@ -200,6 +213,8 @@ def _builtin(path, spec, verifier_root=None):
 
 def grade_artifact(g, record, root, verifier_root=None):
     receipt = {"rule_sha256": suite_digest(g), "scope": "LOCAL_COMPUTATIONAL_CHECK"}
+    if g["type"] in ("executable", "exec") and not _EXECUTION_ALLOWED.get():
+        return None, "MCP read-only verification does not execute programs; use the separately authorized local verifier workflow", receipt
     if root is None:
         return None, "Artifact root not supplied; output text cannot substitute for the artifact", receipt
     entry = record.get("artifacts", {}).get(g["artifact"]) if isinstance(record.get("artifacts", {}), dict) else None

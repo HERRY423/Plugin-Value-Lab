@@ -1,4 +1,18 @@
-# 当前证据与未完成门槛
+# Current evidence / 当前证据与未完成门槛
+
+**Version 0.8.0.** This is the current source version. Historical receipts keep their original versions, hashes and limitations.
+
+## Community readiness (2026-09-30)
+
+| Boundary | Current evidence and remaining work |
+| --- | --- |
+| Hosted CI | Onboarding fixes passed all 10 jobs at `f39e491`: [run 36723158638](https://github.com/HERRY423/Plugin-Value-Lab/actions/runs/36723158638), including 933 tests and actual Linux isolation. Later workflow-delivery changes require their own exact-commit CI evidence. The earlier [failed run](https://github.com/HERRY423/Plugin-Value-Lab/actions/runs/36580804328) is retained. |
+| HPC | Slurm, PBS Pro/OpenPBS and LSF templates run the existing real kernel gates on allocated nodes. No target cluster has been supplied or validated. See [HPC operations](OPERATIONS.md#hpc-compute-node-acceptance). |
+| Paid native eval | A historical official run reported $0.114 against a $0.09 estimate. Direct and sandboxed native launches now fail before a paid request because neither adapter supplies an independently enforced USD boundary. Export, import and offline analysis remain available. This blocking fix is not a completed metered execution adapter. |
+| Scientific execution | Requires working Linux/WSL2 bubblewrap isolation. An installed binary or a passing login-node probe does not establish compute-node compatibility. Windows kernel acceptance remains unestablished. |
+| Adoption and benefit | No complete natural-use plugin repair chain or non-author first-use timing sample is established. Local tests, fixtures, timestamps and packages do not establish scientific validity or independent adoption. |
+
+English entry points: [tutorial](START.md), [operations and costs](OPERATIONS.md), [freeze policy](FREEZE.md). Detailed Chinese records below retain their original evidence scope.
 
 2026-09-29 [研究执行层核查](history/RESEARCH-EXECUTION.zh-CN.md)：修复原生报告不显示可推导 W/OUT 的问题，并避免混用案例分母；研究扩展需在独立副本中显式启用。四题的 24 个计划会话槽位仍无真实研究结果，既有每臂一次的官方检索案例不填入这些槽位。Windows 容器引擎不可用，实核验收仍未完成。工具准备和本地回归均不计入实跑证据。
 
@@ -14,7 +28,7 @@
 
 本轮新增的 [失败诊断谱系、组件真实替换和报告盲测](history/TRACE-DIAGNOSTICS.zh-CN.md) 分开记录真实宿主写入事件、受控本地干预和外部模型读报告；L3、真人阅读验证及通用宿主监控仍未建立。
 
-当前源码版本为 **0.7.0**，含尚未提交的工作区改动。下表区分源码能力、交付验证、实际宿主观察和真人使用；相同版本号不保证字节相同。机器快照见 [P0 状态与来源](evidence/p0-status-20260928.json)，本轮实施与下一步见 [P0 交付记录](history/P0-DELIVERY-20260928.zh-CN.md)。旧收据继续按其原版本、源码摘要及范围解释。
+当前源码版本为 **0.8.0**；当前接入修复尚未发布。下表区分源码能力、交付验证、实际宿主观察和真人使用；相同版本号不保证字节相同。机器快照见 [P0 状态与来源](evidence/p0-status-20260928.json)，本轮实施与下一步见 [P0 交付记录](history/P0-DELIVERY-20260928.zh-CN.md)。旧收据继续按其原版本、源码摘要及范围解释。
 
 | 能力 | 源码／本地验证 | 实际宿主或真人证据 | 当前可说的结论 |
 | --- | --- | --- | --- |

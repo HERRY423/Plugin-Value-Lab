@@ -35,6 +35,15 @@ def validate(root):
     runtime = (root / "value_lab/__init__.py").read_text(encoding="utf-8")
     if package_version != python_version or not re.search(r'^__version__ = "' + re.escape(manifest["version"]) + r'"$', runtime, re.M):
         raise ValueError("Python package/runtime and plugin version drift")
+    for name, pattern in (
+        ('README.md', r'\*\*Version ([0-9][^ ]*)\.\*\*'),
+        ('README.zh-CN.md', r'\*\*版本 ([^。]+)。\*\*'),
+        ('docs/EVIDENCE.md', r'\*\*Version ([0-9][^ ]*)\.\*\*'),
+        ('docs/FREEZE.md', r'\*\*Version ([0-9][^ ]*)\.\*\*'),
+    ):
+        text = (root / name).read_text(encoding='utf-8')
+        if re.findall(pattern, text) != [manifest['version']]:
+            raise ValueError('Current documentation version drift: ' + name)
     skills = []
     for directory in sorted((root / "skills").iterdir()):
         path = directory / "SKILL.md"
