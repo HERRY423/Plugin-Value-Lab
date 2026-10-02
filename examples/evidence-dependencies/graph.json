@@ -1,0 +1,153 @@
+{
+  "format": "pvl-evidence-dependencies-1",
+  "card_sha256": "c7d69b946cf7f215ecf6b32a305b20f350ff2d28402021f0c875f8ccd87c5830",
+  "coverage": {
+    "complete": true,
+    "basis": "Manufactured fixture with explicitly closed dependencies."
+  },
+  "nodes": [
+    {
+      "id": "budget",
+      "kind": "dependency",
+      "category": "budget",
+      "depends_on": []
+    },
+    {
+      "id": "configuration",
+      "kind": "dependency",
+      "category": "configuration",
+      "depends_on": []
+    },
+    {
+      "id": "environment",
+      "kind": "dependency",
+      "category": "environment",
+      "depends_on": []
+    },
+    {
+      "id": "host",
+      "kind": "dependency",
+      "category": "host",
+      "depends_on": []
+    },
+    {
+      "id": "model",
+      "kind": "dependency",
+      "category": "model",
+      "depends_on": []
+    },
+    {
+      "id": "new_evidence",
+      "kind": "dependency",
+      "category": "new_evidence",
+      "depends_on": []
+    },
+    {
+      "id": "plugin",
+      "kind": "dependency",
+      "category": "plugin",
+      "depends_on": []
+    },
+    {
+      "id": "policy",
+      "kind": "dependency",
+      "category": "policy",
+      "depends_on": []
+    },
+    {
+      "id": "task_distribution",
+      "kind": "dependency",
+      "category": "task_distribution",
+      "depends_on": []
+    },
+    {
+      "id": "tool",
+      "kind": "dependency",
+      "category": "tool",
+      "depends_on": []
+    },
+    {
+      "id": "raw",
+      "kind": "artifact",
+      "path": "retrieved.json",
+      "sha256": "df0f58234f00dc4ce5041819939ab4e9cab81206e23e2671f197dda888bd5984",
+      "depends_on": [
+        "budget",
+        "configuration",
+        "environment",
+        "host",
+        "model",
+        "new_evidence",
+        "plugin",
+        "policy",
+        "task_distribution",
+        "tool"
+      ]
+    },
+    {
+      "id": "format",
+      "kind": "rule",
+      "scope": "historical_artifact",
+      "mode": "artifact_rescore",
+      "basis": "Only the frozen JSON's format, not current retrieval behavior.",
+      "depends_on": [
+        "raw"
+      ],
+      "grader": {
+        "id": "format",
+        "type": "artifact",
+        "artifact": "raw",
+        "verifier": {
+          "kind": "json_fields",
+          "expected": {
+            "format": "v1"
+          }
+        }
+      }
+    },
+    {
+      "id": "retrieval",
+      "kind": "rule",
+      "scope": "current_behavior",
+      "mode": "model_execution",
+      "grader": null,
+      "basis": "New retrieval/model execution required under the new API.",
+      "depends_on": [
+        "raw"
+      ]
+    },
+    {
+      "id": "format-claim",
+      "kind": "claim",
+      "statement": "Recorded JSON meets the declared format.",
+      "depends_on": [
+        "format"
+      ]
+    },
+    {
+      "id": "retrieval-claim",
+      "kind": "claim",
+      "statement": "Current retrieval still needs execution evidence.",
+      "depends_on": [
+        "retrieval",
+        "format"
+      ]
+    },
+    {
+      "id": "format-guidance",
+      "kind": "recommendation",
+      "card_pointer": "/envelope/rows/0",
+      "depends_on": [
+        "format-claim"
+      ]
+    },
+    {
+      "id": "retrieval-guidance",
+      "kind": "recommendation",
+      "card_pointer": "/envelope/rows/1",
+      "depends_on": [
+        "retrieval-claim"
+      ]
+    }
+  ]
+}

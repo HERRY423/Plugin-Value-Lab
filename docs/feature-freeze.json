@@ -3462,17 +3462,24 @@
       "value_lab/artifacts.py",
       "value_lab/authoring.py",
       "value_lab/blind_review.py",
+      "value_lab/burden_analyzer.py",
+      "value_lab/burden_collector.py",
+      "value_lab/burden_contracts.py",
+      "value_lab/burden_presentation.py",
+      "value_lab/burden_view.py",
       "value_lab/ci_gate.py",
       "value_lab/claim_scope.py",
       "value_lab/claude_collection.py",
       "value_lab/cli.py",
       "value_lab/codex.py",
+      "value_lab/codex_context.py",
       "value_lab/comparison.py",
       "value_lab/component_localization.py",
       "value_lab/component_studies.py",
       "value_lab/core.py",
       "value_lab/corpus.py",
       "value_lab/costs.py",
+      "value_lab/decision_view.py",
       "value_lab/declarative.py",
       "value_lab/diagnostic_review.py",
       "value_lab/easy_cli.py",
@@ -3480,6 +3487,7 @@
       "value_lab/evidence_acquisition.py",
       "value_lab/evidence_bridge.py",
       "value_lab/evidence_crate.py",
+      "value_lab/evidence_dependencies.py",
       "value_lab/exchange.py",
       "value_lab/execution.py",
       "value_lab/guidance.py",
@@ -3498,6 +3506,7 @@
       "value_lab/native_session.py",
       "value_lab/native_trigger.py",
       "value_lab/online_sandbox.py",
+      "value_lab/plugin_combinations.py",
       "value_lab/preregistration.py",
       "value_lab/processes.py",
       "value_lab/pseudobulk.py",
@@ -3535,6 +3544,8 @@
       "schemas/agent-plugins/1.0.0/SOURCES.json",
       "schemas/agent-plugins/1.0.0/mcp.schema.json",
       "schemas/agent-plugins/1.0.0/plugin.schema.json",
+      "schemas/evidence-dependencies.schema.json",
+      "schemas/plugin-combination.schema.json",
       "schemas/registry/1/answers.schema.json",
       "schemas/registry/1/corpus.schema.json",
       "schemas/registry/1/manifest.schema.json",
@@ -4888,9 +4899,23 @@
   "workflow_delivery_scope_change": {
     "date": "2026-09-30",
     "authorization": "User explicitly requested continuing the pictured L1-L3 workflow integration improvements",
-    "added_runtime_modules": ["ci_gate", "evidence_crate"],
-    "allowed": ["offline reusable CI action", "community module and wrapper candidates", "RO-Crate packaging and verification via module entry points", "hash-pinned release recipe preparation"],
-    "preserved": ["version 0.8.0", "main CLI and SDK signatures", "MCP and grader inventory", "eight mainline documents", "paid native execution budget block"],
+    "added_runtime_modules": [
+      "ci_gate",
+      "evidence_crate"
+    ],
+    "allowed": [
+      "offline reusable CI action",
+      "community module and wrapper candidates",
+      "RO-Crate packaging and verification via module entry points",
+      "hash-pinned release recipe preparation"
+    ],
+    "preserved": [
+      "version 0.8.0",
+      "main CLI and SDK signatures",
+      "MCP and grader inventory",
+      "eight mainline documents",
+      "paid native execution budget block"
+    ],
     "reference": "../examples/community/README.md"
   },
   "engineering_usability_scope_change": {
@@ -4924,19 +4949,133 @@
     "date": "2026-09-30",
     "owner_request": "继续认真推进建立证据迁移与桥接，而不是在精确匹配和任意外推之间二选一",
     "classification": "EXPLICIT_NEW_CAPABILITY",
-    "added_runtime_modules": ["evidence_bridge"],
+    "added_runtime_modules": [
+      "evidence_bridge"
+    ],
     "allowed": "Existing planner context mode for immutable source commitments, deterministic matrix/task drift classification, input-content invariance checks and a separately frozen target paired bridge. Limited input-derived references must match actual source and target bytes.",
-    "preserved": ["version 0.8.0", "six MCP tools and existing CLI signatures", "exact-scope citation and conditional-guidance rules", "old records and failed observations", "no automatic scientific generalization, execution or payment", "eight mainline documents"],
+    "preserved": [
+      "version 0.8.0",
+      "six MCP tools and existing CLI signatures",
+      "exact-scope citation and conditional-guidance rules",
+      "old records and failed observations",
+      "no automatic scientific generalization, execution or payment",
+      "eight mainline documents"
+    ],
     "reference": "history/TASK-SELECTION.zh-CN.md"
   },
   "decision_evidence_acquisition_scope_change": {
     "date": "2026-09-30",
     "owner_request": "继续深度完成从运行一整套测试变成只补能改变选择的证据",
     "classification": "EXPLICIT_NEW_CAPABILITY",
-    "added_runtime_modules": ["evidence_acquisition"],
+    "added_runtime_modules": [
+      "evidence_acquisition"
+    ],
     "allowed": "Prospective mother protocol, decision-frontier batch planning, frozen per-batch matrices, complete-cost budget and stopping rules, held-out whole-plan confirmation; existing context-based planning only.",
-    "preserved": ["version 0.8.0", "six MCP tools and existing CLI signatures", "all started batch denominators", "existing graders and full scientific gates", "no optional-stopping statistical guarantee", "no execution or payment authority", "eight mainline documents"],
+    "preserved": [
+      "version 0.8.0",
+      "six MCP tools and existing CLI signatures",
+      "all started batch denominators",
+      "existing graders and full scientific gates",
+      "no optional-stopping statistical guarantee",
+      "no execution or payment authority",
+      "eight mainline documents"
+    ],
     "reference": "history/TASK-SELECTION.zh-CN.md"
+  },
+  "burden_view_scope_change": {
+    "native_capture_followup": {
+      "date": "2026-10-02",
+      "owner_request": "真实宿主采集层完成验收",
+      "classification": "AUTHORIZED_HOST_ADAPTER",
+      "added_runtime_modules": [
+        "codex_context"
+      ],
+      "allowed": "Read-only adapter and standalone collector script for an explicitly selected Codex desktop 0.159.2 rollout; response/model/session/event bindings, separate measured context and cumulative ledgers, compaction/unknown handling, exact-prefix replay and live local acceptance.",
+      "preserved": [
+        "version 0.8.0",
+        "main CLI and MCP signatures",
+        "existing burden input/output and selection",
+        "eight mainline documents",
+        "no background capture, model launch, paid invocation or upload",
+        "no claim for Claude or other untested hosts"
+      ],
+      "reference": "history/NATIVE-CONTEXT-P0.zh-CN.md"
+    },
+    "layering_followup": {
+      "date": "2026-10-01",
+      "owner_request": "按照你建议的架构把采集器、分析器和展示层分开",
+      "classification": "AUTHORIZED_INTERNAL_REFACTOR",
+      "added_runtime_modules": [
+        "burden_contracts",
+        "burden_collector",
+        "burden_analyzer",
+        "burden_presentation"
+      ],
+      "allowed": "Separate submitted-observation validation, immutable internal contracts, pure burden analysis and read-only presentation; keep burden_view as a compatibility facade.",
+      "preserved": [
+        "version 0.8.0",
+        "all CLI and MCP signatures",
+        "existing input/output formats",
+        "original scoring and selection",
+        "eight mainline documents",
+        "no automatic host collection or new external actions"
+      ],
+      "reference": "history/BURDEN-LAYERS.zh-CN.md"
+    },
+    "interaction_followup": {
+      "date": "2026-10-01",
+      "owner_request": "学习它的交互方式，让证据在需要时出现",
+      "added_runtime_modules": [
+        "decision_view"
+      ],
+      "allowed": "Derived evidence_brief in the existing combination planner, an evidence-first Markdown strip and a standalone offline EVIDENCE.html with progressive disclosure.",
+      "preserved": [
+        "original grading and selection",
+        "version 0.8.0",
+        "all CLI and MCP signatures",
+        "six MCP tools",
+        "eight mainline documents",
+        "snapshot only; no monitoring or automatic action"
+      ],
+      "reference": "history/DECISION-VIEW.zh-CN.md"
+    },
+    "date": "2026-10-01",
+    "owner_request": "增加一个独立的负担视图；先呈现上下文压力、费用、耗时的取舍，再决定是否改变选择规则",
+    "classification": "EXPLICIT_NEW_CAPABILITY",
+    "added_runtime_modules": [
+      "burden_view"
+    ],
+    "allowed": "Independent per-case burden view through the existing combination planner; optional context sidecar bound to original design, session and record.",
+    "preserved": [
+      "version 0.8.0",
+      "original selection and grading semantics",
+      "six MCP tools and existing CLI/Python signatures",
+      "unknowns and original denominators",
+      "eight mainline documents",
+      "no automatic execution, installation or payment"
+    ],
+    "reference": "history/BURDEN-VIEW.zh-CN.md"
+  },
+  "plugin_combination_scope_change": {
+    "date": "2026-10-01",
+    "owner_request": "深度理解图中改进建议，保留原来单插件的评估功能，继续开发最小有效插件组合",
+    "classification": "EXPLICIT_NEW_CAPABILITY",
+    "added_runtime_modules": [
+      "plugin_combinations"
+    ],
+    "added_schemas": [
+      "schemas/plugin-combination.schema.json"
+    ],
+    "allowed": "One task-motivated plugin pair per frozen stage; baseline/A/B/AB and optional BA observations; exact difference-in-differences, diagnostic evidence and bounded minimum selection through the existing planning context.",
+    "preserved": [
+      "version 0.8.0",
+      "single-plugin evaluator and component-factorial semantics",
+      "six MCP tools and all existing CLI signatures",
+      "eight mainline documents",
+      "no execution, installation, removal, permission expansion or paid calls",
+      "unknowns, failed runs and synthetic evidence ceilings"
+    ],
+    "reference": "history/PLUGIN-COMBINATIONS.zh-CN.md"
   },
   "task_selection_scope_change": {
     "date": "2026-09-30",
@@ -4959,5 +5098,26 @@
       "eight mainline documents"
     ],
     "reference": "history/TASK-SELECTION.zh-CN.md"
+  },
+  "evidence_dependencies_scope_change": {
+    "date": "2026-10-02",
+    "owner_request": "推进把一次性使用卡变成可局部更新的决策依据；用依赖关系管理证据失效",
+    "classification": "EXPLICIT_NEW_CAPABILITY",
+    "added_runtime_modules": [
+      "evidence_dependencies"
+    ],
+    "added_schemas": [
+      "schemas/evidence-dependencies.schema.json"
+    ],
+    "allowed": "Local usage-card sidecar dependency graph, affected-path planning, byte replay and built-in artifact rescoring via standalone module entry point.",
+    "preserved": [
+      "version 0.9.0",
+      "existing main CLI and MCP signatures",
+      "legacy whole-card invalidation",
+      "eight mainline documents",
+      "historical failures and unknowns",
+      "no model/scientific execution, registry, signatures, ranking, sharing or paid calls"
+    ],
+    "reference": "history/EVIDENCE-DEPENDENCIES.zh-CN.md"
   }
 }

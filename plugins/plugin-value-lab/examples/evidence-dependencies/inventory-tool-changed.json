@@ -1,0 +1,12 @@
+{
+  "budget": "fixture-v1",
+  "configuration": "fixture-v1",
+  "environment": "fixture-v1",
+  "host": "fixture-v1",
+  "model": "fixture-v1",
+  "new_evidence": "fixture-v1",
+  "plugin": "fixture-v1",
+  "policy": "fixture-v1",
+  "task_distribution": "fixture-v1",
+  "tool": "fixture-api-v2"
+}

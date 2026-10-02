@@ -8,6 +8,8 @@ Start with the [synthetic tutorial](START.md). For a real study, define the task
 
 For existing artifacts, `pvl check`, `pvl aggregate` and `pvl verify` avoid creating a plugin study. Use `pvl --help` and each command's `--help` for inputs. An analysis result supports the declared computational check, not general biological correctness. Preserve old outputs and use fresh directories for revisions.
 
+For optional local dependency rechecks beside an existing usage card, see the [dependency recheck contract and runnable fixture](history/EVIDENCE-DEPENDENCIES.zh-CN.md). It identifies affected paths, retains unchanged historical checks with reasons, and keeps replay, rescoring and new execution separate. Unknown impact widens rechecking; the original whole-card policy remains the default.
+
 ### Native eval budget gate
 
 The official `--max-cost-usd` parameter is an estimate checked after requests; it cannot bound one in-flight request. The observed $0.114 / $0.09 overrun is retained in [historical evidence](history/VALUE-EVIDENCE-20260929.zh-CN.md). PVL now refuses both direct workbench and sandboxed native paid launches with `BUDGET_BOUNDARY_UNAVAILABLE`, before credentials are read for a model request or a model process starts. Legacy frozen plans and UI/API consent cannot bypass this gate. Exported commands are planning material, not budget-safe execution instructions; manually running one outside PVL bypasses its gate.
@@ -100,6 +102,8 @@ CLI 的机器 JSON 标准输出及 JSON 错误输出使用 ASCII 转义，管道
 卡绑定冻结的 `plugin.sha256`（显示为 `plugin_sha256`）、明确的 `conditions.host_version`、`model_version` 及条件／记录摘要。别名不等于模型修订；不改写旧 suite 补身份，缺失保持未知，新研究重新冻结。
 
 插件字节变化即使版本不变也使卡失效；宿主、模型、工具、环境、配置、预算、任务分布、规则或新失败／成本／复核证据变化时重新核验。哈希不认证真实执行；颜色不是新统计检验。[历史接口契约](history/WORKFLOW-CONTRACT.md) 保留更细的兼容字段。
+
+可选的[本地依赖复核](history/EVIDENCE-DEPENDENCIES.zh-CN.md)把重新核验细化为逐路径待办：声明完整且可核对时，保留未受影响的旧产物检查并记录理由；影响不明时扩大复核。旧产物重放、旧产物重评分、模型／科学计算重执行分别记录；检查通过不会自动更新整卡建议。
 
 ## 比较与修复
 

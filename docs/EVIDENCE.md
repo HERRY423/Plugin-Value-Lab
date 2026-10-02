@@ -1,6 +1,16 @@
 # Current evidence / 当前证据与未完成门槛
 
-**Version 0.8.0.** This is the current source version. Historical receipts keep their original versions, hashes and limitations.
+2026-10-02 新增[真实宿主上下文 P0 验收](history/NATIVE-CONTEXT-P0.zh-CN.md)：只读当前 Codex 桌面 0.159.2 的原生会话日志，逐响应绑定宿主、模型、会话、采样阶段和原始事件；分离单次占用与累计账本，未知不补零。[验收记录](evidence/native-context-p0-20261002.json)单列真实采集、实际压缩、追加重放和制造的异常测试。这不代表其他宿主验收、持续实时占用、结算费用或插件收益。
+
+2026-10-01 按用户要求完成[采集、分析与展示分层](history/BURDEN-LAYERS.zh-CN.md)：不可变采集快照、独立分析重放、只读展示和旧入口兼容；四个合成场景逐项核对拆分前输出。[本次验收](evidence/burden-layers-20261001.json)独立记录，旧验收摘要保留历史身份。当前采集器接收已提交材料，未新增实时宿主采集。
+
+2026-10-01 增加[按需展开的证据交互](history/DECISION-VIEW.zh-CN.md)：对话返回简短摘要，文字报告前置当前问题，离线 HTML 支持从提示跳转到具体证据。[验收记录](evidence/decision-view-20261001.json)保留本地测试及浏览器观察；这不是实时宿主监控或已验证的真人阅读收益。
+
+2026-10-01 新增[独立负担视图](history/BURDEN-VIEW.zh-CN.md)，逐任务比较合格候选的上下文峰值、费用和耗时，保留取舍与未知，原选择规则不变。[本地记录](evidence/burden-view-20261001.json)区分测试、合成演示和真实宿主观察；本次未建立自动上下文采集或真实插件收益证据。
+
+**Version 0.9.0.** This is the current source version. Historical receipts keep their original versions, hashes and limitations.
+
+2026-10-01 新增[阶段内插件组合评估](history/PLUGIN-COMBINATIONS.zh-CN.md)，保留单插件评估及原组件消融。[本地验收记录](evidence/plugin-combinations-20261001.json)保存源码摘要：全量回归 1072 项通过，收尾后相关路径复验 128 项通过（含 28 项组合专项及真实本地 stdio）。六种制造案例验证互补、替代、组合退步、顺序差异、零插件足够与缺失数据处理；均为 SIMULATION_ONLY，真实组合收益与宿主暴露认证未建立，未发布或替换已安装插件。
 
 ## Community readiness (2026-09-30)
 

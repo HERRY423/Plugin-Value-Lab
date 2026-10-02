@@ -107,6 +107,9 @@ def create_server(*, enable_extensions=False, artifact_root=None, verifier_root=
         a frozen budget/stop rule, retaining separate screening and confirmation.
         context.evidence_bridge compares an immutable source to a target matrix task,
         verifies input differences and prepares/regrades a separate target bridge.
+        context.plugin_combination freezes or analyzes one stage-scoped A/B pair,
+        retaining baseline/A/B/AB, optional BA, costs, interactions and unknowns.
+        Single-plugin evaluation remains available via evaluate_plugin_value.
         Optional material roots narrow host-authorized directories, as in evaluation.
         No registry lookup, account action, program execution or external call.
         """

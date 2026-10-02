@@ -1,0 +1,240 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pvl:evidence-dependencies:1",
+  "description": "Structural schema; runtime also enforces typed edges, exact card binding, safe paths and supported graders.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "card_sha256",
+    "coverage",
+    "nodes"
+  ],
+  "properties": {
+    "format": {
+      "const": "pvl-evidence-dependencies-1"
+    },
+    "card_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "complete",
+        "basis"
+      ],
+      "properties": {
+        "complete": {
+          "type": "boolean"
+        },
+        "basis": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2000,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "depends_on",
+              "card_pointer"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,100}$"
+              },
+              "kind": {
+                "const": "recommendation"
+              },
+              "depends_on": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,100}$"
+                }
+              },
+              "card_pointer": {
+                "type": "string",
+                "pattern": "^/(use_when|prefer_baseline_when|investigate|envelope/rows)/[0-9]+$"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "depends_on",
+              "statement"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,100}$"
+              },
+              "kind": {
+                "const": "claim"
+              },
+              "depends_on": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,100}$"
+                }
+              },
+              "statement": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "depends_on",
+              "scope",
+              "mode",
+              "grader",
+              "basis"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,100}$"
+              },
+              "kind": {
+                "const": "rule"
+              },
+              "depends_on": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,100}$"
+                }
+              },
+              "scope": {
+                "enum": [
+                  "historical_artifact",
+                  "current_behavior"
+                ]
+              },
+              "mode": {
+                "enum": [
+                  "artifact_rescore",
+                  "model_execution",
+                  "scientific_execution"
+                ]
+              },
+              "grader": {
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "basis": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "depends_on",
+              "path",
+              "sha256"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,100}$"
+              },
+              "kind": {
+                "const": "artifact"
+              },
+              "depends_on": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,100}$"
+                }
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "depends_on",
+              "category"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,100}$"
+              },
+              "kind": {
+                "const": "dependency"
+              },
+              "depends_on": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,100}$"
+                }
+              },
+              "category": {
+                "enum": [
+                  "plugin",
+                  "tool",
+                  "model",
+                  "host",
+                  "environment",
+                  "task_distribution",
+                  "configuration",
+                  "budget",
+                  "policy",
+                  "new_evidence"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

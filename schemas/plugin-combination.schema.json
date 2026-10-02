@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Bounded plugin combination request",
+  "description": "Structure only. Runtime validation additionally checks original suite/record semantics, frozen design, identities, paths, costs and thresholds.",
+  "oneOf": [
+    {"type": "object", "additionalProperties": false, "required": ["action", "spec"], "properties": {"action": {"const": "plan"}, "spec": {"$ref": "#/$defs/spec"}}},
+    {"type": "object", "additionalProperties": false, "required": ["action", "design", "observations", "expected_id"], "properties": {
+      "burden_observations": {"$ref": "#/$defs/burdenObservations"},
+      "action": {"const": "analyze"}, "design": {"$ref": "#/$defs/design"}, "observations": {"$ref": "#/$defs/observations"}, "expected_id": {"$ref": "#/$defs/sha"}
+    }}
+  ],
+  "$defs": {
+    "burdenObservations": {"type":"object","additionalProperties":false,"required":["format","design_sha256","measurement","runs"],"properties":{"format":{"const":"pvl-context-observations-1"},"design_sha256":{"$ref":"#/$defs/sha"},"measurement":{"type":"object","additionalProperties":false,"required":["host","model","host_version","source","sampling","context_window_tokens"],"properties":{"host":{"$ref":"#/$defs/text"},"model":{"$ref":"#/$defs/text"},"host_version":{"$ref":"#/$defs/text"},"source":{"$ref":"#/$defs/text"},"sampling":{"const":"each_main_agent_request"},"context_window_tokens":{"type":"integer","minimum":1,"maximum":9007199254740991}}},"runs":{"type":"array","maxItems":10000,"items":{"type":"object","additionalProperties":false,"required":["case_id","repetition","arm","session_id","record_sha256","coverage","expected_samples","samples"],"properties":{"case_id":{"$ref":"#/$defs/id"},"repetition":{"type":"integer","minimum":1,"maximum":50},"arm":{"$ref":"#/$defs/arm"},"session_id":{"$ref":"#/$defs/text"},"record_sha256":{"$ref":"#/$defs/sha"},"coverage":{"enum":["complete","partial"]},"expected_samples":{"type":"integer","minimum":1,"maximum":10000},"samples":{"type":"array","maxItems":10000,"items":{"type":"object","additionalProperties":false,"required":["request_index","input_tokens"],"properties":{"request_index":{"type":"integer","minimum":1,"maximum":10000},"input_tokens":{"type":"integer","minimum":0,"maximum":9007199254740991}}}}}}}}},
+    "sha": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$"},
+    "text": {"type": "string", "minLength": 1, "maxLength": 4000},
+    "ratio": {"type": "number", "minimum": 0, "maximum": 1},
+    "number": {"type": "number", "minimum": 0},
+    "arm": {"enum": ["BASELINE", "A", "B", "AB", "BA"]},
+    "inputs": {"type": "object", "minProperties": 1, "maxProperties": 50, "propertyNames": {"$ref": "#/$defs/id"}, "additionalProperties": {"$ref": "#/$defs/sha"}},
+    "plugin": {"type": "object", "additionalProperties": false, "required": ["id", "version", "sha256", "capabilities"], "properties": {
+      "id": {"$ref": "#/$defs/id"}, "version": {"$ref": "#/$defs/text"}, "sha256": {"$ref": "#/$defs/sha"},
+      "capabilities": {"type": "array", "minItems": 1, "maxItems": 20, "uniqueItems": true, "items": {"$ref": "#/$defs/text"}}
+    }},
+    "spec": {"type": "object", "additionalProperties": false, "required": ["suite", "stage", "inputs", "plugins", "rationale", "policy", "compare_orders", "seed"], "properties": {
+      "suite": {"type": "object", "description": "Validated by the unchanged suite validator."},
+      "stage": {"type": "object", "additionalProperties": false, "required": ["id", "summary"], "properties": {"id": {"$ref": "#/$defs/id"}, "summary": {"$ref": "#/$defs/text"}}},
+      "inputs": {"$ref": "#/$defs/inputs"}, "plugins": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/plugin"}}, "rationale": {"$ref": "#/$defs/text"},
+      "policy": {"type": "object", "additionalProperties": false, "required": ["quality_floor", "success_floor", "max_mean_cost_usd", "max_mean_duration_seconds", "interaction_margin"], "properties": {
+        "quality_floor": {"$ref": "#/$defs/ratio"}, "success_floor": {"$ref": "#/$defs/ratio"}, "max_mean_cost_usd": {"$ref": "#/$defs/number"}, "max_mean_duration_seconds": {"$ref": "#/$defs/number"}, "interaction_margin": {"$ref": "#/$defs/ratio"}
+      }},
+      "compare_orders": {"type": "boolean"}, "seed": {"type": "integer", "minimum": 0, "maximum": 4294967295}
+    }},
+    "exposure": {"type": "object", "additionalProperties": false, "required": ["plugins", "order", "inputs", "background_conditions"], "properties": {
+      "plugins": {"type": "array", "maxItems": 2, "items": {"$ref": "#/$defs/plugin"}}, "order": {"type": "array", "maxItems": 2, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}}, "inputs": {"$ref": "#/$defs/inputs"}, "background_conditions": {"type": "object"}
+    }},
+    "assignment": {"type": "object", "additionalProperties": false, "required": ["case_id", "repetition", "arm", "execution_index"], "properties": {
+      "case_id": {"$ref": "#/$defs/id"}, "repetition": {"type": "integer", "minimum": 1, "maximum": 50}, "arm": {"$ref": "#/$defs/arm"}, "execution_index": {"type": "integer", "minimum": 1, "maximum": 10000}
+    }},
+    "design": {"type": "object", "additionalProperties": false, "required": ["format", "spec", "arms", "assignments"], "properties": {
+      "format": {"const": "pvl-plugin-combination-design-1"}, "spec": {"$ref": "#/$defs/spec"},
+      "arms": {"type": "array", "minItems": 4, "maxItems": 5, "items": {"type": "object", "additionalProperties": false, "required": ["id", "exposure"], "properties": {"id": {"$ref": "#/$defs/arm"}, "exposure": {"$ref": "#/$defs/exposure"}}}},
+      "assignments": {"type": "array", "minItems": 4, "maxItems": 10000, "items": {"$ref": "#/$defs/assignment"}}
+    }},
+    "diagnosticKind": {"enum": ["duplicate_work", "information_overwrite", "parameter_handoff_error", "erroneous_evidence_propagation"]},
+    "diagnostics": {"type": "object", "additionalProperties": false, "required": ["assessed", "events"], "properties": {
+      "assessed": {"type": "array", "maxItems": 4, "uniqueItems": true, "items": {"$ref": "#/$defs/diagnosticKind"}},
+      "events": {"type": "array", "maxItems": 100, "items": {"type": "object", "additionalProperties": false, "required": ["kind", "detail", "evidence"], "properties": {
+        "kind": {"$ref": "#/$defs/diagnosticKind"}, "detail": {"$ref": "#/$defs/text"},
+        "evidence": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"$ref": "#/$defs/text"}, "sha256": {"$ref": "#/$defs/sha"}}}
+      }}}
+    }},
+    "cost": {"type": ["number", "null"], "minimum": 0},
+    "run": {"type": "object", "additionalProperties": false, "required": ["case_id", "repetition", "arm", "execution_index", "exposure", "record", "additional_cost_usd", "diagnostics"], "properties": {
+      "case_id": {"$ref": "#/$defs/id"}, "repetition": {"type": "integer", "minimum": 1, "maximum": 50}, "arm": {"$ref": "#/$defs/arm"}, "execution_index": {"type": "integer", "minimum": 1, "maximum": 10000},
+      "exposure": {"$ref": "#/$defs/exposure"}, "record": {"type": "object", "description": "Original record regraded by the unchanged core evaluator."}, "diagnostics": {"$ref": "#/$defs/diagnostics"},
+      "additional_cost_usd": {"type": "object", "additionalProperties": false, "required": ["setup_usd", "judge_usd", "retry_usd", "other_usd"], "properties": {"setup_usd": {"$ref": "#/$defs/cost"}, "judge_usd": {"$ref": "#/$defs/cost"}, "retry_usd": {"$ref": "#/$defs/cost"}, "other_usd": {"$ref": "#/$defs/cost"}}}
+    }},
+    "observations": {"type": "object", "additionalProperties": false, "required": ["format", "design_sha256", "runs"], "properties": {
+      "format": {"const": "pvl-plugin-combination-observations-1"}, "design_sha256": {"$ref": "#/$defs/sha"}, "runs": {"type": "array", "maxItems": 10000, "items": {"$ref": "#/$defs/run"}}
+    }}
+  }
+}
