@@ -1,6 +1,6 @@
 # Community workflow delivery / 社区工作流接入
 
-Version 0.8.0 remains unchanged. These are reviewable integration candidates, not claims of PyPI/Bioconda publication or acceptance by nf-core/Snakemake maintainers. The installed `pvl` CLI and Python SDK remain the L1 entry points. L0 marketplace installation is unchanged.
+Version 0.9.0 remains unchanged. These are reviewable integration candidates, not claims of PyPI/Bioconda publication or acceptance by nf-core/Snakemake maintainers. The installed `pvl` CLI and Python SDK remain the L1 entry points. L0 marketplace installation is unchanged.
 
 ## L1: package and workflow candidates
 
@@ -9,7 +9,7 @@ Build from the reviewed checkout, validate metadata and prepare a recipe bound t
 ```sh
 python -m build --outdir /path/to/new-release
 python -m twine check /path/to/new-release/*
-python scripts/prepare_community_release.py --sdist /path/to/new-release/plugin_value_lab-0.8.0.tar.gz --output /path/to/new-recipe
+python scripts/prepare_community_release.py --sdist /path/to/new-release/plugin_value_lab-0.9.0.tar.gz --output /path/to/new-recipe
 ```
 
 The recipe includes the scientific dependencies needed for counts aggregation. Its future PyPI URL must serve exactly the recorded SHA-256 before submitting it to Bioconda. No script uploads packages, acquires credentials, or starts a release. PyPI ownership/trusted publishing, a real Bioconda build and upstream maintainer acceptance remain required. Never replace an already published version with different bytes.

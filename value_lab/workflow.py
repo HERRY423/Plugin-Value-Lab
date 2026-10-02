@@ -72,6 +72,28 @@ def plan_plugin_use(context, now=None, *, artifact_root=None, verifier_root=None
     intent = context.get("intent")
     if intent not in ("choose", "use", "evaluate", "manage"):
         raise ValidationError("intent must be choose, use, evaluate or manage")
+    if "plugin_combination" in context:
+        if (intent not in ("choose", "evaluate") or context.get("selected_plugin") is not None
+                or any(k in context for k in ("task_selection", "evidence_acquisition", "evidence_bridge"))):
+            raise ValidationError("Plugin combination needs a separate choose/evaluate request without a selected provider")
+        from .plugin_combinations import route
+        result = route(context['plugin_combination'], artifact_root=artifact_root, verifier_root=verifier_root)
+        from .decision_view import brief
+        preparing = 'design' in result
+        stage = result['design']['spec']['stage'] if preparing else result['stage']
+        headline = ('已冻结插件对照计划，等待真实观察' if preparing else
+                    '合成演示：已重算插件组合，不构成真实采用建议' if result['evidence_status'] == 'SIMULATION_ONLY' else
+                    '已重算插件组合；建议仅限本阶段已测试候选')
+        return {'schema_version': 1, 'type': 'plugin_use_plan', 'route': 'ASSESS_PLUGIN_COMBINATION',
+                'owner': LAB, 'headline': headline,
+                'task_summary': stage['summary'], 'reasons': [result['status']], 'combination': result,
+                'evidence_brief': brief(result),
+                'steps': [{'owner': 'host', 'purpose': '独立保留计划与摘要，按随机顺序采集各臂原始结果、成本和暴露记录。'
+                           if preparing else '复核交互量、逐任务结果、未知候选和最小组合范围；另行验证宿主执行。'}],
+                'handoff': {'status': 'NO_AUTOMATIC_ACTION'},
+                'limitations': ['保留原有单插件评估。合成材料不是现实收益证据。',
+                                '交互量是描述性结果，负交互不等于冲突；配置声明不证明真实暴露或调用。',
+                                '不自动安装、卸载、扩大权限、执行宿主或调用付费服务。']}
     if "evidence_acquisition" in context and "task_selection" not in context:
         raise ValidationError("Evidence acquisition requires an explicit task_selection catalog")
     if "evidence_bridge" in context and ("task_selection" not in context or "evidence_acquisition" in context):
@@ -322,14 +344,49 @@ def write_plan(plan, output_dir):
     root.mkdir(parents=True, exist_ok=True)
     write_json(root / "plan.json", plan)
     notice = ("本计划重算已有记录与授权产物；没有运行新的模型或插件、搜索、安装、连接或修改账户。"
-              if any(k in plan for k in ("selection", "acquisition", "bridge")) else "此计划没有搜索、安装、连接、评测或修改账户。")
+              if any(k in plan for k in ("selection", "acquisition", "bridge", "combination")) else "此计划没有搜索、安装、连接、评测或修改账户。")
     lines = ["# 证据迁移与桥接" if "bridge" in plan else "# 最小补证据计划" if "acquisition" in plan else "# 任务方案选择" if "selection" in plan else "# 插件使用计划", "", f"**{_md(plan['headline'])}**", "",
              f"任务：{_md(plan['task_summary'])}", "", notice, "",
              "## 下一步", ""]
     lines.extend(f"{i}. {_md(step['purpose'])}（{_md(step['owner'])}）" for i, step in enumerate(plan["steps"], 1))
     if not plan["steps"]:
         lines.append("先澄清具体请求，不创建账户操作。")
+    if 'combination' in plan:
+        from .decision_view import markdown as evidence_markdown
+        # Put the evidence strip before generic next steps and full tables.
+        offset = lines.index('## 下一步')
+        lines[offset:offset] = evidence_markdown(plan['combination'])
     lines.extend(["", "## 判断依据", ""] + [f"- {_md(r)}" for r in plan["reasons"]])
+    if 'combination' in plan:
+        result = plan['combination']
+        lines += ['', '## 最小有效插件组合', '']
+        if 'design' in result:
+            lines += [f"计划 {len(result['design']['assignments'])} 次运行；未执行。",
+                      f"独立保留设计摘要：{result['design_sha256']}。",
+                      '按 BASELINE、A、B、AB（可选 BA）的随机分配采集新会话。完整设计保留在 plan.json。']
+        else:
+            lines += [f"证据：{result['evidence_status']}；观察 / 计划：{result['observed_runs']} / {result['planned_runs']}。",
+                      '', '实验臂 | 可行性 | 质量 | 成功率 | 完整声明成本（美元） | 耗时（秒）', '--- | --- | --- | --- | --- | ---']
+            for arm in result['arms']:
+                values = [arm['metrics'][m]['mean'] for m in ('quality', 'success', 'cost_usd', 'duration_seconds')]
+                lines.append(' | '.join(_md(str(v)) for v in [arm['arm'], arm['status'], *values]))
+            for arm in result['arms']:
+                if arm['reasons']:
+                    lines.append(f"\n{arm['arm']}：{_md('; '.join(arm['reasons']))}\n")
+            lines += ['', '交互量 = Q(组合) − Q(A) − Q(B) + Q(基线)，没有除以二。']
+            for contrast in result['contrasts']:
+                lines.append(f"- {contrast['arm']}：质量交互量 {contrast['interaction']['quality']['mean']}；{contrast['observed_quality_pattern']}。")
+            if result['order_effect_AB_minus_BA'] is not None:
+                lines.append(f"- 顺序差 AB − BA：{result['order_effect_AB_minus_BA']['quality']['mean']}（质量）。")
+            rec = result['recommendation']
+            lines += ['', f"建议状态：{rec['status']}；候选：{', '.join(rec['candidate_arms']) or '尚无'}。",
+                      '最小范围仅限本阶段的已声明候选；并列候选保留。合成结果仅演示选择逻辑。',
+                      '能力暴露、原始结果判据、逐任务差异和事件证据保留在 plan.json。',
+                      '诊断类别：重复工作、信息覆盖、参数传递错误、错误证据传播；未评估不等于没有发生。']
+            lines += [f"- 待解决：{_md(issue)}" for issue in result['issues']]
+            if 'burden_view' in result:
+                from .burden_presentation import markdown
+                lines += markdown(result['burden_view'])
     if "bridge" in plan:
         bridge = plan["bridge"]
         labels = {"DESCRIPTIVE_ONLY": "描述变化，保留原范围", "VERIFY_INPUT_DIFFERENCE": "核验输入变化",
@@ -400,4 +457,9 @@ def write_plan(plan, output_dir):
             lines.append(f"- {_md(key)}：{_md(plan['handoff'][key])}")
     lines.extend(["", "## 适用限制", ""] + [f"- {_md(item)}" for item in plan["limitations"]])
     (root / "PLAN.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    return {"json": str(root / "plan.json"), "md": str(root / "PLAN.md")}
+    files = {"json": str(root / "plan.json"), "md": str(root / "PLAN.md")}
+    if 'combination' in plan:
+        from .decision_view import render
+        (root / 'EVIDENCE.html').write_text(render(plan['combination'], plan['task_summary']), encoding='utf-8')
+        files['html'] = str(root / 'EVIDENCE.html')
+    return files

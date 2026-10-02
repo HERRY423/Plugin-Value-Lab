@@ -1,8 +1,14 @@
 # Plugin Value Lab
 
+Combination results now lead with [decision-time evidence](docs/history/DECISION-VIEW.zh-CN.md): relevant issues, tradeoffs and missing records. The exported offline EVIDENCE.html expands supporting details on demand without changing grading or selection.
+
+Combination reports now include a separate [burden view](docs/history/BURDEN-VIEW.zh-CN.md): per-task context pressure, cost and time tradeoffs among feasible candidates. Missing context remains unknown; existing selection rules are unchanged.
+
+Single-plugin evaluation remains available. The existing planner also supports a bounded pair study: baseline, A, B, A→B and optionally B→A. It regrades original results, reports descriptive interactions and costs, and identifies the fewest sufficient plugins within the frozen stage and tested candidates. It preserves ties and unknowns and performs no installation or removal. See [combination evaluation and runnable examples](docs/history/PLUGIN-COMBINATIONS.zh-CN.md).
+
 **Call Plugin Value Lab in ChatGPT to evaluate whether another plugin helps with your task.** Tell ChatGPT which plugin to assess, what you want to accomplish and what a useful result means. ChatGPT organizes the evaluation; PVL checks the plan, analyzes supplied records and produces evidence-bounded guidance.
 
-**Version 0.8.0.** This guide starts with PVL already installed and callable in the current conversation. Begin in chat—no repository paths, JSON forms or terminal commands are required to get started.
+**Version 0.9.0.** This guide starts with PVL already installed and callable in the current conversation. Begin in chat—no repository paths, JSON forms or terminal commands are required to get started.
 
 [中文](README.zh-CN.md) · [Current evidence](docs/EVIDENCE.md) · [Detailed operations](docs/OPERATIONS.md)
 

@@ -1,0 +1,34 @@
+{
+  "format": "pvl-layering-before-1",
+  "source": "Captured before collector/analyzer/presentation refactor; synthetic examples, not host evidence",
+  "scenarios": {
+    "dominance": {
+      "result": "d1b1a37e0c55da12d373acc777f5131bf11280d791af1e3a6f328fc1268cf027",
+      "brief": "a64e842999aac366d45f8b16a90931b6b0b4ffc4b688074ecf932e986d716c8d",
+      "html": "44df103934527fcde1ffba9eeca5d6db7f941865a1f2f14d9d09a01aa50b578b",
+      "markdown": "30c216bdcb0fd34f5716426f2bf00a51f5d6b104cb3b848d8def9f1e1b722b03",
+      "burden_markdown": "af1f89bc6e87b23d32d15510758c46a83682fe32b69f5264a91acfd6d7e9bdcd"
+    },
+    "tradeoff": {
+      "result": "485bc5ea7ff2f671562a46d2397fb5f797be8a2d9945e39f9a308d8a70315a4a",
+      "brief": "aedba1dfa0da0618edd89c47a383ba7806ca2a6cc5f532290877a2eb3372db91",
+      "html": "d567d6f2a8a8fef9cc76541dbcb17e59022a7be550698aa5018909ebff9628cc",
+      "markdown": "7b68821b6ebd88cf4b16f86948170cdc63714a696f312f5c696b577a51a648d8",
+      "burden_markdown": "47e29c88cb1bd88f689fdb5034002cc0cfd9a77313f61ca14cc171d61174412d"
+    },
+    "equal": {
+      "result": "e6a8e33b7c84261c76307fc9127f81396ff8803877ec7d2493724f257a023e64",
+      "brief": "a64e842999aac366d45f8b16a90931b6b0b4ffc4b688074ecf932e986d716c8d",
+      "html": "695e629d8fe1e7682a6c427c60011c253414545ebae1714e386767d137d25746",
+      "markdown": "30c216bdcb0fd34f5716426f2bf00a51f5d6b104cb3b848d8def9f1e1b722b03",
+      "burden_markdown": "c59ff961f62d4b0c8fc2ced690574504c53cdefaf50209f5a563ce717250cc43"
+    },
+    "missing": {
+      "result": "970ae6e873c416090719f2a9dd7599da1404dd14836679ead0e3e08b488272cc",
+      "brief": "daff505852944826d8ea6f1285f24c8551a09a329038a1f76ae8da49bbcbbe03",
+      "html": "e878e05ba1030ce55ec33c0a43557d67a93ada579658ef7bb3fcbfda4653b4c6",
+      "markdown": "6c6ef8a3359113eaeb460ac6ea002e51a6188a53caaa885717741f73dbdc5b49",
+      "burden_markdown": "10683fe2189a044ae5d623e72e9ded84b0da1d33868929dc33fe7699fd7119e4"
+    }
+  }
+}

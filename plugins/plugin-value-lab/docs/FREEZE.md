@@ -1,6 +1,18 @@
-# Scope freeze / 六周范围冻结（当前版本 0.8.0）
+# Scope freeze / 六周范围冻结（当前版本 0.9.0）
 
-**Version 0.8.0.** The freeze started on 2026-09-25, with review planned for 2026-11-06. Expiry does not automatically authorize new features. The `version_series: 0.6.x` field in `feature-freeze.json` identifies the original freeze, not the current package.
+2026-10-02，用户明确要求将一次性使用卡推进为可局部更新的决策依据。按 `evidence_dependencies_scope_change` 增加本地依赖图、独立模块入口、受影响路径的旧产物重放／重评分及保守待办；保留主 CLI/MCP、版本、旧卡失效原则与证据上限，不新增签名、登记、全局排名或模型／科学计算执行。见[局部复核说明](history/EVIDENCE-DEPENDENCIES.zh-CN.md)。
+
+2026-10-02，用户要求“真实宿主采集层完成验收”。按 native_capture_followup 增加限定只读采集适配器与独立采集脚本，绑定明确指定的 Codex 桌面会话，验证单次/累计、未知及事件对应关系。原接口、选择规则与版本不变。见[宿主 P0 验收](history/NATIVE-CONTEXT-P0.zh-CN.md)。
+
+2026-10-01，用户明确要求“把采集器、分析器和展示层分开”。按 layering_followup 记录限定内部重构：新增采集、分析、展示和不可变内部契约模块，旧 burden_view 作为兼容入口；输入输出、选择规则、版本和外部接口不变。见[分层说明](history/BURDEN-LAYERS.zh-CN.md)。
+
+2026-10-01，用户进一步要求“让证据在需要时出现”。按负担视图的 interaction_followup 授权增加一个展示模块、既有规划结果的简短证据摘要及离线可展开页面，保持原评分与选择不变，不创建实时监控或宿主状态栏。见[交互说明](history/DECISION-VIEW.zh-CN.md)。
+
+2026-10-01，用户授权增加独立负担视图，记录为 burden_view_scope_change：新增一个视图模块及既有组合请求的可选上下文材料。原选择规则、评分、CLI/MCP 签名和版本不变。见[负担视图](history/BURDEN-VIEW.zh-CN.md)。
+
+**Version 0.9.0.** The freeze started on 2026-09-25, with review planned for 2026-11-06. Expiry does not automatically authorize new features. The `version_series: 0.6.x` field in `feature-freeze.json` identifies the original freeze, not the current package.
+
+2026-10-01，负责人明确要求“保留原来单插件的评估功能，继续开发最小有效插件组合”。按 `plugin_combination_scope_change` 记录新增能力：每次只冻结一个有任务依赖理由的插件对，比较基线、A、B、AB 和可选 BA；经原评分器重算，报告描述性交互、诊断观察和阶段内最小候选。新增一个运行时模块与既有规划上下文模式；保留版本 0.8.0、单插件评估、组件消融、CLI/MCP 签名及八份主线文档。完整契约见[插件组合](history/PLUGIN-COMBINATIONS.zh-CN.md)。
 
 Correctness, security, compatibility, tests, translations and simpler instructions for existing behavior are allowed. New CLI/MCP surfaces, graders, runtime modules or product scope require an explicitly recorded scope decision. Run `python scripts/check_feature_freeze.py`; passing that structural check does not replace semantic review. Keep the eight main documents and historical receipts; do not update historical versions to imply newer validation.
 
@@ -10,7 +22,7 @@ The 2026-09-30 onboarding repairs keep version 0.8.0 and existing interfaces: co
 
 2026-09-30，负责人进一步明确要求完成“从评价一个插件变成为一个任务选择最小必要方案”。本次按新增能力记录 `task_selection_scope_change`，不是普通修错：允许一个任务选择模块、既有规划 MCP 的两个目录选择器、既有 `plan-use` 的两个材料选项，以及制造案例与回归测试。保留六个 MCP 工具、旧路由、评分器、版本 0.8.0 和八份主线文档；不自动运行、付费、安装，不放松原有证据边界。详见[任务选择契约](history/TASK-SELECTION.zh-CN.md)。
 
-生效 **2026-09-25**，计划复盘 **2026-11-06**，共 42 天。冻结最初针对 **0.6.0**，当前项目版本为 **0.8.0**。到期不自动解冻，需要项目负责人明确记录决定。
+生效 **2026-09-25**，计划复盘 **2026-11-06**，共 42 天。冻结最初针对 **0.6.0**，当前项目版本为 **0.9.0**。到期不自动解冻，需要项目负责人明确记录决定。
 
 2026-09-30，负责人进一步要求建立“证据迁移与桥接”。按 `evidence_bridge_scope_change` 增加一个限定矩阵任务的桥接模块，通过已有规划上下文识别差异、验证真实输入、保留旧研究并生成独立目标协议。精确引用门槛不放宽；研究设计、判据、模型／宿主或插件内容变化默认新建研究，输入等价不认证生产程序的运行等价。不新增工具、CLI 参数或版本。
 

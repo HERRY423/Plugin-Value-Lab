@@ -1,0 +1,42 @@
+{
+  "format": "pvl-plugin-combination-local-acceptance-1",
+  "date": "2026-10-01",
+  "version": "0.8.0",
+  "source_sha256": {
+    "value_lab/plugin_combinations.py": "326f4964fa4e6c1b92412e518f365fc6e37241f7187d07e4fd4ee71d2723643c",
+    "value_lab/workflow.py": "d80de66efb1981e60befe41d8e45fb706cee2e547cd7b1c06d34ef410b422366",
+    "value_lab/server.py": "71961916c6c10ca3bb2a513ac8b377528417718194fe773722ffc56a215520b3",
+    "tests/test_plugin_combinations.py": "81b1c1976afae2100e2616ef3214b56508945a5e07d5c7a915cc072ad94fbfd7",
+    "schemas/plugin-combination.schema.json": "12ff392567011aba6dd2a6ded22c118ecc37d3435b55688d20211d7cea7490c6",
+    "examples/plugin-combinations/demo.py": "dcb50c52862941406c3837d888d21f90d2ce93be1b3966111d22bd44698949fd"
+  },
+  "checks": {
+    "broad_regression": {"tests": 1072, "failures": 0, "errors": 0, "skipped": 0, "seconds": 316.739,
+      "scope": "Broad run before final duration normalization and headline cleanup; not an exact-final-tree full run.",
+      "local_log": "work/plugin-combination-20261001/regression.log"},
+    "final_related_regression": {"tests": 128, "failures": 0, "errors": 0, "skipped": 0, "seconds": 27.279,
+      "combination_tests": 28, "real_local_stdio": true,
+      "modules": ["test_plugin_combinations", "test_core", "test_component_studies", "test_task_selection", "test_workflow"],
+      "local_log": "work/plugin-combination-final-20261001/final-tests.log"},
+    "interface_freeze": "PASS",
+    "agent_plugins_manifest": "PASS",
+    "generated_mirror": "PASS"
+  },
+  "scenarios": {
+    "complementary": {"status": "COMPLETE", "candidate_arms": ["AB", "BA"], "minimum_within_tested_set": true, "quality_interaction_AB": 1.0, "report_sha256": "531cfce8e2db888dfaf4b0696cf8a4273b8343b00f5e8fcdf9bff98365caec29"},
+    "substitutes": {"status": "COMPLETE", "candidate_arms": ["A", "B"], "minimum_within_tested_set": true, "quality_interaction_AB": -1.0, "report_sha256": "75bcd1bcfeeae42648b154e1307debabef9101db70d17c64a39b1e33029760c2"},
+    "interference": {"status": "COMPLETE", "candidate_arms": ["A", "B"], "minimum_within_tested_set": true, "quality_interaction_AB": -2.0, "report_sha256": "f5644c326314f87f87096a61dd73a6d8eea76514969c5d0b321c8eaf3e205f5f"},
+    "order": {"status": "COMPLETE", "candidate_arms": ["AB"], "minimum_within_tested_set": true, "quality_interaction_AB": 1.0, "report_sha256": "5ec3cd19008c47bfcf3562f5d5ec49fc4e37a7b070189eaed8d24b23c96eceea"},
+    "baseline": {"status": "COMPLETE", "candidate_arms": ["BASELINE"], "minimum_within_tested_set": true, "quality_interaction_AB": 0.0, "report_sha256": "178fb6f14577db9ac37f4342439de66482d70c9af2945b58299280ec1bbb55f3"},
+    "missing": {"status": "INCOMPLETE", "candidate_arms": ["AB", "BA"], "minimum_within_tested_set": false, "quality_interaction_AB": null, "report_sha256": "d566285c2079b61a7b40875dae39c9f40f8e252516487930b815a3853740436c"}
+  },
+  "scenario_evidence_status": "SIMULATION_ONLY",
+  "scenario_report_root": "work/plugin-combination-final-20261001",
+  "reproduce_scenarios": "python examples/plugin-combinations/demo.py --output NEW_DIRECTORY",
+  "real_plugin_combination_observations": 0,
+  "real_model_calls": 0,
+  "host_exposure_attested": false,
+  "causal_benefit_established": false,
+  "installed_host_acceptance": "NOT_ESTABLISHED",
+  "published": false
+}
