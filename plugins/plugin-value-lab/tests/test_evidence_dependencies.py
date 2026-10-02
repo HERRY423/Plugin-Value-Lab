@@ -132,6 +132,15 @@ class EvidenceDependencyTests(unittest.TestCase):
         self.node("model")["category"] = "tool"
         self.assertEqual(self.run_check(previous=self.baseline)["recheck_scope"], "FULL")
 
+    def test_declared_but_unconnected_behavior_dependency_widens(self):
+        self.node("raw")["depends_on"].remove("model")
+        initial = self.run_check(action="rescore")
+        self.assertTrue(any(x.startswith("INCOMPLETE_BEHAVIOR_PATH:retrieval:model") for x in initial["fallback_reasons"]))
+        self.inventory["model"] = "changed"
+        updated = self.run_check(previous=initial, action="rescore")
+        self.assertEqual(updated["recheck_scope"], "FULL")
+        self.assertTrue(updated["recommendations"][1]["review_required"])
+
     def test_topology_change_widens_including_removed_edge(self):
         self.node("raw")["depends_on"].remove("tool")
         result = self.run_check(previous=self.baseline)

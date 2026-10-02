@@ -8,8 +8,25 @@ import tarfile
 import tomllib
 
 
+def resolve_sdist(path):
+    target = Path(path)
+    if target.is_dir():
+        candidates = sorted(target.glob('*.tar.gz'))
+        if len(candidates) != 1:
+            raise ValueError(f'Expected exactly one source distribution archive in {target}, found {len(candidates)}')
+        return candidates[0]
+    if any(char in str(path) for char in ('*', '?', '[')):
+        candidates = sorted(Path(target.parent).glob(target.name))
+        if len(candidates) != 1:
+            raise ValueError(f'Expected exactly one source distribution archive matching {path}, found {len(candidates)}')
+        return candidates[0]
+    if not target.is_file():
+        raise FileNotFoundError(f'Source distribution not found: {target}')
+    return target
+
+
 def prepare(sdist, output):
-    sdist = Path(sdist)
+    sdist = resolve_sdist(sdist)
     with tarfile.open(sdist, 'r:gz') as archive:
         candidates = [m for m in archive.getmembers() if m.name.count('/') == 1 and m.name.endswith('/pyproject.toml')]
         if len(candidates) != 1 or not candidates[0].isfile() or candidates[0].size > 1048576:

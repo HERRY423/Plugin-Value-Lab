@@ -180,6 +180,11 @@ def recheck(card, graph, inventory, artifact_root, *, previous=None, action="pla
     categories = {n["category"] for n in dependencies.values()}
     if REQUIRED - categories:
         fallback.append("MISSING_CHANGE_CATEGORIES:" + ",".join(sorted(REQUIRED - categories)))
+    for ident, node in nodes.items():
+        if node["kind"] == "rule" and node["scope"] == "current_behavior":
+            bound = {nodes[d]["category"] for d in _closure(nodes, ident) if d in dependencies}
+            if REQUIRED - bound:
+                fallback.append("INCOMPLETE_BEHAVIOR_PATH:" + ident + ":" + ",".join(sorted(REQUIRED - bound)))
     if set(inventory) - dependencies.keys():
         fallback.append("UNMAPPED_DEPENDENCY:" + ",".join(sorted(set(inventory) - dependencies.keys())))
     unknown = [k for k in dependencies if not inventory.get(k)]
@@ -198,6 +203,9 @@ def recheck(card, graph, inventory, artifact_root, *, previous=None, action="pla
                 (n["kind"], n["depends_on"]) != (old_nodes[k]["kind"], old_nodes[k]["depends_on"])
                 for k, n in nodes.items() if k in old_nodes):
             fallback.append("GRAPH_TOPOLOGY_CHANGED")
+        for ident in sorted(set(old_nodes) - set(nodes)):
+            changed.add(ident)
+            changes.append({"id": ident, "reason": "NODE_REMOVED"})
         for ident, node in nodes.items():
             if old_nodes.get(ident) != node:
                 changed.add(ident)
