@@ -59,6 +59,16 @@ def capture(path, expected_session_id, *, prefix_bytes=None):
     trailing = len(raw) - len(complete)
     if not complete:
         raise ValidationError('No complete native events')
+    result, _ = parse_events(complete, expected_session_id)
+    return render_capture(result, len(raw), trailing, hashlib.sha256(complete).hexdigest())
+
+
+def parse_events(complete, expected_session_id, checkpoint=None):
+    """Adapter-private state machine; parse only complete new lines.
+
+    The durable layer binds checkpoint bytes to the parser identity. A carried
+    pending sample is an upsert, never a second independent request.
+    """
     samples, transitions, issues = [], [], []
     meta, turn, model, turn_ref = None, None, None, None
     pending, current, last_measured = None, None, None
@@ -67,7 +77,20 @@ def capture(path, expected_session_id, *, prefix_bytes=None):
     stream_cumulative = _usage(None)
     thread_cumulative, turn_cumulative = _usage(None), _usage(None)
     cumulative_ref = None
-    for number, line in enumerate(complete.splitlines(keepends=True), 1):
+    number = 0
+    if checkpoint is not None:
+        from copy import deepcopy
+        c = deepcopy(checkpoint)
+        meta, turn, model, turn_ref = c['meta'], c['turn'], c['model'], c['turn_ref']
+        current, last_measured, state = c['current'], c['last_measured'], c['state']
+        epoch, offset, number = c['epoch'], c['offset'], c['line']
+        seen, completed_turns = set(c['seen']), set(c['completed_turns'])
+        stream_cumulative = c['stream_cumulative']
+        thread_cumulative, turn_cumulative = c['thread_cumulative'], c['turn_cumulative']
+        cumulative_ref = c['cumulative_ref']
+        if c['pending_sample'] is not None:
+            samples, pending = [c['pending_sample']], 0
+    for number, line in enumerate(complete.splitlines(keepends=True), number + 1):
         try:
             event = json.loads(line)
         except (ValueError, UnicodeError) as exc:
@@ -75,6 +98,9 @@ def capture(path, expected_session_id, *, prefix_bytes=None):
         if not isinstance(event, dict) or not isinstance(event.get('payload'), dict):
             raise ValidationError('Invalid native event envelope')
         payload, kind = event['payload'], event.get('type')
+        ordinal = event.get('ordinal')
+        if ordinal is not None and (type(ordinal) is not int or not 0 <= ordinal <= 2**53 - 1):
+            raise ValidationError('Invalid native event ordinal')
         ref = {'line': number, 'byte_start': offset, 'byte_end': offset + len(line),
                'sha256': hashlib.sha256(line).hexdigest(), 'timestamp': _timestamp(event.get('timestamp')),
                'ordinal': event.get('ordinal')}
@@ -83,6 +109,8 @@ def capture(path, expected_session_id, *, prefix_bytes=None):
             if meta is not None or number != 1 or payload.get('id') != expected_session_id:
                 raise ValidationError('Native session metadata differs from expected session')
             meta = {k: payload.get(k) for k in ('id', 'originator', 'cli_version', 'source', 'model_provider')}
+            if any(value is not None and not isinstance(value, str) for value in meta.values()):
+                raise ValidationError('Invalid native host metadata')
             meta['event'] = ref
             continue
         if meta is None:
@@ -172,6 +200,27 @@ def capture(path, expected_session_id, *, prefix_bytes=None):
                 transitions.append({'kind': state, 'event': ref, 'epoch': epoch,
                                     'host_reported_last_usage': last, 'context_window_tokens': window,
                                     'measured_context_tokens': None})
+    checkpoint = dict(meta=meta, turn=turn, model=model, turn_ref=turn_ref,
+        current=current, last_measured=last_measured, state=state, epoch=epoch,
+        offset=offset, line=number, seen=sorted(seen), completed_turns=sorted(completed_turns),
+        stream_cumulative=stream_cumulative, thread_cumulative=thread_cumulative,
+        turn_cumulative=turn_cumulative, cumulative_ref=cumulative_ref,
+        pending_sample=samples[pending] if pending is not None else None)
+    result = dict(checkpoint=checkpoint, samples=samples, transitions=transitions, issues=issues)
+    return result, checkpoint
+
+
+def render_capture(parsed, read_bytes, trailing, prefix_sha256):
+    """Legacy snapshot presentation; never mutate resumable parser state."""
+    from copy import deepcopy
+    c = deepcopy(parsed['checkpoint'])
+    meta, state, current = c['meta'], c['state'], c['current']
+    last_measured = c['last_measured']
+    samples = deepcopy(parsed['samples'])
+    transitions, issues = parsed['transitions'], parsed['issues']
+    thread_cumulative, turn_cumulative = c['thread_cumulative'], c['turn_cumulative']
+    stream_cumulative, cumulative_ref = c['stream_cumulative'], c['cumulative_ref']
+    completed_turns = c['completed_turns']
     if trailing:
         current, state = None, 'INCOMPLETE_TRAILING_EVENT'
     supported = meta['originator'] == 'codex_work_desktop' and meta['cli_version'] in SUPPORTED_VERSIONS
@@ -181,8 +230,8 @@ def capture(path, expected_session_id, *, prefix_bytes=None):
             sample['status'] = 'UNSUPPORTED_HOST_VERSION'
     return {'format': 'pvl-codex-context-capture-1', 'host': meta,
             'adapter_supported': supported, 'source': {
-                'read_bytes': len(raw), 'complete_bytes': len(complete), 'trailing_bytes': trailing,
-                'complete_prefix_sha256': hashlib.sha256(complete).hexdigest()},
+                'read_bytes': read_bytes, 'complete_bytes': c['offset'], 'trailing_bytes': trailing,
+                'complete_prefix_sha256': prefix_sha256},
             'state': state, 'latest_context_sample': current,
             'last_measured_context_sample': last_measured if supported else None,
             'thread_cumulative_usage': thread_cumulative, 'turn_cumulative_usage': turn_cumulative,

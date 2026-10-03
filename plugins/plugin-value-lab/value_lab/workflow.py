@@ -74,7 +74,7 @@ def plan_plugin_use(context, now=None, *, artifact_root=None, verifier_root=None
         raise ValidationError("intent must be choose, use, evaluate or manage")
     if "plugin_combination" in context:
         if (intent not in ("choose", "evaluate") or context.get("selected_plugin") is not None
-                or any(k in context for k in ("task_selection", "evidence_acquisition", "evidence_bridge"))):
+                or any(k in context for k in ("task_selection", "evidence_acquisition", "evidence_bridge", "risk_acquisition", "burden_decision"))):
             raise ValidationError("Plugin combination needs a separate choose/evaluate request without a selected provider")
         from .plugin_combinations import route
         result = route(context['plugin_combination'], artifact_root=artifact_root, verifier_root=verifier_root)
@@ -96,12 +96,53 @@ def plan_plugin_use(context, now=None, *, artifact_root=None, verifier_root=None
                                 '不自动安装、卸载、扩大权限、执行宿主或调用付费服务。']}
     if "evidence_acquisition" in context and "task_selection" not in context:
         raise ValidationError("Evidence acquisition requires an explicit task_selection catalog")
+    if "burden_decision" in context and ("task_selection" not in context or any(k in context for k in ("evidence_acquisition", "evidence_bridge", "risk_acquisition"))):
+        raise ValidationError("Burden decision requires its own frozen task-selection mode")
+    if "risk_acquisition" in context and ("task_selection" not in context or any(k in context for k in ("evidence_acquisition", "evidence_bridge"))):
+        raise ValidationError("Risk acquisition requires a task_selection and its own prospective mode")
     if "evidence_bridge" in context and ("task_selection" not in context or "evidence_acquisition" in context):
         raise ValidationError("Evidence bridge requires a target task_selection and a separate mode from screening acquisition")
     if "task_selection" in context:
         if intent != "choose" or context.get("selected_plugin") is not None:
             raise ValidationError("Task selection requires a general choose request; do not replace an explicit provider or management request")
         from .task_selection import select_task_plan
+        if "burden_decision" in context:
+            from .burden_decision import route
+            burden = route(context['task_selection'], context['burden_decision'], artifact_root=artifact_root, verifier_root=verifier_root)
+            labels = {'AWAITING_PROSPECTIVE_EVIDENCE': '已冻结负担目标与完整任务比较，等待原始证据',
+                      'PREFERRED_IN_OBSERVED_CATALOG': '在满足科学与隐私条件的已观察方案中找到负担优选',
+                      'NO_MATERIAL_CHANGE_KEEP_INCUMBENT': '差异不足以影响行动，保留符合约束的当前方案',
+                      'CHOICE_REQUIRED': '可行方案存在取舍或实质并列，需要研究者选择',
+                      'NO_FEASIBLE_PLAN': '当前没有同时满足硬约束的方案',
+                      'EVIDENCE_REQUIRED': '负担、科学或隐私证据尚不完整，保留未决',
+                      'SIMULATION_ONLY': '合成演示：科学与隐私约束下比较负担，不构成真实建议'}
+            return {'schema_version': 1, 'type': 'plugin_use_plan', 'route': 'DECIDE_TASK_BURDEN', 'owner': LAB,
+                    'headline': labels[burden['state']], 'task_summary': context['task_selection']['task']['summary'],
+                    'burden_decision': burden, 'evidence_status': burden.get('evidence_status', 'NO_OBSERVATIONS'),
+                    'reasons': [burden['state']],
+                    'steps': [{'owner':'researcher', 'action':'review_burden_policy',
+                        'purpose':'核对科学与隐私门槛、实际差异阈值、人工复核和返工记录，以及 PVL 自身开销；不以低费用抵消失败。'}],
+                    'handoff': {'kind':'none', 'status':'PROPOSED_NOT_EXECUTED', 'execute':False},
+                    'limitations': burden.get('limits', ['冻结的是内容，不是独立见证的注册时间；不授权执行或付费。'])}
+        if "risk_acquisition" in context:
+            from .risk_acquisition import plan_risk_acquisition
+            risk = plan_risk_acquisition(context["task_selection"], context["risk_acquisition"], artifact_root=artifact_root, verifier_root=verifier_root)
+            labels = {"NEXT_BLOCK": "按预设错误风险安排下一批实验", "CERTIFIED_CANDIDATE": "候选达到预设风险与效用条件，仍需完整任务确认",
+                      "CERTIFIED_NO_ACCEPTABLE_CANDIDATE": "在预设风险条件下，当前候选均未达到效用下限",
+                      "STOP_BUDGET_UNRESOLVED": "预算已到，证据不足以选择；不计为效率收益",
+                      "STOP_HORIZON_UNRESOLVED": "达到观察上限，保留未决结果",
+                      "REVIEW_SAMPLING_ASSUMPTIONS": "先复核抽样假设，暂停统计选择",
+                      "REVIEW_TASK_APPLICABILITY": "先复核任务适用性与基线覆盖",
+                      "WAIT_FOR_ORIGINAL_BLOCK": "等待原批次，保留未知结果与费用预留",
+                      "REPAIR_EVIDENCE": "保留失败与未知记录，先修复本批证据"}
+            return {"schema_version": 1, "type": "plugin_use_plan", "route": "RISK_CONTROLLED_ACQUISITION", "owner": "host",
+                    "headline": ("合成演示：" if risk["evidence_status"] == "SIMULATION_ONLY" else "") + labels[risk["state"]],
+                    "task_summary": context["task_selection"]["task"]["summary"], "risk_acquisition": risk,
+                    "reasons": [risk["state"], "错误选择风险、决策用途和有效决策比例优先；少运行本身不是收益。"],
+                    "steps": [{"owner": LAB, "action": "review_risk_contract", "purpose": "核对错误概率上界、容许损失、效用下限与独立实验单位；只在下一批明确存在时继续采集。"}]
+                             + [{"owner": "researcher", "action": "required_review", "purpose": r} for r in risk["required_reviews"]],
+                    "handoff": {"kind": "none", "status": "PROPOSED_NOT_EXECUTED", "execute": False},
+                    "evidence_status": risk["evidence_status"], "limitations": risk["limits"]}
         if "evidence_bridge" in context:
             from .evidence_bridge import plan_bridge
             bridge = plan_bridge(context["task_selection"], context["evidence_bridge"], artifact_root=artifact_root, verifier_root=verifier_root)
@@ -344,7 +385,7 @@ def write_plan(plan, output_dir):
     root.mkdir(parents=True, exist_ok=True)
     write_json(root / "plan.json", plan)
     notice = ("本计划重算已有记录与授权产物；没有运行新的模型或插件、搜索、安装、连接或修改账户。"
-              if any(k in plan for k in ("selection", "acquisition", "bridge", "combination")) else "此计划没有搜索、安装、连接、评测或修改账户。")
+              if any(k in plan for k in ("selection", "acquisition", "bridge", "combination", "risk_acquisition", "burden_decision")) else "此计划没有搜索、安装、连接、评测或修改账户。")
     lines = ["# 证据迁移与桥接" if "bridge" in plan else "# 最小补证据计划" if "acquisition" in plan else "# 任务方案选择" if "selection" in plan else "# 插件使用计划", "", f"**{_md(plan['headline'])}**", "",
              f"任务：{_md(plan['task_summary'])}", "", notice, "",
              "## 下一步", ""]
@@ -357,6 +398,25 @@ def write_plan(plan, output_dir):
         offset = lines.index('## 下一步')
         lines[offset:offset] = evidence_markdown(plan['combination'])
     lines.extend(["", "## 判断依据", ""] + [f"- {_md(r)}" for r in plan["reasons"]])
+    if "burden_decision" in plan:
+        from .burden_decision import markdown as burden_markdown
+        lines.extend(burden_markdown(plan['burden_decision']))
+    if "risk_acquisition" in plan:
+        risk = plan["risk_acquisition"]
+        contract = risk["decision_contract"]
+        lines += ["", "## 风险约束与决策用途", "",
+                  f"预设错误概率上界：{contract['alpha']}；容许效用损失：{contract['epsilon']}；最低效用：{contract['quality_floor']}。",
+                  "上界依赖已声明抽样假设；不等于已验证的真实错误率。重复查看结果已纳入有限观察范围的风险计算。",
+                  f"已启动候选实验单位：{risk['candidate_units_started']}；原计划运行数：{risk['planned_runs_started']}；已报告实际启动运行数：{risk['reported_runs_started']}。",
+                  "停止但没有决策证据，不计为效率收益。完整阶段和集成确认仍需通过原有评估器。", "",
+                  "| 候选 | 独立单位数 | 效用均值 | 下界 | 上界 |", "| --- | --- | --- | --- | --- |"]
+        for ident, row in risk["intervals"].items():
+            lines.append("| " + " | ".join(_md(str(v)) for v in (ident, row["n"], row["mean"], row["lower"], row["upper"])) + " |")
+        block = risk["next_block"]
+        next_text = ("、".join(block["candidate_ids"]) + "；每个候选 " + str(len(block["unit_ids"])) + " 个新实验单位；预留 "
+                     + str(block["reserved_micros"]) + " USD micros。") if block else "无；先处理停止或复核原因。"
+        lines += ["", "下一批：" + _md(next_text), "", "统计候选：" + _md(str(risk["candidate_for_confirmation"] or "未作选择")),
+                  "候选仅限冻结效用与总体，不是全目录最小插件组合或科学采用结论。"]
     if 'combination' in plan:
         result = plan['combination']
         lines += ['', '## 最小有效插件组合', '']

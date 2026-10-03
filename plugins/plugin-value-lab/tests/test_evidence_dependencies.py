@@ -248,8 +248,11 @@ class EvidenceDependencyTests(unittest.TestCase):
         output = self.root / "revision"
         paths = write_revision(self.baseline, output)
         self.assertTrue(Path(paths["report"]).exists())
+        self.assertEqual(write_revision(self.baseline, output), paths)
+        changed = deepcopy(self.baseline)
+        changed["source_status"] = "changed"
         with self.assertRaises(ValidationError):
-            write_revision(self.baseline, output)
+            write_revision(changed, output)
 
     def test_cli_roundtrip(self):
         for name, data in (("card", self.card), ("graph", self.graph), ("inventory", self.inventory)):
@@ -262,7 +265,9 @@ class EvidenceDependencyTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         saved = json.loads((self.root / "cli-revision/revision.json").read_text(encoding="utf-8"))
         self.assertEqual(saved["rules"]["format"]["status"], "PASSED")
-        self.assertNotEqual(subprocess.run(command, capture_output=True).returncode, 0)
+        replay = subprocess.run(command, capture_output=True, text=True)
+        self.assertEqual(replay.returncode, 0, replay.stderr)
+        self.assertTrue(json.loads(replay.stdout)["replayed"])
 
     def test_schema_accepts_fixture_and_rejects_extra_fields(self):
         import jsonschema

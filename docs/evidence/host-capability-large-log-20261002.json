@@ -1,0 +1,67 @@
+{
+  "format": "pvl-host-capability-qualification-1",
+  "status": "PASS",
+  "evidence": "SYNTHETIC_LOCAL_ONLY",
+  "qualification": {
+    "adapter": "codex-desktop-rollout",
+    "parser_version": "codex-rollout-state-1",
+    "parser_sha256": "f521006a692c84c724ff2e7c98e2ba61a8b0206b9ef00fb59e907455a664ff8b",
+    "qualified_originator": "codex_work_desktop",
+    "qualified_engine_versions": [
+      "0.159.2"
+    ],
+    "qualification_scope": "LOCAL_LOG_FIELD_SEMANTICS_NOT_PROVIDER_AUTHENTICATION",
+    "upgrade_rule": "Exact parser and host schema qualification required; never infer from similar field names",
+    "fallback": "Preserve prior bundle; requalify/replay into a separate lineage; existing artifact checks remain independent"
+  },
+  "source_bytes_before_append": 68170560,
+  "legacy_limit_bytes": 67108864,
+  "legacy_rejected_oversized_source": true,
+  "incremental_batch_limit_bytes": 33554432,
+  "batches": [
+    {
+      "new_bytes_parsed": 33541258,
+      "prefix_bytes_rehashed": 33541258,
+      "parser_events_processed": 2037,
+      "new_response_count": 1,
+      "more_events_available": true
+    },
+    {
+      "new_bytes_parsed": 33540434,
+      "prefix_bytes_rehashed": 100622950,
+      "parser_events_processed": 2033,
+      "new_response_count": 0,
+      "more_events_available": true
+    },
+    {
+      "new_bytes_parsed": 1088868,
+      "prefix_bytes_rehashed": 135252252,
+      "parser_events_processed": 66,
+      "new_response_count": 0,
+      "more_events_available": false
+    }
+  ],
+  "append": {
+    "new_bytes_parsed": 528,
+    "prefix_bytes_rehashed": 136341648,
+    "parser_events_processed": 2,
+    "new_response_ids": [
+      "r2"
+    ],
+    "total_unique_response_ids": 2
+  },
+  "unchanged": {
+    "new_bytes_parsed": 0,
+    "parser_events_processed": 0,
+    "new_response_count": 0
+  },
+  "private_text_exported": false,
+  "model_calls": 0,
+  "actual_paid_calls": 0,
+  "installed_host_acceptance": false,
+  "source_sha256": {
+    "codex_context.py": "badefc7be1b29c5342232440596c8fd7ddf49c5a94cc2890bbbdcb13514dca41",
+    "context_stream.py": "cf2ab7454fdc1c26c45f1e032d6a5e1c8ce094db6c7103d1cd582e33d2f39b5c",
+    "host_capabilities.py": "6a117ca95fe0419717c8d7467fd37f820480364616ded6137bb45d29e580aec2"
+  }
+}

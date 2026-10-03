@@ -1,0 +1,1032 @@
+{
+  "format": "pvl-codex-legacy-fixtures-1",
+  "producer_sha256": "3b89ee8cbf6068f4e7b4bfaaa9030aed93eb003188fdf8272d9611506e2d5c9e",
+  "evidence": "SYNTHETIC_COMPATIBILITY_ONLY",
+  "cases": [
+    {
+      "name": "measured",
+      "events": [
+        {
+          "type": "session_meta",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "id": "session",
+            "originator": "codex_work_desktop",
+            "cli_version": "0.159.2",
+            "source": "vscode",
+            "model_provider": "openai",
+            "instructions": "PRIVATE-INSTRUCTIONS",
+            "cwd": "PRIVATE-PATH"
+          }
+        },
+        {
+          "type": "event_msg",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "type": "task_started",
+            "turn_id": "turn"
+          }
+        },
+        {
+          "type": "turn_context",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "turn_id": "turn",
+            "model": "observed-model",
+            "private": "PRIVATE-TEXT"
+          }
+        },
+        {
+          "type": "token_usage_record",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "thread_id": "session",
+            "session_id": "session",
+            "turn_id": "turn",
+            "root_turn_id": "turn",
+            "response_id": "response",
+            "usage": {
+              "input_tokens": 200,
+              "output_tokens": 10,
+              "cached_input_tokens": 100,
+              "cache_write_input_tokens": 0,
+              "reasoning_output_tokens": 5,
+              "total_tokens": 210
+            },
+            "thread_token_usage": {
+              "input_tokens": 9000,
+              "output_tokens": 1000,
+              "cached_input_tokens": 100,
+              "cache_write_input_tokens": 0,
+              "reasoning_output_tokens": 5,
+              "total_tokens": 10000
+            },
+            "turn_token_usage": {
+              "input_tokens": 9000,
+              "output_tokens": 1000,
+              "cached_input_tokens": 100,
+              "cache_write_input_tokens": 0,
+              "reasoning_output_tokens": 5,
+              "total_tokens": 10000
+            }
+          }
+        },
+        {
+          "type": "event_msg",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "type": "token_count",
+            "info": {
+              "last_token_usage": {
+                "input_tokens": 200,
+                "output_tokens": 10,
+                "cached_input_tokens": 100,
+                "cache_write_input_tokens": 0,
+                "reasoning_output_tokens": 5,
+                "total_tokens": 210
+              },
+              "total_token_usage": {
+                "input_tokens": 9000,
+                "output_tokens": 1000,
+                "cached_input_tokens": 100,
+                "cache_write_input_tokens": 0,
+                "reasoning_output_tokens": 5,
+                "total_tokens": 10000
+              },
+              "model_context_window": 1000
+            }
+          }
+        },
+        {
+          "type": "event_msg",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "type": "task_complete",
+            "turn_id": "turn"
+          }
+        }
+      ],
+      "tail": "",
+      "expected": {
+        "format": "pvl-codex-context-capture-1",
+        "host": {
+          "id": "session",
+          "originator": "codex_work_desktop",
+          "cli_version": "0.159.2",
+          "source": "vscode",
+          "model_provider": "openai",
+          "event": {
+            "line": 1,
+            "byte_start": 0,
+            "byte_end": 265,
+            "sha256": "73ef383d8e2e2495d0adb9ce4038af62003706d444324bc61ec166a71f40c7bd",
+            "timestamp": "2026-10-02T09:00:00Z",
+            "ordinal": null
+          }
+        },
+        "adapter_supported": true,
+        "source": {
+          "read_bytes": 1856,
+          "complete_bytes": 1856,
+          "trailing_bytes": 0,
+          "complete_prefix_sha256": "06568a02f7efa2346e9d3f075ec6339e851f7d889bb527f9e1aa0439b8d24669"
+        },
+        "state": "MEASURED_AT_SAMPLE",
+        "latest_context_sample": {
+          "response_id": "response",
+          "turn_id": "turn",
+          "model": "observed-model",
+          "phase": "post_response_token_count",
+          "as_of": "2026-10-02T09:00:00Z",
+          "event": {
+            "line": 5,
+            "byte_start": 1251,
+            "byte_end": 1740,
+            "sha256": "5d27c5b42802a8c54f62114a2a8ae4ea8521ac5c9b06a566388a8b0319f39733",
+            "timestamp": "2026-10-02T09:00:00Z",
+            "ordinal": null
+          },
+          "request_input_tokens": 200,
+          "context_tokens": 210,
+          "context_window_tokens": 1000,
+          "context_fraction": 0.21
+        },
+        "last_measured_context_sample": {
+          "response_id": "response",
+          "turn_id": "turn",
+          "model": "observed-model",
+          "phase": "post_response_token_count",
+          "as_of": "2026-10-02T09:00:00Z",
+          "event": {
+            "line": 5,
+            "byte_start": 1251,
+            "byte_end": 1740,
+            "sha256": "5d27c5b42802a8c54f62114a2a8ae4ea8521ac5c9b06a566388a8b0319f39733",
+            "timestamp": "2026-10-02T09:00:00Z",
+            "ordinal": null
+          },
+          "request_input_tokens": 200,
+          "context_tokens": 210,
+          "context_window_tokens": 1000,
+          "context_fraction": 0.21
+        },
+        "thread_cumulative_usage": {
+          "input_tokens": 9000,
+          "cached_input_tokens": 100,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1000,
+          "reasoning_output_tokens": 5,
+          "total_tokens": 10000
+        },
+        "turn_cumulative_usage": {
+          "input_tokens": 9000,
+          "cached_input_tokens": 100,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1000,
+          "reasoning_output_tokens": 5,
+          "total_tokens": 10000
+        },
+        "usage_ledger_event": {
+          "line": 4,
+          "byte_start": 528,
+          "byte_end": 1251,
+          "sha256": "05fe8bc8c8f6542826226d243146e0ba9b463a95cbcf95b868662a9268b3c84e",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "ordinal": null
+        },
+        "context_stream_cumulative_usage": {
+          "input_tokens": 9000,
+          "cached_input_tokens": 100,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1000,
+          "reasoning_output_tokens": 5,
+          "total_tokens": 10000
+        },
+        "settled_cost_usd": null,
+        "samples": [
+          {
+            "kind": "MAIN_REQUEST",
+            "status": "MEASURED_RESPONSE_BOUND",
+            "session_id": "session",
+            "turn_id": "turn",
+            "model": "observed-model",
+            "response_id": "response",
+            "epoch": 0,
+            "event": {
+              "line": 4,
+              "byte_start": 528,
+              "byte_end": 1251,
+              "sha256": "05fe8bc8c8f6542826226d243146e0ba9b463a95cbcf95b868662a9268b3c84e",
+              "timestamp": "2026-10-02T09:00:00Z",
+              "ordinal": null
+            },
+            "turn_context_event": {
+              "line": 3,
+              "byte_start": 380,
+              "byte_end": 528,
+              "sha256": "9f18d0f2ea2bebe10efbae07f9653c2937037ebb218eeafbdbca06234155fe37",
+              "timestamp": "2026-10-02T09:00:00Z",
+              "ordinal": null
+            },
+            "phase": "response_usage_recorded",
+            "request_usage": {
+              "input_tokens": 200,
+              "cached_input_tokens": 100,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 10,
+              "reasoning_output_tokens": 5,
+              "total_tokens": 210
+            },
+            "context_event": {
+              "line": 5,
+              "byte_start": 1251,
+              "byte_end": 1740,
+              "sha256": "5d27c5b42802a8c54f62114a2a8ae4ea8521ac5c9b06a566388a8b0319f39733",
+              "timestamp": "2026-10-02T09:00:00Z",
+              "ordinal": null
+            },
+            "context_window_tokens": 1000,
+            "request_input_fraction": 0.2,
+            "context_tokens_at_sample": 210,
+            "context_fraction_at_sample": 0.21
+          }
+        ],
+        "transitions": [],
+        "completed_turns": [
+          "turn"
+        ],
+        "issues": [],
+        "scope": "Local Codex desktop rollout, engine 0.159.2; response-bound samples only.",
+        "definitions": {
+          "request_input": "usage.input_tokens includes cached input; never add cache again.",
+          "context_at_sample": "Matched last_token_usage.total_tokens after a response; input plus output, not cumulative spend.",
+          "burden_input": "Use request_input_fraction for the existing main-agent input-peak metric; do not substitute post-response total.",
+          "cumulative": "Separate host ledgers. Never divide cumulative usage by context capacity or infer monetary charges.",
+          "unknown": "Absent/mismatched/estimated observations remain unknown, including after compaction.",
+          "freshness": "As-of event snapshot, not the live prompt after later tools, messages or compaction."
+        },
+        "claim_limits": [
+          "Local file observations are not independent provider attestation.",
+          "No other host or engine version is qualified by this capture.",
+          "No complete experiment, plugin benefit, settled fee or recommendation follows."
+        ]
+      }
+    },
+    {
+      "name": "partial",
+      "events": [
+        {
+          "type": "session_meta",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "id": "session",
+            "originator": "codex_work_desktop",
+            "cli_version": "0.159.2",
+            "source": "vscode",
+            "model_provider": "openai",
+            "instructions": "PRIVATE-INSTRUCTIONS",
+            "cwd": "PRIVATE-PATH"
+          }
+        },
+        {
+          "type": "event_msg",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "type": "task_started",
+            "turn_id": "turn"
+          }
+        },
+        {
+          "type": "turn_context",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "turn_id": "turn",
+            "model": "observed-model",
+            "private": "PRIVATE-TEXT"
+          }
+        },
+        {
+          "type": "token_usage_record",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "thread_id": "session",
+            "session_id": "session",
+            "turn_id": "turn",
+            "root_turn_id": "turn",
+            "response_id": "response",
+            "usage": {
+              "input_tokens": 200,
+              "output_tokens": 10,
+              "cached_input_tokens": 100,
+              "cache_write_input_tokens": 0,
+              "reasoning_output_tokens": 5,
+              "total_tokens": 210
+            },
+            "thread_token_usage": {
+              "input_tokens": 9000,
+              "output_tokens": 1000,
+              "cached_input_tokens": 100,
+              "cache_write_input_tokens": 0,
+              "reasoning_output_tokens": 5,
+              "total_tokens": 10000
+            },
+            "turn_token_usage": {
+              "input_tokens": 9000,
+              "output_tokens": 1000,
+              "cached_input_tokens": 100,
+              "cache_write_input_tokens": 0,
+              "reasoning_output_tokens": 5,
+              "total_tokens": 10000
+            }
+          }
+        },
+        {
+          "type": "event_msg",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "type": "token_count",
+            "info": {
+              "last_token_usage": {
+                "input_tokens": 200,
+                "output_tokens": 10,
+                "cached_input_tokens": 100,
+                "cache_write_input_tokens": 0,
+                "reasoning_output_tokens": 5,
+                "total_tokens": 210
+              },
+              "total_token_usage": {
+                "input_tokens": 9000,
+                "output_tokens": 1000,
+                "cached_input_tokens": 100,
+                "cache_write_input_tokens": 0,
+                "reasoning_output_tokens": 5,
+                "total_tokens": 10000
+              },
+              "model_context_window": 1000
+            }
+          }
+        },
+        {
+          "type": "event_msg",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "type": "task_complete",
+            "turn_id": "turn"
+          }
+        }
+      ],
+      "tail": "{",
+      "expected": {
+        "format": "pvl-codex-context-capture-1",
+        "host": {
+          "id": "session",
+          "originator": "codex_work_desktop",
+          "cli_version": "0.159.2",
+          "source": "vscode",
+          "model_provider": "openai",
+          "event": {
+            "line": 1,
+            "byte_start": 0,
+            "byte_end": 265,
+            "sha256": "73ef383d8e2e2495d0adb9ce4038af62003706d444324bc61ec166a71f40c7bd",
+            "timestamp": "2026-10-02T09:00:00Z",
+            "ordinal": null
+          }
+        },
+        "adapter_supported": true,
+        "source": {
+          "read_bytes": 1857,
+          "complete_bytes": 1856,
+          "trailing_bytes": 1,
+          "complete_prefix_sha256": "06568a02f7efa2346e9d3f075ec6339e851f7d889bb527f9e1aa0439b8d24669"
+        },
+        "state": "INCOMPLETE_TRAILING_EVENT",
+        "latest_context_sample": null,
+        "last_measured_context_sample": {
+          "response_id": "response",
+          "turn_id": "turn",
+          "model": "observed-model",
+          "phase": "post_response_token_count",
+          "as_of": "2026-10-02T09:00:00Z",
+          "event": {
+            "line": 5,
+            "byte_start": 1251,
+            "byte_end": 1740,
+            "sha256": "5d27c5b42802a8c54f62114a2a8ae4ea8521ac5c9b06a566388a8b0319f39733",
+            "timestamp": "2026-10-02T09:00:00Z",
+            "ordinal": null
+          },
+          "request_input_tokens": 200,
+          "context_tokens": 210,
+          "context_window_tokens": 1000,
+          "context_fraction": 0.21
+        },
+        "thread_cumulative_usage": {
+          "input_tokens": 9000,
+          "cached_input_tokens": 100,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1000,
+          "reasoning_output_tokens": 5,
+          "total_tokens": 10000
+        },
+        "turn_cumulative_usage": {
+          "input_tokens": 9000,
+          "cached_input_tokens": 100,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1000,
+          "reasoning_output_tokens": 5,
+          "total_tokens": 10000
+        },
+        "usage_ledger_event": {
+          "line": 4,
+          "byte_start": 528,
+          "byte_end": 1251,
+          "sha256": "05fe8bc8c8f6542826226d243146e0ba9b463a95cbcf95b868662a9268b3c84e",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "ordinal": null
+        },
+        "context_stream_cumulative_usage": {
+          "input_tokens": 9000,
+          "cached_input_tokens": 100,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1000,
+          "reasoning_output_tokens": 5,
+          "total_tokens": 10000
+        },
+        "settled_cost_usd": null,
+        "samples": [
+          {
+            "kind": "MAIN_REQUEST",
+            "status": "MEASURED_RESPONSE_BOUND",
+            "session_id": "session",
+            "turn_id": "turn",
+            "model": "observed-model",
+            "response_id": "response",
+            "epoch": 0,
+            "event": {
+              "line": 4,
+              "byte_start": 528,
+              "byte_end": 1251,
+              "sha256": "05fe8bc8c8f6542826226d243146e0ba9b463a95cbcf95b868662a9268b3c84e",
+              "timestamp": "2026-10-02T09:00:00Z",
+              "ordinal": null
+            },
+            "turn_context_event": {
+              "line": 3,
+              "byte_start": 380,
+              "byte_end": 528,
+              "sha256": "9f18d0f2ea2bebe10efbae07f9653c2937037ebb218eeafbdbca06234155fe37",
+              "timestamp": "2026-10-02T09:00:00Z",
+              "ordinal": null
+            },
+            "phase": "response_usage_recorded",
+            "request_usage": {
+              "input_tokens": 200,
+              "cached_input_tokens": 100,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 10,
+              "reasoning_output_tokens": 5,
+              "total_tokens": 210
+            },
+            "context_event": {
+              "line": 5,
+              "byte_start": 1251,
+              "byte_end": 1740,
+              "sha256": "5d27c5b42802a8c54f62114a2a8ae4ea8521ac5c9b06a566388a8b0319f39733",
+              "timestamp": "2026-10-02T09:00:00Z",
+              "ordinal": null
+            },
+            "context_window_tokens": 1000,
+            "request_input_fraction": 0.2,
+            "context_tokens_at_sample": 210,
+            "context_fraction_at_sample": 0.21
+          }
+        ],
+        "transitions": [],
+        "completed_turns": [
+          "turn"
+        ],
+        "issues": [],
+        "scope": "Local Codex desktop rollout, engine 0.159.2; response-bound samples only.",
+        "definitions": {
+          "request_input": "usage.input_tokens includes cached input; never add cache again.",
+          "context_at_sample": "Matched last_token_usage.total_tokens after a response; input plus output, not cumulative spend.",
+          "burden_input": "Use request_input_fraction for the existing main-agent input-peak metric; do not substitute post-response total.",
+          "cumulative": "Separate host ledgers. Never divide cumulative usage by context capacity or infer monetary charges.",
+          "unknown": "Absent/mismatched/estimated observations remain unknown, including after compaction.",
+          "freshness": "As-of event snapshot, not the live prompt after later tools, messages or compaction."
+        },
+        "claim_limits": [
+          "Local file observations are not independent provider attestation.",
+          "No other host or engine version is qualified by this capture.",
+          "No complete experiment, plugin benefit, settled fee or recommendation follows."
+        ]
+      }
+    },
+    {
+      "name": "upgrade",
+      "events": [
+        {
+          "type": "session_meta",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "id": "session",
+            "originator": "codex_work_desktop",
+            "cli_version": "0.160.0",
+            "source": "vscode",
+            "model_provider": "openai",
+            "instructions": "PRIVATE-INSTRUCTIONS",
+            "cwd": "PRIVATE-PATH"
+          }
+        },
+        {
+          "type": "event_msg",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "type": "task_started",
+            "turn_id": "turn"
+          }
+        },
+        {
+          "type": "turn_context",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "turn_id": "turn",
+            "model": "observed-model",
+            "private": "PRIVATE-TEXT"
+          }
+        },
+        {
+          "type": "token_usage_record",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "thread_id": "session",
+            "session_id": "session",
+            "turn_id": "turn",
+            "root_turn_id": "turn",
+            "response_id": "response",
+            "usage": {
+              "input_tokens": 200,
+              "output_tokens": 10,
+              "cached_input_tokens": 100,
+              "cache_write_input_tokens": 0,
+              "reasoning_output_tokens": 5,
+              "total_tokens": 210
+            },
+            "thread_token_usage": {
+              "input_tokens": 9000,
+              "output_tokens": 1000,
+              "cached_input_tokens": 100,
+              "cache_write_input_tokens": 0,
+              "reasoning_output_tokens": 5,
+              "total_tokens": 10000
+            },
+            "turn_token_usage": {
+              "input_tokens": 9000,
+              "output_tokens": 1000,
+              "cached_input_tokens": 100,
+              "cache_write_input_tokens": 0,
+              "reasoning_output_tokens": 5,
+              "total_tokens": 10000
+            }
+          }
+        },
+        {
+          "type": "event_msg",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "type": "token_count",
+            "info": {
+              "last_token_usage": {
+                "input_tokens": 200,
+                "output_tokens": 10,
+                "cached_input_tokens": 100,
+                "cache_write_input_tokens": 0,
+                "reasoning_output_tokens": 5,
+                "total_tokens": 210
+              },
+              "total_token_usage": {
+                "input_tokens": 9000,
+                "output_tokens": 1000,
+                "cached_input_tokens": 100,
+                "cache_write_input_tokens": 0,
+                "reasoning_output_tokens": 5,
+                "total_tokens": 10000
+              },
+              "model_context_window": 1000
+            }
+          }
+        },
+        {
+          "type": "event_msg",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "type": "task_complete",
+            "turn_id": "turn"
+          }
+        }
+      ],
+      "tail": "",
+      "expected": {
+        "format": "pvl-codex-context-capture-1",
+        "host": {
+          "id": "session",
+          "originator": "codex_work_desktop",
+          "cli_version": "0.160.0",
+          "source": "vscode",
+          "model_provider": "openai",
+          "event": {
+            "line": 1,
+            "byte_start": 0,
+            "byte_end": 265,
+            "sha256": "3d56dbc53d2b3253890a0814759d7c8c9d0338d5b5775669c3f885811a7e3651",
+            "timestamp": "2026-10-02T09:00:00Z",
+            "ordinal": null
+          }
+        },
+        "adapter_supported": false,
+        "source": {
+          "read_bytes": 1856,
+          "complete_bytes": 1856,
+          "trailing_bytes": 0,
+          "complete_prefix_sha256": "21b59469098aa75e35dcad4617dfc74fa0658e4895b7a6325478f1c7377f5a2f"
+        },
+        "state": "UNSUPPORTED_HOST_VERSION",
+        "latest_context_sample": null,
+        "last_measured_context_sample": null,
+        "thread_cumulative_usage": {
+          "input_tokens": 9000,
+          "cached_input_tokens": 100,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1000,
+          "reasoning_output_tokens": 5,
+          "total_tokens": 10000
+        },
+        "turn_cumulative_usage": {
+          "input_tokens": 9000,
+          "cached_input_tokens": 100,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1000,
+          "reasoning_output_tokens": 5,
+          "total_tokens": 10000
+        },
+        "usage_ledger_event": {
+          "line": 4,
+          "byte_start": 528,
+          "byte_end": 1251,
+          "sha256": "05fe8bc8c8f6542826226d243146e0ba9b463a95cbcf95b868662a9268b3c84e",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "ordinal": null
+        },
+        "context_stream_cumulative_usage": {
+          "input_tokens": 9000,
+          "cached_input_tokens": 100,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1000,
+          "reasoning_output_tokens": 5,
+          "total_tokens": 10000
+        },
+        "settled_cost_usd": null,
+        "samples": [
+          {
+            "kind": "MAIN_REQUEST",
+            "status": "UNSUPPORTED_HOST_VERSION",
+            "session_id": "session",
+            "turn_id": "turn",
+            "model": "observed-model",
+            "response_id": "response",
+            "epoch": 0,
+            "event": {
+              "line": 4,
+              "byte_start": 528,
+              "byte_end": 1251,
+              "sha256": "05fe8bc8c8f6542826226d243146e0ba9b463a95cbcf95b868662a9268b3c84e",
+              "timestamp": "2026-10-02T09:00:00Z",
+              "ordinal": null
+            },
+            "turn_context_event": {
+              "line": 3,
+              "byte_start": 380,
+              "byte_end": 528,
+              "sha256": "9f18d0f2ea2bebe10efbae07f9653c2937037ebb218eeafbdbca06234155fe37",
+              "timestamp": "2026-10-02T09:00:00Z",
+              "ordinal": null
+            },
+            "phase": "response_usage_recorded",
+            "request_usage": {
+              "input_tokens": 200,
+              "cached_input_tokens": 100,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 10,
+              "reasoning_output_tokens": 5,
+              "total_tokens": 210
+            },
+            "context_event": {
+              "line": 5,
+              "byte_start": 1251,
+              "byte_end": 1740,
+              "sha256": "5d27c5b42802a8c54f62114a2a8ae4ea8521ac5c9b06a566388a8b0319f39733",
+              "timestamp": "2026-10-02T09:00:00Z",
+              "ordinal": null
+            },
+            "context_window_tokens": 1000,
+            "request_input_fraction": 0.2,
+            "context_tokens_at_sample": 210,
+            "context_fraction_at_sample": 0.21
+          }
+        ],
+        "transitions": [],
+        "completed_turns": [
+          "turn"
+        ],
+        "issues": [],
+        "scope": "Local Codex desktop rollout, engine 0.159.2; response-bound samples only.",
+        "definitions": {
+          "request_input": "usage.input_tokens includes cached input; never add cache again.",
+          "context_at_sample": "Matched last_token_usage.total_tokens after a response; input plus output, not cumulative spend.",
+          "burden_input": "Use request_input_fraction for the existing main-agent input-peak metric; do not substitute post-response total.",
+          "cumulative": "Separate host ledgers. Never divide cumulative usage by context capacity or infer monetary charges.",
+          "unknown": "Absent/mismatched/estimated observations remain unknown, including after compaction.",
+          "freshness": "As-of event snapshot, not the live prompt after later tools, messages or compaction."
+        },
+        "claim_limits": [
+          "Local file observations are not independent provider attestation.",
+          "No other host or engine version is qualified by this capture.",
+          "No complete experiment, plugin benefit, settled fee or recommendation follows."
+        ]
+      }
+    },
+    {
+      "name": "compaction",
+      "events": [
+        {
+          "type": "session_meta",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "id": "session",
+            "originator": "codex_work_desktop",
+            "cli_version": "0.159.2",
+            "source": "vscode",
+            "model_provider": "openai",
+            "instructions": "PRIVATE-INSTRUCTIONS",
+            "cwd": "PRIVATE-PATH"
+          }
+        },
+        {
+          "type": "event_msg",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "type": "task_started",
+            "turn_id": "turn"
+          }
+        },
+        {
+          "type": "turn_context",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "turn_id": "turn",
+            "model": "observed-model",
+            "private": "PRIVATE-TEXT"
+          }
+        },
+        {
+          "type": "token_usage_record",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "thread_id": "session",
+            "session_id": "session",
+            "turn_id": "turn",
+            "root_turn_id": "turn",
+            "response_id": "response",
+            "usage": {
+              "input_tokens": 200,
+              "output_tokens": 10,
+              "cached_input_tokens": 100,
+              "cache_write_input_tokens": 0,
+              "reasoning_output_tokens": 5,
+              "total_tokens": 210
+            },
+            "thread_token_usage": {
+              "input_tokens": 9000,
+              "output_tokens": 1000,
+              "cached_input_tokens": 100,
+              "cache_write_input_tokens": 0,
+              "reasoning_output_tokens": 5,
+              "total_tokens": 10000
+            },
+            "turn_token_usage": {
+              "input_tokens": 9000,
+              "output_tokens": 1000,
+              "cached_input_tokens": 100,
+              "cache_write_input_tokens": 0,
+              "reasoning_output_tokens": 5,
+              "total_tokens": 10000
+            }
+          }
+        },
+        {
+          "type": "event_msg",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "type": "token_count",
+            "info": {
+              "last_token_usage": {
+                "input_tokens": 200,
+                "output_tokens": 10,
+                "cached_input_tokens": 100,
+                "cache_write_input_tokens": 0,
+                "reasoning_output_tokens": 5,
+                "total_tokens": 210
+              },
+              "total_token_usage": {
+                "input_tokens": 9000,
+                "output_tokens": 1000,
+                "cached_input_tokens": 100,
+                "cache_write_input_tokens": 0,
+                "reasoning_output_tokens": 5,
+                "total_tokens": 10000
+              },
+              "model_context_window": 1000
+            }
+          }
+        },
+        {
+          "type": "event_msg",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "type": "task_complete",
+            "turn_id": "turn"
+          }
+        },
+        {
+          "type": "compacted",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "payload": {
+            "compaction_response_id": "response"
+          }
+        }
+      ],
+      "tail": "",
+      "expected": {
+        "format": "pvl-codex-context-capture-1",
+        "host": {
+          "id": "session",
+          "originator": "codex_work_desktop",
+          "cli_version": "0.159.2",
+          "source": "vscode",
+          "model_provider": "openai",
+          "event": {
+            "line": 1,
+            "byte_start": 0,
+            "byte_end": 265,
+            "sha256": "73ef383d8e2e2495d0adb9ce4038af62003706d444324bc61ec166a71f40c7bd",
+            "timestamp": "2026-10-02T09:00:00Z",
+            "ordinal": null
+          }
+        },
+        "adapter_supported": true,
+        "source": {
+          "read_bytes": 1966,
+          "complete_bytes": 1966,
+          "trailing_bytes": 0,
+          "complete_prefix_sha256": "7cb3c2ff14cfc2ecc66c2fc08abd157493826bb44f3d0d53680af4e82d575e02"
+        },
+        "state": "UNKNOWN_AFTER_COMPACTION",
+        "latest_context_sample": null,
+        "last_measured_context_sample": {
+          "response_id": "response",
+          "turn_id": "turn",
+          "model": "observed-model",
+          "phase": "post_response_token_count",
+          "as_of": "2026-10-02T09:00:00Z",
+          "event": {
+            "line": 5,
+            "byte_start": 1251,
+            "byte_end": 1740,
+            "sha256": "5d27c5b42802a8c54f62114a2a8ae4ea8521ac5c9b06a566388a8b0319f39733",
+            "timestamp": "2026-10-02T09:00:00Z",
+            "ordinal": null
+          },
+          "request_input_tokens": 200,
+          "context_tokens": 210,
+          "context_window_tokens": 1000,
+          "context_fraction": 0.21
+        },
+        "thread_cumulative_usage": {
+          "input_tokens": 9000,
+          "cached_input_tokens": 100,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1000,
+          "reasoning_output_tokens": 5,
+          "total_tokens": 10000
+        },
+        "turn_cumulative_usage": {
+          "input_tokens": 9000,
+          "cached_input_tokens": 100,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1000,
+          "reasoning_output_tokens": 5,
+          "total_tokens": 10000
+        },
+        "usage_ledger_event": {
+          "line": 4,
+          "byte_start": 528,
+          "byte_end": 1251,
+          "sha256": "05fe8bc8c8f6542826226d243146e0ba9b463a95cbcf95b868662a9268b3c84e",
+          "timestamp": "2026-10-02T09:00:00Z",
+          "ordinal": null
+        },
+        "context_stream_cumulative_usage": {
+          "input_tokens": 9000,
+          "cached_input_tokens": 100,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1000,
+          "reasoning_output_tokens": 5,
+          "total_tokens": 10000
+        },
+        "settled_cost_usd": null,
+        "samples": [
+          {
+            "kind": "COMPACTION_RESPONSE",
+            "status": "EXCLUDED_FROM_MAIN_REQUESTS",
+            "session_id": "session",
+            "turn_id": "turn",
+            "model": "observed-model",
+            "response_id": "response",
+            "epoch": 0,
+            "event": {
+              "line": 4,
+              "byte_start": 528,
+              "byte_end": 1251,
+              "sha256": "05fe8bc8c8f6542826226d243146e0ba9b463a95cbcf95b868662a9268b3c84e",
+              "timestamp": "2026-10-02T09:00:00Z",
+              "ordinal": null
+            },
+            "turn_context_event": {
+              "line": 3,
+              "byte_start": 380,
+              "byte_end": 528,
+              "sha256": "9f18d0f2ea2bebe10efbae07f9653c2937037ebb218eeafbdbca06234155fe37",
+              "timestamp": "2026-10-02T09:00:00Z",
+              "ordinal": null
+            },
+            "phase": "response_usage_recorded",
+            "request_usage": {
+              "input_tokens": 200,
+              "cached_input_tokens": 100,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 10,
+              "reasoning_output_tokens": 5,
+              "total_tokens": 210
+            },
+            "context_event": {
+              "line": 5,
+              "byte_start": 1251,
+              "byte_end": 1740,
+              "sha256": "5d27c5b42802a8c54f62114a2a8ae4ea8521ac5c9b06a566388a8b0319f39733",
+              "timestamp": "2026-10-02T09:00:00Z",
+              "ordinal": null
+            },
+            "context_window_tokens": 1000,
+            "request_input_fraction": 0.2,
+            "context_tokens_at_sample": 210,
+            "context_fraction_at_sample": 0.21
+          }
+        ],
+        "transitions": [
+          {
+            "kind": "COMPACTION",
+            "event": {
+              "line": 7,
+              "byte_start": 1856,
+              "byte_end": 1966,
+              "sha256": "bec903b9138d7133d1ff3b017d1b57688d429079cd6b5c812043645e6071b057",
+              "timestamp": "2026-10-02T09:00:00Z",
+              "ordinal": null
+            },
+            "epoch": 1,
+            "response_id": "response"
+          }
+        ],
+        "completed_turns": [
+          "turn"
+        ],
+        "issues": [],
+        "scope": "Local Codex desktop rollout, engine 0.159.2; response-bound samples only.",
+        "definitions": {
+          "request_input": "usage.input_tokens includes cached input; never add cache again.",
+          "context_at_sample": "Matched last_token_usage.total_tokens after a response; input plus output, not cumulative spend.",
+          "burden_input": "Use request_input_fraction for the existing main-agent input-peak metric; do not substitute post-response total.",
+          "cumulative": "Separate host ledgers. Never divide cumulative usage by context capacity or infer monetary charges.",
+          "unknown": "Absent/mismatched/estimated observations remain unknown, including after compaction.",
+          "freshness": "As-of event snapshot, not the live prompt after later tools, messages or compaction."
+        },
+        "claim_limits": [
+          "Local file observations are not independent provider attestation.",
+          "No other host or engine version is qualified by this capture.",
+          "No complete experiment, plugin benefit, settled fee or recommendation follows."
+        ]
+      }
+    }
+  ]
+}

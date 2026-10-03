@@ -1,0 +1,129 @@
+{
+  "format": "pvl-risk-acquisition-acceptance-1",
+  "date": "2026-10-02",
+  "base_commit": "b0ae821d7a7d9a5e2fc962c234206c38e80a0032",
+  "scope": "LOCAL_ENGINEERING_AND_SYNTHETIC_CALIBRATION",
+  "objective": "Fewer experimental units at the same declared risk ceiling, loss tolerance, quality floor and useful-decision requirements",
+  "source_sha256": {
+    "value_lab/risk_acquisition.py": "f7208c6315d05963bbe965aaa8c5302444417b493cb2586de23b2d8ae8179e52",
+    "value_lab/workflow.py": "8a0860daa40558d4ec4f76cb661bea9e6a7c5f711999e0a8a1765ff7b4090196",
+    "schemas/risk-acquisition.schema.json": "a822eddc8572a4cc80bca75a3c3eaa50fd4240ce7a880eb4ea11b96f81026e18",
+    "tests/test_risk_acquisition.py": "4962263b5248912f4851fb67037cd945b4575e4a36b38245512b33d03e985791",
+    "scripts/check_risk_acquisition.py": "a3880d8c92d2aad20ea00434889f8e973b0a65b0050b58d8c72be235b062e258",
+    "examples/task-selection/risk_demo.py": "e1f2b839607e7be05f9e4542501ebd4e825011b32dbb2b58d3a3c5165ea50a85"
+  },
+  "tests": {
+    "full_suite": {
+      "command": "python scripts/check_release_tests.py",
+      "status": "PASS",
+      "tests": 1266,
+      "seconds": 359.366,
+      "skipped": 0
+    },
+    "focused_suite": {
+      "command": "python -m unittest tests.test_risk_acquisition tests.test_evidence_acquisition tests.test_task_selection tests.test_interpretation_history -q",
+      "status": "PASS",
+      "tests": 124,
+      "seconds": 39.173
+    },
+    "new_risk_tests": 33,
+    "coverage": [
+      "finite-horizon Bernoulli crossing recursion",
+      "frozen protocol and assignment integrity",
+      "unknown outcomes and costs",
+      "failures retained",
+      "duplicate input and session rejection",
+      "partial runs are not independent units",
+      "post-stop history rejection",
+      "assumption drift",
+      "same-risk comparison identity",
+      "abstention cannot establish efficiency",
+      "loss of useful decisions rejects apparent savings",
+      "existing CLI and six-tool stdio MCP entry"
+    ]
+  },
+  "calibration": {
+    "report": "risk-calibration-20261002.json",
+    "sha256": "828d05e1b8925b7ea6b9742fcc94dfcde93a1e107be753b84143d7700a91dc30",
+    "evidence": "SIMULATION_ONLY",
+    "scenarios": 6,
+    "paired_replications_per_scenario": 1000,
+    "comparison_family_error_budget": 0.05,
+    "final_run_exactly_reproduces_initial_json": true,
+    "supported_scenario": "few_finalists",
+    "not_established_scenarios": [
+      "separated",
+      "near_ties",
+      "none_acceptable",
+      "floor_boundary",
+      "budget_too_small"
+    ],
+    "supported_scenario_mean_units": {
+      "uniform_all": 7075.392,
+      "adaptive_frontier": 2621.536
+    },
+    "supported_scenario_observed_useful_decision_rate": {
+      "uniform_all": 1.0,
+      "adaptive_frontier": 1.0
+    },
+    "supported_scenario_observed_wrong_decisions": {
+      "uniform_all": 0,
+      "adaptive_frontier": 0
+    },
+    "zero_observed_errors_means_zero_true_error": false,
+    "same_ceiling_means_identical_actual_error_probabilities": false
+  },
+  "statistical_contract": {
+    "bound": "hoeffding_candidate_horizon_union_v1",
+    "scope": "Unconditional probability of any false issued candidate/no-acceptable declaration within one frozen finite study",
+    "assumptions": [
+      "bounded utility",
+      "independent units within each candidate",
+      "stationary target population",
+      "predictable assignment"
+    ],
+    "assumptions_verified": false,
+    "utility_basis": "SUBMITTED_UTILITY_WITH_HASH_BINDINGS_NOT_INDEPENDENTLY_REGRADED",
+    "optimal_allocation_claimed": false,
+    "automatic_adoption": false
+  },
+  "wheel": {
+    "status": "PASS",
+    "wheel_sha256": "7b9c2030742e25530dfb95dc85b67bf2259660400d70706eff085ee61d02ac3c",
+    "source_bytes_match": true,
+    "existing_workflow_route": "RISK_CONTROLLED_ACQUISITION",
+    "synthetic_certificate": "CERTIFIED_CANDIDATE",
+    "synthetic_candidate": "c0",
+    "automatic_adoption": false,
+    "zero_budget_state": "STOP_BUDGET_UNRESOLVED",
+    "installed_host_acceptance": false
+  },
+  "distribution_checks": {
+    "marketplace_mirror": "PASS",
+    "mirrored_files": 552,
+    "feature_freeze": "PASS",
+    "mainline_document_count": 8,
+    "agent_plugin_manifest": "PASS",
+    "git_diff_check": "PASS",
+    "client_certification": false,
+    "published": false
+  },
+  "compatibility": {
+    "existing_six_mcp_signatures_unchanged": true,
+    "legacy_heuristic_statistical_guarantee": "NONE",
+    "prior_recovery_and_interpretation_tests_included": true,
+    "new_protocol_does_not_retrofit_old_studies": true
+  },
+  "external_service_calls": {
+    "paid_calls": 0,
+    "paid_spend_usd": 0,
+    "discovery": "Free AgentMuxer discovery followed by native primary-source browsing; no catalog offering invoked"
+  },
+  "boundaries": {
+    "real_researcher_benefit_established": false,
+    "scientific_validity_established": false,
+    "installed_host_acceptance": false,
+    "published": false,
+    "live_scientific_execution": false
+  }
+}

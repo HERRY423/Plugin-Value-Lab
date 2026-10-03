@@ -1,0 +1,706 @@
+{
+  "format": "pvl-risk-efficiency-calibration-1",
+  "evidence": "SIMULATION_ONLY",
+  "seed": 20261002,
+  "replications_per_scenario": 1000,
+  "scenario_family_error": 0.05,
+  "scenarios": [
+    {
+      "scenario": "separated",
+      "true_means": [
+        0.35,
+        0.9,
+        0.25,
+        0.1,
+        0.2,
+        0.3
+      ],
+      "protocol": {
+        "format": "pvl-risk-acquisition-1",
+        "catalog_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "task_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "objective": "epsilon_optimal_above_floor_v1",
+        "bound": "hoeffding_candidate_horizon_union_v1",
+        "alpha": 0.05,
+        "epsilon": 0.12,
+        "quality_floor": 0.5,
+        "allocation": "adaptive_frontier",
+        "candidates": [
+          {
+            "id": "c0",
+            "plan_sha256": "df0a70382e01e4706a8ee160c72fc3763b46e35d628d839e7d491135701cd7ce",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c1",
+            "plan_sha256": "02acdee5b29e6ebb6a0b967d46b3fda93a4a2427abea42d93db5de754282d635",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c2",
+            "plan_sha256": "8ddb4da0c85985603150e81a08c9824a7c64b9e4ec1477706b780f67c22b21cd",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c3",
+            "plan_sha256": "76d1c10f05aa0f3e602553700f8a8f73ada0a4993fcb495ba881afb374c5549d",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c4",
+            "plan_sha256": "495d6a17256f81745c552d5da521b17ecfd14d1517f0be638cc28c486c58aa70",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c5",
+            "plan_sha256": "f7f83445a1af5246bf8dd0b358ce32820245669c9939de46bbc99350e18a8b5f",
+            "unit_cost_cap_micros": 10
+          }
+        ],
+        "baseline_id": "c0",
+        "max_units_per_candidate": 2048,
+        "batch_units": 32,
+        "runs_per_unit": 1,
+        "budget_micros": 122880,
+        "max_total_units": 12288,
+        "population": {
+          "id": "synthetic-iid",
+          "sampling_unit": "independent task instance",
+          "sampling_rule": "New independent bounded utility draws, assignment precedes outcomes",
+          "distribution_sha256": "4d58752e599578bcef80f2220d40a9bc14f0fbeda64850d0865459b011b681d2"
+        },
+        "utility_contract": {
+          "measure": "Bernoulli task completion utility",
+          "failure": 0,
+          "scale": [
+            0,
+            1
+          ]
+        },
+        "assumptions": {
+          "bounded_utility": true,
+          "independent_units": true,
+          "stationary_population": true,
+          "predictable_assignment": true
+        },
+        "evidence_type": "synthetic"
+      },
+      "adaptive": {
+        "replications": 1000,
+        "issued_decisions": 1000,
+        "wrong_decisions": 0,
+        "useful_decision_rate": 1,
+        "abstention_rate": 0.0,
+        "mean_candidate_units": 427.968,
+        "mean_cost_micros": 4279.68,
+        "wrong_among_issued": 0.0,
+        "mean_regret_when_candidate_issued": 0.0
+      },
+      "uniform": {
+        "replications": 1000,
+        "issued_decisions": 1000,
+        "wrong_decisions": 0,
+        "useful_decision_rate": 1,
+        "abstention_rate": 0.0,
+        "mean_candidate_units": 464.832,
+        "mean_cost_micros": 4648.32,
+        "wrong_among_issued": 0.0,
+        "mean_regret_when_candidate_issued": 0.0
+      },
+      "same_risk_contract": true,
+      "risk_identity": "54a1c0102a3b5ee9f19339c2addfe9271c69a62a9b489abb87c075b2429ee313",
+      "comparison_error": 0.008333333333333333,
+      "adaptive_wrong_probability_upper": 0.0070650015379346565,
+      "uniform_wrong_probability_upper": 0.0070650015379346565,
+      "paired_useful_decision_loss_upper": 0.0070650015379346565,
+      "adaptive_useful_coverage_lower": 0.9434450282679934,
+      "mean_paired_units_saved": 36.864,
+      "paired_savings_lower": -1353.0309852857959,
+      "coverage_margin": 0.03,
+      "minimum_useful_coverage": 0.8,
+      "efficiency_status": "NOT_ESTABLISHED"
+    },
+    {
+      "scenario": "few_finalists",
+      "true_means": [
+        0.9,
+        0.87,
+        0.15,
+        0.2,
+        0.1,
+        0.25
+      ],
+      "protocol": {
+        "format": "pvl-risk-acquisition-1",
+        "catalog_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "task_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "objective": "epsilon_optimal_above_floor_v1",
+        "bound": "hoeffding_candidate_horizon_union_v1",
+        "alpha": 0.05,
+        "epsilon": 0.12,
+        "quality_floor": 0.5,
+        "allocation": "adaptive_frontier",
+        "candidates": [
+          {
+            "id": "c0",
+            "plan_sha256": "df0a70382e01e4706a8ee160c72fc3763b46e35d628d839e7d491135701cd7ce",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c1",
+            "plan_sha256": "02acdee5b29e6ebb6a0b967d46b3fda93a4a2427abea42d93db5de754282d635",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c2",
+            "plan_sha256": "8ddb4da0c85985603150e81a08c9824a7c64b9e4ec1477706b780f67c22b21cd",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c3",
+            "plan_sha256": "76d1c10f05aa0f3e602553700f8a8f73ada0a4993fcb495ba881afb374c5549d",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c4",
+            "plan_sha256": "495d6a17256f81745c552d5da521b17ecfd14d1517f0be638cc28c486c58aa70",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c5",
+            "plan_sha256": "f7f83445a1af5246bf8dd0b358ce32820245669c9939de46bbc99350e18a8b5f",
+            "unit_cost_cap_micros": 10
+          }
+        ],
+        "baseline_id": "c0",
+        "max_units_per_candidate": 2048,
+        "batch_units": 32,
+        "runs_per_unit": 1,
+        "budget_micros": 122880,
+        "max_total_units": 12288,
+        "population": {
+          "id": "synthetic-iid",
+          "sampling_unit": "independent task instance",
+          "sampling_rule": "New independent bounded utility draws, assignment precedes outcomes",
+          "distribution_sha256": "292d8772e8b578f74736c3775a1b89ad408a2c52cd1324cdf1d31500e8f0c2f6"
+        },
+        "utility_contract": {
+          "measure": "Bernoulli task completion utility",
+          "failure": 0,
+          "scale": [
+            0,
+            1
+          ]
+        },
+        "assumptions": {
+          "bounded_utility": true,
+          "independent_units": true,
+          "stationary_population": true,
+          "predictable_assignment": true
+        },
+        "evidence_type": "synthetic"
+      },
+      "adaptive": {
+        "replications": 1000,
+        "issued_decisions": 1000,
+        "wrong_decisions": 0,
+        "useful_decision_rate": 1,
+        "abstention_rate": 0.0,
+        "mean_candidate_units": 2621.536,
+        "mean_cost_micros": 26215.36,
+        "wrong_among_issued": 0.0,
+        "mean_regret_when_candidate_issued": 9.000000000000007e-05
+      },
+      "uniform": {
+        "replications": 1000,
+        "issued_decisions": 1000,
+        "wrong_decisions": 0,
+        "useful_decision_rate": 1,
+        "abstention_rate": 0.0,
+        "mean_candidate_units": 7075.392,
+        "mean_cost_micros": 70753.92,
+        "wrong_among_issued": 0.0,
+        "mean_regret_when_candidate_issued": 9.000000000000007e-05
+      },
+      "same_risk_contract": true,
+      "risk_identity": "bbeef9295b791420f47b7fd541e19ffeb337c875a2a678c0e6aa26602b964155",
+      "comparison_error": 0.008333333333333333,
+      "adaptive_wrong_probability_upper": 0.0070650015379346565,
+      "uniform_wrong_probability_upper": 0.0070650015379346565,
+      "paired_useful_decision_loss_upper": 0.0070650015379346565,
+      "adaptive_useful_coverage_lower": 0.9434450282679934,
+      "mean_paired_units_saved": 4453.856,
+      "paired_savings_lower": 3063.961014714204,
+      "coverage_margin": 0.03,
+      "minimum_useful_coverage": 0.8,
+      "efficiency_status": "SUPPORTED_IN_THIS_SIMULATION"
+    },
+    {
+      "scenario": "near_ties",
+      "true_means": [
+        0.73,
+        0.72,
+        0.71,
+        0.72,
+        0.73,
+        0.72
+      ],
+      "protocol": {
+        "format": "pvl-risk-acquisition-1",
+        "catalog_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "task_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "objective": "epsilon_optimal_above_floor_v1",
+        "bound": "hoeffding_candidate_horizon_union_v1",
+        "alpha": 0.05,
+        "epsilon": 0.12,
+        "quality_floor": 0.5,
+        "allocation": "adaptive_frontier",
+        "candidates": [
+          {
+            "id": "c0",
+            "plan_sha256": "df0a70382e01e4706a8ee160c72fc3763b46e35d628d839e7d491135701cd7ce",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c1",
+            "plan_sha256": "02acdee5b29e6ebb6a0b967d46b3fda93a4a2427abea42d93db5de754282d635",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c2",
+            "plan_sha256": "8ddb4da0c85985603150e81a08c9824a7c64b9e4ec1477706b780f67c22b21cd",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c3",
+            "plan_sha256": "76d1c10f05aa0f3e602553700f8a8f73ada0a4993fcb495ba881afb374c5549d",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c4",
+            "plan_sha256": "495d6a17256f81745c552d5da521b17ecfd14d1517f0be638cc28c486c58aa70",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c5",
+            "plan_sha256": "f7f83445a1af5246bf8dd0b358ce32820245669c9939de46bbc99350e18a8b5f",
+            "unit_cost_cap_micros": 10
+          }
+        ],
+        "baseline_id": "c0",
+        "max_units_per_candidate": 2048,
+        "batch_units": 32,
+        "runs_per_unit": 1,
+        "budget_micros": 122880,
+        "max_total_units": 12288,
+        "population": {
+          "id": "synthetic-iid",
+          "sampling_unit": "independent task instance",
+          "sampling_rule": "New independent bounded utility draws, assignment precedes outcomes",
+          "distribution_sha256": "baefa921af44f9716b52a675a911535fb2856cd09717598eabca64452f7c9df2"
+        },
+        "utility_contract": {
+          "measure": "Bernoulli task completion utility",
+          "failure": 0,
+          "scale": [
+            0,
+            1
+          ]
+        },
+        "assumptions": {
+          "bounded_utility": true,
+          "independent_units": true,
+          "stationary_population": true,
+          "predictable_assignment": true
+        },
+        "evidence_type": "synthetic"
+      },
+      "adaptive": {
+        "replications": 1000,
+        "issued_decisions": 1000,
+        "wrong_decisions": 0,
+        "useful_decision_rate": 1,
+        "abstention_rate": 0.0,
+        "mean_candidate_units": 9533.568,
+        "mean_cost_micros": 95335.68,
+        "wrong_among_issued": 0.0,
+        "mean_regret_when_candidate_issued": 0.0028300000000000027
+      },
+      "uniform": {
+        "replications": 1000,
+        "issued_decisions": 1000,
+        "wrong_decisions": 0,
+        "useful_decision_rate": 1,
+        "abstention_rate": 0.0,
+        "mean_candidate_units": 9533.568,
+        "mean_cost_micros": 95335.68,
+        "wrong_among_issued": 0.0,
+        "mean_regret_when_candidate_issued": 0.0028300000000000027
+      },
+      "same_risk_contract": true,
+      "risk_identity": "c07914f395e9c5e5b1fb14255cc3436795da9aebe8703f0e7d2c4a393ac2f696",
+      "comparison_error": 0.008333333333333333,
+      "adaptive_wrong_probability_upper": 0.0070650015379346565,
+      "uniform_wrong_probability_upper": 0.0070650015379346565,
+      "paired_useful_decision_loss_upper": 0.0070650015379346565,
+      "adaptive_useful_coverage_lower": 0.9434450282679934,
+      "mean_paired_units_saved": 0,
+      "paired_savings_lower": -1389.8949852857959,
+      "coverage_margin": 0.03,
+      "minimum_useful_coverage": 0.8,
+      "efficiency_status": "NOT_ESTABLISHED"
+    },
+    {
+      "scenario": "none_acceptable",
+      "true_means": [
+        0.1,
+        0.12,
+        0.15,
+        0.2,
+        0.18,
+        0.25
+      ],
+      "protocol": {
+        "format": "pvl-risk-acquisition-1",
+        "catalog_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "task_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "objective": "epsilon_optimal_above_floor_v1",
+        "bound": "hoeffding_candidate_horizon_union_v1",
+        "alpha": 0.05,
+        "epsilon": 0.12,
+        "quality_floor": 0.5,
+        "allocation": "adaptive_frontier",
+        "candidates": [
+          {
+            "id": "c0",
+            "plan_sha256": "df0a70382e01e4706a8ee160c72fc3763b46e35d628d839e7d491135701cd7ce",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c1",
+            "plan_sha256": "02acdee5b29e6ebb6a0b967d46b3fda93a4a2427abea42d93db5de754282d635",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c2",
+            "plan_sha256": "8ddb4da0c85985603150e81a08c9824a7c64b9e4ec1477706b780f67c22b21cd",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c3",
+            "plan_sha256": "76d1c10f05aa0f3e602553700f8a8f73ada0a4993fcb495ba881afb374c5549d",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c4",
+            "plan_sha256": "495d6a17256f81745c552d5da521b17ecfd14d1517f0be638cc28c486c58aa70",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c5",
+            "plan_sha256": "f7f83445a1af5246bf8dd0b358ce32820245669c9939de46bbc99350e18a8b5f",
+            "unit_cost_cap_micros": 10
+          }
+        ],
+        "baseline_id": "c0",
+        "max_units_per_candidate": 2048,
+        "batch_units": 32,
+        "runs_per_unit": 1,
+        "budget_micros": 122880,
+        "max_total_units": 12288,
+        "population": {
+          "id": "synthetic-iid",
+          "sampling_unit": "independent task instance",
+          "sampling_rule": "New independent bounded utility draws, assignment precedes outcomes",
+          "distribution_sha256": "37819e75f12d49888b1c17373418f0248b5b3315980401572fbfa351cc7c70ec"
+        },
+        "utility_contract": {
+          "measure": "Bernoulli task completion utility",
+          "failure": 0,
+          "scale": [
+            0,
+            1
+          ]
+        },
+        "assumptions": {
+          "bounded_utility": true,
+          "independent_units": true,
+          "stationary_population": true,
+          "predictable_assignment": true
+        },
+        "evidence_type": "synthetic"
+      },
+      "adaptive": {
+        "replications": 1000,
+        "issued_decisions": 1000,
+        "wrong_decisions": 0,
+        "useful_decision_rate": 1,
+        "abstention_rate": 0.0,
+        "mean_candidate_units": 789.312,
+        "mean_cost_micros": 7893.12,
+        "wrong_among_issued": 0.0,
+        "mean_regret_when_candidate_issued": null
+      },
+      "uniform": {
+        "replications": 1000,
+        "issued_decisions": 1000,
+        "wrong_decisions": 0,
+        "useful_decision_rate": 1,
+        "abstention_rate": 0.0,
+        "mean_candidate_units": 789.312,
+        "mean_cost_micros": 7893.12,
+        "wrong_among_issued": 0.0,
+        "mean_regret_when_candidate_issued": null
+      },
+      "same_risk_contract": true,
+      "risk_identity": "2eecc526e8beadb7226311b6885c5b466fca1601424eeace9afc2835ab1d7c56",
+      "comparison_error": 0.008333333333333333,
+      "adaptive_wrong_probability_upper": 0.0070650015379346565,
+      "uniform_wrong_probability_upper": 0.0070650015379346565,
+      "paired_useful_decision_loss_upper": 0.0070650015379346565,
+      "adaptive_useful_coverage_lower": 0.9434450282679934,
+      "mean_paired_units_saved": 0,
+      "paired_savings_lower": -1389.8949852857959,
+      "coverage_margin": 0.03,
+      "minimum_useful_coverage": 0.8,
+      "efficiency_status": "NOT_ESTABLISHED"
+    },
+    {
+      "scenario": "floor_boundary",
+      "true_means": [
+        0.5,
+        0.49,
+        0.48,
+        0.47,
+        0.46,
+        0.45
+      ],
+      "protocol": {
+        "format": "pvl-risk-acquisition-1",
+        "catalog_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "task_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "objective": "epsilon_optimal_above_floor_v1",
+        "bound": "hoeffding_candidate_horizon_union_v1",
+        "alpha": 0.05,
+        "epsilon": 0.12,
+        "quality_floor": 0.5,
+        "allocation": "adaptive_frontier",
+        "candidates": [
+          {
+            "id": "c0",
+            "plan_sha256": "df0a70382e01e4706a8ee160c72fc3763b46e35d628d839e7d491135701cd7ce",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c1",
+            "plan_sha256": "02acdee5b29e6ebb6a0b967d46b3fda93a4a2427abea42d93db5de754282d635",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c2",
+            "plan_sha256": "8ddb4da0c85985603150e81a08c9824a7c64b9e4ec1477706b780f67c22b21cd",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c3",
+            "plan_sha256": "76d1c10f05aa0f3e602553700f8a8f73ada0a4993fcb495ba881afb374c5549d",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c4",
+            "plan_sha256": "495d6a17256f81745c552d5da521b17ecfd14d1517f0be638cc28c486c58aa70",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c5",
+            "plan_sha256": "f7f83445a1af5246bf8dd0b358ce32820245669c9939de46bbc99350e18a8b5f",
+            "unit_cost_cap_micros": 10
+          }
+        ],
+        "baseline_id": "c0",
+        "max_units_per_candidate": 2048,
+        "batch_units": 32,
+        "runs_per_unit": 1,
+        "budget_micros": 122880,
+        "max_total_units": 12288,
+        "population": {
+          "id": "synthetic-iid",
+          "sampling_unit": "independent task instance",
+          "sampling_rule": "New independent bounded utility draws, assignment precedes outcomes",
+          "distribution_sha256": "f9902131997774edf1e2b83cb09a2ecd5fbca7bddaaea99e09b4b3c6620eeaf8"
+        },
+        "utility_contract": {
+          "measure": "Bernoulli task completion utility",
+          "failure": 0,
+          "scale": [
+            0,
+            1
+          ]
+        },
+        "assumptions": {
+          "bounded_utility": true,
+          "independent_units": true,
+          "stationary_population": true,
+          "predictable_assignment": true
+        },
+        "evidence_type": "synthetic"
+      },
+      "adaptive": {
+        "replications": 1000,
+        "issued_decisions": 0,
+        "wrong_decisions": 0,
+        "useful_decision_rate": 0,
+        "abstention_rate": 1.0,
+        "mean_candidate_units": 12288,
+        "mean_cost_micros": 122880,
+        "wrong_among_issued": null,
+        "mean_regret_when_candidate_issued": null
+      },
+      "uniform": {
+        "replications": 1000,
+        "issued_decisions": 0,
+        "wrong_decisions": 0,
+        "useful_decision_rate": 0,
+        "abstention_rate": 1.0,
+        "mean_candidate_units": 12288,
+        "mean_cost_micros": 122880,
+        "wrong_among_issued": null,
+        "mean_regret_when_candidate_issued": null
+      },
+      "same_risk_contract": true,
+      "risk_identity": "0373a784ed8b463154475560f7a5d4e0075f92c421ac96e9e6aee752b7940b4b",
+      "comparison_error": 0.008333333333333333,
+      "adaptive_wrong_probability_upper": 0.0070650015379346565,
+      "uniform_wrong_probability_upper": 0.0070650015379346565,
+      "paired_useful_decision_loss_upper": 0.0070650015379346565,
+      "adaptive_useful_coverage_lower": 0.0,
+      "mean_paired_units_saved": 0,
+      "paired_savings_lower": -1389.8949852857959,
+      "coverage_margin": 0.03,
+      "minimum_useful_coverage": 0.8,
+      "efficiency_status": "NOT_ESTABLISHED"
+    },
+    {
+      "scenario": "budget_too_small",
+      "true_means": [
+        0.9,
+        0.87,
+        0.15,
+        0.2,
+        0.1,
+        0.25
+      ],
+      "protocol": {
+        "format": "pvl-risk-acquisition-1",
+        "catalog_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "task_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "objective": "epsilon_optimal_above_floor_v1",
+        "bound": "hoeffding_candidate_horizon_union_v1",
+        "alpha": 0.05,
+        "epsilon": 0.12,
+        "quality_floor": 0.5,
+        "allocation": "adaptive_frontier",
+        "candidates": [
+          {
+            "id": "c0",
+            "plan_sha256": "df0a70382e01e4706a8ee160c72fc3763b46e35d628d839e7d491135701cd7ce",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c1",
+            "plan_sha256": "02acdee5b29e6ebb6a0b967d46b3fda93a4a2427abea42d93db5de754282d635",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c2",
+            "plan_sha256": "8ddb4da0c85985603150e81a08c9824a7c64b9e4ec1477706b780f67c22b21cd",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c3",
+            "plan_sha256": "76d1c10f05aa0f3e602553700f8a8f73ada0a4993fcb495ba881afb374c5549d",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c4",
+            "plan_sha256": "495d6a17256f81745c552d5da521b17ecfd14d1517f0be638cc28c486c58aa70",
+            "unit_cost_cap_micros": 10
+          },
+          {
+            "id": "c5",
+            "plan_sha256": "f7f83445a1af5246bf8dd0b358ce32820245669c9939de46bbc99350e18a8b5f",
+            "unit_cost_cap_micros": 10
+          }
+        ],
+        "baseline_id": "c0",
+        "max_units_per_candidate": 2048,
+        "batch_units": 32,
+        "runs_per_unit": 1,
+        "budget_micros": 122880,
+        "max_total_units": 192,
+        "population": {
+          "id": "synthetic-iid",
+          "sampling_unit": "independent task instance",
+          "sampling_rule": "New independent bounded utility draws, assignment precedes outcomes",
+          "distribution_sha256": "93596f8844f9e749086c6d25ff0c6b216fd137d370bd246bf2d0943ca55a9af0"
+        },
+        "utility_contract": {
+          "measure": "Bernoulli task completion utility",
+          "failure": 0,
+          "scale": [
+            0,
+            1
+          ]
+        },
+        "assumptions": {
+          "bounded_utility": true,
+          "independent_units": true,
+          "stationary_population": true,
+          "predictable_assignment": true
+        },
+        "evidence_type": "synthetic"
+      },
+      "adaptive": {
+        "replications": 1000,
+        "issued_decisions": 0,
+        "wrong_decisions": 0,
+        "useful_decision_rate": 0,
+        "abstention_rate": 1.0,
+        "mean_candidate_units": 192,
+        "mean_cost_micros": 1920,
+        "wrong_among_issued": null,
+        "mean_regret_when_candidate_issued": null
+      },
+      "uniform": {
+        "replications": 1000,
+        "issued_decisions": 0,
+        "wrong_decisions": 0,
+        "useful_decision_rate": 0,
+        "abstention_rate": 1.0,
+        "mean_candidate_units": 192,
+        "mean_cost_micros": 1920,
+        "wrong_among_issued": null,
+        "mean_regret_when_candidate_issued": null
+      },
+      "same_risk_contract": true,
+      "risk_identity": "a75a735a7f27718d7e01b0859bcb5eee602608c3beb45b2d5f1bf27d7da2c6bf",
+      "comparison_error": 0.008333333333333333,
+      "adaptive_wrong_probability_upper": 0.0070650015379346565,
+      "uniform_wrong_probability_upper": 0.0070650015379346565,
+      "paired_useful_decision_loss_upper": 0.0070650015379346565,
+      "adaptive_useful_coverage_lower": 0.0,
+      "mean_paired_units_saved": 0,
+      "paired_savings_lower": -21.71710914509056,
+      "coverage_margin": 0.03,
+      "minimum_useful_coverage": 0.8,
+      "efficiency_status": "NOT_ESTABLISHED"
+    }
+  ],
+  "real_researcher_benefit_established": false,
+  "limitations": [
+    "Shared error ceilings are not proof of equal true error rates.",
+    "Acceptance concerns these frozen independent Bernoulli scenarios only; no real scientific correctness claim.",
+    "Low-budget abstentions and hard near-boundary tasks must remain visible.",
+    "No new external executions or paid calls."
+  ]
+}

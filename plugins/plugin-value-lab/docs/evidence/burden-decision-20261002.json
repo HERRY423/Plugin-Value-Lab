@@ -1,0 +1,103 @@
+{
+  "format": "pvl-burden-decision-acceptance-1",
+  "date": "2026-10-02",
+  "base_commit": "b0ae821d7a7d9a5e2fc962c234206c38e80a0032",
+  "scope": "LOCAL_ENGINEERING_AND_SYNTHETIC_DECISION_SCENARIOS",
+  "source_sha256": {
+    "value_lab/burden_decision.py": "67cf4b8d3f9f65aaf830339d35f351b2f1a8402a657c840eb527107426f68f1a",
+    "value_lab/workflow.py": "05c48dad94a662f2042a91eaca0f197580440a139b16850261fc77dffca015a3",
+    "schemas/burden-decision.schema.json": "a9e8fdbde88437ba26230e97ef24c23b8b49bee3a61121db8a2f1613702d7c21",
+    "tests/test_burden_decision.py": "ad36cedf95ebf0a4095ee0da3c3f23d1cf9d076ff39fe14ff24ded7d4fb5897b",
+    "scripts/check_burden_decision.py": "453f5f4af171899322f85fdb082ecd5e36c224d8c35cb8dbae6fa755df76d475",
+    "examples/task-selection/burden_demo.py": "d6ffab96f2bca4e2cacaa81c5866e489dbe5eb32fa8afbc25f06b7650018d721"
+  },
+  "tests": {
+    "full_release_suite": {
+      "status": "PASS",
+      "tests": 1343,
+      "seconds": 420.669,
+      "skipped": 0
+    },
+    "focused_burden_and_task_suite": {
+      "status": "PASS",
+      "tests": 108,
+      "seconds": 64.625,
+      "skipped": 0
+    },
+    "new_tests": 47,
+    "commands": [
+      "python scripts/check_release_tests.py",
+      "python -m unittest tests.test_burden_decision tests.test_burden_layers tests.test_burden_view tests.test_task_selection -q"
+    ],
+    "coverage": [
+      "recomputed scientific artifacts and integration gates",
+      "privacy applies to native and plugin plans",
+      "required review pending/rejected",
+      "frozen policy and original study binding",
+      "unknown and failed costs retained",
+      "estimated versus settled cash",
+      "original settled supplemental expenses cannot disappear",
+      "actor timer overlap and parallel labor versus task elapsed time",
+      "shared PVL overhead counted once",
+      "material ties preserve feasible incumbent",
+      "tradeoffs and tolerance cycles",
+      "per-trial caps despite favorable means",
+      "synthetic evidence ceiling",
+      "legacy selection unchanged",
+      "existing CLI and six-tool stdio MCP preparation"
+    ]
+  },
+  "scenario_report": "burden-decision-scenarios-20261002.json",
+  "scenario_report_sha256": "f02c12e013d147c0708857a5d00d4a6523b2072c305d2aa9d0b04bd24bafcffe",
+  "synthetic_scenarios": 8,
+  "final_scenarios_reproduce_initial_outcomes": true,
+  "synthetic_example": {
+    "native_human_seconds": 600,
+    "plugin_and_script_human_seconds": 80,
+    "shared_decision_human_seconds": 60,
+    "all_observed_selection_human_seconds": 1380,
+    "all_observed_selection_cash_usd": 11,
+    "actual_researcher_timing": false
+  },
+  "wheel": {
+    "status": "PASS",
+    "wheel_sha256": "9bf38412086ae183780f7457008a813b9b6814cdd94df126ef8efd76976547a9",
+    "source_bytes_match": true,
+    "isolated_wheel_import": true,
+    "existing_planning_route": "DECIDE_TASK_BURDEN",
+    "synthetic_evidence_ceiling_preserved": true,
+    "privacy_gate_changes_simulated_choice": true,
+    "shared_overhead_counted_once": true,
+    "installed_host_acceptance": false
+  },
+  "distribution": {
+    "marketplace_mirror": "PASS",
+    "feature_freeze": "PASS",
+    "manifest_validation": "PASS",
+    "git_diff_check": "PASS",
+    "version": "0.9.0",
+    "six_mcp_signatures_unchanged": true,
+    "main_cli_and_sdk_unchanged": true,
+    "default_fewest_plugins_rule_unchanged": true,
+    "legacy_burden_view_reselects": false,
+    "mainline_documents": 8,
+    "installed_host_updated": false,
+    "published": false
+  },
+  "boundaries": {
+    "statistical_guarantee": "NONE",
+    "global_minimum_established": false,
+    "real_researcher_benefit_established": false,
+    "scientific_validity_established": false,
+    "privacy_review_authenticated": false,
+    "settlement_references_authenticated": false,
+    "independently_witnessed_preregistration": false,
+    "execution_authorized": false,
+    "cost_forecast_or_amortization": false
+  },
+  "external_services": {
+    "paid_calls_this_turn": 0,
+    "paid_spend_usd_this_turn": 0,
+    "live_model_experiments": 0
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "format": "pvl-host-capability-acceptance-1",
+  "date": "2026-10-02",
+  "base_commit": "b0ae821d7a7d9a5e2fc962c234206c38e80a0032",
+  "scope": "LOCAL_ENGINEERING_AND_SYNTHETIC_QUALIFICATION",
+  "source_sha256": {
+    "value_lab/codex_context.py": "badefc7be1b29c5342232440596c8fd7ddf49c5a94cc2890bbbdcb13514dca41",
+    "value_lab/context_stream.py": "cf2ab7454fdc1c26c45f1e032d6a5e1c8ce094db6c7103d1cd582e33d2f39b5c",
+    "value_lab/host_capabilities.py": "6a117ca95fe0419717c8d7467fd37f820480364616ded6137bb45d29e580aec2",
+    "schemas/host-capabilities.schema.json": "1f272f0e055edd95f7ee4a6d92b2e4373e8e58e6f0adc205b8ddbf831c4ca8c2",
+    "scripts/collect_codex_context.py": "8aab374f7f0de8d6e7035aa4fbbe7eb01b1ce10866a05f313a969ef31e621e2b",
+    "scripts/check_context_contract.py": "9c734986bf7edf5f74d194ad0f21d670bb4b82705f718c1eec0cd72c59d30304",
+    "tests/test_context_stream.py": "5a4e2f6b9d58f619e70646fef9420139e373cf4dce7075e2b26eedb6b22643d1",
+    "tests/fixtures/codex-context-v1.json": "b67ba45e155a9d182bf64ddad10e67fcb7dfae459d19b3ec21706eb85f65ac46"
+  },
+  "tests": {
+    "full_suite": {
+      "command": "python scripts/check_release_tests.py",
+      "status": "PASS",
+      "tests": 1296,
+      "seconds": 420.921,
+      "skipped": 0
+    },
+    "focused_suite": {
+      "command": "python -m unittest tests.test_context_stream tests.test_codex_context tests.test_artifacts -q",
+      "status": "PASS",
+      "tests": 57,
+      "seconds": 9.608
+    },
+    "new_tests": 30,
+    "prior_native_adapter_tests": 16,
+    "frozen_legacy_cases": [
+      "measured",
+      "partial",
+      "upgrade",
+      "compaction"
+    ],
+    "coverage": [
+      "every event boundary state equality",
+      "split UTF-8/JSON",
+      "pending response upsert",
+      "cross-batch compaction and deduplication",
+      "same-size same-mtime prefix modification",
+      "truncation",
+      "identical-content file rotation",
+      "concurrent source mutation",
+      "parser identity change",
+      "unknown host upgrade",
+      "changed semantic requirement",
+      "transactional publication interruption and resume",
+      "independent actual CSV verification",
+      "unknown costs and missing input counts",
+      "content minimization",
+      "real standalone CLI"
+    ]
+  },
+  "large_log": {
+    "report": "host-capability-large-log-20261002.json",
+    "evidence": "SYNTHETIC_LOCAL_ONLY",
+    "source_bytes": 68170560,
+    "batches": 3,
+    "legacy_64_mib_limit_preserved": true,
+    "appended_events_parsed": 2,
+    "appended_bytes_parsed": 528,
+    "new_response_count": 1,
+    "unchanged_log_new_responses": 0,
+    "unchanged_log_events_parsed": 0,
+    "prefix_verification_still_linear_io": true
+  },
+  "wheel": {
+    "status": "PASS",
+    "wheel_sha256": "45982b045d491c0e2aed492b38662b7bb4239fcfbdea9fcf2dc5501307a1ad6b",
+    "source_bytes_match": true,
+    "isolated_import_from_wheel": true,
+    "resource_based_parser_identity": "f521006a692c84c724ff2e7c98e2ba61a8b0206b9ef00fb59e907455a664ff8b",
+    "cross_batch_pending_response_upsert": true,
+    "legacy_fixture_equality": true,
+    "unchanged_log_new_responses": 0,
+    "installed_host_acceptance": false
+  },
+  "distribution": {
+    "marketplace_mirror": "PASS",
+    "feature_freeze": "PASS",
+    "agent_plugin_manifest": "PASS",
+    "git_diff_check": "PASS",
+    "version": "0.9.0",
+    "mainline_documents": 8,
+    "six_mcp_signatures_unchanged": true,
+    "installed_host_updated": false,
+    "published": false
+  },
+  "boundaries": {
+    "qualified_host": "codex_work_desktop",
+    "qualified_engine_versions": [
+      "0.159.2"
+    ],
+    "new_host_versions_qualified": false,
+    "provider_authenticated": false,
+    "plugin_execution_inferred": false,
+    "settled_cost_inferred": false,
+    "live_context_occupancy_claimed": false,
+    "real_researcher_benefit_established": false,
+    "scientific_validity_established": false,
+    "automatic_execution_authorized": false
+  },
+  "external_services": {
+    "free_discovery_used": true,
+    "native_conversation_reference_read": true,
+    "paid_calls_this_turn": 0,
+    "paid_spend_usd_this_turn": 0,
+    "live_model_experiments": 0
+  }
+}

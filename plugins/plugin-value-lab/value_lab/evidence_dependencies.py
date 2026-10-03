@@ -6,14 +6,17 @@ The graph is an operator declaration, not discovery or proof of completeness.
 from __future__ import annotations
 
 import argparse
+import ast
 from copy import deepcopy
+from functools import lru_cache
+import hashlib
 import json
 from pathlib import Path
 import platform
 import re
 
 from .artifacts import MAX_BYTES, confined, grade_artifact, sha, validate_verifier
-from .core import ValidationError, load_json, suite_digest, write_json
+from .core import ValidationError, load_json, suite_digest
 
 FORMAT = "pvl-evidence-dependencies-1"
 REVISION = "pvl-evidence-recheck-1"
@@ -125,11 +128,78 @@ def _closure(nodes, ident, historical=False):
     return seen
 
 
-def _engine():
-    # Conservative implementation/runtime binding; unchanged version strings are insufficient.
+@lru_cache(maxsize=256)
+def _partition_source(name, data):
+    tree = ast.parse(data)
+    verified, presentation, transformed = True, None, data
+    for top in tree.body:
+        for node in ast.walk(top):
+            reference = (isinstance(node, ast.Name) and node.id == "_revision_files"
+                         or isinstance(node, ast.Attribute) and node.attr == "_revision_files"
+                         or isinstance(node, ast.alias) and node.name.endswith("_revision_files")
+                         or isinstance(node, ast.Constant) and node.value == "_revision_files")
+            if reference and not (name == "evidence_dependencies.py" and isinstance(top, ast.FunctionDef)
+                                  and top.name in ("_partition_source", "write_revision", "_recover_revision_delivery")):
+                verified = False
+    if name == "evidence_dependencies.py":
+        matches = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_revision_files"]
+        if len(matches) != 1 or matches[0].decorator_list:
+            return data, None, False
+        renderer = matches[0]
+        # The reviewed renderer may serialize/escape text and build local lists,
+        # but new calls or writes through arguments invalidate this exception.
+        for node in ast.walk(renderer):
+            if isinstance(node, (ast.Global, ast.Nonlocal, ast.Import, ast.Delete, ast.With, ast.AsyncWith)):
+                verified = False
+            if isinstance(node, ast.ImportFrom) and not (node.level == 1 and node.module == "usage"
+                    and len(node.names) == 1 and node.names[0].name == "_markdown" and node.names[0].asname is None):
+                verified = False
+            if isinstance(node, ast.Call):
+                call = node.func
+                safe = (isinstance(call, ast.Name) and call.id in ("_markdown", "str") or
+                        isinstance(call, ast.Attribute) and call.attr in ("join", "encode", "items") or
+                        isinstance(call, ast.Attribute) and call.attr == "dumps" and isinstance(call.value, ast.Name) and call.value.id == "json")
+                if not safe:
+                    verified = False
+            if isinstance(node, (ast.Assign, ast.AnnAssign, ast.AugAssign)):
+                targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+                if any(not isinstance(t, ast.Name) or t.id in ("report", "request") for t in targets):
+                    verified = False
+        lines = data.decode("utf-8").splitlines(keepends=True)
+        presentation = hashlib.sha256("".join(lines[renderer.lineno - 1:renderer.end_lineno]).encode()).hexdigest()
+        replacement = "# report renderer body excluded: " + ast.dump(renderer.args) + str(ast.dump(renderer.returns) if renderer.returns else None) + "\n"
+        transformed = ("".join(lines[:renderer.lineno - 1]) + replacement + "".join(lines[renderer.end_lineno:])).encode()
+    return transformed, presentation, verified
+
+
+def _engine_sources():
+    """Exclude only the reviewed report renderer, with a checked call boundary.
+
+    Unknown references or syntax retain the full source hash. Every other module
+    remains conservatively bound, including new modules and runtime changes.
+    This is deliberately not a general Python dependency discovery algorithm.
+    """
     root = Path(__file__).parent
+    sources = {p.name: p.read_bytes() for p in sorted(root.glob("*.py"))}
+    presentation, verified = None, True
+    try:
+        for name, data in sources.items():
+            sources[name], display, safe = _partition_source(name, data)
+            verified = verified and safe
+            if display is not None:
+                presentation = display
+    except (SyntaxError, UnicodeError):
+        verified = False
+    if not verified or presentation is None:
+        sources = {p.name: p.read_bytes() for p in sorted(root.glob("*.py"))}
+    return {"sources": {name: hashlib.sha256(data).hexdigest() for name, data in sources.items()},
+            "presentation_sha256": presentation, "partition_verified": verified and presentation is not None}
+
+
+def _engine():
+    parts = _engine_sources()
     return suite_digest({"python": platform.python_version(), "platform": platform.platform(),
-                         "sources": {p.name: sha(p) for p in sorted(root.glob("*.py"))}})
+                         "sources": parts["sources"], "partition_verified": parts["partition_verified"]})
 
 
 def _observe(nodes, root):
@@ -312,6 +382,10 @@ def recheck(card, graph, inventory, artifact_root, *, previous=None, action="pla
         "source_status": card.get("status"), "source_verdict": card.get("verdict"),
         "inventory": deepcopy(inventory), "inventory_basis": "OPERATOR_SUPPLIED_NOT_LIVE_VERIFIED",
         "engine_sha256": engine, "artifacts": observed, "changes": changes,
+        "identities": {"observation_sha256": suite_digest(observed),
+                       "judgment_sha256": suite_digest({"engine": engine, "rules": {k: n for k, n in nodes.items() if n["kind"] == "rule"}}),
+                       "decision_sha256": suite_digest({"source_card": card, "inventory": inventory, "graph": graph}),
+                       "presentation": {k: v for k, v in _engine_sources().items() if k != "sources"}},
         "fallback_reasons": sorted(set(fallback)), "recheck_scope": "FULL" if fallback or previous is None else "LOCAL",
         "rules": rules, "claims": claims, "recommendations": recommendations,
         "unmapped_card_pointers": unmapped, "pending_tasks": tasks,
@@ -326,12 +400,7 @@ def recheck(card, graph, inventory, artifact_root, *, previous=None, action="pla
     return _seal(report)
 
 
-def write_revision(report, output):
-    """Write a new sidecar revision; never overwrite old cards or reports."""
-    output = Path(output)
-    _require(not output.exists(), "Preserve old evidence; choose a new output directory")
-    output.mkdir(parents=True, exist_ok=False)
-    write_json(output / "revision.json", report)
+def _revision_files(report, request=None):
     from .usage import _markdown
     lines = ["# 使用依据局部复核", "", "原卡状态：" + _markdown(report["source_status"]),
              "", "复核范围：" + report["recheck_scope"], "", "整卡未重新认证；原结论与证据上限保持。", "",
@@ -347,8 +416,53 @@ def write_revision(report, output):
     lines += ["", "未映射建议：" + _markdown(report["unmapped_card_pointers"]), "",
               "本轮旧产物重评分：" + str(report["local_rescores"]), "",
               "本轮模型／科学计算执行：0／0。待执行任务见 revision.json 的 pending_tasks。", ""]
-    (output / "RECHECK.md").write_text("\n".join(lines), encoding="utf-8")
-    return {"revision": str(output / "revision.json"), "report": str(output / "RECHECK.md")}
+    files = {
+        "revision.json": (json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + "\n").encode("utf-8"),
+        "RECHECK.md": "\n".join(lines).encode("utf-8")}
+    if request is not None:
+        # Persist the input identity before the result so interrupted delivery can
+        # be recovered without calling the scorer again.
+        files = {"REQUEST.json": (json.dumps(request, sort_keys=True, allow_nan=False) + "\n").encode(), **files}
+    return files
+
+
+def write_revision(report, output, *, resume=False, request=None):
+    """Commit a complete revision; replay identical bytes, retain failed staging."""
+    from .delivery import publish_bundle
+    output = Path(output)
+    files = _revision_files(report, request)
+    delivery = publish_bundle(output, files, resume=resume)
+    return {**delivery,
+            "revision": str(output / "revision.json") if delivery["status"] == "COMMITTED" else None,
+            "report": str(output / "RECHECK.md") if delivery["status"] == "COMMITTED" else None}
+
+
+def _recover_revision_delivery(output, request, resume):
+    """Never rescore to repair delivery; use the exact retained scored result."""
+    prefix = "." + output.name + ".pvl-"
+    stages = sorted(p for p in output.parent.iterdir() if p.name.startswith(prefix) and p.is_dir()) if output.parent.is_dir() else []
+    if not stages:
+        return None
+    if not resume:
+        return {"status": "INCOMPLETE", "revision": None, "report": None, "pending": [str(p) for p in stages],
+                "scoring_executed": False, "reason": "Delivery is incomplete; explicitly resume retained bytes. No scoring was repeated."}
+    for stage in stages:
+        try:
+            if stage.is_symlink() or load_json(stage / "REQUEST.json") != request:
+                continue
+            report = load_json(stage / "revision.json")
+            unsigned = {k: v for k, v in report.items() if k != "revision_sha256"}
+            if report.get("revision_sha256") != suite_digest(unsigned):
+                continue
+            files = _revision_files(report, request)
+            digest = suite_digest({name: hashlib.sha256(data).hexdigest() for name, data in sorted(files.items())})
+            if not stage.name.startswith(prefix + digest + "-"):
+                continue
+            return {**write_revision(report, output, resume=True, request=request), "scoring_executed": False,
+                    "recovered_from_retained_result": True}
+        except (OSError, ValueError, KeyError, TypeError):
+            continue
+    raise ValidationError("No intact scored result matches this request; preserve staging and explicitly rescore into a new revision directory")
 
 
 def main(argv=None):
@@ -360,17 +474,35 @@ def main(argv=None):
     parser.add_argument("--artifacts", required=True)
     parser.add_argument("--previous")
     parser.add_argument("--output", required=True)
+    parser.add_argument("--resume", action="store_true", help="Resume delivery only; preserve incomplete staging")
     args = parser.parse_args(argv)
     try:
         output = Path(args.output).resolve()
         inputs = [Path(p).resolve() for p in (args.card, args.graph, args.inventory, args.artifacts)]
         if args.previous:
             inputs.append(Path(args.previous).resolve())
-        _require(not output.exists() and not any(p == output or p.is_relative_to(output) for p in inputs), "Output must be fresh and separate from inputs")
-        report = recheck(load_json(args.card), load_json(args.graph), load_json(args.inventory), args.artifacts,
-                         previous=load_json(args.previous) if args.previous else None, action=args.action)
-        print(json.dumps(write_revision(report, args.output), ensure_ascii=True, allow_nan=False))
-        return 0
+        _require(not any(p == output or p.is_relative_to(output) for p in inputs), "Output must be separate from inputs")
+        card, graph, inventory = load_json(args.card), load_json(args.graph), load_json(args.inventory)
+        previous = load_json(args.previous) if args.previous else None
+        request = {"action": args.action, "card": suite_digest(card), "graph": suite_digest(graph),
+                   "inventory": suite_digest(inventory), "previous": suite_digest(previous),
+                   "engine": _engine(), "artifacts": _observe(validate_graph(graph, card), args.artifacts)}
+        if output.exists():
+            from .delivery import read_bundle
+            manifest = read_bundle(output)
+            _require("REQUEST.json" in manifest["files"] and load_json(output / "REQUEST.json") == request,
+                     "Preserve old evidence; output belongs to another request or legacy delivery")
+            print(json.dumps({"status": "COMMITTED", "replayed": True,
+                              "revision": str(output / "revision.json"), "report": str(output / "RECHECK.md")}))
+            return 0
+        recovered = _recover_revision_delivery(output, request, args.resume)
+        if recovered is not None:
+            print(json.dumps(recovered, ensure_ascii=True, allow_nan=False))
+            return 0 if recovered["status"] == "COMMITTED" else 3
+        report = recheck(card, graph, inventory, args.artifacts, previous=previous, action=args.action)
+        delivery = write_revision(report, args.output, resume=args.resume, request=request)
+        print(json.dumps(delivery, ensure_ascii=True, allow_nan=False))
+        return 0 if delivery["status"] == "COMMITTED" else 3
     except (ValidationError, OSError, ValueError) as exc:
         parser.exit(2, str(exc) + "\n")
 

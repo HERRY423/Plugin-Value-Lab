@@ -1,0 +1,46 @@
+{
+  "format": "pvl-adapter-qualification-1",
+  "scope": {
+    "originator": "codex_work_desktop",
+    "engine_versions": [
+      "0.159.2"
+    ],
+    "evidence": "SYNTHETIC_LOCAL_CONFORMANCE_ONLY"
+  },
+  "qualification": {
+    "adapter": "codex-desktop-rollout",
+    "parser_version": "codex-rollout-state-1",
+    "parser_sha256": "f521006a692c84c724ff2e7c98e2ba61a8b0206b9ef00fb59e907455a664ff8b",
+    "qualified_originator": "codex_work_desktop",
+    "qualified_engine_versions": [
+      "0.159.2"
+    ],
+    "qualification_scope": "LOCAL_LOG_FIELD_SEMANTICS_NOT_PROVIDER_AUTHENTICATION",
+    "upgrade_rule": "Exact parser and host schema qualification required; never infer from similar field names",
+    "fallback": "Preserve prior bundle; requalify/replay into a separate lineage; existing artifact checks remain independent"
+  },
+  "implementation": {
+    "adapter_qualification.py": "fd8d4dbf5bdb1de1410eaa1773044264f7f2686be8d38a54f68f5bf6fac2f7d2",
+    "context_stream.py": "cf2ab7454fdc1c26c45f1e032d6a5e1c8ce094db6c7103d1cd582e33d2f39b5c",
+    "codex_context.py": "badefc7be1b29c5342232440596c8fd7ddf49c5a94cc2890bbbdcb13514dca41",
+    "host_capabilities.py": "6a117ca95fe0419717c8d7467fd37f820480364616ded6137bb45d29e580aec2",
+    "delivery.py": "152e48088bdef95d9c5f2afb16436425d554aec29e8134c9cee09f411affc927",
+    "core.py": "2906e0fbea43cdf58c03f5883251e1ec65d49ffa0de57df6b6f7eb867b69ad89"
+  },
+  "fixture_sha256": "b67ba45e155a9d182bf64ddad10e67fcb7dfae459d19b3ec21706eb85f65ac46",
+  "checks": {
+    "legacy_bytes": "PASS",
+    "usage_semantics": "PASS",
+    "missing_usage": "PASS",
+    "unknown_host": "PASS",
+    "unknown_originator": "PASS",
+    "incremental_boundaries": "PASS",
+    "unchanged_replay": "PASS",
+    "prefix_mutation": "PASS",
+    "parser_upgrade": "PASS"
+  },
+  "status": "PASS",
+  "provider_authenticated": false,
+  "live_host_verified": false,
+  "execution_authorized": false
+}

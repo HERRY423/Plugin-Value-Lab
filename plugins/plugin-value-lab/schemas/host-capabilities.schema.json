@@ -1,0 +1,363 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "pvl-host-capabilities-1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "adapter",
+    "qualification",
+    "source",
+    "capabilities",
+    "execution_authorized"
+  ],
+  "properties": {
+    "format": {
+      "const": "pvl-host-capabilities-1"
+    },
+    "adapter": {
+      "type": "string",
+      "minLength": 1
+    },
+    "qualification": {
+      "type": "object"
+    },
+    "source": {
+      "type": "object"
+    },
+    "execution_authorized": {
+      "const": false
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "session_identity",
+        "request_identity",
+        "model_identity",
+        "plugin_identity",
+        "artifact_access",
+        "tool_declared",
+        "tool_loaded",
+        "tool_invoked",
+        "request_usage",
+        "thread_usage",
+        "turn_usage",
+        "stream_usage",
+        "context_sample",
+        "settled_cost",
+        "comparable_execution",
+        "incremental_resume",
+        "remote_task_status"
+      ],
+      "properties": {
+        "session_identity": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "semantic_id": {
+                  "const": "local-session-id/v1"
+                }
+              }
+            }
+          ]
+        },
+        "request_identity": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "semantic_id": {
+                  "const": "local-response-turn-id/v1"
+                }
+              }
+            }
+          ]
+        },
+        "model_identity": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "semantic_id": {
+                  "const": "local-turn-model-label/v1"
+                }
+              }
+            }
+          ]
+        },
+        "plugin_identity": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "semantic_id": {
+                  "const": "observed-plugin-bytes/v1"
+                }
+              }
+            }
+          ]
+        },
+        "artifact_access": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "semantic_id": {
+                  "const": "authorized-local-artifact-access/v1"
+                }
+              }
+            }
+          ]
+        },
+        "tool_declared": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "semantic_id": {
+                  "const": "declared-tool-inventory/v1"
+                }
+              }
+            }
+          ]
+        },
+        "tool_loaded": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "semantic_id": {
+                  "const": "observed-tool-load/v1"
+                }
+              }
+            }
+          ]
+        },
+        "tool_invoked": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "semantic_id": {
+                  "const": "observed-tool-invocation/v1"
+                }
+              }
+            }
+          ]
+        },
+        "request_usage": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "semantic_id": {
+                  "const": "response-bound-input-includes-cache/v1"
+                }
+              }
+            }
+          ]
+        },
+        "thread_usage": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "semantic_id": {
+                  "const": "host-thread-cumulative-ledger/v1"
+                }
+              }
+            }
+          ]
+        },
+        "turn_usage": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "semantic_id": {
+                  "const": "host-turn-cumulative-ledger/v1"
+                }
+              }
+            }
+          ]
+        },
+        "stream_usage": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "semantic_id": {
+                  "const": "host-context-stream-cumulative-ledger/v1"
+                }
+              }
+            }
+          ]
+        },
+        "context_sample": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "semantic_id": {
+                  "const": "post-response-input-plus-output-sample/v1"
+                }
+              }
+            }
+          ]
+        },
+        "settled_cost": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "semantic_id": {
+                  "const": "actual-settled-currency-charge/v1"
+                }
+              }
+            }
+          ]
+        },
+        "comparable_execution": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "semantic_id": {
+                  "const": "independent-matched-arms/v1"
+                }
+              }
+            }
+          ]
+        },
+        "incremental_resume": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "semantic_id": {
+                  "const": "verified-prefix-parser-checkpoint/v1"
+                }
+              }
+            }
+          ]
+        },
+        "remote_task_status": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "semantic_id": {
+                  "const": "reconciled-remote-execution-status/v1"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "semantic_id",
+        "status",
+        "value",
+        "evidence",
+        "reason"
+      ],
+      "properties": {
+        "semantic_id": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "OBSERVED",
+            "UNKNOWN",
+            "UNSUPPORTED",
+            "NOT_PROVIDED"
+          ]
+        },
+        "value": {},
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "minProperties": 1
+          }
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "OBSERVED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "evidence": {
+                "minItems": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "value": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

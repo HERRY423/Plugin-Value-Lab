@@ -44,7 +44,7 @@
 
 ## 本地运行
 
-从仓库根目录运行，输出目录每次必须为新目录。可复制的例子见 [制造案例](../../examples/evidence-dependencies/README.md)。输入包括原 `card.json`、符合 [结构模式](../../schemas/evidence-dependencies.schema.json) 的 graph、当前 inventory，以及原始产物目录。
+从仓库根目录运行，新修订使用新目录。完全相同的已提交请求会校验后重放，不再评分；中断交付返回 INCOMPLETE，明确加 `--resume` 才重新交付并保留旧暂存材料。正式结果需要 `COMMITTED.json`；旧目录不自动补标记。详见[事务式交付与决策恢复](DECISION-RECOVERY.zh-CN.md)。可复制的例子见 [制造案例](../../examples/evidence-dependencies/README.md)。输入包括原 `card.json`、符合 [结构模式](../../schemas/evidence-dependencies.schema.json) 的 graph、当前 inventory，以及原始产物目录。
 
 ```powershell
 python -m value_lab.evidence_dependencies rescore --card examples/evidence-dependencies/card.json --graph examples/evidence-dependencies/graph.json --inventory examples/evidence-dependencies/inventory-before.json --artifacts examples/evidence-dependencies --output work/dependency-first
