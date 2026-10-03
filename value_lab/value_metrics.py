@@ -13,6 +13,10 @@ def validate_power_plan(policy):
     plan = policy.get("power_plan")
     if plan is None:
         return
+    if isinstance(plan, dict) and plan.get('version') == 2:
+        from .sample_size import validate
+        validate(plan)
+        return
     fields = {"expected_family_sd", "minimum_detectable_delta", "alpha", "power"}
     if not isinstance(plan, dict) or set(plan) != fields:
         raise ValidationError("power_plan requires expected_family_sd, minimum_detectable_delta, alpha and power")
@@ -24,6 +28,9 @@ def validate_power_plan(policy):
 
 def power_plan(suite):
     plan = suite["policy"].get("power_plan")
+    if isinstance(plan, dict) and plan.get('version') == 2:
+        from .sample_size import suite_plan
+        return suite_plan(suite)
     families = len({c["cluster"] for c in suite["cases"]})
     base = {"planned_families": families, "repetitions_per_case": suite["runs_per_case"],
             "aligned_with_primary_quality_gate": suite['policy'].get('quality_weighting', 'case') == 'family',
@@ -124,6 +131,7 @@ def _rates(cases, repetitions, floor):
 
 
 def build_value_metrics(suite, report):
+    from .sample_size import confidence_intervals
     cases, costs = report["cases"], report["cost_analysis"]
     rates = _rates(cases, suite["runs_per_case"], suite["policy"]["quality_floor"])
     groups = defaultdict(list)
@@ -158,6 +166,7 @@ def build_value_metrics(suite, report):
             "duration_seconds_saved_per_run": saved("mean_duration_seconds"),
             "cost_per_success_saved_usd": saved("cost_per_success_usd"),
             "power_plan": power_plan(suite),
+            "confidence_intervals": confidence_intervals(suite, report),
             "limitations": ["Success uses the shared task outcome gate: required decision/delivery/correctness evidence, completion, quality floor and critical checks. Text-only legacy suites measure configured checks only. Missing pairs remain in planned denominators; bounds are not confidence intervals.",
                             "Rescue rate is rescued / baseline failures; harm rate is harmed / baseline successes. Pairing must be justified by the frozen design.",
                             "Task, negative-control and abstention strata are separate: refusing everything is not productive task benefit.",

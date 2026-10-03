@@ -1,22 +1,47 @@
 # Plugin Value Lab
 
-Combination results now lead with [decision-time evidence](docs/history/DECISION-VIEW.zh-CN.md): relevant issues, tradeoffs and missing records. The exported offline EVIDENCE.html expands supporting details on demand without changing grading or selection.
+**Determine whether a plugin improves a specific task through paired comparisons, frozen plans, and recomputable results.**
 
-Combination reports now include a separate [burden view](docs/history/BURDEN-VIEW.zh-CN.md): per-task context pressure, cost and time tradeoffs among feasible candidates. Missing context remains unknown; existing selection rules are unchanged.
+Compare the same task with and without the plugin, fix the evaluation rules before collecting results, and recompute the difference from original records. Missing evidence remains unknown.
 
-Single-plugin evaluation remains available. The existing planner also supports a bounded pair study: baseline, A, B, A→B and optionally B→A. It regrades original results, reports descriptive interactions and costs, and identifies the fewest sufficient plugins within the frozen stage and tested candidates. It preserves ties and unknowns and performs no installation or removal. See [combination evaluation and runnable examples](docs/history/PLUGIN-COMBINATIONS.zh-CN.md).
+**Version 0.9.0.** Start in chat once PVL is installed and callable. Give the plugin name and one concrete task; the host handles plans and records.
 
-**Call Plugin Value Lab in ChatGPT to evaluate whether another plugin helps with your task.** Tell ChatGPT which plugin to assess, what you want to accomplish and what a useful result means. ChatGPT organizes the evaluation; PVL checks the plan, analyzes supplied records and produces evidence-bounded guidance.
+[中文](README.zh-CN.md) · [Getting started](docs/START.md) · [Advanced guide](docs/history/ADVANCED.md) · [Current evidence](docs/EVIDENCE.md)
 
-**Version 0.9.0.** This guide starts with PVL already installed and callable in the current conversation. Begin in chat—no repository paths, JSON forms or terminal commands are required to get started.
+## Start with one question
 
-[中文](README.zh-CN.md) · [Current evidence](docs/EVIDENCE.md) · [Detailed operations](docs/OPERATIONS.md)
+> Use Plugin Value Lab to determine whether [plugin] improves [specific task]. Check the available tools, propose a paired with/without comparison, and freeze the inputs, success criteria and run conditions before collecting results. Recompute the difference from original records and show the uncertainty, failures and missing evidence. Use existing records where suitable; follow existing authorization for new runs.
 
-### 🤖 Path A: ChatGPT / Codex or Claude Code
+For example: does a literature-search plugin find more verifiable primary papers for the same research question, with fewer unsupported claims?
+
+## One evaluation, three steps
+
+| Step | What it means |
+| --- | --- |
+| **Pair** | Compare with-plugin and no-plugin runs on the same tasks and authorized inputs, under comparable models and budgets, with independent records. |
+| **Freeze** | Fix cases, success criteria, conditions and the sampling plan before observation. Plan task counts and repetitions for a meaningful effect size. |
+| **Recompute** | Score original records using the frozen rules. Report differences, failures, costs and confidence intervals where the design supports them. |
+
+The host coordinates execution; PVL checks supplied plans and analyzes supplied records. A plugin name alone does not launch isolated sessions or recover historical logs. Alternating “use the plugin” and “do not use it” in one chat does not establish independent arms. Freezing already observed data is a retrospective check, not preregistration.
+
+## What you receive
+
+A task-level comparison: **with plugin → without plugin → difference → uncertainty → evidence**. Read it as an answer about the tested task, plugin, model and conditions.
+
+| Finding | Interpretation |
+| --- | --- |
+| A positive observed difference | A gain was observed under the reported conditions; uncertainty and evidence limits still apply. |
+| No difference or a regression | No added gain was observed, or performance worsened; retain the original failures. |
+| Incomplete or incomparable evidence | Benefit remains unestablished. Missing baselines and costs are unknown, not zero. |
+| Synthetic example | Demonstrates the calculation and report, not real plugin benefit. |
+
+Files and independent execution depend on host capabilities. Existing-record analysis can proceed locally. Paid native eval launches remain blocked until a reliable spend boundary is available; see [operations](docs/OPERATIONS.md).
+
+## Install
 
 Plugin installation does not install the Python package. Running Plugin Value Lab analyses, `doctor` checks, or the local stdio MCP server requires Python 3.11+.
 
-#### 1. ChatGPT / Codex repo marketplace
+### 1. ChatGPT / Codex repo marketplace
 
 Add the repository marketplace:
 
@@ -28,7 +53,7 @@ Restart the ChatGPT desktop app, open the Plugins Directory, select **Plugin Val
 
 When the public submission is approved and published, search the universal Plugins Directory for **Plugin Value Lab** instead; one public listing is shared by supported ChatGPT and Codex surfaces.
 
-#### 2. Claude Code marketplace
+### 2. Claude Code marketplace
 
 ```bash
 claude plugin marketplace add HERRY423/Plugin-Value-Lab
@@ -40,99 +65,6 @@ Start a fresh session after installation:
 ```bash
 claude
 ```
-
-## Start with this request
-
-Replace the bracketed values:
-
-> Use Plugin Value Lab to assess whether [plugin name] helps with [specific task]. First check which relevant tools are available in this conversation, then design an evaluation around my task. Inspect existing results first; if there are none, prepare a small pilot. Compare incremental benefit when a reliable no-plugin baseline is available; otherwise explain what evidence is missing. Handle configuration and records, and tell me where the plugin helps, where it fails, where the evidence is, and what to verify next.
-
-For example:
-
-> Use Plugin Value Lab to assess my connected literature-search plugin: can it find verifiable primary research for my question and accurately explain what each paper supports? Propose cases and success criteria first, then carry out feasible checks within existing authorization.
-
-**A plugin name and one real task are enough to begin.** ChatGPT should use the existing context and ask only for information that affects the assessment. You do not need to know tool names, graders or file layouts.
-
-## Choose a starting point
-
-| Your situation | What to ask ChatGPT |
-| --- | --- |
-| Evaluate a plugin from scratch | “Use PVL to assess [plugin] on [task]. Start with an evaluation plan and a small pilot.” |
-| Check a result you just received | “Use PVL to inspect that plugin output: what is supported, what fails my requirements, and what remains unknown?” |
-| Compare with and without a plugin | “Use PVL to compare these two sets of results. Check whether inputs, models and conditions are comparable before interpreting the difference.” |
-| Check a repair | “Here are the before/after results and records. Use PVL to retain the original failures and check what improved or regressed.” |
-| See whether PVL is callable | “Call PVL's example and validation tools to show the evaluation structure. Clearly label it a demonstration if there are no real runs.” |
-
-Inspecting one output can support a limited diagnosis. Establishing added benefit requires comparable with/without evidence. These are different requests.
-
-## What to provide
-
-- **The goal:** a plugin name and a concrete task, such as finding primary papers supporting a claim, rather than a generic plugin score.
-- **A useful outcome:** what decision the result supports and which errors matter. Say when there is no known answer key.
-- **Available materials:** inputs, outputs, citations and run records from the conversation or attachments the host can read. Provide local paths only when file access is actually needed.
-- **Constraints:** which materials may be sent to other services, whether new paid trials are allowed, and existing spending or time limits. Existing authorization should be reused.
-
-If the target plugin is not connected, ChatGPT should identify that specific gap and continue independent preparation. An already callable PVL does not need to be installed again.
-
-## How the evaluation proceeds
-
-| Stage | What ChatGPT and PVL do | What you should receive |
-| --- | --- | --- |
-| Establish the task and capabilities | Check the target plugin, available tools and materials | The evaluation question, current capabilities and gaps |
-| Design and check the plan | Propose realistic positive, counterexample and missing-evidence cases; use PVL to check rules | Readable cases, success criteria, comparison design and pilot scope |
-| Obtain real results | ChatGPT uses supported, authorized host tools or organizes existing runs | Actual calls, original outputs, failures and available cost/time records |
-| Analyze and advise | PVL computes comparisons from supplied structured records and checks missing evidence | Arm results, concrete failures, unknowns and bounded guidance |
-| Retest a repair | Preserve old results and collect comparable new observations | What changed, what remains missing and any regressions |
-
-**ChatGPT understands the task and coordinates available tools; PVL's default evaluation tools process supplied plans and records.** A plugin name alone does not make PVL launch another plugin, create isolated sessions or retrieve every historical log. Execution depends on the host and target plugin. Without suitable execution or collection support, deliver a plan or a diagnosis of existing evidence.
-
-Asking “do not use the plugin” and then “use the plugin” in the same chat does not automatically create independent, uncontaminated arms. Reliable comparisons need the same task and authorized inputs, comparable models and budgets, independent run records and verifiable plugin-loading state. When the host cannot provide these, added benefit remains unestablished.
-
-## What the final answer should contain
-
-You can request an inline result:
-
-> Summarize each task in a table: with-plugin result, no-plugin result, difference, failures or missing evidence, evidence location and usage guidance. Separate observations from claims still needing verification. Keep absent baselines and costs unknown rather than setting them to zero.
-
-Read the result this way:
-
-| Result | Meaning |
-| --- | --- |
-| Both arms perform well; Δ = 0 | No additional quality gain was observed for these tasks |
-| Failure or regression | Inspect the output and records; a host fault is not automatically a plugin defect |
-| Insufficient evidence | Required baseline, conditions, cost, identity or review evidence is missing; this does not mean the plugin is useless |
-| Simulation / demonstration only | The tool and report structure can be demonstrated without measuring real plugin performance |
-| Bounded trial guidance | Applies only to the reported tasks, plugin, model and conditions |
-
-The default MCP tools return structured results that ChatGPT can explain as tables and prose. Saving files or providing downloadable reports requires appropriate host capabilities; it is not an automatic output of every tool call.
-
-For real output files, the host can now connect both evaluation and usage cards to authorized artifact and scorer directories. The tools recheck the bytes and return digest-bound verification receipts. Host setup and missing-access behavior are described in [the controlled MCP handoff](docs/history/ARTIFACTS.md#controlled-mcp-file-handoff-080); no file access is enabled by default, and MCP does not execute verifier programs.
-
-You can also ask whether a task needs any new plugin, or only one stage of a plugin. The existing planner compares native capabilities, existing scripts/workflows and complete plugin plans using recomputed frozen evidence. It minimizes new plugins, then total plugins, subject to the declared task requirements. Conditions, human reviews, ties, failures and untested simpler alternatives remain visible; passing separate stages does not validate their composition. See [task-plan selection](docs/history/TASK-SELECTION.zh-CN.md). Local engineering acceptance does not establish real researcher efficiency or benefit.
-
-For “what evidence could change this choice?”, the same planner supports prospective batches under a frozen candidate catalog, selection rule, stopping rule and budget. Actual batch outcomes determine the next relevant check; unaffected alternatives are deferred. Every started batch retains its complete matrix and costs. Screening cannot authorize adoption: separate held-out whole-plan confirmation remains required. Budget exhaustion and no relevant remaining check are valid stopping outcomes, including with unresolved choices. The cost/relevance priority is not a success probability, expected information gain or a statistical stopping guarantee.
-
-For “does prior evidence apply to this new input?”, the existing planner supports a reviewed matrix-task bridge: compare design, data, rubric and runtime differences, verify real input bytes, preserve the original study and freeze a separate target comparison for one previously supported plan. Input-content equivalence only qualifies the corresponding content checks; design, inference-goal, arbitrary rubric, model/host or plugin-content changes require a new study. Existing exact-scope citations remain unchanged. See [evidence bridging](docs/history/TASK-SELECTION.zh-CN.md#证据迁移与桥接).
-
-## Common questions
-
-**PVL is installed, but ChatGPT says it cannot call it.**
-
-Check the tools actually exposed to the current conversation. If they are absent, use the host's supported enablement or connection flow. A reply labeled “PVL analysis” alone does not establish that a tool was called.
-
-**Can I start with an output but no complete logs?**
-
-Yes. Check the output against the task requirements and identify missing evidence. Do not invent call records or treat that inspection as a complete benefit comparison.
-
-**Does every evaluation require new paid calls?**
-
-Existing-material analysis and local computation do not require an additional model pilot. The current ChatGPT conversation, target plugin and separately launched model runs may have their own usage or charges. New calls follow existing authorization; unknown cost is not zero.
-
-**Official Claude evals already have a baseline. What does PVL add?**
-
-Official evals display WITH, W/OUT and Δ; their exit threshold uses the WITH score. PVL's scientific gate separately requires matched task-success differences and sufficient evidence. See [comparison details](docs/history/RESEARCH-EXECUTION.zh-CN.md).
-
-The four research cases still lack real model/judge runs, and Windows online isolation still needs kernel acceptance. Exposed tools, local tests and manifest validation do not establish those empirical outcomes. See [current evidence](docs/EVIDENCE.md).
 
 ## Developer appendix: local reproduction and file reports
 
@@ -150,13 +82,11 @@ python scripts/value_lab.py compare-studies examples/first-run/before.json examp
 
 Start with `work/first-run/usage/USAGE.md` or `ENVELOPE.html`. Full scores are in `work/first-run/report/report.html`, `report.md` and `report.json`; the comparison is `work/first-run/comparison.json`. The expected tutorial verdict is `SIMULATION_ONLY`. `freeze` collects no sessions, and `evaluate` scores supplied records; your own study needs real observations first.
 
-- [Local tutorial and timing](docs/START.md) · [Real-study operations](docs/OPERATIONS.md) · [Conversational study design](docs/history/RESEARCH-AUTHORING.zh-CN.md)
-- [CLI / Python SDK](docs/history/ENGINEERING-USABILITY.zh-CN.md) · [Workflow examples](examples/workflow-integration/README.md)
-- [Online isolation](docs/history/ONLINE-ISOLATION.zh-CN.md) · [Environment locks and replay](docs/history/ENVIRONMENT-RECORDING.zh-CN.md)
-- [Scientific metamorphic checks](docs/history/METAMORPHIC-GRADERS.zh-CN.md) · [Component comparisons](docs/history/COMPONENT-METHODOLOGY.zh-CN.md) · [Interface freeze](docs/FREEZE.md)
-
-English onboarding, cost controls, HPC job templates, contributor checks and evidence limits are in [START](docs/START.md), [OPERATIONS](docs/OPERATIONS.md), [EVIDENCE](docs/EVIDENCE.md) and [FREEZE](docs/FREEZE.md). Detailed historical research records remain primarily in Chinese.
+- [Local tutorial](docs/START.md) · [Research methods](docs/METHODOLOGY.md) · [Advanced guide](docs/history/ADVANCED.md)
+- [Current evidence](docs/EVIDENCE.md) · [Operations and troubleshooting](docs/OPERATIONS.md) · [Interface freeze](docs/FREEZE.md)
 
 [![CI](https://github.com/HERRY423/Plugin-Value-Lab/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/HERRY423/Plugin-Value-Lab/actions/workflows/ci.yml)
 
-The badge reports the main branch, not unpushed changes. Paid native eval launches are currently blocked until an independent spend boundary is available; offline analysis and export/import remain usable. See [budget and HPC requirements](docs/OPERATIONS.md).
+The badge reports the main branch, not unpushed changes. Source checks do not establish installed-host acceptance or scientific benefit.
+
+Project policies: [citation](CITATION.cff) · [security reports](SECURITY.md) · [contributing](CONTRIBUTING.md) · [API stability](docs/API-STABILITY.md) · [data governance](docs/DATA-GOVERNANCE.md). Identifiable patient data must not enter ordinary records or prompts; de-identified derivatives still require data-owner approval.

@@ -1,9 +1,0 @@
-{
-  "cell_type": "B cells",
-  "control": "ctrl",
-  "treatment": "stim",
-  "matrix": "layers/counts",
-  "min_cells": 10,
-  "min_total_count": 10,
-  "selection": "strict"
-}

@@ -13,7 +13,7 @@
     "usage-card",
     "compare-studies"
   ],
-  "mainline_document_limit": 8,
+  "mainline_document_limit": 13,
   "surface": {
     "global_options": [
       {
@@ -3460,6 +3460,7 @@
       "value_lab/__init__.py",
       "value_lab/__main__.py",
       "value_lab/adapter_qualification.py",
+      "value_lab/antigravity_context.py",
       "value_lab/artifacts.py",
       "value_lab/authoring.py",
       "value_lab/blind_review.py",
@@ -3509,6 +3510,7 @@
       "value_lab/native_analysis.py",
       "value_lab/native_evidence.py",
       "value_lab/native_execution.py",
+      "value_lab/native_host_context.py",
       "value_lab/native_hypotheses.py",
       "value_lab/native_repair.py",
       "value_lab/native_session.py",
@@ -3526,11 +3528,13 @@
       "value_lab/replay.py",
       "value_lab/replicates.py",
       "value_lab/report.py",
+      "value_lab/request_budget.py",
       "value_lab/research.py",
       "value_lab/reuse.py",
       "value_lab/review.py",
       "value_lab/review_policy.py",
       "value_lab/risk_acquisition.py",
+      "value_lab/sample_size.py",
       "value_lab/saturation.py",
       "value_lab/scenarios.py",
       "value_lab/science.py",
@@ -3554,6 +3558,8 @@
       "schemas/agent-plugins/1.0.0/mcp.schema.json",
       "schemas/agent-plugins/1.0.0/plugin.schema.json",
       "schemas/burden-decision.schema.json",
+      "schemas/citation-file-format/1.2.0/SOURCES.json",
+      "schemas/citation-file-format/1.2.0/schema.json",
       "schemas/continuity-environment.schema.json",
       "schemas/decision-event.schema.json",
       "schemas/evidence-dependencies.schema.json",
@@ -3566,6 +3572,7 @@
       "schemas/registry/1/review-packet-manifest.schema.json",
       "schemas/registry/1/review.schema.json",
       "schemas/risk-acquisition.schema.json",
+      "schemas/sample-size-plan.schema.json",
       "schemas/science/equivalence-design.schema.json",
       "schemas/science/metamorphic-design.schema.json",
       "schemas/science/scenario-pack.schema.json"
@@ -5117,59 +5124,130 @@
     "date": "2026-10-02",
     "owner_request": "深化分析中所说决策深化：从最少插件走向满足科学约束的最小总负担",
     "classification": "EXPLICIT_NEW_CAPABILITY",
-    "added_runtime_modules": ["burden_decision"],
-    "added_schemas": ["schemas/burden-decision.schema.json"],
+    "added_runtime_modules": [
+      "burden_decision"
+    ],
+    "added_schemas": [
+      "schemas/burden-decision.schema.json"
+    ],
     "allowed": "Separate prospective task-level burden policy through the existing planning context; complete recomputed scientific gates and scoped privacy/review receipts precede comparisons, fixed practical margins and per-trial caps, complete human/cash/task-window accounting including PVL and shared overhead, no hidden scalar score or post-outcome policy substitution.",
-    "preserved": ["version 0.9.0", "six MCP tools, public SDK and main CLI signatures", "default fewest-new-then-total-plugins policy", "legacy burden view does not reselect", "scientific and per-case regression gates", "failures, unknowns and complete denominators", "eight mainline documents", "no external execution, payment, installation, publishing or scientific authority"],
+    "preserved": [
+      "version 0.9.0",
+      "six MCP tools, public SDK and main CLI signatures",
+      "default fewest-new-then-total-plugins policy",
+      "legacy burden view does not reselect",
+      "scientific and per-case regression gates",
+      "failures, unknowns and complete denominators",
+      "eight mainline documents",
+      "no external execution, payment, installation, publishing or scientific authority"
+    ],
     "reference": "history/BURDEN-DECISION.zh-CN.md"
   },
   "continuity_deliverables_scope_change": {
     "date": "2026-10-02",
     "owner_request": "继续深化三个核心交付：跨会话恢复、跨版本解释、单宿主适配器资格",
     "classification": "EXPLICIT_NEW_CAPABILITY",
-    "added_runtime_modules": ["adapter_qualification", "continuity"],
-    "added_schemas": ["schemas/continuity-environment.schema.json"],
+    "added_runtime_modules": [
+      "adapter_qualification",
+      "continuity"
+    ],
+    "added_schemas": [
+      "schemas/continuity-environment.schema.json"
+    ],
     "allowed": "Checkpoint-bound read-only current-environment assessments, separate judgment/policy/scope actions, executable pinned single-adapter synthetic qualification, exact receipt/parser/session/source bindings and immutable independently verifiable handoff bundles via standalone modules.",
-    "preserved": ["version 0.9.0", "main CLI, SDK and six MCP signatures", "original history, costs and observations", "pending guidance never automatically reactivated", "eight mainline documents", "no external execution, scoring, installation, publishing or live-host certification"],
+    "preserved": [
+      "version 0.9.0",
+      "main CLI, SDK and six MCP signatures",
+      "original history, costs and observations",
+      "pending guidance never automatically reactivated",
+      "eight mainline documents",
+      "no external execution, scoring, installation, publishing or live-host certification"
+    ],
     "reference": "history/CONTINUITY-DELIVERABLES.zh-CN.md"
   },
   "host_capability_scope_change": {
     "date": "2026-10-02",
     "owner_request": "继续推进第三优先级：把单宿主采集深化为能力契约，而不是不断增加宿主特判",
     "classification": "EXPLICIT_NEW_CAPABILITY",
-    "added_runtime_modules": ["host_capabilities", "context_stream"],
-    "added_schemas": ["schemas/host-capabilities.schema.json"],
+    "added_runtime_modules": [
+      "host_capabilities",
+      "context_stream"
+    ],
+    "added_schemas": [
+      "schemas/host-capabilities.schema.json"
+    ],
     "allowed": "Per-claim qualified local observation contracts and bounded incremental Codex parsing with immutable checkpoint bundles, exact prefix/parser/session binding, upgrade rejection, atomic delivery and qualification fixtures. Existing standalone collector gains explicit opt-in incremental flags.",
-    "preserved": ["version 0.9.0", "main CLI, public SDK and six MCP signatures", "legacy snapshot output for valid qualified fixtures", "read-only authorized file access", "independent artifact verification", "eight mainline documents", "no model execution, remote reconciliation, fee inference, provider authentication or installation claims"],
+    "preserved": [
+      "version 0.9.0",
+      "main CLI, public SDK and six MCP signatures",
+      "legacy snapshot output for valid qualified fixtures",
+      "read-only authorized file access",
+      "independent artifact verification",
+      "eight mainline documents",
+      "no model execution, remote reconciliation, fee inference, provider authentication or installation claims"
+    ],
     "reference": "history/HOST-CAPABILITIES.zh-CN.md"
   },
   "risk_acquisition_scope_change": {
     "date": "2026-10-02",
     "owner_request": "深化目标在同样的错误选择风险下，用更少实验得到同样有用的决策，而不是单纯把运行次数压低",
     "classification": "EXPLICIT_NEW_CAPABILITY",
-    "added_runtime_modules": ["risk_acquisition"],
-    "added_schemas": ["schemas/risk-acquisition.schema.json"],
+    "added_runtime_modules": [
+      "risk_acquisition"
+    ],
+    "added_schemas": [
+      "schemas/risk-acquisition.schema.json"
+    ],
     "allowed": "Separate prospective fixed-risk allocation through existing plan context; frozen bounded utility, loss tolerance, family error ceiling, sampling-unit assumptions, horizon and budgets; conservative finite-horizon simultaneous intervals and matched uniform-policy calibration with useful-decision coverage gates.",
-    "preserved": ["version 0.9.0", "main CLI and six MCP signatures", "legacy heuristic acquisition has no statistical guarantee", "single-plugin evaluator and full-stage scientific confirmation", "eight mainline documents", "failed/unknown observations and costs", "no external execution, payment or adoption authority"],
+    "preserved": [
+      "version 0.9.0",
+      "main CLI and six MCP signatures",
+      "legacy heuristic acquisition has no statistical guarantee",
+      "single-plugin evaluator and full-stage scientific confirmation",
+      "eight mainline documents",
+      "failed/unknown observations and costs",
+      "no external execution, payment or adoption authority"
+    ],
     "reference": "history/RISK-CONTROLLED-ACQUISITION.zh-CN.md"
   },
   "interpretation_history_scope_change": {
     "date": "2026-10-02",
     "owner_request": "认真参考对话，深度推进第二优先级：将证据不可变与解释可以修订彻底分开",
     "classification": "EXPLICIT_NEW_CAPABILITY",
-    "added_runtime_modules": ["interpretation_history"],
+    "added_runtime_modules": [
+      "interpretation_history"
+    ],
     "allowed": "Four independent identities, append-only structured judgments and policy decisions, explicit guidance lifecycle and presentation receipts, checked renderer-only invalidation exception, and frozen previous-wheel compatibility fixtures. Independent decision-store CLI can import submitted dependency rechecks without scoring.",
-    "preserved": ["version 0.9.0", "six default read-only MCP tools and main CLI signatures", "legacy evidence and original event identities", "conservative unknown dependency review", "eight mainline documents", "scientific gates and no automatic execution or payment"],
+    "preserved": [
+      "version 0.9.0",
+      "six default read-only MCP tools and main CLI signatures",
+      "legacy evidence and original event identities",
+      "conservative unknown dependency review",
+      "eight mainline documents",
+      "scientific gates and no automatic execution or payment"
+    ],
     "reference": "history/INTERPRETATION-HISTORY.zh-CN.md"
   },
   "decision_recovery_scope_change": {
     "date": "2026-10-02",
     "owner_request": "认真理解第二次分析，推进第一优先级：把能完成一次分析深化为能可靠恢复一项科研决策",
     "classification": "EXPLICIT_NEW_CAPABILITY",
-    "added_runtime_modules": ["decision_store", "delivery"],
-    "added_schemas": ["schemas/decision-event.schema.json"],
+    "added_runtime_modules": [
+      "decision_store",
+      "delivery"
+    ],
+    "added_schemas": [
+      "schemas/decision-event.schema.json"
+    ],
     "allowed": "Local transactional decision store, immutable attempts/artifacts/interpretations, unsettled cost continuity, idempotent recovery and atomic dependency-revision delivery; v2 action separation with v1 read compatibility, explicit retry ancestry, source-bound reconciliation, same-observation rescore, checkpointed bundle restore and delivery recovery without rescoring.",
-    "preserved": ["version 0.9.0", "existing main CLI and MCP signatures", "read-only MCP", "existing evaluator and scientific gates", "eight mainline documents", "no external execution, paid calls, or scientific authorization"],
+    "preserved": [
+      "version 0.9.0",
+      "existing main CLI and MCP signatures",
+      "read-only MCP",
+      "existing evaluator and scientific gates",
+      "eight mainline documents",
+      "no external execution, paid calls, or scientific authorization"
+    ],
     "reference": "history/DECISION-RECOVERY.zh-CN.md"
   },
   "evidence_dependencies_scope_change": {
@@ -5192,5 +5270,98 @@
       "no model/scientific execution, registry, signatures, ranking, sharing or paid calls"
     ],
     "reference": "history/EVIDENCE-DEPENDENCIES.zh-CN.md"
+  },
+  "multi_host_native_capture_scope_change": {
+    "date": "2026-10-03",
+    "authorization": "User explicitly requested native context coverage for Claude Code, DSH and Antigravity.",
+    "scope": "Read-only explicit-source adapters and local acceptance; no new model execution or account configuration.",
+    "added_runtime_modules": [
+      "value_lab/antigravity_context.py",
+      "value_lab/native_host_context.py"
+    ],
+    "standalone_script": "scripts/collect_host_context.py",
+    "preserved": [
+      "CLI",
+      "MCP",
+      "SDK",
+      "version 0.9.0",
+      "scoring semantics",
+      "Codex adapter",
+      "historical evidence"
+    ],
+    "antigravity_ceiling": "Raw SQLite protobuf usage only; normalized context and producer version remain unknown.",
+    "verification": "docs/evidence/multi-host-context-20261003.json"
+  },
+  "documentation_build_scope_change": {
+    "date": "2026-10-03",
+    "owner_request": "Correct contradictory current-version prose, remove maintained distribution duplicates, and provide an English methodology for international laboratories.",
+    "classification": "EXPLICIT_DOCUMENTATION_AND_BUILD_SCOPE",
+    "added_mainline_document": "docs/METHODOLOGY.md",
+    "mainline_document_limit": 9,
+    "distribution": "Canonical root for source catalogs; ignored build/marketplace and dist outputs generated from one inventory.",
+    "preserved": [
+      "version 0.9.0",
+      "runtime modules and public CLI/MCP/SDK interfaces",
+      "historical evidence bytes",
+      "existing scientific and comparison gates"
+    ]
+  },
+  "community_infrastructure_scope_change": {
+    "date": "2026-10-03",
+    "owner_request": "Add CITATION.cff, SECURITY.md, CONTRIBUTING.md, an API stability/deprecation policy, and data governance including patient-data handling.",
+    "classification": "EXPLICIT_COMMUNITY_DOCUMENTATION_SCOPE",
+    "added_mainline_documents": [
+      "SECURITY.md",
+      "CONTRIBUTING.md",
+      "docs/API-STABILITY.md",
+      "docs/DATA-GOVERNANCE.md"
+    ],
+    "mainline_document_limit": 13,
+    "added_schemas": [
+      "schemas/citation-file-format/1.2.0/schema.json",
+      "schemas/citation-file-format/1.2.0/SOURCES.json"
+    ],
+    "metadata": "CITATION.cff follows pinned CFF 1.2.0 with source-version checks; no invented DOI or release date.",
+    "security_reporting": "GitHub private reporting when available; otherwise a public contact request without vulnerability details, explicitly accepted by the user.",
+    "preserved": [
+      "version 0.9.0",
+      "runtime modules and CLI/MCP/SDK signatures",
+      "scientific and evidence gates",
+      "historical receipt bytes"
+    ],
+    "limits": [
+      "Policies do not implement patient-data classification, encryption or retention enforcement",
+      "No public API newly deprecated by this policy",
+      "No publication or GitHub settings changes"
+    ]
+  },
+  "request_budget_scope_change": {
+    "authorized_on": "2026-10-03",
+    "user_request": "认真卓越解决图中硬阻断的问题",
+    "scope": [
+      "durable request reservation and reconciliation accounting",
+      "close direct broker paid-launch bypass",
+      "explicit existing WSL Linux isolation acceptance wrapper"
+    ],
+    "does_not_authorize": [
+      "new paid calls with unknown historical liability",
+      "declaring provider hard caps from local accounting",
+      "reclassifying WSL evidence as native Windows evidence"
+    ],
+    "public_cli_and_mcp_unchanged": true
+  },
+  "sample_size_guidance_scope_change": {
+    "authorized_on": "2026-10-03",
+    "user_request": "Add design-stage sample-size guidance for effect sizes, task counts, repetitions and confidence intervals",
+    "scope": [
+      "v2 hierarchical paired power plan and schema",
+      "existing plan-use and MCP context route",
+      "suite-check and validate_value_suite planning output",
+      "conditional family-level intervals and report tables",
+      "optional planning dependency for noncentral t"
+    ],
+    "legacy_power_plan_preserved": true,
+    "public_cli_and_mcp_signatures_unchanged": true,
+    "no_automatic_execution_or_adoption_gate_changes": true
   }
 }

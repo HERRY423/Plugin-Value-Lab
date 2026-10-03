@@ -1,5 +1,7 @@
 # Current evidence / 当前证据与未完成门槛
 
+2026-10-03 新增[多宿主原生采集](history/MULTI-HOST-CONTEXT-20261003.zh-CN.md)：Claude Code 2.1.288 的 26 个会话取得 39 个已结算响应；DSH v4 的 6 个会话取得 282 个最终响应；Antigravity Desktop SQLite 取得 49 条原始用量元数据，规范化上下文仍为 UNKNOWN。Desktop/IDE 两份文本转录均不能提供用量。详见[脱敏验收](evidence/multi-host-context-20261003.json)。这是只读既有真实记录的验收，本次没有新增模型调用；不能升级成所有宿主、版本或实时占用均已通过。
+
 2026-10-02 新增[真实宿主上下文 P0 验收](history/NATIVE-CONTEXT-P0.zh-CN.md)：只读当前 Codex 桌面 0.159.2 的原生会话日志，逐响应绑定宿主、模型、会话、采样阶段和原始事件；分离单次占用与累计账本，未知不补零。[验收记录](evidence/native-context-p0-20261002.json)单列真实采集、实际压缩、追加重放和制造的异常测试。这不代表其他宿主验收、持续实时占用、结算费用或插件收益。
 
 2026-10-01 按用户要求完成[采集、分析与展示分层](history/BURDEN-LAYERS.zh-CN.md)：不可变采集快照、独立分析重放、只读展示和旧入口兼容；四个合成场景逐项核对拆分前输出。[本次验收](evidence/burden-layers-20261001.json)独立记录，旧验收摘要保留历史身份。当前采集器接收已提交材料，未新增实时宿主采集。
@@ -22,7 +24,7 @@
 | Scientific execution | Requires working Linux/WSL2 bubblewrap isolation. An installed binary or a passing login-node probe does not establish compute-node compatibility. Windows kernel acceptance remains unestablished. |
 | Adoption and benefit | No complete natural-use plugin repair chain or non-author first-use timing sample is established. Local tests, fixtures, timestamps and packages do not establish scientific validity or independent adoption. |
 
-English entry points: [tutorial](START.md), [operations and costs](OPERATIONS.md), [freeze policy](FREEZE.md). Detailed Chinese records below retain their original evidence scope.
+English entry points: [methodology](METHODOLOGY.md), [tutorial](START.md), [operations and costs](OPERATIONS.md), [freeze policy](FREEZE.md). Detailed Chinese records below retain their original evidence scope.
 
 2026-09-29 [研究执行层核查](history/RESEARCH-EXECUTION.zh-CN.md)：修复原生报告不显示可推导 W/OUT 的问题，并避免混用案例分母；研究扩展需在独立副本中显式启用。四题的 24 个计划会话槽位仍无真实研究结果，既有每臂一次的官方检索案例不填入这些槽位。Windows 容器引擎不可用，实核验收仍未完成。工具准备和本地回归均不计入实跑证据。
 
@@ -32,13 +34,13 @@ English entry points: [tutorial](START.md), [operations and costs](OPERATIONS.md
 
 本轮判定可靠性修复及原反例的前后对照见 [正确性参考资格与内核 CI 记录](history/CORRECTNESS-RELIABILITY-20260928.zh-CN.md)。状态／格式通过不再补足蜕变结果的正确性参考资格；本地内核通过与尚未复验的托管 CI 分开记录。
 
-## P0 当前能力与证据
+## P0 历史能力与证据快照（2026-09-28）
 
 2026-09-29 新增[外部时间、结论范围与真实插件观察](history/VALUE-EVIDENCE-20260929.zh-CN.md)：两份 RFC3161 外部时间戳已验证，逐结论范围卡会拒绝越界引用，真实官方 export/import 已走通。Literature 实际标识符分类缺陷在本地副本修复并经现场对照复测；NGS 运行环境接口超时，未启动工作流。官方运行出现条件偏离及费用超限，保留失败；这些观察不增加非作者自然使用或收益样本。下表原 P0 计数仍按其历史口径解释。
 
 本轮新增的 [失败诊断谱系、组件真实替换和报告盲测](history/TRACE-DIAGNOSTICS.zh-CN.md) 分开记录真实宿主写入事件、受控本地干预和外部模型读报告；L3、真人阅读验证及通用宿主监控仍未建立。
 
-当前源码版本为 **0.8.0**；当前接入修复尚未发布。下表区分源码能力、交付验证、实际宿主观察和真人使用；相同版本号不保证字节相同。机器快照见 [P0 状态与来源](evidence/p0-status-20260928.json)，本轮实施与下一步见 [P0 交付记录](history/P0-DELIVERY-20260928.zh-CN.md)。旧收据继续按其原版本、源码摘要及范围解释。
+以下是 **2026-09-28、版本 0.8.0 的历史 P0 快照**，不是当前源码版本声明。下表区分当时的源码能力、交付验证、实际宿主观察和真人使用；相同版本号不保证字节相同。机器快照见 [P0 状态与来源](evidence/p0-status-20260928.json)，当时的实施记录见 [P0 交付记录](history/P0-DELIVERY-20260928.zh-CN.md)。旧收据继续按其原版本、源码摘要及范围解释；当前版本以本页顶部的声明为准。
 
 | 能力 | 源码／本地验证 | 实际宿主或真人证据 | 当前可说的结论 |
 | --- | --- | --- | --- |

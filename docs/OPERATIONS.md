@@ -1,5 +1,7 @@
 # Real-study operations / 五步之后，如何做真实评估
 
+The core workflow is [pair, freeze, recompute](../README.md). For optional capabilities, use the [advanced guide / 高级指南](history/ADVANCED.md).
+
 ## English operating guide
 
 For L1 community workflow candidates, the L2 offline GitHub Action, and L3 RO-Crate evidence export, use the [workflow delivery guide](../examples/community/README.md). Module entry points preserve the frozen main CLI and SDK. Community acceptance, package publication and scientific replication remain separate gates.
@@ -10,11 +12,21 @@ For existing artifacts, `pvl check`, `pvl aggregate` and `pvl verify` avoid crea
 
 For optional local dependency rechecks beside an existing usage card, see the [dependency recheck contract and runnable fixture](history/EVIDENCE-DEPENDENCIES.zh-CN.md). It identifies affected paths, retains unchanged historical checks with reasons, and keeps replay, rescoring and new execution separate. Unknown impact widens rechecking; the original whole-card policy remains the default.
 
+### Prospective sample-size guidance
+
+For prospective sample-size guidance, run `python scripts/value_lab.py plan-use examples/sample-size-plan.json --output <new-directory>`. The example uses assumed variances, not real study evidence. Review `PLAN.md`, replace the target effect/variance source/sampling assumptions, and copy the reviewed `sample_size_plan` into `suite.policy.power_plan`. Existing `suite-check` and MCP `validate_value_suite` expose the current design's shortfall before data collection. See [the sampling and confidence-interval methods](METHODOLOGY.md#plan-task-counts-and-repetitions-before-collection). Planning is local and does not authorize model calls.
+
 ### Native eval budget gate
 
 The official `--max-cost-usd` parameter is an estimate checked after requests; it cannot bound one in-flight request. The observed $0.114 / $0.09 overrun is retained in [historical evidence](history/VALUE-EVIDENCE-20260929.zh-CN.md). PVL now refuses both direct workbench and sandboxed native paid launches with `BUDGET_BOUNDARY_UNAVAILABLE`, before credentials are read for a model request or a model process starts. Legacy frozen plans and UI/API consent cannot bypass this gate. Exported commands are planning material, not budget-safe execution instructions; manually running one outside PVL bypasses its gate.
 
 This deliberately leaves paid native execution unavailable. A future transport must intercept every model/judge/tool charge, verify an upper bound before each request, reserve it durably against a shared task budget, serialize concurrent admission and keep uncertain reservations until reconciled. Restart, retry and additional study IDs must not reset that budget. Request counts, token limits, reduced estimates and process cancellation alone do not establish a dollar cap. Offline inspection/import remains usable, and historical unsettled costs stay unknown.
+
+The local accounting component is now implemented in `value_lab.request_budget.RequestBudget`: exclusive ledger creation, immutable task identity, integer USD micros, SQLite transactional admission, persistent uncertain reservations, non-dispatching idempotent recovery, append-only history reconciliation and terminal bound-breach reporting. Unknown historical liabilities block admission; native estimates never become settlements. Reconciliation is a trusted operator operation requiring evidence references, not authentication of those invoices. Use the same controller-owned ledger across every study/retry for a task; a new database does not authorize a new budget. This component is **not yet an integrated, provider-enforced paid transport** and does not unlock the native gate. The underlying HTTPS broker also checks that gate when called directly.
+
+### Explicit Linux isolation alternative from Windows
+
+If an existing Ubuntu WSL distribution has Python and bubblewrap, run `python scripts/check_wsl_boundary.py --distribution Ubuntu --output C:\\Test\\pvl-wsl-acceptance-new` from the checkout. The output must not already exist. This invokes the existing offline/online kernel acceptance checks without installing software or making provider calls. Inspect `acceptance.json` and retain failed attempts. Successful fixtures establish the tested Linux kernel/protocol boundary, not native Windows Hyper-V, actual Claude runtime acceptance, model availability or scientific validity. Moving a study to WSL changes its execution conditions and requires a new frozen Linux plan; the Windows launcher does not silently fall back or launch paid work.
 
 ### HPC compute-node acceptance
 
@@ -40,7 +52,11 @@ Check the scheduler's terminal exit status **and** `acceptance.json`: both `offl
 
 ### Contributing and verifying CI
 
-From the source root, install `python -m pip install ".[dev,mcp,science,registry]"`, regenerate the shipped mirror with `python scripts/build_marketplace.py --generate`, then run `python scripts/check_feature_freeze.py`, `python scripts/validate_agent_plugin.py` and `python scripts/check_release_tests.py`. The release check rejects skips. Optional scientific fitting, data-scale, notebook installation and workflow-engine checks run separately in CI.
+See the [contributor guide](../CONTRIBUTING.md), [security policy](../SECURITY.md), [API stability policy](API-STABILITY.md) and [data governance](DATA-GOVERNANCE.md) before preparing a real study or contribution.
+
+From the source root, install `python -m pip install ".[dev,mcp,science,registry]"`, then run `python scripts/check_community.py`, `python scripts/build_marketplace.py --check`, `python scripts/check_feature_freeze.py`, `python scripts/validate_agent_plugin.py` and `python scripts/check_release_tests.py`. A clean checkout needs no generated copy. The release check rejects skips. Optional scientific fitting, data-scale, notebook installation and workflow-engine checks run separately in CI.
+
+Maintain documentation and evidence only in the root `docs/` tree. Repository marketplace catalogs point to `./`, so Git installations use the canonical plugin directly. `python scripts/build_marketplace.py --package` generates the complete installable marketplace under ignored `build/marketplace/` and writes both marketplace and portable archives to `dist/`. `--generate` produces only that build tree; `--check` validates source catalogs and, if a build exists, rejects stale generated bytes. Artifacts include their documentation and evidence without symlinks or references outside the package. Never edit or commit generated copies. The builder removes only obsolete manifest-owned files whose old hashes still match, and refuses unknown files or modified obsolete files.
 
 The [hosted workflow](https://github.com/HERRY423/Plugin-Value-Lab/actions/workflows/ci.yml) has mandatory Windows/Linux tests and Linux kernel/science gates, with retained evidence artifacts. A red gate remains a failure. The ephemeral Ubuntu runner explicitly loads the distribution's scoped bubblewrap AppArmor profile, consistent with [Ubuntu's administrator guidance](https://discourse.ubuntu.com/t/understanding-apparmor-user-namespace-restriction/58007); it does not turn off AppArmor globally or run probes as root. This runner setup is not permission to change an HPC site's security policy. New fixes need a green run on their exact commit before acceptance is claimed.
 

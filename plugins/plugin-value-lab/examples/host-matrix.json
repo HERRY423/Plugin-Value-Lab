@@ -1,4 +1,0 @@
-[
-  {"host": "codex-cli", "host_version": "REPLACE_WITH_OBSERVED_VERSION"},
-  {"host": "claude-code", "host_version": "REPLACE_WITH_OBSERVED_VERSION"}
-]

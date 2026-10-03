@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/HERRY423/Plugin-Value-Lab/schemas/sample-size-plan.schema.json",
+  "title": "PVL prospective three-level paired quality design",
+  "description": "SDs describe paired score differences, not individual arms. Runtime also checks total variance against the [-1,1] outcome bound. This schema does not authorize execution.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "minimum_detectable_delta", "alpha", "power", "between_family_sd", "between_task_sd", "within_task_sd", "tasks_per_family", "repetitions_per_case", "max_families", "variance_source", "sampling_basis", "method", "comparisons"],
+  "properties": {
+    "version": {"const": 2, "type": "integer"},
+    "minimum_detectable_delta": {"type": "number", "minimum": 0.000001, "maximum": 1},
+    "alpha": {"type": "number", "minimum": 0.000001, "maximum": 0.2},
+    "power": {"type": "number", "minimum": 0.5, "maximum": 0.999},
+    "between_family_sd": {"$ref": "#/$defs/sd"},
+    "between_task_sd": {"$ref": "#/$defs/sd"},
+    "within_task_sd": {"$ref": "#/$defs/sd"},
+    "tasks_per_family": {"type": "array", "minItems": 1, "maxItems": 8, "uniqueItems": true, "items": {"type": "integer", "minimum": 1, "maximum": 1000}},
+    "repetitions_per_case": {"type": "array", "minItems": 1, "maxItems": 8, "uniqueItems": true, "items": {"type": "integer", "minimum": 1, "maximum": 50}},
+    "max_families": {"type": "integer", "minimum": 2, "maximum": 100000},
+    "variance_source": {"type": "string", "pattern": "\\S"},
+    "sampling_basis": {"enum": ["independent_representative_families", "fixed_benchmark", "unknown"]},
+    "method": {"enum": ["normal_approximation", "paired_t"]},
+    "comparisons": {"type": "integer", "minimum": 1, "maximum": 1000},
+    "sd_multipliers": {"type": "array", "minItems": 1, "maxItems": 5, "uniqueItems": true, "contains": {"const": 1}, "items": {"type": "number", "minimum": 0.1, "maximum": 5}},
+    "cost_weights": {
+      "type": "object", "additionalProperties": false,
+      "required": ["unit", "family_setup", "task_setup", "generation"],
+      "properties": {
+        "unit": {"type": "string", "pattern": "\\S"},
+        "family_setup": {"type": "number", "minimum": 0, "maximum": 1000000000},
+        "task_setup": {"type": "number", "minimum": 0, "maximum": 1000000000},
+        "generation": {"type": "number", "exclusiveMinimum": 0, "maximum": 1000000000}
+      }
+    }
+  },
+  "$defs": {"sd": {"type": "number", "minimum": 0, "maximum": 1}}
+}

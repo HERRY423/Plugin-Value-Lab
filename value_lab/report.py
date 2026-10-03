@@ -326,6 +326,26 @@ def _value_notes(report):
             f"样本量规划：已有 {plan['planned_families']} 个任务族，目标 {_text(plan['required_families'])}，还需 {_text(plan['additional_families'])}。这是前瞻近似规划，不是事后功效或显著性检验；重复运行不增加独立任务族数。",
             "成功须完成任务、满足必要结果证据、达到冻结质量底线并通过全部关键检查；过程检查不计分，部分分数不能替代交付与正确性。缺失保留在计划分母。人工分钟仅含运行计时，额外设置与复核投入计入完整成本。",
             "成本证据：" + report["cost_analysis"]["cash_evidence"]["status"] + "。结算引用仍由提交者提供，不能认证账单真实性；人工折算不是现金结算。"]
+    if plan.get('format') == 'pvl-sample-size-2':
+        notes.append('采样方案按任务族、族内任务和每任务重复拆分方差；表中任务数是独立族内的具体题目数，两臂生成次数另列。方法：' + plan['spec']['method'] + '。')
+        notes.append('目标质量差：' + _delta(plan['spec']['minimum_detectable_delta']) + '；目标功效：' + _score(plan['spec']['power']) +
+                     '；校正后的 α：' + str(plan['effective_alpha']) + '；方差来源：' + plan['spec']['variance_source'])
+        notes.append('推荐依据：' + plan['recommendation_objective'] + '；只在提交的候选网格内比较，预计投入不是实际费用。')
+        notes.append('预计半宽基于所选正态/t 模型；不代表保守 Hoeffding 区间的宽度或功效。当前设计检查：' + plan['current_design_status'])
+    inference = value.get('confidence_intervals', {})
+    if inference.get('bounded_interval'):
+        bound = inference['bounded_interval']
+        notes.append(f"族级置信区间（状态 {inference['status']}；独立单位 {inference['independent_units']}）："
+                     + _score(bound['confidence_level_at_least']) + ' Hoeffding 保守区间 [' + _delta(bound['low']) + '，' + _delta(bound['high']) + ']。')
+        student = inference['student_t_interval']
+        if 'low' in student:
+            notes.append('正态族均值假设下的 ' + _score(student['confidence_level']) + ' 配对 t 区间 [' + _delta(student['low']) + '，' +
+                         _delta(student['high']) + ']；自由度 ' + str(student['df']) + '，不按重复次数增加自由度。')
+        else:
+            notes.append('配对 t 区间未给出：' + student.get('reason', '未知'))
+        notes.extend(inference['limitations'])
+    elif inference:
+        notes.append('条件置信区间未给出：' + inference.get('reason', '未知'))
     interpretation = report.get("value_interpretation")
     quality = report.get('quality_estimand')
     if quality:
@@ -347,11 +367,27 @@ def _value_notes(report):
     return notes
 
 
+def _planning_rows(report):
+    plan = report.get('value_metrics', {}).get('power_plan', {})
+    return [(r['sd_multiplier'], r['tasks_per_family'], r['repetitions_per_case_per_arm'],
+             r['required_families'], r['required_tasks'], r['generation_runs'],
+             _score(r['conditional_power']), _delta(r['expected_ci_half_width']), r['status'])
+            for r in plan.get('designs', [])]
+
+
+_PLANNING_HEADERS = ('SD 倍率', '每族任务', '每任务每臂重复', '所需任务族', '所需任务总数', '两臂生成次数', '条件功效', '预计区间半宽', '状态')
+
+
 def _value_html(report):
     if not report.get("value_metrics"):
         return ""
     rows = "".join("<tr>" + "".join("<td>" + _escape(cell) + "</td>" for cell in row) + "</tr>" for row in _value_rows(report))
-    return '<section class="panel full"><h2>插件带来了什么收益</h2><div class="table-wrap"><table class="cost-table"><thead><tr><th>指标</th><th>未启用</th><th>启用</th><th>变化</th></tr></thead><tbody>' + rows + '</tbody></table></div>' + _bullet_list(_value_notes(report), empty="") + '</section>'
+    design_rows = _planning_rows(report)
+    design = ('<h3>任务数与重复次数方案</h3><div class="table-wrap"><table><thead><tr>' +
+              ''.join('<th>' + h + '</th>' for h in _PLANNING_HEADERS) + '</tr></thead><tbody>' +
+              ''.join('<tr>' + ''.join('<td>' + _escape(v) + '</td>' for v in row) + '</tr>' for row in design_rows) +
+              '</tbody></table></div>') if design_rows else ''
+    return '<section class="panel full"><h2>插件带来了什么收益</h2><div class="table-wrap"><table class="cost-table"><thead><tr><th>指标</th><th>未启用</th><th>启用</th><th>变化</th></tr></thead><tbody>' + rows + '</tbody></table></div>' + _bullet_list(_value_notes(report), empty="") + design + '</section>'
 
 
 def _cost_detail_html(report):
@@ -488,6 +524,11 @@ def _render_markdown(report: dict[str, Any]) -> str:
         lines += ["## 插件带来了什么收益", "", "| 指标 | 未启用 | 启用 | 变化 |", "| --- | ---: | ---: | ---: |"]
         lines += ["| " + " | ".join(_markdown(cell) for cell in row) + " |" for row in _value_rows(report)]
         lines += [""] + ["- " + _markdown(note) for note in _value_notes(report)] + [""]
+        if _planning_rows(report):
+            lines += ['### 任务数与重复次数方案', '', '| ' + ' | '.join(_PLANNING_HEADERS) + ' |',
+                      '| ' + ' | '.join(['---'] * len(_PLANNING_HEADERS)) + ' |']
+            lines += ['| ' + ' | '.join(_markdown(v) for v in row) + ' |' for row in _planning_rows(report)]
+            lines += ['']
     for field in ("corpus_errors", "scientific_errors"):
         if not report.get(field):
             continue

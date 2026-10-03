@@ -1,0 +1,2 @@
+include CITATION.cff SECURITY.md CONTRIBUTING.md CONTRACT.md DETECTION-VALIDITY.md README.zh-CN.md
+recursive-include docs *.md *.json

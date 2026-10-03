@@ -281,6 +281,7 @@ def inspect_suite(suite):
         warnings.append('Text matches establish surface checks only; use artifact checks or human review for correctness')
     if any(g['type'] == 'metamorphic' for c in suite['cases'] for g in c['graders']):
         warnings.append('Metamorphic relations require scientifically justified transformations, complete follow-up runs and a separate task correctness oracle')
-    return {'status': 'VALID', 'suite_sha256': suite_digest(suite), 'cases': [
+    from .value_metrics import power_plan
+    return {'status': 'VALID', 'suite_sha256': suite_digest(suite), 'power_plan': power_plan(suite), 'cases': [
         {'id': c['id'], 'kind': c['kind'], 'graders': [g['id'] for g in c['graders']]} for c in suite['cases']],
         'warnings': warnings, 'executed': False, 'frozen': False}

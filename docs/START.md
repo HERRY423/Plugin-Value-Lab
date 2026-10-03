@@ -1,53 +1,28 @@
-# Getting started / 已安装插件的对话入口与本地教程
+# Getting started / 从一项具体任务开始
 
-## English tutorial
+**配对、冻结、可复算地判断插件对一项具体任务有没有增益。**
 
-If PVL is installed and callable in ChatGPT, start with the [README conversation example](../README.md). Give the plugin name, real task and success criteria. The host organizes available evidence; PVL does not automatically launch paired sessions.
+**Determine whether a plugin improves a specific task through paired comparisons, frozen plans, and recomputable results.**
 
-For a local demonstration, unpack the project, open a terminal at its root and use Python 3.11+. Run `python -m value_lab demo --output work/demo` and open `work/demo/REPORT.md`. This uses synthetic BH data and makes no model calls. For a complete synthetic plugin comparison, follow the five commands in the [developer appendix](../README.md#developer-appendix-local-reproduction-and-file-reports). Read `usage/USAGE.md`, `report/report.md` and `comparison.json`; the expected tutorial verdict is `SIMULATION_ONLY`. Reuse a fresh output directory for every attempt.
+## In chat / 在对话中开始
 
-Windows, macOS and Linux can analyze supplied records with the standard library. Optional science/MCP dependencies are separate. This tutorial needs no API key, model account, WSL or sandbox. Re-execution has stricter requirements: read [operations](OPERATIONS.md) before a real study.
+If PVL is installed and callable, give the plugin name, one real task and what success means. Use the [English request](../README.md#start-with-one-question) or [中文示例](../README.zh-CN.md#从一个问题开始). The host coordinates available tools; PVL checks the plan and computes from supplied records.
 
-For a non-author usability trial, ask a person who did not build PVL to start from the README and produce their first usage card without a demonstration. Record package hash, OS/Python, first-open time, installation time, first-file time, time to explain a negative finding, every error, help request and intervention. Stop after 30 minutes if stuck; retain failure and abandonment. Report assisted completion separately. Maintainer/AI timings are not non-author observations, and generating a card is not evidence of plugin benefit. The table below can be used as the participant record; missing observations remain unknown.
+1. **Pair / 配对：** use the same task and authorized inputs, comparable model/budget conditions, and independent with/without records.
+2. **Freeze / 冻结：** review the success criteria and sample-size assumptions before collection. Repeated runs do not replace independent tasks.
+3. **Recompute / 可复算：** retain original outputs, apply frozen rules, and read the difference with its uncertainty and missing evidence.
 
-**已经在 ChatGPT 中安装并能调用 PVL：从 [README 的对话示例](../README.zh-CN.md)开始。** 告诉 ChatGPT 待评估的插件名称和实际任务，由它组织可行的评测并调用已暴露工具。无需先走下方终端教程。工具可调用不代表宿主具备独立两臂运行与完整证据采集能力；缺少条件时保留未知。
+没有可靠基线、独立记录或可比条件时，先交付方案或已有证据诊断，保留“尚不能证明增益”。工具可调用不代表宿主能自动组织独立两臂运行。
 
-## 本地复现：从零得到第一份使用卡
+## Local tutorial / 本地复现
 
-只想先验证环境并看到一份报告：在解压目录执行 `python -m value_lab demo --output work/demo`，然后打开 `work/demo/REPORT.md`。它使用合成 BH 表，不运行模型。处理自己的 h5ad、嵌入 Python 或工作流时，直接看[简洁入口指南](history/ENGINEERING-USABILITY.zh-CN.md)。下方保留完整插件评估教学及非作者计时协议。
+Use Python 3.11+ from the unpacked project root. Follow the identical five commands in the [English developer appendix](../README.md#developer-appendix-local-reproduction-and-file-reports) or [中文开发者补充](../README.zh-CN.md#开发者补充本地复现与文件报告). They process synthetic paired records without model calls.
 
-目标：独立生成并读懂 `work/first-run/usage/USAGE.md`。随包记录是合成教学数据，不是你的插件测量结果。无需 API key、插件账户、MCP、WSL 或模型。
+1. Run `doctor`; `offline_engine_ready: true` is required. Optional host/dependency gaps do not block this tutorial.
+2. Follow the remaining commands in order. Open `work/first-run/usage/USAGE.md`, `work/first-run/report/report.md` and `work/first-run/comparison.json`.
+3. Expect `SIMULATION_ONLY`. Explain one failure or missing-evidence item before interpreting the example.
+4. For another attempt, consistently replace `work/first-run` with a fresh directory and preserve prior attempts.
 
-这里测的是“能否学会读报告”。已有自己的插件问题时，先读[真实问题交接页](../examples/pseudobulk-author-pilot/HANDOFF.md)，由当前 Agent 根据已有产物、尚未运行或准备复测选择现有路径。研究人员说明问题和审阅标准，Agent 处理路径与配置。供者配对任务的详细操作仍见[作者试跑包](../examples/pseudobulk-author-pilot/RUNBOOK.md)。真实参与者仍待提供，不以维护者／AI 试跑代替。
+Windows、macOS、Linux 均可用标准库分析所提供记录。本教程无需 API key、模型账户、WSL 或隔离引擎；随包合成记录不是真实插件收益证据。对它们执行冻结只演示一致性，不声称事前预注册。
 
-1. 解压到新目录，打开终端并进入包含 README 的目录，不在压缩包内执行。
-2. 需要 Python 3.11+。如果没有，记录安装耗时与问题，使用所在组织允许的安装方式；本任务不需要整套科学计算依赖。
-3. 按 [README 五条命令](../README.zh-CN.md) 顺序执行。`doctor` 的 `offline_engine_ready: true` 是必需条件；可选宿主或依赖不存在不影响本流程。
-4. 第四条后打开目标 USAGE.md，找到负向证据、未测任务、身份缺口和失效条件；第五条后确认 comparison.json 生成。
-5. 重跑时将所有 `work/first-run` 一起换成新目录，例如 `work/first-run-2`，保留原尝试。
-
-## 非作者试跑：由用户转交
-
-**待真实参与者，完成样本 0。** 维护者或 AI 的冒烟时间不计作非作者样本。参与者应未编写或维护 PVL，且此前未执行本教程；同一团队同事可以参与，但既有接触须披露。这不是独立科学验证。
-
-转交完整 ZIP 和下方任务原文，不先演示，也不替同事配环境。参与者自己操作；观察者的任何帮助都计数，受助完成不写成独立完成。先做一次，失败不换人删记录；30 分钟仍未完成可停止。这是试跑停止点，不是已证实的产品耗时目标。
-
-> 请从解压后的 README 开始，在自己的环境生成第一份 `work/first-run/usage/USAGE.md`。从第一次打开资料开始计时，解压、安装 Python、阅读、出错和求助都计入。读卡后指出一项负向证据或缺口，并解释为什么示例不能当成真实收益。不输入账户密钥或真实研究数据。最多尝试 30 分钟；卡住、放弃或不理解都是真实结果。
-
-请交回下表、目标 `USAGE.md`、`card.json`、`doctor` 输出和失败信息。可用代号，无需姓名、账户或完整终端历史；保留原记录后，制作移除私有路径的分享副本。
-
-| 项目 | 真实参与者填写 |
-| --- | --- |
-| 代号；是否参与 PVL 开发；此前接触 | 待填写 |
-| 系统；Python 是否预装；包 SHA-256 | 待填写 |
-| 首次打开资料时间（含时区） | 待填写 |
-| 解压完成；Python 可用时间 | 待填写 |
-| 首次生成目标 USAGE.md 时间 | 待填写／未生成 |
-| 首次理解一项可行动问题的时间及自己的解释 | 待填写／仍不理解 |
-| 求助次数、内容、时间；观察者干预 | 待填写；没有也明确记录 |
-| 失败命令、错误原文、重试、暂停与结束时间 | 待填写；失败不删除 |
-| 完成且理解／生成未理解／卡住／放弃 | 待填写 |
-
-主要计时：“首次打开资料 → 首份目标文件生成”；另记“→ 理解问题”。同时报告包含与扣除明确暂停的时长、安装时间、帮助次数和全部尝试数；不以机器延迟代替人工耗时，不只报告成功者。单人完成只是一项可用性观察。
-
-完成教程后才读 [OPERATIONS](OPERATIONS.md)。真实研究必须在观察前冻结；对已有合成数据重新冻结只是演示一致性，不伪称预注册。
+真实研究的费用、执行和隔离要求见[操作说明](OPERATIONS.md)。样本量与置信区间的方法见[方法学](METHODOLOGY.md#plan-task-counts-and-repetitions-before-collection)。其他能力统一从[高级指南](history/ADVANCED.md)进入。

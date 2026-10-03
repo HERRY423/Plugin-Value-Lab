@@ -1,4 +1,4 @@
-"""Check the frozen interface inventory and eight-document onboarding boundary.
+"""Check the frozen interface inventory and approved documentation boundary.
 
 This local CI guard does not judge whether code inside an existing interface adds
 new behavior. Such changes still require review. Dates never unlock the guard.
@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 GOLDEN = ['doctor', 'freeze', 'evaluate', 'usage-card', 'compare-studies']
 FREEZE_FORMAT = 'pvl-feature-freeze-2'
+MAINLINE_DOCUMENT_LIMIT = 13  # Explicit community/governance request, 2026-10-03.
 
 # Explicit expression fields, never AST repr/_fields: interpreter metadata and
 # empty-field display defaults are not part of this project's interface schema.
@@ -167,8 +168,8 @@ def documentation_issues(root=ROOT):
     issues = []
     docs = sorted(list(root.glob('*.md')) + [p for p in (root / 'docs').rglob('*.md')
                   if p.relative_to(root / 'docs').parts[0] != 'history'])
-    if len(docs) > 8:
-        issues.append(f'Mainline documents: {len(docs)} exceeds 8')
+    if len(docs) > MAINLINE_DOCUMENT_LIMIT:
+        issues.append(f'Mainline documents: {len(docs)} exceeds {MAINLINE_DOCUMENT_LIMIT}')
     for name in ('README.md', 'README.zh-CN.md'):
         commands = re.findall(r'^python scripts/value_lab.py ([a-z-]+)\b', (root / name).read_text(encoding='utf-8'), re.M)
         if commands != GOLDEN:
@@ -194,6 +195,8 @@ def check(root=ROOT):
                    if observed.get(k) != frozen['surface'].get(k)]
     if frozen.get('format') != FREEZE_FORMAT:
         issues.append('Unsupported freeze format; reviewed migration required')
+    if frozen.get('mainline_document_limit') != MAINLINE_DOCUMENT_LIMIT:
+        issues.append('Documentation boundary differs from the reviewed scope')
     if frozen['status'] != 'FROZEN' or frozen['golden_commands'] != GOLDEN:
         issues.append('Freeze status or golden path was altered; explicit owner decision required')
     return {'status': 'PASS' if not issues else 'FAIL', 'issues': issues,

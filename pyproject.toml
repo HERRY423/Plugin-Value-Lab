@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "plugin-value-lab"
 version = "0.9.0"
-description = "Evidence-bounded paired plugin value evaluation"
+description = "Determine whether a plugin improves a specific task through paired comparisons, frozen plans, and recomputable results."
 readme = "README.md"
 license = {file = "LICENSE"}
 requires-python = ">=3.11"
@@ -18,7 +18,8 @@ Issues = "https://github.com/HERRY423/Plugin-Value-Lab/issues"
 
 [project.optional-dependencies]
 mcp = ["mcp>=1.12,<2"]
-dev = ["jsonschema>=4.22,<5"]
+dev = ["jsonschema>=4.22,<5", "PyYAML>=6,<7"]
+planning = ["scipy>=1.11,<2"]
 registry = ["cryptography>=41"]
 science = ["anndata>=0.10,<0.14", "scipy>=1.11,<2", "h5py>=3.10,<4", "numpy>=1.26,<3"]
 pseudobulk = ["anndata>=0.11,<0.14", "pydeseq2==0.5.4"]

@@ -6,8 +6,8 @@
   "plugins": [
     {
       "name": "plugin-value-lab",
-      "source": "./plugins/plugin-value-lab",
-      "description": "Compare plugin runs, locate failures and retest repairs under matched conditions."
+      "source": "./",
+      "description": "Determine whether a plugin improves a specific task through paired comparisons, frozen plans, and recomputable results."
     }
   ]
 }

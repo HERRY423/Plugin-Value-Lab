@@ -190,11 +190,15 @@ class ModelGateway:
         if not isinstance(secret, str) or not secret or any(c in secret for c in '\r\n'):
             raise ValidationError('Dedicated model credential unavailable or invalid')
         self._secret = secret
+        self._live_transport = transport is None
         self.transport = transport or self._https
         self.requests, self.events = 0, []
         self.cancelled = threading.Event()
 
     def request(self, message, remaining):
+        if self._live_transport:
+            from .native import require_budget_boundary
+            require_budget_boundary()
         # Treat even bridge messages as untrusted. A compromised sandbox cannot
         # choose another host, forward credentials, CONNECT, redirect or retry.
         if self.cancelled.is_set() or remaining <= 0:
@@ -241,6 +245,11 @@ class ModelGateway:
             raise ValidationError('Model request failed or was refused; charge/response may be unknown; no retry') from None
 
     def _https(self, path, body, beta, timeout):
+        # The internal broker is also callable without run_session. Do not let
+        # that path evade the paid-launch gate. A local reservation ledger alone
+        # cannot make this uncapped provider API safe.
+        from .native import require_budget_boundary
+        require_budget_boundary()
         started = time.monotonic()
         host = urlsplit(self.config['endpoint']).hostname
         addresses = socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)

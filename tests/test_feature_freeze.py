@@ -115,10 +115,10 @@ async def tool(a: int, b: str = "中文", /, c: "list[dict]" = None,
         with patch.object(guard, 'surface', side_effect=ValueError('Unsupported signature expression')):
             self.assertEqual(guard.check()['status'], 'FAIL')
 
-    def test_current_surface_and_eight_mainline_documents(self):
+    def test_current_surface_and_thirteen_mainline_documents(self):
         result = guard.check()
         self.assertEqual(result['issues'], [])
-        self.assertEqual(len(result['mainline_documents']), 8)
+        self.assertEqual(len(result['mainline_documents']), 13)
         self.assertFalse(result['automatic_unfreeze'])
 
     def test_added_command_tool_module_or_grader_fails(self):
@@ -134,7 +134,7 @@ async def tool(a: int, b: str = "中文", /, c: "list[dict]" = None,
                 with patch.object(guard, 'surface', return_value=changed):
                     self.assertIn('Frozen surface changed: ' + key, guard.check()['issues'])
 
-    def test_ninth_document_and_sixth_command_are_rejected(self):
+    def test_fourteenth_document_and_sixth_command_are_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             shutil.copytree(ROOT / 'docs', root / 'docs')
@@ -145,7 +145,7 @@ async def tool(a: int, b: str = "中文", /, c: "list[dict]" = None,
             with (root / 'README.md').open('a', encoding='utf-8') as f:
                 f.write('\npython scripts/value_lab.py diagnose\n')
             issues, _ = guard.documentation_issues(root)
-            self.assertTrue(any('exceeds 8' in i for i in issues))
+            self.assertTrue(any('exceeds 13' in i for i in issues))
             self.assertTrue(any('five golden' in i for i in issues))
 
     def test_five_commands_work_in_relocated_offline_directory(self):

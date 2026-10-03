@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: >-
+  If you use Plugin Value Lab, cite this software and identify the exact release
+  or commit used. For an unreleased checkout, include the commit and local
+  modifications. A software citation does not establish scientific validation.
+type: software
+title: Plugin Value Lab
+authors:
+  - name: Plugin Value Lab contributors
+repository-code: https://github.com/HERRY423/Plugin-Value-Lab
+url: https://github.com/HERRY423/Plugin-Value-Lab
+version: 0.9.0
+license: Apache-2.0
+abstract: >-
+  Determine whether a plugin improves a specific task through paired comparisons,
+  frozen plans, and recomputable results. Compare original with-plugin and
+  no-plugin records under matched conditions; retain failures, uncertainty and
+  missing evidence. Conclusions remain scoped to the tested task and conditions.
+keywords:
+  - research software
+  - plugin evaluation
+  - reproducibility
+  - evidence governance

@@ -72,7 +72,9 @@ def create_server(*, enable_extensions=False, artifact_root=None, verifier_root=
         """Validate a proposed paired study. This does not freeze it or attest observations."""
         validate_suite(suite)
         from .scoring import inspect_rules
+        from .value_metrics import power_plan
         return {**inspect_rules(suite, samples), "suite_sha256": suite_digest(suite),
+                "power_plan": power_plan(suite),
                 "expected_runs": len(suite["cases"]) * suite["runs_per_case"] * 2}
 
     @mcp.tool()
@@ -109,6 +111,8 @@ def create_server(*, enable_extensions=False, artifact_root=None, verifier_root=
         verifies input differences and prepares/regrades a separate target bridge.
         context.plugin_combination freezes or analyzes one stage-scoped A/B pair,
         retaining baseline/A/B/AB, optional BA, costs, interactions and unknowns.
+        A separate evaluate context.sample_size_plan compares prospective task/family
+        counts and per-arm repetitions from an effect, SD assumptions and target power.
         Single-plugin evaluation remains available via evaluate_plugin_value.
         Optional material roots narrow host-authorized directories, as in evaluation.
         No registry lookup, account action, program execution or external call.

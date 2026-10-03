@@ -1,18 +1,15 @@
 {
   "name": "plugin-value-lab",
   "version": "0.9.0",
-  "description": "Compare plugin runs, locate failures and retest repairs under matched conditions.",
+  "description": "Determine whether a plugin improves a specific task through paired comparisons, frozen plans, and recomputable results.",
   "author": {
     "name": "Local developer"
   },
   "skills": "./skills/",
   "keywords": [
-    "evaluation",
-    "plugin-value",
-    "baseline",
-    "quality",
-    "cost",
-    "scientific-validation",
-    "evidence-gaps"
+    "plugin-evaluation",
+    "paired-comparison",
+    "frozen-plan",
+    "reproducibility"
   ]
 }

@@ -1,5 +1,11 @@
 # Scope freeze / 六周范围冻结（当前版本 0.9.0）
 
+2026-10-03，用户要求补齐引用、安全、贡献、API 稳定性／弃用策略和数据治理。`community_infrastructure_scope_change` 限定新增四份政策文档与 CITATION 元数据，将主线文档上限从九份增至十三份，并增加离线元数据、版本和分发检查。患者数据处理规则不冒充自动脱敏、访问控制或合规认证；不改变产品版本、运行时接口及历史证据。
+
+2026-10-03，用户要求修正文档不一致、将分发副本改为构建时生成，并为国际实验室提供英文方法学。`documentation_build_scope_change` 限定授权新增 [METHODOLOGY.md](METHODOLOGY.md)，主线文档上限从八份增至九份；源码目录入口指向根目录，分发内容仅由构建生成。历史收据保留原版本和结论，产品版本及运行时接口不变。
+
+2026-10-03，用户明确要求“扩大宿主覆盖……Claude Code 和其他宿主如 DSH 和 Antigravity 补齐”。按 `multi_host_native_capture_scope_change` 限定增加两个只读适配模块、独立采集脚本及真实本地验收。主 CLI/MCP、SDK、版本、评分规则、Codex 既有采集与旧证据保持不变；Antigravity 原始计数与尚未资格核验的上下文口径分开。见[多宿主采集记录](history/MULTI-HOST-CONTEXT-20261003.zh-CN.md)。
+
 2026-10-02，用户明确要求将一次性使用卡推进为可局部更新的决策依据。按 `evidence_dependencies_scope_change` 增加本地依赖图、独立模块入口、受影响路径的旧产物重放／重评分及保守待办；保留主 CLI/MCP、版本、旧卡失效原则与证据上限，不新增签名、登记、全局排名或模型／科学计算执行。见[局部复核说明](history/EVIDENCE-DEPENDENCIES.zh-CN.md)。
 
 2026-10-02，用户要求“真实宿主采集层完成验收”。按 native_capture_followup 增加限定只读采集适配器与独立采集脚本，绑定明确指定的 Codex 桌面会话，验证单次/累计、未知及事件对应关系。原接口、选择规则与版本不变。见[宿主 P0 验收](history/NATIVE-CONTEXT-P0.zh-CN.md)。
@@ -14,7 +20,7 @@
 
 2026-10-01，负责人明确要求“保留原来单插件的评估功能，继续开发最小有效插件组合”。按 `plugin_combination_scope_change` 记录新增能力：每次只冻结一个有任务依赖理由的插件对，比较基线、A、B、AB 和可选 BA；经原评分器重算，报告描述性交互、诊断观察和阶段内最小候选。新增一个运行时模块与既有规划上下文模式；保留版本 0.8.0、单插件评估、组件消融、CLI/MCP 签名及八份主线文档。完整契约见[插件组合](history/PLUGIN-COMBINATIONS.zh-CN.md)。
 
-Correctness, security, compatibility, tests, translations and simpler instructions for existing behavior are allowed. New CLI/MCP surfaces, graders, runtime modules or product scope require an explicitly recorded scope decision. Run `python scripts/check_feature_freeze.py`; passing that structural check does not replace semantic review. Keep the eight main documents and historical receipts; do not update historical versions to imply newer validation.
+Correctness, security, compatibility, tests, translations and simpler instructions for existing behavior are allowed. New CLI/MCP surfaces, graders, runtime modules or product scope require an explicitly recorded scope decision. Run `python scripts/check_feature_freeze.py`; passing that structural check does not replace semantic review. Keep the approved thirteen main documents (the prior nine plus four requested community and governance policies) and historical receipts; do not update historical versions to imply newer validation.
 
 The 2026-09-30 onboarding repairs keep version 0.8.0 and existing interfaces: correct current version declarations, add English sections and scheduler examples for existing acceptance scripts, block unbounded native paid execution, and repair hosted CI failures. Kernel probes remain mandatory and cannot fall back to unsandboxed execution. The budget gate blocks launches pending a genuinely bounded transport; it does not claim to meter requests. These are fixes to existing paths requested by the project owner.
 
@@ -22,7 +28,11 @@ The 2026-09-30 onboarding repairs keep version 0.8.0 and existing interfaces: co
 
 2026-09-30，负责人进一步明确要求完成“从评价一个插件变成为一个任务选择最小必要方案”。本次按新增能力记录 `task_selection_scope_change`，不是普通修错：允许一个任务选择模块、既有规划 MCP 的两个目录选择器、既有 `plan-use` 的两个材料选项，以及制造案例与回归测试。保留六个 MCP 工具、旧路由、评分器、版本 0.8.0 和八份主线文档；不自动运行、付费、安装，不放松原有证据边界。详见[任务选择契约](history/TASK-SELECTION.zh-CN.md)。
 
+2026-10-03，负责人明确要求“认真卓越解决图中硬阻断的问题”。`request_budget_scope_change` 限定增加逐请求持久化预留与历史对账组件、补齐底层网络代理的预算拒绝检查，以及已有 WSL Linux 隔离验收的显式 Windows 启动脚本。未知历史费用继续阻断，账本不是供应商硬封顶，也不解除付费原生启动门槛；WSL 验收不改写 Windows 原生证据。不新增主 CLI、MCP 工具或版本号。
+
 生效 **2026-09-25**，计划复盘 **2026-11-06**，共 42 天。冻结最初针对 **0.6.0**，当前项目版本为 **0.9.0**。到期不自动解冻，需要项目负责人明确记录决定。
+
+2026-10-03，负责人要求“加样本量指导”，在研究设计阶段给出效应量对应的任务与重复次数，并补充置信区间。`sample_size_guidance_scope_change` 限定新增 v2 分层配对设计模块与输入 schema，通过既有规划上下文、suite-check 和验证 MCP 返回结果；报告增加条件族级区间与方案表。旧四字段功效计划、探索性 bootstrap 和采用判据保持兼容；可选 scipy 仅用于非中心 t 计算。不新增主 CLI、MCP 签名、自动运行或版本号。
 
 2026-09-30，负责人进一步要求建立“证据迁移与桥接”。按 `evidence_bridge_scope_change` 增加一个限定矩阵任务的桥接模块，通过已有规划上下文识别差异、验证真实输入、保留旧研究并生成独立目标协议。精确引用门槛不放宽；研究设计、判据、模型／宿主或插件内容变化默认新建研究，输入等价不认证生产程序的运行等价。不新增工具、CLI 参数或版本。
 
@@ -39,7 +49,7 @@ The 2026-09-30 onboarding repairs keep version 0.8.0 and existing interfaces: co
 | 有复现证据的正确性、安全、兼容修复 | 新 CLI 子命令或选项、MCP 工具、自动发现技能 |
 | 同一已有行为的文案、帮助、错误处理、步骤简化 | 新评分器、指标体系、集成、宿主、研究／团队产品面 |
 | 补测试、真实运行、非作者计时、上游反馈 | 新运行时模块或与验收无关的重构 |
-| 归档实施记录、修复引用、减少阅读量 | 主线文档扩张至八份以上 |
+| 归档实施记录、修复引用、减少阅读量 | 主线文档超出已批准的十三份 |
 
 必要例外先记录问题、复现、无法在既有接口修复的原因、影响范围、复测和负责人明确同意。不得把新功能改称修复或擅改冻结清单以让检查通过；普通既有路径修错无需额外审批。
 

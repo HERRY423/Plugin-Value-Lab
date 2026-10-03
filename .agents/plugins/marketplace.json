@@ -8,7 +8,7 @@
       "name": "plugin-value-lab",
       "source": {
         "source": "local",
-        "path": "./plugins/plugin-value-lab"
+        "path": "./"
       },
       "policy": {
         "installation": "AVAILABLE",

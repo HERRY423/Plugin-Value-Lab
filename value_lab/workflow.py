@@ -72,6 +72,23 @@ def plan_plugin_use(context, now=None, *, artifact_root=None, verifier_root=None
     intent = context.get("intent")
     if intent not in ("choose", "use", "evaluate", "manage"):
         raise ValidationError("intent must be choose, use, evaluate or manage")
+    if 'sample_size_plan' in context:
+        if intent != 'evaluate' or set(context) - {'schema_version', 'intent', 'task', 'sample_size_plan'}:
+            raise ValidationError('Sample-size planning needs a separate evaluate context with task and sample_size_plan')
+        if not isinstance(context.get('task'), str) or not context['task'].strip():
+            raise ValidationError('Sample-size planning requires a task summary')
+        from .sample_size import plan_sample_size
+        planning = plan_sample_size(context['sample_size_plan'])
+        return {'schema_version': 1, 'type': 'plugin_use_plan', 'route': 'PLAN_SAMPLE_SIZE', 'owner': LAB,
+                'headline': '在采样前比较独立任务与重复次数', 'task_summary': context['task'],
+                'sample_size': planning, 'evidence_status': 'DESIGN_ASSUMPTIONS_ONLY',
+                'reasons': ['效应量、方差来源、抽样单位和检验目标须在采集前固定。'],
+                'steps': [{'owner': LAB, 'action': 'review_sampling_assumptions',
+                           'purpose': '核对任务族独立性及配对差值方差，再选择网格中的任务数与重复次数。'},
+                          {'owner': LAB, 'action': 'freeze_then_collect',
+                           'purpose': '将 v2 power_plan 写入 suite.policy 并冻结，保留全部失败和缺失。'}],
+                'handoff': {'kind': 'trial_design', 'status': 'PROPOSED_NOT_EXECUTED', 'execute': False},
+                'limitations': planning['limitations']}
     if "plugin_combination" in context:
         if (intent not in ("choose", "evaluate") or context.get("selected_plugin") is not None
                 or any(k in context for k in ("task_selection", "evidence_acquisition", "evidence_bridge", "risk_acquisition", "burden_decision"))):
@@ -327,6 +344,7 @@ def plan_plugin_use(context, now=None, *, artifact_root=None, verifier_root=None
         return result("DESIGN_MATCHED_TRIAL", LAB, "设计与当前采用问题相称的小规模比较",
                       ["明确的评估请求优先；不必先改变任何插件连接或权限。"],
                       [(LAB, "prepare_matched_suite", "固定版本、模型、资料和预算，包含普通任务、负对照和应当暂缓结论的案例。"),
+                       (LAB, "plan_sample_size", "先提供目标效应量与独立先导方差；用 sample_size_plan 比较任务数与重复次数，再冻结 power_plan。"),
                        (LAB, "freeze_then_collect", "冻结后记录独立会话、失败、原始输出和完整成本。"),
                        (LAB, "build_usage_card", "从完整记录重算结果，形成带适用条件的使用卡。")], "trial_design")
 
@@ -398,6 +416,23 @@ def write_plan(plan, output_dir):
         offset = lines.index('## 下一步')
         lines[offset:offset] = evidence_markdown(plan['combination'])
     lines.extend(["", "## 判断依据", ""] + [f"- {_md(r)}" for r in plan["reasons"]])
+    if 'sample_size' in plan:
+        from .report import _PLANNING_HEADERS, _planning_rows
+        planning = plan['sample_size']
+        spec = planning['spec']
+        lines += ['', '## 样本量与重复次数', '',
+                  f"目标质量差 {spec['minimum_detectable_delta']*100:g} 个百分点；功效 {spec['power']*100:g}%；双侧 α={spec['alpha']}；比较数 {spec['comparisons']}。",
+                  '方差来源：' + _md(spec['variance_source']),
+                  '方法：' + _md(spec['method']) + '；抽样依据：' + _md(spec['sampling_basis']), '',
+                  '| ' + ' | '.join(_PLANNING_HEADERS) + ' |', '| ' + ' | '.join(['---'] * len(_PLANNING_HEADERS)) + ' |']
+        lines += ['| ' + ' | '.join(_md(str(v)) for v in row) + ' |'
+                  for row in _planning_rows({'value_metrics': {'power_plan': planning}})]
+        selected = planning['recommended_design']
+        if selected:
+            lines += ['', f"网格内推荐：{selected['required_families']} 个任务族、{selected['required_tasks']} 个具体任务、每任务每臂 {selected['repetitions_per_case_per_arm']} 次，总计 {selected['generation_runs']} 次生成。",
+                      '推荐依据：' + planning['recommendation_objective'] + '。这不是唯一合理设计，也不是费用承诺。']
+        else:
+            lines += ['', '给定任务族上限内没有满足目标的方案；不能把上限当作所需样本量。']
     if "burden_decision" in plan:
         from .burden_decision import markdown as burden_markdown
         lines.extend(burden_markdown(plan['burden_decision']))

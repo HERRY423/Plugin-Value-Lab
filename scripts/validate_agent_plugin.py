@@ -40,9 +40,14 @@ def validate(root):
         ('README.zh-CN.md', r'\*\*版本 ([^。]+)。\*\*'),
         ('docs/EVIDENCE.md', r'\*\*Version ([0-9][^ ]*)\.\*\*'),
         ('docs/FREEZE.md', r'\*\*Version ([0-9][^ ]*)\.\*\*'),
+        ('docs/METHODOLOGY.md', r'\*\*Source version ([0-9][^;]*);'),
     ):
         text = (root / name).read_text(encoding='utf-8')
         if re.findall(pattern, text) != [manifest['version']]:
+            raise ValueError('Current documentation version drift: ' + name)
+        # A correct headline cannot hide a second contradictory current claim.
+        current_claims = re.findall(r'当前源码版本为\s*\*\*([^*]+)\*\*|Current source version(?: is|:)\s*\*\*([^*]+)\*\*', text)
+        if any((zh or en).rstrip('.') != manifest['version'] for zh, en in current_claims):
             raise ValueError('Current documentation version drift: ' + name)
     skills = []
     for directory in sorted((root / "skills").iterdir()):
@@ -85,6 +90,8 @@ def validate(root):
             old = json.loads(path.read_text(encoding="utf-8"))
             if any(old[key] != manifest[key] for key in ("name", "version")):
                 raise ValueError("Compatibility manifest identity/version drift")
+    from check_community import check as check_community
+    check_community(root)
     return {"valid": True, "specification": "Agent Plugins 1.0.0", "name": manifest["name"],
             "version": manifest["version"], "skills": skills, "mcp_servers": list(mcp["mcpServers"]),
             "schemas_loaded_offline": True, "client_certification": False}

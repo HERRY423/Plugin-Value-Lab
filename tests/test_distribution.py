@@ -75,7 +75,7 @@ class DistributionTests(unittest.TestCase):
             validate(self.root)
 
     def test_current_documentation_version_drift_rejected(self):
-        for name in ('README.md', 'README.zh-CN.md', 'docs/EVIDENCE.md', 'docs/FREEZE.md'):
+        for name in ('README.md', 'README.zh-CN.md', 'docs/EVIDENCE.md', 'docs/FREEZE.md', 'docs/METHODOLOGY.md'):
             path = self.root / name
             original = path.read_text(encoding='utf-8')
             version = json.loads((self.root / 'plugin.json').read_text(encoding='utf-8'))['version']
@@ -84,6 +84,12 @@ class DistributionTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'documentation version drift'):
                     validate(self.root)
                 path.write_text(original, encoding='utf-8')
+
+    def test_correct_headline_does_not_hide_a_second_stale_current_claim(self):
+        path = self.root / 'docs/EVIDENCE.md'
+        path.write_text(path.read_text(encoding='utf-8') + '\n当前源码版本为 **0.8.0**。\n', encoding='utf-8')
+        with self.assertRaisesRegex(ValueError, 'documentation version drift'):
+            validate(self.root)
 
     def test_runtime_version_drift_rejected(self):
         (self.root / "value_lab/__init__.py").write_text('__version__ = "99.0.0"\n', encoding="utf-8")

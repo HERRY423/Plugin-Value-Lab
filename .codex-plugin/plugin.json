@@ -1,7 +1,7 @@
 {
   "name": "plugin-value-lab",
   "version": "0.9.0",
-  "description": "Compare plugin runs, locate failures and retest repairs under matched conditions.",
+  "description": "Determine whether a plugin improves a specific task through paired comparisons, frozen plans, and recomputable results.",
   "author": {
     "name": "Local developer"
   },
@@ -23,15 +23,13 @@
   },
   "interface": {
     "displayName": "Plugin Value Lab",
-    "shortDescription": "Diagnose plugin failures and plan matched retests.",
-    "longDescription": "Help plugin authors locate failed or unknown outcomes and prepare matched retests. Work locally without registration or public scoring. The registry is a provisional evidence ledger; research and team extensions require explicit opt-in.",
+    "shortDescription": "Does this plugin improve this task? Pair, freeze, recompute.",
+    "longDescription": "Determine whether a plugin improves a specific task through paired comparisons, frozen plans, and recomputable results. Compare with-plugin and no-plugin records under matched conditions. Keep failures, uncertainty and missing evidence visible; scope conclusions to the tested task.",
     "developerName": "Local developer",
     "category": "Productivity",
     "capabilities": [],
     "defaultPrompt": [
-      "比较这个插件相对无插件基线是否有实际增益。",
-      "用可执行验证器检查评估产物，保留失败和缺失证据。",
-      "从已有配对记录生成改进清单，再准备修复后的复测。"
+      "用配对、冻结、可复算的评估，判断这个插件对我的具体任务有没有增益。"
     ]
   }
 }

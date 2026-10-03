@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "intent": "evaluate",
+  "task": "Synthetic planning example: detect a 10 percentage-point mean quality gain; replace the assumed SDs before real collection.",
+  "sample_size_plan": {
+    "version": 2,
+    "minimum_detectable_delta": 0.1,
+    "alpha": 0.05,
+    "power": 0.8,
+    "between_family_sd": 0.15,
+    "between_task_sd": 0.1,
+    "within_task_sd": 0.2,
+    "tasks_per_family": [1, 2],
+    "repetitions_per_case": [1, 3, 5],
+    "max_families": 10000,
+    "variance_source": "Manufactured assumptions for documentation; not a pilot estimate or scientific evidence",
+    "sampling_basis": "independent_representative_families",
+    "method": "normal_approximation",
+    "comparisons": 1,
+    "sd_multipliers": [1, 1.5],
+    "cost_weights": {
+      "unit": "assumed effort units",
+      "family_setup": 20,
+      "task_setup": 5,
+      "generation": 1
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "retrieved_on": "2026-10-03",
+  "files": [
+    {
+      "file": "schema.json",
+      "url": "https://citation-file-format.github.io/1.2.0/schema.json",
+      "sha256": "0b8d22140da702d766df318dcff3a91af2f39521298dcf36d76315fd99cc169b"
+    },
+    {
+      "file": "LICENSE",
+      "url": "https://raw.githubusercontent.com/citation-file-format/citation-file-format/main/LICENSE",
+      "sha256": "d26e56663498f0f17dbcb8a9bd50d344828948be08265f4fc97b4fc612e9be71"
+    }
+  ],
+  "upstream": "https://github.com/citation-file-format/citation-file-format",
+  "attribution": "Citation File Format contributors; upstream schema reproduced without modification",
+  "purpose": "Offline validation of CITATION.cff"
+}
