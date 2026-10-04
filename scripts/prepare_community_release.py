@@ -35,8 +35,8 @@ def prepare(sdist, output):
     if project['name'] != 'plugin-value-lab':
         raise ValueError('Wrong package')
     version = project['version']
-    if not re.fullmatch(r'\d+\.\d+\.\d+', version):
-        raise ValueError('Community recipe requires a reviewed stable version')
+    if not re.fullmatch(r'\d+\.\d+\.\d+(?:(?:a|b|rc)\d+)?', version):
+        raise ValueError('Community recipe requires a reviewed release or candidate version')
     with sdist.open('rb') as stream:
         digest = hashlib.file_digest(stream, 'sha256').hexdigest()
     url = f'https://pypi.org/packages/source/p/plugin-value-lab/plugin_value_lab-{version}.tar.gz'
