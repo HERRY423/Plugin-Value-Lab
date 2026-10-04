@@ -2,6 +2,8 @@
 
 The core workflow is [pair, freeze, recompute](../README.md). For optional capabilities, use the [advanced guide / 高级指南](history/ADVANCED.md).
 
+Codex 的[单宿主执行交接](history/CODEX-EXECUTION.zh-CN.md)提供本地冻结、持久尝试、规范化原始材料检查与离线重评分。冻结 v3 计划的采集结果现已接入既有确认性评估器，并支持按原尝试对账费用、保留诊断重试和导出复算。真实宿主派发、明确版本和完整工具暴露证据尚未验收；当前会话的两次回答不能替代独立两臂，合成测试与规范化导入不能解除这一限制。
+
 ## English operating guide
 
 For L1 community workflow candidates, the L2 offline GitHub Action, and L3 RO-Crate evidence export, use the [workflow delivery guide](../examples/community/README.md). Module entry points preserve the frozen main CLI and SDK. Community acceptance, package publication and scientific replication remain separate gates.
@@ -15,6 +17,8 @@ For optional local dependency rechecks beside an existing usage card, see the [d
 ### Prospective sample-size guidance
 
 For prospective sample-size guidance, run `python scripts/value_lab.py plan-use examples/sample-size-plan.json --output <new-directory>`. The example uses assumed variances, not real study evidence. Review `PLAN.md`, replace the target effect/variance source/sampling assumptions, and copy the reviewed `sample_size_plan` into `suite.policy.power_plan`. Existing `suite-check` and MCP `validate_value_suite` expose the current design's shortfall before data collection. See [the sampling and confidence-interval methods](METHODOLOGY.md#plan-task-counts-and-repetitions-before-collection). Planning is local and does not authorize model calls.
+
+For the v3 pilot-to-confirmation route, use `python scripts/value_lab.py plan-use examples/confirmatory-plan.json --output <new-directory>` or pass the same evaluate context to `plan_plugin_use`. Review the retained paired pilot packet, variance uncertainty/transfer rationale, practical quality or noninferiority-and-cost thresholds, and fixed sample size before copying the whole plan into `suite.policy.power_plan`. Keep confirmation families, tasks, input hashes and execution identities separate from the pilot; freeze before observation, then evaluate complete records with the lock and cost ledger. The [detailed handoff contract](history/PILOT-CONFIRMATION.zh-CN.md) explains inputs, t versus Hoeffding assumptions, result states and the manufactured example. Total-cost criteria include valued labor and settled cash; they are not provider spending caps. This local design path does not unlock paid execution.
 
 ### Native eval budget gate
 

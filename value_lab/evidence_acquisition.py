@@ -58,6 +58,9 @@ def _validate(selection, request, base):
         _strings(check["decision_case_ids"])
         suite = check["suite"]
         validate_suite(suite)
+        from .value_metrics import requires_confirmation
+        if requires_confirmation(suite):
+            raise ValidationError('Confirmatory v3 requires fixed sampling; adaptive acquisition needs a separate design')
         if "acquisition_batch" in suite:
             raise ValidationError("Batch identity is generated only after the next experiment is selected")
         binding = suite.get("task_selection")

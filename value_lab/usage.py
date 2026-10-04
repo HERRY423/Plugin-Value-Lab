@@ -247,6 +247,9 @@ def _scope_assessments(suite, records, report, envelope, artifact_root, verifier
         selected = [rows[f] for f in spec['families']]
         runs = [r for c in cases for r in c['runs']]
         blockers = list(report['scope_integrity_blockers'])
+        from .value_metrics import positive_signal, requires_confirmation
+        if requires_confirmation(report) and not positive_signal(report):
+            blockers.append('Prespecified whole-study confirmation is not supported; a favorable subset cannot override it')
         if report['evidence_type'] == 'synthetic':
             blockers.append('Synthetic evidence cannot support use')
         if envelope['missing_identity']:
@@ -433,7 +436,8 @@ def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_ro
     eligible = summary["comparison_eligible"] and not report["blockers"]
     non_regressed = report["verdict"] in {"PROMISING_LOCAL_SIGNAL", "NO_DEMONSTRATED_GAIN"}
     can_describe = eligible and not synthetic and non_regressed
-    can_support = can_describe and report["verdict"] == "PROMISING_LOCAL_SIGNAL"
+    from .value_metrics import positive_signal, requires_confirmation
+    can_support = can_describe and positive_signal(report)
     objective = policy.get("objective", "quality")
     cost_required = objective == "efficiency" or policy["require_cost_saving"]
     prompts = {case["id"]: case["prompt"] for case in suite["cases"]}
@@ -494,6 +498,8 @@ def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_ro
             reasons.append('必要的任务结果失败或尚未知，部分分数不能替代交付与正确性证据')
         if synthetic:
             reasons.append("包含合成演示，不能转化为实际使用建议")
+        elif requires_confirmation(report) and not positive_signal(report):
+            reasons.append('事前确认性规则尚未通过；局部均值信号不能作为正向使用建议')
         elif not eligible:
             reasons.append("整项比较存在证据阻断，先补足并复核全套材料")
         elif not non_regressed:
@@ -522,9 +528,13 @@ def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_ro
     if synthetic:
         status = "TRIAL_GUIDANCE_ONLY"
         next_steps = ["先冻结真实任务、两组相同的授权输入及比较条件，再收集真实运行和完整成本。", "合成案例只用于演练记录和判读流程。"]
-    elif not can_describe:
+    elif not can_describe or (requires_confirmation(report) and not positive_signal(report)):
         status = "REVIEW_REQUIRED"
         next_steps = ["逐项复核阻断、失败、缺失和关键回退；保留原记录，以明确修订后的新实验重新比较。", "问题解决前，不依据单个高分案例作使用推广。"]
+        if requires_confirmation(report):
+            confirmation = report.get('confirmatory_analysis')
+            confirmation_status = confirmation.get('status', 'INSUFFICIENT_EVIDENCE') if isinstance(confirmation, dict) else 'INSUFFICIENT_EVIDENCE'
+            next_steps.append('确认规则状态：' + confirmation_status + '；不得看结果后追加样本或放宽门槛冒充原确认研究。')
     else:
         status = "BOUNDED_LOCAL_GUIDANCE"
         next_steps = ["将当前任务与原案例、插件版本和执行条件逐项比较；仅在相符时参考本卡。", "对范围外任务先作小规模配对试用，保留失败、成本和人工纠正记录。"]
@@ -535,6 +545,7 @@ def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_ro
         "schema_version": 1, "type": "plugin_usage_card",
         "plugin": copy.deepcopy(report["plugin"]), "study_id": report["study_id"],
         "verdict": report["verdict"], "status": status,
+        **({'confirmatory_analysis': copy.deepcopy(report['confirmatory_analysis'])} if report.get('confirmatory_analysis') else {}),
         "scope": {
             "plugin": copy.deepcopy(report["plugin"]),
             "suite_sha256": report["provenance"]["suite_sha256"],

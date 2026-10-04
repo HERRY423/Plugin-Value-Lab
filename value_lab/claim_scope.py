@@ -7,7 +7,8 @@ UNSUPPORTED = ['broader_adoption', 'causal_benefit', 'independent_scientific_val
                'human_usability', 'other_models', 'other_hosts', 'larger_or_different_data', 'unseen_tasks']
 BRANCHES = ('verdict', 'measured_verdict', 'summary', 'quality_estimand', 'value_metrics',
             'decision_review', 'value_interpretation', 'claim_limits', 'scientific_errors', 'corpus_errors',
-            'cost_analysis', 'methodology', 'uncertainty', 'blockers', 'warnings', 'scope_integrity_blockers')
+            'cost_analysis', 'methodology', 'uncertainty', 'blockers', 'warnings', 'scope_integrity_blockers',
+            'confirmatory_analysis')
 
 
 def validate_context(suite):

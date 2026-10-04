@@ -219,6 +219,11 @@ def _continuation_records(root, plan):
 
 
 def run(directory, expected_plan_sha256, auth_home, *, continue_unstarted=False, previous_collector=None):
+    # Native max-budget-usd is not an independently enforced request ceiling.
+    # Block initial and continuation launches before reading credentials or
+    # claiming an attempt; offline preparation and verification stay available.
+    from .native import require_budget_boundary
+    require_budget_boundary()
     root = Path(directory).resolve()
     plan, suite = load_json(root / "plan.json"), load_json(root / "suite.json")
     validate_suite(suite)

@@ -13,7 +13,7 @@ def validate_power_plan(policy):
     plan = policy.get("power_plan")
     if plan is None:
         return
-    if isinstance(plan, dict) and plan.get('version') == 2:
+    if isinstance(plan, dict) and plan.get('version') in (2, 3):
         from .sample_size import validate
         validate(plan)
         return
@@ -28,7 +28,7 @@ def validate_power_plan(policy):
 
 def power_plan(suite):
     plan = suite["policy"].get("power_plan")
-    if isinstance(plan, dict) and plan.get('version') == 2:
+    if isinstance(plan, dict) and plan.get('version') in (2, 3):
         from .sample_size import suite_plan
         return suite_plan(suite)
     families = len({c["cluster"] for c in suite["cases"]})
@@ -78,6 +78,31 @@ def quality_summary(cases, weighting='case'):
             'scope': 'Outcome quality score only. Success, cash and interpretation endpoints are separate; do not select a favorable weighting after observation.'}
 
 
+def requires_confirmation(report):
+    plan = report.get('policy', {}).get('power_plan')
+    return (isinstance(plan, dict) and plan.get('version') == 3) or report.get('confirmatory_analysis') is not None
+
+
+def positive_signal(report):
+    """An opted-in confirmatory rule governs downstream positive guidance."""
+    confirmation = report.get('confirmatory_analysis')
+    if requires_confirmation(report):
+        if not isinstance(confirmation, dict) or not isinstance(confirmation.get('rule'), dict):
+            return False
+        objective = confirmation['rule'].get('objective')
+        required = {'total_cost_within_bound', 'per_run_cost_within_bound', 'quality_lower_exceeds_threshold',
+                    'case_regression_allowed', 'legacy_task_success_gate', 'no_critical_failure',
+                    'methodology_limits_met', 'legacy_cost_gate'}
+        if objective == 'efficiency':
+            required.add('cost_lower_exceeds_threshold')
+        return (objective in ('quality', 'efficiency') and confirmation.get('format') == 'pvl-confirmatory-result-1'
+                and confirmation.get('status') == 'CONDITIONALLY_SUPPORTED'
+                and confirmation.get('statistical_support') is True and confirmation.get('planning_target_met') is True
+                and isinstance(confirmation.get('criteria'), dict) and required <= set(confirmation['criteria'])
+                and all(v is True for v in confirmation['criteria'].values()) and confirmation.get('reasons') == [])
+    return report['verdict'] == 'PROMISING_LOCAL_SIGNAL'
+
+
 def decision_review(report):
     """Explain current gates; never invent a relaxed failure budget or adoption."""
     counts = {}
@@ -88,8 +113,8 @@ def decision_review(report):
                        'failed': states.count(False), 'unknown': states.count(None)}
     return {
         'single_run': {'arms': counts, 'scope': 'Passed means the configured task contract, never biological validity or general usability.'},
-        'controlled_trial': {'status': 'LOCAL_SIGNAL_FOR_REVIEW' if report['verdict'] == 'PROMISING_LOCAL_SIGNAL'
-                             else 'SIMULATION_ONLY' if report['evidence_type'] == 'synthetic' else 'NO_POSITIVE_RECOMMENDATION',
+        'controlled_trial': {'status': ('CONFIRMATORY_SUPPORT_FOR_REVIEW' if report.get('confirmatory_analysis') else 'LOCAL_SIGNAL_FOR_REVIEW')
+                             if positive_signal(report) else 'SIMULATION_ONLY' if report['evidence_type'] == 'synthetic' else 'NO_POSITIVE_RECOMMENDATION',
             'success_policy': 'ALL_PLANNED_WITH_RUNS_MUST_PASS',
             'allowed_failed_or_unknown_with_runs': 0,
             'all_with_success_gate_met': report['summary']['task_success_gate_met'],

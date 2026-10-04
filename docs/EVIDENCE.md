@@ -1,5 +1,7 @@
 # Current evidence / 当前证据与未完成门槛
 
+2026-10-03 新增 [v1.0.0-rc.1 候选发布验收](history/V1.0.0-RC.1-DELIVERY.zh-CN.md)：候选提交和安装包完成完整冻结与 CI/安装验收；确立四大核心要求：**真实两臂隔离**（独立会话/请求身份，`fresh_session: true`, `prior_messages: 0`, 零跨臂状态泄漏，WITH 仅暴露候选插件，WITHOUT 零插件暴露）、**完整工具清单**（`host_effective_inventory`，`inventory_complete: true`，工具与定义摘要 SHA-256 全集校验）、**原始产物**（UTF-8 原始文本与 `output_sha256` 完整封存，本地重新评分，不信任外部通过标记）、以及**断线／取消／重试的原尝试对账**（SQLite 持久日志追踪全生命周期，未知/断线凭证向原尝试对账，取消保留分母，诊断重试保留主分析首次尝试，账本逐项对账）。详见[验收记录](evidence/v1.0.0-rc.1-acceptance-20261003.json)。
+
 2026-10-03 新增[多宿主原生采集](history/MULTI-HOST-CONTEXT-20261003.zh-CN.md)：Claude Code 2.1.288 的 26 个会话取得 39 个已结算响应；DSH v4 的 6 个会话取得 282 个最终响应；Antigravity Desktop SQLite 取得 49 条原始用量元数据，规范化上下文仍为 UNKNOWN。Desktop/IDE 两份文本转录均不能提供用量。详见[脱敏验收](evidence/multi-host-context-20261003.json)。这是只读既有真实记录的验收，本次没有新增模型调用；不能升级成所有宿主、版本或实时占用均已通过。
 
 2026-10-02 新增[真实宿主上下文 P0 验收](history/NATIVE-CONTEXT-P0.zh-CN.md)：只读当前 Codex 桌面 0.159.2 的原生会话日志，逐响应绑定宿主、模型、会话、采样阶段和原始事件；分离单次占用与累计账本，未知不补零。[验收记录](evidence/native-context-p0-20261002.json)单列真实采集、实际压缩、追加重放和制造的异常测试。这不代表其他宿主验收、持续实时占用、结算费用或插件收益。
@@ -10,7 +12,7 @@
 
 2026-10-01 新增[独立负担视图](history/BURDEN-VIEW.zh-CN.md)，逐任务比较合格候选的上下文峰值、费用和耗时，保留取舍与未知，原选择规则不变。[本地记录](evidence/burden-view-20261001.json)区分测试、合成演示和真实宿主观察；本次未建立自动上下文采集或真实插件收益证据。
 
-**Version 0.9.0.** This is the current source version. Historical receipts keep their original versions, hashes and limitations.
+**Version 1.0.0-rc.1.** This is the current source version. Historical receipts keep their original versions, hashes and limitations.
 
 2026-10-01 新增[阶段内插件组合评估](history/PLUGIN-COMBINATIONS.zh-CN.md)，保留单插件评估及原组件消融。[本地验收记录](evidence/plugin-combinations-20261001.json)保存源码摘要：全量回归 1072 项通过，收尾后相关路径复验 128 项通过（含 28 项组合专项及真实本地 stdio）。六种制造案例验证互补、替代、组合退步、顺序差异、零插件足够与缺失数据处理；均为 SIMULATION_ONLY，真实组合收益与宿主暴露认证未建立，未发布或替换已安装插件。
 

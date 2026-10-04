@@ -106,6 +106,14 @@ def _evidence_label(report: dict[str, Any]) -> str:
 
 
 def _verdict(report: dict[str, Any]) -> str:
+    from .value_metrics import requires_confirmation, positive_signal
+    if requires_confirmation(report):
+        confirmation = report.get('confirmatory_analysis')
+        status = confirmation.get('status', 'INSUFFICIENT_EVIDENCE') if isinstance(confirmation, dict) else 'INSUFFICIENT_EVIDENCE'
+        if status == 'CONDITIONALLY_SUPPORTED' and not positive_signal(report):
+            status = 'INSUFFICIENT_EVIDENCE'
+        return {'CONDITIONALLY_SUPPORTED': '事前确认规则获条件支持', 'NOT_CONFIRMED': '未达到事前确认规则',
+                'INSUFFICIENT_EVIDENCE': '确认性证据不足', 'SIMULATION_ONLY': '仅模拟演示，未建立确认性支持'}.get(status, status)
     raw = report.get("verdict")
     return _VERDICTS.get(raw, _text(raw)) if isinstance(raw, str) else _text(raw)
 
@@ -332,6 +340,23 @@ def _value_notes(report):
                      '；校正后的 α：' + str(plan['effective_alpha']) + '；方差来源：' + plan['spec']['variance_source'])
         notes.append('推荐依据：' + plan['recommendation_objective'] + '；只在提交的候选网格内比较，预计投入不是实际费用。')
         notes.append('预计半宽基于所选正态/t 模型；不代表保守 Hoeffding 区间的宽度或功效。当前设计检查：' + plan['current_design_status'])
+    if plan.get('format') == 'pvl-sample-size-3':
+        notes.extend(_confirmatory_design_notes(plan))
+    confirmation = report.get('confirmatory_analysis')
+    if confirmation:
+        notes.append('确认性判断：' + confirmation['status'] + '；原局部信号结论不变，确认性支持不自动授权采用。')
+        notes.append('原描述性结论：' + _VERDICTS.get(report['verdict'], report['verdict']) + '；新方案的使用建议和 CI 门槛以确认性规则为准。')
+        for label, key in [('质量差', 'quality_interval'), ('每次运行总成本节省', 'cost_saving_interval')]:
+            interval = confirmation.get(key, {})
+            if 'lower' in interval:
+                notes.append(label + '：估计 ' + _measurement(interval['estimate']) + '；单侧 ' +
+                             _score(interval['one_sided_confidence_level']) + ' 下置信界 ' + _measurement(interval['lower']) +
+                             '；独立任务族 ' + str(interval['independent_families']) + '。')
+            elif interval:
+                notes.append(label + '区间不可用：' + interval.get('reason', '未知'))
+        notes.extend('确认规则 ' + key + '：' + _text(v) for key, v in confirmation['criteria'].items())
+        notes.extend(confirmation['reasons'])
+        notes.extend(confirmation['limitations'])
     inference = value.get('confidence_intervals', {})
     if inference.get('bounded_interval'):
         bound = inference['bounded_interval']
@@ -344,7 +369,7 @@ def _value_notes(report):
         else:
             notes.append('配对 t 区间未给出：' + student.get('reason', '未知'))
         notes.extend(inference['limitations'])
-    elif inference:
+    elif inference and plan.get('format') != 'pvl-sample-size-3':
         notes.append('条件置信区间未给出：' + inference.get('reason', '未知'))
     interpretation = report.get("value_interpretation")
     quality = report.get('quality_estimand')
@@ -365,6 +390,25 @@ def _value_notes(report):
                          "；区间状态 " + endpoint["family_uncertainty"]["status"] + "。")
         notes.append("逐项检查结论保存在 JSON 的 value_interpretation.check_claims；费用缺失不抹去数值诊断。缺失范围不是置信区间；失败归因尚未经独立认证。")
     return notes
+
+
+def _confirmatory_design_notes(plan):
+    spec, pilot = plan['spec'], plan['pilot_summary']
+    rule = spec['rule']
+    return [
+        '先导来源：' + spec['pilot']['task_source'] + '；身份摘要 ' + pilot['source_packet_sha256'] + '。完整来源、族划分、两臂协方差与区间保存在 JSON。',
+        '规划标准差（配对差值）：' + str(plan['planning_sd']) + '；使用族 bootstrap 上端与显式方差下限，不能作为保证的总体上界。',
+        '先导可迁移依据：' + spec['variance_policy']['transfer_rationale'],
+        '先导估计警示：' + '; '.join(pilot['warnings']),
+        '质量确认边界：' + str(plan['quality_null_boundary']) + '；预期质量差：' + str(rule['anticipated_quality_delta']) + '。样本量检验同一边界，不只检验差值是否为零。',
+        '确认主终点：' + ', '.join(plan['named_hypotheses']) + '；整体 α=' + str(spec['alpha']) + '；各终点 α=' + str(plan['effective_alpha']) + '。',
+        '规划功效仅覆盖命名统计终点，不保证同时通过全部任务成功、错误上限、退步与成本硬门槛。',
+        '固定样本停止；确认案例、输入和运行标识必须与先导分开。缺失、提前停止或看到结果后换阈值不能通过。',
+        '允许单任务退步：' + str(rule['max_case_regression']) + '；总成本上限 USD ' + str(rule['max_total_cost_usd']) +
+        '；每次完整成本界 USD ' + str(rule['cost_per_run_bound_usd']) + '。这些是分析边界，不是支付硬上限。',
+        '前瞻成本范围依据：' + rule['cost_bound_rationale'],
+        '效率目标需要质量非劣与成本节省的下置信界同时通过；现金须有结算引用，人工仍按冻结时薪折算。',
+    ]
 
 
 def _planning_rows(report):

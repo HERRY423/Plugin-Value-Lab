@@ -12,6 +12,14 @@ def gate_code(report):
     verdict = report.get('verdict')
     if report.get('blockers') or verdict in ('SIMULATION_ONLY', 'INSUFFICIENT_EVIDENCE'):
         return 2
+    from .value_metrics import positive_signal, requires_confirmation
+    if requires_confirmation(report):
+        confirmation = report.get('confirmatory_analysis')
+        if not isinstance(confirmation, dict) or confirmation.get('status') not in ('CONDITIONALLY_SUPPORTED', 'NOT_CONFIRMED'):
+            return 2
+        if confirmation['status'] == 'CONDITIONALLY_SUPPORTED' and not positive_signal(report):
+            return 2
+        return 0 if positive_signal(report) else 1
     return {'PROMISING_LOCAL_SIGNAL': 0, 'NO_DEMONSTRATED_GAIN': 1,
             'REGRESSION_DETECTED': 1}.get(verdict, 2)
 
@@ -39,6 +47,9 @@ def summary(report, code, verified):
              'Missing values are unknown, never zero. Positive cost Δ means greater cost.', '',
              f'SDK result byte checks: {verified}. These do not establish scientific validity.', '', 'Blockers:', '']
     lines += ['- ' + safe(v) for v in report.get('blockers', [])] or ['- None recorded.']
+    if report.get('confirmatory_analysis'):
+        lines += ['', 'Prespecified confirmation: **' + safe(report['confirmatory_analysis']['status']) + '**.',
+                  'The legacy verdict above is descriptive; this v3 gate follows the frozen confirmation rule.']
     lines += ['', 'Scope: submitted frozen comparison only; no causal, independent, or scientific certification.',
               'No model calls. Official Claude aggregate imports remain diagnostic evidence.']
     return '\n'.join(lines)[:60000] + '\n'

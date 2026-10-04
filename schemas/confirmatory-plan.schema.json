@@ -1,0 +1,356 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "alpha",
+    "power",
+    "sampling_basis",
+    "method",
+    "tasks_per_family",
+    "repetitions_per_case",
+    "max_families",
+    "pilot",
+    "variance_policy",
+    "rule"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 3
+    },
+    "alpha": {
+      "type": "number",
+      "minimum": 1e-06,
+      "maximum": 0.2
+    },
+    "power": {
+      "type": "number",
+      "minimum": 0.5,
+      "maximum": 0.999
+    },
+    "sampling_basis": {
+      "const": "independent_representative_families"
+    },
+    "method": {
+      "enum": [
+        "paired_t",
+        "hoeffding"
+      ]
+    },
+    "tasks_per_family": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 1000
+      }
+    },
+    "repetitions_per_case": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 50
+      }
+    },
+    "max_families": {
+      "type": "integer",
+      "minimum": 2,
+      "maximum": 100000
+    },
+    "pilot": {
+      "$ref": "#/$defs/pilot"
+    },
+    "variance_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "basis",
+        "sd_floor",
+        "rationale",
+        "transfer_rationale"
+      ],
+      "properties": {
+        "basis": {
+          "const": "bootstrap_upper95"
+        },
+        "sd_floor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "between_family_sd",
+            "between_task_sd",
+            "within_task_sd"
+          ],
+          "properties": {
+            "between_family_sd": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "between_task_sd": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "within_task_sd": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        "rationale": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "transfer_rationale": {
+          "type": "string",
+          "pattern": "\\S"
+        }
+      }
+    },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "objective",
+        "primary_endpoint",
+        "minimum_gain",
+        "noninferiority_margin",
+        "anticipated_quality_delta",
+        "max_case_regression",
+        "max_total_cost_usd",
+        "cost_per_run_bound_usd",
+        "minimum_cost_saving_usd",
+        "anticipated_cost_saving_usd",
+        "stopping",
+        "confirmation_not_started",
+        "cost_bound_rationale"
+      ],
+      "properties": {
+        "objective": {
+          "enum": [
+            "quality",
+            "efficiency"
+          ]
+        },
+        "primary_endpoint": {
+          "const": "equal_family_quality"
+        },
+        "minimum_gain": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "noninferiority_margin": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "anticipated_quality_delta": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "max_case_regression": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "max_total_cost_usd": {
+          "type": "number",
+          "minimum": 1e-09,
+          "maximum": 1000000000000.0
+        },
+        "cost_per_run_bound_usd": {
+          "type": "number",
+          "minimum": 1e-09,
+          "maximum": 1000000000.0
+        },
+        "minimum_cost_saving_usd": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000.0
+        },
+        "anticipated_cost_saving_usd": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000.0
+        },
+        "stopping": {
+          "const": "fixed_sample"
+        },
+        "confirmation_not_started": {
+          "const": true
+        },
+        "cost_bound_rationale": {
+          "type": "string",
+          "pattern": "\\S"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "objective": {
+                "const": "quality"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "noninferiority_margin": {
+                "const": 0
+              },
+              "minimum_cost_saving_usd": {
+                "const": 0
+              },
+              "anticipated_cost_saving_usd": {
+                "const": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "minimum_gain": {
+                "const": 0
+              },
+              "noninferiority_margin": {
+                "exclusiveMinimum": 0
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "title": "PVL pilot-bound prospective confirmation v3",
+  "description": "Strict fixed-sample design. Runtime additionally validates pilot identity, positive floors for boundary components, cross-field effect/cost constraints, balanced confirmation sampling, and frozen rule alignment. Does not authorize execution or adoption.",
+  "$id": "https://github.com/HERRY423/Plugin-Value-Lab/schemas/confirmatory-plan.schema.json",
+  "$defs": {
+    "pilot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "pilot_id",
+        "evidence_type",
+        "endpoint",
+        "task_source",
+        "independence_rationale",
+        "records"
+      ],
+      "properties": {
+        "version": {
+          "type": "integer",
+          "const": 1
+        },
+        "pilot_id": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "evidence_type": {
+          "enum": [
+            "real",
+            "synthetic"
+          ]
+        },
+        "endpoint": {
+          "const": "outcome_quality"
+        },
+        "task_source": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "independence_rationale": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "records": {
+          "type": "array",
+          "minItems": 12,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "family_id",
+              "task_id",
+              "input_sha256",
+              "repetition",
+              "with_score",
+              "without_score",
+              "with_run_id",
+              "without_run_id",
+              "source_ref"
+            ],
+            "properties": {
+              "family_id": {
+                "type": "string",
+                "pattern": "\\S"
+              },
+              "task_id": {
+                "type": "string",
+                "pattern": "\\S"
+              },
+              "input_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-fA-F]{64}$"
+              },
+              "repetition": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "with_score": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "without_score": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "with_run_id": {
+                "type": "string",
+                "pattern": "\\S"
+              },
+              "without_run_id": {
+                "type": "string",
+                "pattern": "\\S"
+              },
+              "source_ref": {
+                "type": "string",
+                "pattern": "\\S"
+              },
+              "with_session_id": {
+                "type": "string",
+                "pattern": "\\S"
+              },
+              "without_session_id": {
+                "type": "string",
+                "pattern": "\\S"
+              }
+            },
+            "dependentRequired": {
+              "with_session_id": [
+                "without_session_id"
+              ],
+              "without_session_id": [
+                "with_session_id"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

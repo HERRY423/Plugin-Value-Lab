@@ -227,6 +227,9 @@ def validate_suite(suite):
         success_requirements(case)
     from .usage import _validate_usage_contract
     _validate_usage_contract(suite)
+    if isinstance(policy.get('power_plan'), dict) and policy['power_plan'].get('version') == 3:
+        from .confirmatory import validate_suite_design
+        validate_suite_design(suite)
     return suite
 
 
@@ -283,7 +286,7 @@ def _grade(g, record):
             obj = obj[int(key)] if isinstance(obj, list) else obj[key]
         # Python considers True == 1; JSON booleans and numbers must remain distinct.
         return suite_digest(obj) == suite_digest(g["value"]), "Exact typed JSON field check"
-    except (ValueError, TypeError, KeyError, IndexError):
+    except (ValueError, TypeError, KeyError, IndexError, RecursionError):
         return False, "Invalid JSON or absent field"
 
 
@@ -653,6 +656,13 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
     from .value_metrics import build_value_metrics, decision_review
     report["value_metrics"] = build_value_metrics(suite, report)
     report['decision_review'] = decision_review(report)
+    if isinstance(policy.get('power_plan'), dict) and policy['power_plan'].get('version') == 3:
+        from .confirmatory import assess
+        report['confirmatory_analysis'] = assess(suite, report, records)
+        report['value_metrics']['legacy_local_signal_eligible'] = report['value_metrics']['benefit_claim_eligible']
+        report['value_metrics']['benefit_claim_eligible'] = report['confirmatory_analysis']['statistical_support']
+        report['value_metrics']['benefit_claim_scope'] = 'CONDITIONAL_ON_PRESPECIFIED_RULE; legacy verdict is descriptive only'
+        report['decision_review'] = decision_review(report)
     if "value_interpretation" in policy:
         from .interpretation import build_interpretation
         report["value_interpretation"] = build_interpretation(suite, report)

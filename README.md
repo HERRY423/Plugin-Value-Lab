@@ -4,7 +4,7 @@
 
 Compare the same task with and without the plugin, fix the evaluation rules before collecting results, and recompute the difference from original records. Missing evidence remains unknown.
 
-**Version 0.9.0.** Start in chat once PVL is installed and callable. Give the plugin name and one concrete task; the host handles plans and records.
+**Version 1.0.0-rc.1.** Start in chat once PVL is installed and callable. Give the plugin name and one concrete task; the host handles plans and records.
 
 [中文](README.zh-CN.md) · [Getting started](docs/START.md) · [Advanced guide](docs/history/ADVANCED.md) · [Current evidence](docs/EVIDENCE.md)
 

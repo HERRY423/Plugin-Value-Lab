@@ -489,8 +489,13 @@ def main(argv=None):
                               load_json(args.cost_ledger) if args.cost_ledger else None,
                               artifact_root=args.artifacts, verifier_root=args.verifiers, corpus_root=args.corpus)
             _emit({"verdict": report["verdict"], "files": write_reports(report, args.output),
-                   "blocker_count": len(report["blockers"])})
+                   "blocker_count": len(report["blockers"]),
+                   **({'confirmatory_status': report['confirmatory_analysis']['status']} if report.get('confirmatory_analysis') else {})})
             if args.gate:
+                from .value_metrics import requires_confirmation
+                if requires_confirmation(report):
+                    from .ci_gate import gate_code
+                    return gate_code(report)
                 return 0 if report["verdict"] == "PROMISING_LOCAL_SIGNAL" else (2 if report["verdict"] in ("SIMULATION_ONLY", "INSUFFICIENT_EVIDENCE") else 1)
         elif args.command == "pseudobulk-reference":
             from .pseudobulk import create_reference

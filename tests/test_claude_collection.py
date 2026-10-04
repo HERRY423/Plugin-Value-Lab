@@ -3,8 +3,9 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
-from value_lab.claude_collection import parse_events, verify_collection, _continuation_records
+from value_lab.claude_collection import parse_events, verify_collection, _continuation_records, run
 from value_lab.core import demo_suite, write_json, suite_digest, ValidationError
 from value_lab.artifacts import sha
 from value_lab.codex import schedule
@@ -33,6 +34,27 @@ class NativeCollectionTests(unittest.TestCase):
         self.assertTrue(result["plugin_loaded"])
         self.assertEqual(result["skill_calls"], [{"skill": "fixture"}])
         self.assertEqual(result["model_usd"], .02)
+
+    def test_paid_launch_and_continuation_block_before_reads_writes_or_dispatch(self):
+        root = Path(self.tmp.name) / "blocked-collection"
+        auth = Path(self.tmp.name) / "fixture-auth"
+        root.mkdir()
+        auth.mkdir()
+        sentinel = root / "retained-evidence.txt"
+        sentinel.write_text("preserve this evidence", encoding="utf-8")
+        for continuation in (False, True):
+            with self.subTest(continue_unstarted=continuation):
+                with patch("value_lab.claude_collection.load_json", side_effect=AssertionError("No plan or credential reads")) as reader, \
+                        patch("value_lab.claude_collection._run", side_effect=AssertionError("No model dispatch")) as dispatch, \
+                        patch.object(Path, "open", side_effect=AssertionError("No credential reads or attempt markers")):
+                    with self.assertRaisesRegex(ValidationError, "BUDGET_BOUNDARY_UNAVAILABLE"):
+                        run(root, "a" * 64, auth, continue_unstarted=continuation,
+                            previous_collector="untrusted-previous-collector.py" if continuation else None)
+                reader.assert_not_called()
+                dispatch.assert_not_called()
+                self.assertEqual(list(root.iterdir()), [sentinel])
+                self.assertEqual(sentinel.read_text(encoding="utf-8"), "preserve this evidence")
+                self.assertEqual(list(auth.iterdir()), [])
 
     def test_baseline_exposure_is_observed_not_assumed(self):
         self.assertIsNone(self.parse("without")["plugin_loaded"])

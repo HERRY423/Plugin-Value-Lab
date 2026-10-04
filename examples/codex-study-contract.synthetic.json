@@ -1,0 +1,22 @@
+{
+  "host": {
+    "product": "codex",
+    "surface": "desktop",
+    "build": "SYNTHETIC-CODEX-BUILD-1",
+    "model": "SYNTHETIC-MODEL-1"
+  },
+  "plugin": {
+    "id": "example-plugin",
+    "version": "0.0.0-demo",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "common_tools": [],
+  "candidate_tools": [
+    {
+      "name": "fixture_tool",
+      "definition_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  ],
+  "context_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "max_attempts_per_slot": 2
+}

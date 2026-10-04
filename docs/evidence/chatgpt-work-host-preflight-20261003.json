@@ -1,0 +1,24 @@
+{
+  "format": "pvl-chatgpt-work-host-preflight-1",
+  "checked_at": "2026-10-03T17:00:26.105633+00:00",
+  "requested_host": "ChatGPT Work / web",
+  "requested_scope": "One frozen paired execution path with independent sessions, exposure evidence, all attempts, raw scoring and independent recomputation",
+  "current_thread": {
+    "kind": "codex",
+    "host_id": "local",
+    "source": "Codex app read_thread metadata observed in this turn"
+  },
+  "browser_observation": "ChatGPT homepage was unauthenticated; no Work study was sent. Temporary tab closed after user requested current-conversation completion.",
+  "chatgpt_work_build_observed": null,
+  "chatgpt_model_version_observed": null,
+  "effective_inventory_observed": false,
+  "independent_chatgpt_sessions_executed": 0,
+  "live_host_accepted": false,
+  "status": "BLOCKED_HOST_TRANSPORT_AND_EVIDENCE",
+  "third_person_recomputed": false,
+  "new_paid_invocations": 0,
+  "historical_settled_cost_usd": null,
+  "historical_unsettled_upper_usd": null,
+  "official_setup_reference": "https://developers.openai.com/plugins/deploy/connect-chatgpt",
+  "local_scope": "Synthetic coordinator/review tests only; no paid/native/scientific study and no publisher, model or human attestation."
+}

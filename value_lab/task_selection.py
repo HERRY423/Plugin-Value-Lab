@@ -276,6 +276,9 @@ def _assess_studies(selection, catalog, artifact_root, verifier_root):
         report = evaluate(suite, bundle["records"], bundle["lock"], bundle.get("cost_ledger"),
                           artifact_root=artifact_root, verifier_root=verifier_root)
         reasons.extend(report["blockers"])
+        from .value_metrics import requires_confirmation, positive_signal
+        if requires_confirmation(report) and not positive_signal(report):
+            reasons.append('Prespecified confirmation is not supported; candidate selection cannot override it')
         if not report["cost_analysis"]["complete_category_coverage"]:
             reasons.append("Full setup/retry/review and other cost coverage is incomplete")
         if report["methodology"]["violations"]:

@@ -23,6 +23,9 @@ def plan(spec):
     """Freeze exactly one task-motivated pair, never search the power set."""
     keys(spec, 'suite stage inputs plugins rationale policy compare_orders seed')
     validate_suite(spec['suite'])
+    from .value_metrics import requires_confirmation
+    if requires_confirmation(spec['suite']):
+        raise ValidationError('Confirmatory v3 is a single-plugin paired design; multi-arm combinations require a separate design')
     keys(spec['stage'], 'id summary')
     _id(spec['stage']['id'])
     _text(spec['stage']['summary'])

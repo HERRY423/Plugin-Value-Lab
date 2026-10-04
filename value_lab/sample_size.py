@@ -18,6 +18,9 @@ SOURCES = [
 
 
 def validate(plan):
+    if isinstance(plan, dict) and plan.get('version') == 3:
+        from .confirmatory import validate as validate_confirmation
+        return validate_confirmation(plan)
     required = {'version', 'minimum_detectable_delta', 'alpha', 'power', 'between_family_sd',
                 'between_task_sd', 'within_task_sd', 'tasks_per_family', 'repetitions_per_case',
                 'max_families', 'variance_source', 'sampling_basis', 'method', 'comparisons'}
@@ -103,6 +106,9 @@ def _required(effect, sd, alpha, target, maximum, method):
 
 
 def plan_sample_size(spec):
+    if isinstance(spec, dict) and spec.get('version') == 3:
+        from .confirmatory import plan_sample_size as plan_confirmation
+        return plan_confirmation(spec)
     validate(spec)
     if spec['method'] == 'paired_t':
         _scipy_stats()  # fail clearly before returning a partial design grid
@@ -157,6 +163,9 @@ def plan_sample_size(spec):
 
 def suite_plan(suite):
     spec = suite['policy']['power_plan']
+    if spec.get('version') == 3:
+        from .confirmatory import suite_plan as plan_confirmation_suite
+        return plan_confirmation_suite(suite)
     result = plan_sample_size(spec)
     counts = Counter(c['cluster'] for c in suite['cases'])
     minimum_tasks = min(counts.values())
@@ -182,6 +191,8 @@ def confidence_intervals(suite, report):
     """Fixed-sample family CI; never treat repetitions or judge votes as df."""
     spec = suite['policy'].get('power_plan')
     unavailable = lambda why: {'status': 'UNAVAILABLE', 'reason': why}
+    if isinstance(spec, dict) and spec.get('version') == 3:
+        return unavailable('Use the prespecified one-sided bounds and decision criteria in confirmatory_analysis')
     if not isinstance(spec, dict) or spec.get('version') != 2:
         return unavailable('Freeze a v2 sampling/alpha plan before collection; legacy bootstrap remains descriptive')
     if spec['sampling_basis'] != 'independent_representative_families':

@@ -1,0 +1,84 @@
+{
+  "format": "pvl-release-acceptance-1",
+  "date": "2026-10-03",
+  "version": "1.0.0-rc.1",
+  "pep440_version": "1.0.0rc1",
+  "status": "CANDIDATE_FREEZE_AND_ACCEPTANCE_VERIFIED",
+  "git_ref": "v1.0.0-rc.1",
+  "packages": [
+    {
+      "name": "plugin-value-lab-marketplace-1.0.0-rc.1.zip",
+      "bytes": 2046132,
+      "sha256": "c02ba06c150b53932c8def516bf610006ece1d8bf14e6559c3086dd6e1912ad1",
+      "files": 635,
+      "member_hashes_verified": true
+    },
+    {
+      "name": "plugin-value-lab-agent-plugins-1.0.0-rc.1.zip",
+      "bytes": 1995160,
+      "sha256": "83374dd1613294b1300ed5b2aa27960d0b5efff936ea960372a44a4a447eb1af",
+      "files": 629,
+      "member_hashes_verified": true
+    },
+    {
+      "name": "plugin_value_lab-1.0.0rc1-py3-none-any.whl",
+      "bytes": 587926,
+      "sha256": "f06cecd620d87fb67b64798e9af9406e943689dd76bcd3cfb13b3d93314e05ec",
+      "isolated_wheel_install": "passed"
+    }
+  ],
+  "ci_gates": {
+    "feature_freeze": "PASS",
+    "community_policy": "PASS",
+    "agent_plugin_validation": "PASS",
+    "release_tests_zero_skip": "PASS",
+    "engineering_usability_clean_venv": "PASS"
+  },
+  "four_rigor_pillars": {
+    "two_arm_isolation": {
+      "status": "VERIFIED",
+      "rules": [
+        "fresh_session: true",
+        "prior_messages: 0",
+        "parent_session_id: null",
+        "memory_enabled: false",
+        "shared_artifacts: false",
+        "unique_session_and_request_ids_enforced",
+        "with_arm_exposure: candidate plugin plus declared common_tools only",
+        "without_arm_exposure: baseline zero candidate plugin and common_tools only",
+        "context_sha256 digest pinning against frozen plan"
+      ]
+    },
+    "complete_effective_tool_inventory": {
+      "status": "VERIFIED",
+      "source_kind": "host_effective_inventory",
+      "inventory_complete": true,
+      "rules": [
+        "definition_sha256 digest pinning for every exposed tool schema",
+        "no unconsumed cursor, pagination truncation, or ambiguous tool list",
+        "exact bipartite inventory match against frozen plan"
+      ]
+    },
+    "raw_artifact_preservation_and_rescoring": {
+      "status": "VERIFIED",
+      "rules": [
+        "raw_output retained as verbatim UTF-8 string or explicit null",
+        "output_sha256 cryptographic binding",
+        "local deterministic re-scoring from raw output using objective validators",
+        "zero trust in external pass/fail markers or self-reported model claims"
+      ]
+    },
+    "attempt_journal_reconciliation": {
+      "status": "VERIFIED",
+      "rules": [
+        "durable sqlite append-only AttemptJournal with immutable triggers",
+        "lifecycle state machine: prepared -> dispatched -> running -> terminal",
+        "disconnect and unknown attempts reconciled with source_ref",
+        "denominator conservation: cancelled and failed attempts retained in analysis",
+        "explicit diagnostic retry using retry_of preserving primary attempt prominence",
+        "full cost settlement reconciliation across all dispatched attempts"
+      ]
+    }
+  },
+  "scope": "Software release candidate validation and rigorous methodology specification only; not proof of generic plugin superiority or unassisted external adoption."
+}

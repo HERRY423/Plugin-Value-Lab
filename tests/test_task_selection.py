@@ -32,6 +32,17 @@ class SelectionTests(unittest.TestCase):
     def result(self):
         return select_task_plan(self.data, artifact_root=self.artifacts, verifier_root=self.scorers)
 
+    def test_confirmation_failure_cannot_become_supported_candidate(self):
+        from value_lab.core import evaluate
+        def confirmation_failed(*args,**kwargs):
+            report=evaluate(*args,**kwargs)
+            report['confirmatory_analysis']={'status':'NOT_CONFIRMED','statistical_support':False}
+            return report
+        with patch('value_lab.task_selection.evaluate',side_effect=confirmation_failed):
+            result=self.result()
+        self.assertIsNone(result['selected_plan_sha256'])
+        self.assertTrue(all(o['status']!='SUPPORTED' for row in result['plans'] for o in row['observations']))
+
     def row(self, result, a, b):
         return next(r for r in result["plans"] if [o["component_id"] for o in r["manifest"]["steps"]] == [a, b])
 

@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "codex-contract-fixture",
+  "plugin": {
+    "name": "example-plugin",
+    "version": "0.0.0-demo"
+  },
+  "evidence_type": "synthetic",
+  "runs_per_case": 1,
+  "conditions": {
+    "model": "SYNTHETIC-MODEL-1",
+    "host": "codex",
+    "tools": [],
+    "environment": "synthetic-fixture-v1",
+    "budget": {
+      "max_turns": 10
+    },
+    "host_version": "SYNTHETIC-CODEX-BUILD-1"
+  },
+  "policy": {
+    "min_quality_delta": 0.1,
+    "quality_floor": 0.8,
+    "max_case_regression": 0,
+    "min_clusters": 3,
+    "require_cost_saving": false,
+    "human_hourly_usd": 60
+  },
+  "cases": [
+    {
+      "id": "structured-delivery",
+      "cluster": "delivery",
+      "kind": "task",
+      "prompt": "Deliver a task result with a source reference and explicit limitations.",
+      "graders": [
+        {
+          "id": "source",
+          "type": "contains",
+          "value": "SOURCE:",
+          "weight": 1,
+          "critical": false,
+          "dimension": "outcome"
+        },
+        {
+          "id": "limits",
+          "type": "contains",
+          "value": "LIMITS:",
+          "weight": 1,
+          "critical": false,
+          "dimension": "outcome"
+        }
+      ]
+    }
+  ]
+}

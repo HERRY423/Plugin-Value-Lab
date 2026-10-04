@@ -3462,6 +3462,7 @@
       "value_lab/adapter_qualification.py",
       "value_lab/antigravity_context.py",
       "value_lab/artifacts.py",
+      "value_lab/attempt_journal.py",
       "value_lab/authoring.py",
       "value_lab/blind_review.py",
       "value_lab/burden_analyzer.py",
@@ -3476,9 +3477,12 @@
       "value_lab/cli.py",
       "value_lab/codex.py",
       "value_lab/codex_context.py",
+      "value_lab/codex_evidence.py",
+      "value_lab/codex_study.py",
       "value_lab/comparison.py",
       "value_lab/component_localization.py",
       "value_lab/component_studies.py",
+      "value_lab/confirmatory.py",
       "value_lab/context_stream.py",
       "value_lab/continuity.py",
       "value_lab/core.py",
@@ -3516,6 +3520,7 @@
       "value_lab/native_session.py",
       "value_lab/native_trigger.py",
       "value_lab/online_sandbox.py",
+      "value_lab/pilot.py",
       "value_lab/plugin_combinations.py",
       "value_lab/preregistration.py",
       "value_lab/processes.py",
@@ -3560,10 +3565,12 @@
       "schemas/burden-decision.schema.json",
       "schemas/citation-file-format/1.2.0/SOURCES.json",
       "schemas/citation-file-format/1.2.0/schema.json",
+      "schemas/confirmatory-plan.schema.json",
       "schemas/continuity-environment.schema.json",
       "schemas/decision-event.schema.json",
       "schemas/evidence-dependencies.schema.json",
       "schemas/host-capabilities.schema.json",
+      "schemas/pilot-data.schema.json",
       "schemas/plugin-combination.schema.json",
       "schemas/registry/1/answers.schema.json",
       "schemas/registry/1/corpus.schema.json",
@@ -5363,5 +5370,66 @@
     "legacy_power_plan_preserved": true,
     "public_cli_and_mcp_signatures_unchanged": true,
     "no_automatic_execution_or_adoption_gate_changes": true
+  },
+  "pilot_confirmatory_scope_change": {
+    "authorized_on": "2026-10-03",
+    "user_request": "Complete independent pilot-to-sample-size handoff and prespecified confirmatory decision rules around the same practical target",
+    "added_runtime_modules": [
+      "value_lab/confirmatory.py",
+      "value_lab/pilot.py"
+    ],
+    "added_schemas": [
+      "schemas/confirmatory-plan.schema.json",
+      "schemas/pilot-data.schema.json"
+    ],
+    "scope": [
+      "balanced nested paired pilot covariance/variance and family bootstrap uncertainty",
+      "identity-disjoint pilot and confirmation data, transparent transfer/floor assumptions",
+      "opt-in power_plan v3 with practical quality or quality-NI plus full-cost endpoints",
+      "fixed sample, prospective lock, cost/regression/legacy integrity gates and one-sided bounds",
+      "existing planning, validation, evaluation and report interfaces"
+    ],
+    "legacy_v2_and_local_verdict_preserved": true,
+    "public_cli_and_mcp_signatures_unchanged": true,
+    "does_not_authorize": [
+      "new paid execution",
+      "retrospective confirmatory claims",
+      "independence or invoice authentication",
+      "automatic adoption",
+      "publication"
+    ]
+  },
+  "codex_execution_scope_change": {
+    "date": "2026-10-03",
+    "authorization": "On 2026-10-03 the user explicitly changed the requested host to Codex. Migrate the unpublished coordinator, observation contract, examples and tests to Codex desktop while retaining interruption, retry, contamination, missing-record and independent recomputation checks.",
+    "added_runtime_modules": [
+      "value_lab/attempt_journal.py",
+      "value_lab/codex_evidence.py",
+      "value_lab/codex_study.py"
+    ],
+    "boundary": "Codex desktop only: product=codex, surface=desktop. Prospective local coordinator and normalized capture contract; no qualified live transport, host acceptance, benefit claim, paid dispatch or independent-person attestation. Historical evidence is not relabeled. Main CLI and six MCP tools unchanged.",
+    "confirmation_integration": {
+      "date": "2026-10-03",
+      "authorization": "User explicitly requested connecting collected Codex results to the existing confirmatory evaluator, preserving frozen locks, pilot separation, full matrix and settled costs.",
+      "scope": "Existing codex_study review/export/verify routes call core.evaluate for pre-frozen v3 plans. Optional --settlement on the module's review/export commands retains all-attempt cost evidence; no main CLI or MCP expansion and no new statistical evaluator.",
+      "boundary": "First attempts remain primary; retry outcomes never replace them. Reconcile every retry cost and execution identity. Operator captures retain an unauthenticated-host blocker; synthetic data cannot support a real confirmation. Original plans, source packets and evidence remain immutable."
+    }
+  },
+  "v1_0_0_rc1_candidate_release_scope_change": {
+    "date": "2026-10-03",
+    "authorization": "On 2026-10-03 the user explicitly requested publishing release v1.0.0-rc.1: freeze candidate commit and packages, complete CI and install acceptance, and formally establish true two-arm isolation, complete effective tool inventory, raw output preservation and rescoring, and attempt journal reconciliation for disconnect/cancel/retry.",
+    "version": "1.0.0-rc.1",
+    "pep440_version": "1.0.0rc1",
+    "delivery_document": "docs/history/V1.0.0-RC.1-DELIVERY.zh-CN.md",
+    "acceptance_evidence": "docs/evidence/v1.0.0-rc.1-acceptance-20261003.json",
+    "scope": [
+      "Version advancement across configuration and documentation to 1.0.0-rc.1 (Python package 1.0.0rc1)",
+      "Frozen release distribution packages (.whl, marketplace zip, agent-plugins zip)",
+      "Isolated clean-venv installation acceptance via check_engineering_usability.py",
+      "Four rigor pillars formalization: true two-arm isolation, complete effective tool inventory, verbatim raw output and local deterministic rescoring, and persistent attempt journal reconciliation for disconnect/cancellation/retry",
+      "Historical receipts, interfaces, and limitations preserved unchanged"
+    ],
+    "golden_commands_preserved": true,
+    "public_cli_and_mcp_signatures_unchanged": true
   }
 }

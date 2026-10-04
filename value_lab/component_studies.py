@@ -17,6 +17,9 @@ FORMAT = 'pvl-component-design-1'
 
 def plan(suite, components, seed=20260928):
     validate_suite(suite)
+    from .value_metrics import requires_confirmation
+    if requires_confirmation(suite):
+        raise ValidationError('Confirmatory v3 is a single-plugin paired design; factorial components require a separate design')
     keys(components, 'prompt tools context')
     if type(seed) is not int or not 0 <= seed <= 2**32 - 1:
         raise ValidationError('Assignment seed must be an unsigned 32-bit integer')

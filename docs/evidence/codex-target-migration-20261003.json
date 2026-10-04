@@ -1,0 +1,48 @@
+{
+  "format": "pvl-codex-target-migration-1",
+  "date": "2026-10-03",
+  "date_timezone": "America/Los_Angeles",
+  "authorization": "User explicitly changed the requested host to Codex.",
+  "target": {
+    "product": "codex",
+    "surface": "desktop"
+  },
+  "entrypoint": "python -m value_lab.codex_study",
+  "observation_format": "pvl-codex-study-observation-1",
+  "tests": {
+    "test_codex_study": 24,
+    "test_codex_evidence": 32,
+    "test_attempt_journal": 14,
+    "passed": 70,
+    "failed": 0,
+    "skipped": 0
+  },
+  "feature_freeze": "PASS",
+  "cli_help": "PASS",
+  "diff_whitespace": "PASS",
+  "resolved_validation_issue": "Runtime module inventory order corrected after the authorized module rename; no unrelated surface regenerated.",
+  "historical_evidence_rewritten": false,
+  "source_preimages_retained_locally": true,
+  "live_dispatch_available": false,
+  "host_transport": "NOT_QUALIFIED",
+  "live_host_accepted": false,
+  "confirmed_decision": "NOT_EVALUATED",
+  "cost": {
+    "status": "UNKNOWN",
+    "actual_settled_usd": null,
+    "unsettled_upper_usd": null
+  },
+  "scope": "Prospective target and contract migration plus local regression checks. No new model dispatch, native paired execution or cost settlement is asserted.",
+  "sha256": {
+    "value_lab/codex_study.py": "9a3f3a4387546256a3079664e6a5fa06a7095150153981c5fb36fc3a2a676b2a",
+    "value_lab/codex_evidence.py": "a3cf0f69ea09b4a3da2e23495a521c9cdc36db51564cd7a9aca361106be9fcb2",
+    "value_lab/attempt_journal.py": "98759e172827da563a810d72f16ea8250ae69bdb4370daca54cc16cb7f6731c4",
+    "tests/test_codex_study.py": "d6e30d2f3c1687af09de469e45e0f62bdfb9cdc49604ef1e6f33fe4d62521e06",
+    "tests/test_codex_evidence.py": "d085f8cdc4decbbb7bb419df24116708ca421c6d5f11a6bb668617360753fab7",
+    "tests/test_attempt_journal.py": "e4a37a7654ad08d3148ed6b87bdbe2eb1bc88a968a614760d54baf22f4beb850",
+    "examples/codex-study-contract.synthetic.json": "e20a38c66a43c49f841390fb966723c2ed827544f5a25f9b90aac68702b23d71",
+    "examples/codex-study-suite.synthetic.json": "18203829657fff39edee10f3ee86cc785e7f6c0cae2e001f2d176f27b1bc7be8",
+    "docs/history/CODEX-EXECUTION.zh-CN.md": "d34daa771d47e8cbf00424377b6ddbad4c84b944bd276b3c8346c18e04e1eacf",
+    "docs/feature-freeze.json": "9797649b9cb7fea054253ea41665626b72322a287bdfe12b42f0cf1ec97d3119"
+  }
+}

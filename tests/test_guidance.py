@@ -3,6 +3,7 @@ from copy import deepcopy
 import tempfile
 from pathlib import Path
 import unittest
+from unittest.mock import patch
 
 from value_lab.core import ValidationError, suite_digest, validate_suite
 from value_lab.comparison import compare_studies
@@ -41,6 +42,15 @@ def target(study):
 
 
 class GuidanceTests(unittest.TestCase):
+    def test_confirmation_failure_blocks_descriptive_guidance_override(self):
+        from value_lab.core import evaluate
+        a,b=studies()
+        report=evaluate(b['suite'],b['records'],b['lock'],b['cost_ledger'])
+        report['confirmatory_analysis']={'status':'NOT_CONFIRMED','statistical_support':False}
+        with patch('value_lab.guidance.evaluate',return_value=report):
+            g=conditional_guidance(a,b,target(b),axis='model')
+        self.assertFalse(any(row['status']=='PLUGIN_TRIAL_WITH_REVIEW' for row in g['cases']))
+
     def test_explicit_model_version_change_with_same_alias(self):
         a, b = studies()
         result = compare_studies(a, b, axis="model")

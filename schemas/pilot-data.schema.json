@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "pilot_id",
+    "evidence_type",
+    "endpoint",
+    "task_source",
+    "independence_rationale",
+    "records"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "pilot_id": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "evidence_type": {
+      "enum": [
+        "real",
+        "synthetic"
+      ]
+    },
+    "endpoint": {
+      "const": "outcome_quality"
+    },
+    "task_source": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "independence_rationale": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "records": {
+      "type": "array",
+      "minItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "family_id",
+          "task_id",
+          "input_sha256",
+          "repetition",
+          "with_score",
+          "without_score",
+          "with_run_id",
+          "without_run_id",
+          "source_ref"
+        ],
+        "properties": {
+          "family_id": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "task_id": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "input_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{64}$"
+          },
+          "repetition": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "with_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "without_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "with_run_id": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "without_run_id": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "source_ref": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "with_session_id": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "without_session_id": {
+            "type": "string",
+            "pattern": "\\S"
+          }
+        },
+        "dependentRequired": {
+          "with_session_id": [
+            "without_session_id"
+          ],
+          "without_session_id": [
+            "with_session_id"
+          ]
+        }
+      }
+    }
+  },
+  "title": "PVL independent paired pilot packet",
+  "description": "Runtime additionally requires balanced disjoint task identities, at least three families, two tasks per family and two complete paired repetitions. Identity/source declarations are not authenticated.",
+  "$id": "https://github.com/HERRY423/Plugin-Value-Lab/schemas/pilot-data.schema.json"
+}

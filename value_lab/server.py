@@ -111,8 +111,9 @@ def create_server(*, enable_extensions=False, artifact_root=None, verifier_root=
         verifies input differences and prepares/regrades a separate target bridge.
         context.plugin_combination freezes or analyzes one stage-scoped A/B pair,
         retaining baseline/A/B/AB, optional BA, costs, interactions and unknowns.
-        A separate evaluate context.sample_size_plan compares prospective task/family
-        counts and per-arm repetitions from an effect, SD assumptions and target power.
+        A separate evaluate context.sample_size_plan compares task/family counts and
+        per-arm repetitions: v2 SD assumptions or v3 independent pilot plus practical
+        confirmation thresholds, fixed stopping and cost bounds. Planning is not execution.
         Single-plugin evaluation remains available via evaluate_plugin_value.
         Optional material roots narrow host-authorized directories, as in evaluation.
         No registry lookup, account action, program execution or external call.

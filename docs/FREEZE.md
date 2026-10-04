@@ -1,4 +1,8 @@
-# Scope freeze / 六周范围冻结（当前版本 0.9.0）
+# Scope freeze / 六周范围冻结（当前版本 1.0.0-rc.1）
+
+2026-10-03，用户明确要求发布 v1.0.0-rc.1 候选版本，完成候选提交与安装包冻结、CI/安装验收，并确立真实两臂隔离、完整工具清单、原始产物与断线／取消／重试原尝试对账规则。按 `v1_0_0_rc1_candidate_release_scope_change` 记录范围：版本推进至 1.0.0-rc.1（Python 包版本 1.0.0rc1），主 CLI、六个默认 MCP 工具和公开 SDK 保持兼容；安装包（wheel、marketplace 与 agent-plugins ZIP）经哈希冻结与隔离安装验证；四大核心要求纳入正式验收标准，历史证据与版本保持原样。详见[候选发布交付说明](history/V1.0.0-RC.1-DELIVERY.zh-CN.md)。
+
+2026-10-03，用户明确要求完成“独立先导数据到样本量假设的交接”和“事前声明的确认性决策规则”。`pilot_confirmatory_scope_change` 限定新增先导计算与确认性分析两个模块、两份输入 schema，通过已有规划、冻结、评估与报告入口提供可选 v3 协议。保留先导来源、配对协方差、分层方差不确定性，检查确认集身份分离；规划和单侧判断使用同一实际增益或非劣/成本门槛，仅支持完整固定样本。原 v2 与局部信号不变，不新增命令、MCP 签名、自动付费、版本号或采用授权。详见[先导与确认交接](history/PILOT-CONFIRMATION.zh-CN.md)。
 
 2026-10-03，用户要求补齐引用、安全、贡献、API 稳定性／弃用策略和数据治理。`community_infrastructure_scope_change` 限定新增四份政策文档与 CITATION 元数据，将主线文档上限从九份增至十三份，并增加离线元数据、版本和分发检查。患者数据处理规则不冒充自动脱敏、访问控制或合规认证；不改变产品版本、运行时接口及历史证据。
 
@@ -16,7 +20,7 @@
 
 2026-10-01，用户授权增加独立负担视图，记录为 burden_view_scope_change：新增一个视图模块及既有组合请求的可选上下文材料。原选择规则、评分、CLI/MCP 签名和版本不变。见[负担视图](history/BURDEN-VIEW.zh-CN.md)。
 
-**Version 0.9.0.** The freeze started on 2026-09-25, with review planned for 2026-11-06. Expiry does not automatically authorize new features. The `version_series: 0.6.x` field in `feature-freeze.json` identifies the original freeze, not the current package.
+**Version 1.0.0-rc.1.** The freeze started on 2026-09-25, with review planned for 2026-11-06. Expiry does not automatically authorize new features. The `version_series: 0.6.x` field in `feature-freeze.json` identifies the original freeze, not the current package.
 
 2026-10-01，负责人明确要求“保留原来单插件的评估功能，继续开发最小有效插件组合”。按 `plugin_combination_scope_change` 记录新增能力：每次只冻结一个有任务依赖理由的插件对，比较基线、A、B、AB 和可选 BA；经原评分器重算，报告描述性交互、诊断观察和阶段内最小候选。新增一个运行时模块与既有规划上下文模式；保留版本 0.8.0、单插件评估、组件消融、CLI/MCP 签名及八份主线文档。完整契约见[插件组合](history/PLUGIN-COMBINATIONS.zh-CN.md)。
 
@@ -30,7 +34,7 @@ The 2026-09-30 onboarding repairs keep version 0.8.0 and existing interfaces: co
 
 2026-10-03，负责人明确要求“认真卓越解决图中硬阻断的问题”。`request_budget_scope_change` 限定增加逐请求持久化预留与历史对账组件、补齐底层网络代理的预算拒绝检查，以及已有 WSL Linux 隔离验收的显式 Windows 启动脚本。未知历史费用继续阻断，账本不是供应商硬封顶，也不解除付费原生启动门槛；WSL 验收不改写 Windows 原生证据。不新增主 CLI、MCP 工具或版本号。
 
-生效 **2026-09-25**，计划复盘 **2026-11-06**，共 42 天。冻结最初针对 **0.6.0**，当前项目版本为 **0.9.0**。到期不自动解冻，需要项目负责人明确记录决定。
+生效 **2026-09-25**，计划复盘 **2026-11-06**，共 42 天。冻结最初针对 **0.6.0**，当前项目版本为 **1.0.0-rc.1**。到期不自动解冻，需要项目负责人明确记录决定。
 
 2026-10-03，负责人要求“加样本量指导”，在研究设计阶段给出效应量对应的任务与重复次数，并补充置信区间。`sample_size_guidance_scope_change` 限定新增 v2 分层配对设计模块与输入 schema，通过既有规划上下文、suite-check 和验证 MCP 返回结果；报告增加条件族级区间与方案表。旧四字段功效计划、探索性 bootstrap 和采用判据保持兼容；可选 scipy 仅用于非中心 t 计算。不新增主 CLI、MCP 签名、自动运行或版本号。
 
@@ -66,5 +70,9 @@ The 2026-09-30 onboarding repairs keep version 0.8.0 and existing interfaces: co
 冻结期改动说明复现问题、既有路径怎样改善、验证结果和历史证据影响；实施细节放 `docs/history/`，旧运行与判断不覆盖。发布、付费和联系他人仍遵守具体授权。
 
 ## 到期复盘
+
+2026-10-03 用户明确要求把 Codex 采集结果接入现有确认性评估器。`codex_execution_scope_change.confirmation_integration` 限定在原协调器的 review/export/verify 路径传递 v3 冻结计划、原始首次尝试、完整矩阵和全尝试费用；模块命令 review/export 增加可选 `--settlement`，不扩张主 CLI 或 MCP。沿用 `core.evaluate()` 与 `confirmatory.assess()`，不另建统计判据，不升级未认证宿主或合成证据。
+
+2026-10-03 用户指定优先完成 Codex 单宿主路径，授权新增本地尝试日志、观测契约和控制/复算模块。此次仅交付离线工程路径与对抗测试；真实 Codex 执行器、版本与暴露证明、第三人复核仍未验收。原主 CLI、六个默认 MCP 工具及旧判断保持；范围见 `codex_execution_scope_change` 与[执行交接](history/CODEX-EXECUTION.zh-CN.md)。
 
 负责人查看 [证据状态](EVIDENCE.md)、真实首次使用记录、剩余失败与维护负担，决定延长冻结、仅修错或明确批准下一项功能，并说明范围与依据。没有同事回执就保留缺失，打包完成不能算作采用。

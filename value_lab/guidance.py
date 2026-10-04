@@ -80,6 +80,9 @@ def conditional_guidance(before, after, target, *, axis, artifact_roots=None, ve
     roots = artifact_roots or (None, None)
     scorers = verifier_roots or (None, None)
     report = evaluate(suite, after["records"], after["lock"], after.get("cost_ledger"), artifact_root=roots[1], verifier_root=scorers[1])
+    from .value_metrics import requires_confirmation, positive_signal
+    if requires_confirmation(report) and not positive_signal(report):
+        target_blockers.append('Prespecified confirmation is not supported; descriptive trial rules cannot override it')
     settled = report["cost_analysis"]["cash_evidence"]["settlement_references_complete"]
     both_settled = all(comparison["costs"][side]["cash_evidence"]["settlement_references_complete"] for side in ("before", "after"))
     cost_ready = comparison["cost_comparison_eligible"] and (not policy["require_settled_costs"] or both_settled)

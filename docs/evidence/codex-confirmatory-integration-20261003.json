@@ -1,0 +1,48 @@
+{
+  "format": "pvl-codex-confirmatory-integration-1",
+  "date": "2026-10-03",
+  "timezone": "America/Los_Angeles",
+  "status": "ENGINEERING_INTEGRATION_VERIFIED",
+  "evidence_type": "synthetic",
+  "planned_families": 20,
+  "collected_fixture_attempts": 40,
+  "route": "retained Codex captures -> core.evaluate -> confirmatory.assess -> export -> fresh-process verify",
+  "confirmed_decision": "SIMULATION_ONLY",
+  "simulated_criteria_met": true,
+  "statistical_support": false,
+  "live_host_accepted": false,
+  "new_model_dispatches": 0,
+  "third_person_identity_verified": false,
+  "synthetic_cost_reference_status": "SETTLEMENT_REFERENCES_PRESENT",
+  "real_cash_settlement_verified": false,
+  "plan_sha256": "63db1e00abcff8b611213e102f802b0297f47628f4557fe2fd2efdbabf955558",
+  "manifest_sha256": "a10001d7d0d182bdb6d9c2608645257bb3ed7b499c7734f33f5cc0ea2b12daa1",
+  "recompute_status": "RECOMPUTED_LOCALLY",
+  "test_counts": {
+    "codex_confirmation": 11,
+    "codex_study": 24,
+    "codex_evidence": 32,
+    "attempt_journal": 14,
+    "confirmatory": 27,
+    "pilot": 14,
+    "core": 24,
+    "unique_total": 146,
+    "failed": 0,
+    "skipped": 0
+  },
+  "feature_freeze": "PASS",
+  "diff_whitespace": "PASS",
+  "local_bundle": "work/codex-confirmatory-integration-20261003/bundle",
+  "source_sha256": {
+    "value_lab/codex_study.py": "120bcaee3ea6bd75fb43051e4989e57f207a33ac170e43882c239e31a316d3f3",
+    "value_lab/core.py": "ade314797a14c35a621d78d3d8a825046e4398a0fc83a540324583943b6047ac",
+    "value_lab/confirmatory.py": "422ef1957ab40b02f8408c1b018c006254d4b72240f42d2fe354a19ea2b8c688",
+    "value_lab/pilot.py": "8207f91d8fa02fb8acf5afe5df9ce22fa7aa0bfaa19fd2c0c4180633e83ed8b3",
+    "tests/test_codex_confirmation.py": "f5ab4fd23ec88840ddef7d59b7914c30c9c33a430043a3c9b9adf8654e7a56ed"
+  },
+  "limits": [
+    "All retained attempts and settlement lines in this acceptance are manufactured.",
+    "No real pilot, host isolation, model execution, invoice authentication or adoption is asserted.",
+    "Legacy non-v3 reviews remain unconfirmed; operator captures remain blocked by host provenance."
+  ]
+}

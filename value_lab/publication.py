@@ -41,11 +41,14 @@ def _card(row, entry, report, suite, trust, declaration):
     heldout = _heldout(entry, suite, declaration)
     reviews = review_gate(row, suite, trust)
     blockers = []
-    positive = report["verdict"] == "PROMISING_LOCAL_SIGNAL"
+    from .value_metrics import positive_signal
+    positive = positive_signal(report)
     if not row["descriptive_comparison_eligible"]:
         blockers.append("Study is synthetic, incomplete, disputed, superseded or reuses sessions")
     if not positive:
         blockers.append("No positive marginal-value verdict")
+    if report.get('confirmatory_analysis') and not positive:
+        blockers.append('Prespecified confirmatory rule not supported: ' + report['confirmatory_analysis']['status'])
     if reviews["qualifying_reviewers"] < 1:
         blockers.append("At least one version-bound, trusted-key non-author review is required")
     if not heldout["heldout_cases"] or heldout["status"] != "declared_unexposed":

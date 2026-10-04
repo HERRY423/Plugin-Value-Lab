@@ -86,7 +86,7 @@ def plan_plugin_use(context, now=None, *, artifact_root=None, verifier_root=None
                 'steps': [{'owner': LAB, 'action': 'review_sampling_assumptions',
                            'purpose': '核对任务族独立性及配对差值方差，再选择网格中的任务数与重复次数。'},
                           {'owner': LAB, 'action': 'freeze_then_collect',
-                           'purpose': '将 v2 power_plan 写入 suite.policy 并冻结，保留全部失败和缺失。'}],
+                           'purpose': '将选定版本的 power_plan 写入 suite.policy 并冻结；先导与确认材料分开，保留全部失败和缺失。'}],
                 'handoff': {'kind': 'trial_design', 'status': 'PROPOSED_NOT_EXECUTED', 'execute': False},
                 'limitations': planning['limitations']}
     if "plugin_combination" in context:
@@ -420,9 +420,12 @@ def write_plan(plan, output_dir):
         from .report import _PLANNING_HEADERS, _planning_rows
         planning = plan['sample_size']
         spec = planning['spec']
-        lines += ['', '## 样本量与重复次数', '',
-                  f"目标质量差 {spec['minimum_detectable_delta']*100:g} 个百分点；功效 {spec['power']*100:g}%；双侧 α={spec['alpha']}；比较数 {spec['comparisons']}。",
-                  '方差来源：' + _md(spec['variance_source']),
+        target = (f"确认性目标：预期质量差 {spec['rule']['anticipated_quality_delta']*100:g} 个百分点；需超过边界 {planning['quality_null_boundary']*100:g} 个百分点；联合功效目标 {spec['power']*100:g}%；整体 α={spec['alpha']}。"
+                  if spec['version'] == 3 else
+                  f"目标质量差 {spec['minimum_detectable_delta']*100:g} 个百分点；功效 {spec['power']*100:g}%；双侧 α={spec['alpha']}；比较数 {spec['comparisons']}。")
+        source = ('独立先导 ' + spec['pilot']['pilot_id'] + '；族 bootstrap 上端与有依据的方差下限' if spec['version'] == 3 else spec['variance_source'])
+        lines += ['', '## 样本量与重复次数', '', target,
+                  '方差来源：' + _md(source),
                   '方法：' + _md(spec['method']) + '；抽样依据：' + _md(spec['sampling_basis']), '',
                   '| ' + ' | '.join(_PLANNING_HEADERS) + ' |', '| ' + ' | '.join(['---'] * len(_PLANNING_HEADERS)) + ' |']
         lines += ['| ' + ' | '.join(_md(str(v)) for v in row) + ' |'
@@ -433,6 +436,9 @@ def write_plan(plan, output_dir):
                       '推荐依据：' + planning['recommendation_objective'] + '。这不是唯一合理设计，也不是费用承诺。']
         else:
             lines += ['', '给定任务族上限内没有满足目标的方案；不能把上限当作所需样本量。']
+        if spec['version'] == 3:
+            from .report import _confirmatory_design_notes
+            lines += ['', '## 先导交接与确认规则', ''] + ['- ' + _md(v) for v in _confirmatory_design_notes(planning)]
     if "burden_decision" in plan:
         from .burden_decision import markdown as burden_markdown
         lines.extend(burden_markdown(plan['burden_decision']))
