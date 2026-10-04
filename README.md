@@ -89,4 +89,8 @@ Start with `work/first-run/usage/USAGE.md` or `ENVELOPE.html`. Full scores are i
 
 The badge reports the main branch, not unpushed changes. Source checks do not establish installed-host acceptance or scientific benefit.
 
-Project policies: [citation](CITATION.cff) · [security reports](SECURITY.md) · [contributing](CONTRIBUTING.md) · [API stability](docs/API-STABILITY.md) · [data governance](docs/DATA-GOVERNANCE.md). Identifiable patient data must not enter ordinary records or prompts; de-identified derivatives still require data-owner approval.
+Project policies: [citation](CITATION.cff) · [maintenance and owner](CONTRIBUTING.md#minimum-maintenance-commitment) · [security reports](SECURITY.md) · [contributing](CONTRIBUTING.md) · [compatibility scope](docs/API-STABILITY.md#maintained-environments) · [data governance](docs/DATA-GOVERNANCE.md). Identifiable patient data must not enter ordinary records or prompts; de-identified derivatives still require data-owner approval.
+
+Maintainer: **@HERRY423**. Report vulnerabilities through the **[private GitHub channel](https://github.com/HERRY423/Plugin-Value-Lab/security/advisories/new)**; do not include exploit details or sensitive material in public issues. P0/P1 acknowledgement commitments are 1/2 working days, with scope and escalation in [SECURITY.md](SECURITY.md#serious-issue-response).
+
+The [v0.9.0 maintenance and paid-execution addendum](docs/history/MAINTENANCE-AND-PAID-BOUNDARY-20261003.md) records the release-specific policy. Paid native execution remains blocked; local accounting has `provider_cap_verified: false` and `paid_launch_authorized: false`.

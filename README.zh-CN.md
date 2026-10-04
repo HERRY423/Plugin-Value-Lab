@@ -87,4 +87,8 @@ python scripts/value_lab.py compare-studies examples/first-run/before.json examp
 
 源码检查通过不代表已安装宿主验收或已证明科学收益。
 
-项目规范：[引用](CITATION.cff) · [安全报告](SECURITY.md) · [贡献指南](CONTRIBUTING.md) · [API 稳定性](docs/API-STABILITY.md) · [数据治理](docs/DATA-GOVERNANCE.md)。可识别患者数据不得进入普通记录或提示词；去标识化衍生材料仍需数据负责人批准。
+项目规范：[引用](CITATION.cff) · [最低维护承诺与维护人](CONTRIBUTING.md#minimum-maintenance-commitment) · [安全报告](SECURITY.md) · [贡献指南](CONTRIBUTING.md) · [兼容范围](docs/API-STABILITY.md#maintained-environments) · [数据治理](docs/DATA-GOVERNANCE.md)。可识别患者数据不得进入普通记录或提示词；去标识化衍生材料仍需数据负责人批准。
+
+首要维护人：**@HERRY423**，目前无备份维护人。私密漏洞请使用 **[GitHub 私密报告入口](https://github.com/HERRY423/Plugin-Value-Lab/security/advisories/new)**（需登录；2026-10-03 已启用并核验入口）。P0/P1 分别在 1/2 个工作日内确认，确认后 2/5 个工作日内给出缓解或停用建议；补丁日期按问题评估，不等于全天候保障。工作日按洛杉矶时间周一至周五计算。完整分级、更新频率与逾期处理见[严重问题流程](SECURITY.md#serious-issue-response)，不要在公开 issue 提交漏洞细节。
+
+[v0.9.0 维护承诺与付费边界补充说明](docs/history/MAINTENANCE-AND-PAID-BOUNDARY-20261003.md)：付费原生执行仍被阻断；后续源码的记账模块仍为 `provider_cap_verified: false`、`paid_launch_authorized: false`。已发布版本的原始安装包与后续源码范围在说明中分别列明。

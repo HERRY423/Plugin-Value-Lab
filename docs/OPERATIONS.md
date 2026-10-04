@@ -18,6 +18,8 @@ For prospective sample-size guidance, run `python scripts/value_lab.py plan-use 
 
 ### Native eval budget gate
 
+The [v0.9.0 dated maintenance and paid-execution addendum](history/MAINTENANCE-AND-PAID-BOUNDARY-20261003.md) distinguishes the original release assets from later source. Current accounting reports `provider_cap_verified: false` and `paid_launch_authorized: false`; it does not enable paid launch. Unknown spending remains UNKNOWN, and cancellation/disconnect/retry must reconcile the original attempt before another dispatch.
+
 The official `--max-cost-usd` parameter is an estimate checked after requests; it cannot bound one in-flight request. The observed $0.114 / $0.09 overrun is retained in [historical evidence](history/VALUE-EVIDENCE-20260929.zh-CN.md). PVL now refuses both direct workbench and sandboxed native paid launches with `BUDGET_BOUNDARY_UNAVAILABLE`, before credentials are read for a model request or a model process starts. Legacy frozen plans and UI/API consent cannot bypass this gate. Exported commands are planning material, not budget-safe execution instructions; manually running one outside PVL bypasses its gate.
 
 This deliberately leaves paid native execution unavailable. A future transport must intercept every model/judge/tool charge, verify an upper bound before each request, reserve it durably against a shared task budget, serialize concurrent admission and keep uncertain reservations until reconciled. Restart, retry and additional study IDs must not reset that budget. Request counts, token limits, reduced estimates and process cancellation alone do not establish a dollar cap. Offline inspection/import remains usable, and historical unsettled costs stay unknown.

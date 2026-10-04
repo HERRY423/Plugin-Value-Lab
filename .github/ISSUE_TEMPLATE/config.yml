@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Private vulnerability report / 私密漏洞报告
+    url: https://github.com/HERRY423/Plugin-Value-Lab/security/advisories/new
+    about: Report security vulnerabilities privately. Do not include secrets, patient data or exploit details in public issues.

@@ -1,0 +1,39 @@
+{
+  "format": "pvl-maintenance-channel-check-1",
+  "repository": "HERRY423/Plugin-Value-Lab",
+  "checked_on": "2026-10-03",
+  "date_timezone": "America/Los_Angeles",
+  "checked_at_utc": "2026-10-04T00:56:42Z",
+  "primary_maintainer": "HERRY423",
+  "backup_maintainer": null,
+  "authenticated_repository_admin_verified": true,
+  "latest_non_prerelease": "v0.9.0",
+  "latest_release_published_at": "2026-10-02T10:39:06Z",
+  "private_reporting": {
+    "endpoint": "https://api.github.com/repos/HERRY423/Plugin-Value-Lab/private-vulnerability-reporting",
+    "before": {"enabled": false},
+    "enable_method": "PUT",
+    "enable_status": 204,
+    "enable_request_id": "2481:394B8C:B83EF:E0936:6AC1A449",
+    "authenticated_read_status": 200,
+    "authenticated_read_request_id": "9731:39F455:B2237:DA8D2:6AC1A44A",
+    "after": {"enabled": true},
+    "unauthenticated_read_status": 200,
+    "unauthenticated_enabled": true,
+    "public_security_page_status": 200,
+    "public_report_link_present": true,
+    "public_report_label_present": true,
+    "report_url": "https://github.com/HERRY423/Plugin-Value-Lab/security/advisories/new"
+  },
+  "report_submitted": false,
+  "notification_delivery_tested": false,
+  "human_response_performance_measured": false,
+  "policy_files_published_by_this_task": false,
+  "scope": "Repository setting and public discoverability verified; no end-to-end report/response drill, runtime acceptance, security audit or scientific validation claimed.",
+  "discovery": {
+    "agentmuxer_search_used": true,
+    "paid_offering_invoked": false,
+    "paid_offering_cost_usd": 0,
+    "selected_tools": "GitHub CLI API and unauthenticated HTTP reads"
+  }
+}

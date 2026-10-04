@@ -15,6 +15,21 @@ Policy effective 2026-10-03. The current source version is defined in [plugin.js
 
 The frozen inventory in [feature-freeze.json](feature-freeze.json) is an engineering change detector, not proof that every listed module is a stable API. The [freeze policy](FREEZE.md) remains an additional scope restriction. Scientific verdicts, threshold behavior and treatment of failures or unknowns are part of documented semantics, not incidental formatting.
 
+## Maintained environments
+
+The latest non-prerelease minor release at its newest published patch is the maintenance target (v0.9.0 as checked on 2026-10-03). The [maintainer](../CONTRIBUTING.md#minimum-maintenance-commitment) handles security/correctness fixes and regressions within this scope. Environment scope is distinct from the public-interface compatibility promise above.
+
+| Layer | Maintenance scope and acceptance boundary |
+| --- | --- |
+| Core Python / CLI / offline validation | Package metadata requires Python >=3.11; the release CI matrix targets Python 3.11 and 3.13 on Windows and Ubuntu. These matrix entries are intended support targets, not a claim that this checkout's CI passed. Python 3.12, 3.14+, macOS and other distributions require their own acceptance before support is claimed. |
+| Optional dependencies | Use the version bounds in [pyproject.toml](../pyproject.toml) for the relevant extra; MCP currently requires `mcp>=1.12,<2`. Record resolved versions. Bounds permit installation but do not certify every combination. Optional science, registry and planning capabilities require their matching checks. |
+| Isolation and scientific execution | The dedicated CI target is Ubuntu 24.04 with approved namespace/bubblewrap support and the curated runtime. Windows core support does not imply native Linux isolation. WSL, Docker and an HPC partition each need their own boundary checks; no real Slurm/PBS/LSF cluster is certified by hosted CI. |
+| Codex host telemetry | Pin the exact host, parser and artifact identity. The retained [0.159.2 / codex_work_desktop qualification](evidence/single-host-qualification-20261002.json) explicitly says synthetic local conformance; it is not blanket native-host acceptance or support for newer versions. |
+| Other hosts and plugin surfaces | Claude, ChatGPT, other Codex versions and other hosts require exact-version native evidence for the requested workflow. Manifest compatibility, installed visibility or a synthetic adapter test alone does not establish complete execution support. |
+| Stored evidence / team use | Versioned files retain their original interpretation; unknown formats fail explicitly. Local SQLite is not a supported shared-network multiwriter database, and a loopback workbench is not an authenticated multi-user service. |
+
+Before adopting an upgrade, retain the source/artifact digest and resolved environment, run the documented checks on that exact candidate, and keep prior evidence intact. Host, dependency or schema drift requires requalification; unavailable checks remain unverified. The [operations guide](OPERATIONS.md) identifies the applicable gates. The metadata's open-ended Python requirement is not an unlimited forward-compatibility guarantee.
+
 ## Versioning and consumer expectations
 
 For pre-1.0 releases, compatible fixes belong in a patch release; an intentional public breaking change requires a new minor version, migration notes and the notice process below. After 1.0, intentional public breaking changes require a major version. These are project commitments, not a claim of 1.0 readiness.

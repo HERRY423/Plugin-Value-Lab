@@ -2,6 +2,19 @@
 
 Start with the [English methodology](docs/METHODOLOGY.md), [implementation contract](CONTRACT.md), [API policy](docs/API-STABILITY.md) and [data governance](docs/DATA-GOVERNANCE.md). 中文：欢迎代码、文档和可复现缺陷报告；使用合成或经批准的公开材料，不提交患者数据、密钥或完整宿主会话。
 
+## Minimum maintenance commitment
+
+Effective **2026-10-03**, **[@HERRY423](https://github.com/HERRY423)** is the primary maintainer and security responder for Plugin Value Lab: issue triage, compatibility decisions, release approval, remediation and private-report follow-up. This account's repository administration permission was verified when the policy was introduced. [.github/CODEOWNERS](.github/CODEOWNERS) routes review requests to that account; it does not itself enforce branch protection or prove review occurred. There is **no appointed backup maintainer** or institutional support team.
+
+The maintenance baseline is the latest non-prerelease minor line at its newest published patch (v0.9.0 as checked on 2026-10-03). It covers defects, security problems and regressions in the [maintained environments](docs/API-STABILITY.md#maintained-environments) and documented public contracts. Older lines receive no routine backports. Experimental extensions, unpublished changes and unqualified host versions are not implicitly supported releases. Feature requests carry no delivery commitment.
+
+- Check public issues and the private security advisory inbox each working day. Acknowledge ordinary defects within 5 working days; [P0/P1 incidents](SECURITY.md#serious-issue-response) have shorter deadlines and explicit update intervals.
+- Before every release, review unresolved P0/P1 incidents, verify that private reporting remains enabled and the public Security page exposes its report link, and inspect the exact-commit CI and applicable environment evidence. A release with an unresolved P0/P1 affecting its supported use must be held or explicitly withdraw/disable that use with documented mitigation.
+- Recheck owner availability, support scope, dependency bounds and channel accessibility at least every 90 days; the first review is due **2027-01-01**. Record the review and any scope change. This document assigns an obligation; it does not schedule an automated monitor.
+- Announce a planned support reduction or end of maintenance at least 30 calendar days ahead in this policy and release notes, with last supported artifact, migration/stop-use advice and unresolved risks. The normal public-API deprecation notice remains separate. An emergency security withdrawal may be immediate. A planned absence needs a consenting named replacement or a visible support-pause notice and a release hold; an unfilled backup role must remain explicit.
+
+General defects: [repository issues](https://github.com/HERRY423/Plugin-Value-Lab/issues). Vulnerabilities: **[private report](https://github.com/HERRY423/Plugin-Value-Lab/security/advisories/new)**. The [security policy](SECURITY.md) defines severity, response clocks, containment, repair, disclosure and escalation. These are prospective operating commitments, not a claim of measured response performance or a commercial SLA.
+
 ## Propose a focused change
 
 For a reproducible defect, describe the concrete input, expected result, actual result and affected version or commit. Use a small synthetic fixture. For a new interface, scoring rule, scientific claim or runtime capability, first describe the intended scope and obtain the maintainer's scope decision. Existing correctness fixes and documentation improvements do not require a separate proposal. Security reports follow [SECURITY.md](SECURITY.md), not a public defect report.
