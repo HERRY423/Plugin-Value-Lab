@@ -26,6 +26,8 @@
     "shortDescription": "Does this plugin improve this task? Pair, freeze, recompute.",
     "longDescription": "Determine whether a plugin improves a specific task through paired comparisons, frozen plans, and recomputable results. Compare with-plugin and no-plugin records under matched conditions. Keep failures, uncertainty and missing evidence visible; scope conclusions to the tested task.",
     "developerName": "Local developer",
+    "logo": "./assets/plugin-value-lab.png",
+    "composerIcon": "./assets/plugin-value-lab.png",
     "category": "Productivity",
     "capabilities": [],
     "defaultPrompt": [
