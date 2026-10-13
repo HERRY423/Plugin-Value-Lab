@@ -78,7 +78,7 @@ class DistributionTests(unittest.TestCase):
             validate(self.root)
 
     def test_current_documentation_version_drift_rejected(self):
-        for name in ('README.md',):
+        for name in ('README.md', 'README.en.md'):
             path = self.root / name
             original = path.read_text(encoding='utf-8')
             version = json.loads((self.root / 'plugin.json').read_text(encoding='utf-8'))['version']

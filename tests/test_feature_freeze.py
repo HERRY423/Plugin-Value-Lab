@@ -115,10 +115,10 @@ async def tool(a: int, b: str = "中文", /, c: "list[dict]" = None,
         with patch.object(guard, 'surface', side_effect=ValueError('Unsupported signature expression')):
             self.assertEqual(guard.check()['status'], 'FAIL')
 
-    def test_current_surface_and_single_decision_page(self):
+    def test_current_surface_and_bilingual_decision_page(self):
         result = guard.check()
         self.assertEqual(result['issues'], [])
-        self.assertEqual(result['mainline_documents'], ['README.md'])
+        self.assertEqual(result['mainline_documents'], ['README.en.md', 'README.md'])
         self.assertFalse(result['automatic_unfreeze'])
 
     def test_added_command_tool_module_or_grader_fails(self):
@@ -134,7 +134,7 @@ async def tool(a: int, b: str = "中文", /, c: "list[dict]" = None,
                 with patch.object(guard, 'surface', return_value=changed):
                     self.assertIn('Frozen surface changed: ' + key, guard.check()['issues'])
 
-    def test_second_document_and_sixth_command_are_rejected(self):
+    def test_third_document_and_sixth_command_are_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             shutil.copytree(ROOT / 'docs', root / 'docs')
@@ -145,7 +145,7 @@ async def tool(a: int, b: str = "中文", /, c: "list[dict]" = None,
             with (root / 'README.md').open('a', encoding='utf-8') as f:
                 f.write('\npython scripts/value_lab.py diagnose\n')
             issues, _ = guard.documentation_issues(root)
-            self.assertTrue(any('exceeds 1' in i for i in issues))
+            self.assertTrue(any('exceeds 2' in i for i in issues))
             self.assertTrue(any('five golden' in i for i in issues))
 
     def test_five_commands_work_in_relocated_offline_directory(self):
@@ -163,7 +163,7 @@ async def tool(a: int, b: str = "中文", /, c: "list[dict]" = None,
             shutil.copyfile(ROOT / 'scripts/value_lab.py', root / 'scripts/value_lab.py')
             shutil.copytree(ROOT / 'examples/first-run', root / 'examples/first-run')
             readme_commands = []
-            for readme in ('README.md', 'docs/history/20261011/README.zh-CN.md'):
+            for readme in ('README.md', 'README.en.md'):
                 commands = re.findall(r'^python scripts/value_lab.py .+$', (ROOT / readme).read_text(encoding='utf-8'), re.M)
                 readme_commands.append(commands)
                 self.assertEqual([shlex.split(c)[2] for c in commands], guard.GOLDEN)

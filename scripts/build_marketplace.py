@@ -46,7 +46,7 @@ def marketplace_inventory(root, payload):
         'Extract the complete archive. Add the extracted marketplace root containing both '
         'catalog files as a local marketplace, then install '
         f'`{NAME}@{MARKET}`. Select the marketplace directory, not the ZIP or nested plugin directory.\n\n'
-        f'- [Current decision and installation guide](plugins/{NAME}/README.md)\n'
+        f'- [中文指南](plugins/{NAME}/README.md) · [English guide](plugins/{NAME}/README.en.md)\n'
         f'- [Documentation status and historical references](plugins/{NAME}/docs/history/INDEX.md)\n'
         f'- [Methodology reference](plugins/{NAME}/docs/history/20261011/docs/METHODOLOGY.md)\n\n'
         '构建成功不代表已发布或科学有效。 / A successful build does not establish publication or scientific validity.\n'

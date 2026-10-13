@@ -37,6 +37,7 @@ def validate(root):
         raise ValueError("Python package/runtime and plugin version drift")
     for name, pattern in (
         ('README.md', r'\*\*Version ([0-9][^ ]*)\.\*\*'),
+        ('README.en.md', r'\*\*Version ([0-9][^ ]*)\.\*\*'),
     ):
         text = (root / name).read_text(encoding='utf-8')
         if re.findall(pattern, text) != [manifest['version']]:

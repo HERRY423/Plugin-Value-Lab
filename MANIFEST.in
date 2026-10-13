@@ -1,3 +1,4 @@
 include CITATION.cff docs/history/20261011/SECURITY.md docs/history/20261011/CONTRIBUTING.md docs/history/20261011/CONTRACT.md docs/history/20261011/DETECTION-VALIDITY.md docs/history/20261011/README.zh-CN.md
 recursive-include docs *.md *.json
+include README.en.md
 recursive-include assets *.png

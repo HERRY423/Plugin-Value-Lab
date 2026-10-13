@@ -13,7 +13,13 @@
     "usage-card",
     "compare-studies"
   ],
-  "mainline_document_limit": 1,
+  "mainline_document_limit": 2,
+  "bilingual_readme_scope_change": {
+    "date": "2026-10-13",
+    "authorization": "Owner requested README improvements and an English version.",
+    "documents": ["README.md", "README.en.md"],
+    "scope": "One decision guide in two languages; runtime surface and five golden commands remain frozen."
+  },
   "surface": {
     "global_options": [
       {
