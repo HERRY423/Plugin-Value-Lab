@@ -1,4 +1,5 @@
 """Adversarial combination checks; all observations are manufactured fixtures."""
+from tests.optional import available, requires
 from copy import deepcopy
 import importlib.util
 import io
@@ -273,6 +274,8 @@ class CombinationTests(unittest.TestCase):
         with patch.object(combinations, 'evaluate', side_effect=guarded):
             self.result()
 
+    @requires('jsonschema')
+    @unittest.skipUnless(available('jsonschema'), "requires: jsonschema")
     @unittest.skipUnless(importlib.util.find_spec('jsonschema'), 'Developer schema dependency not installed')
     def test_published_schema_matches_both_requests_and_rejects_extra_fields(self):
         import jsonschema
@@ -286,6 +289,8 @@ class CombinationTests(unittest.TestCase):
             jsonschema.validate(request, schema)
 
 
+@requires('mcp')
+@unittest.skipUnless(available('mcp'), "requires: mcp")
 @unittest.skipUnless(importlib.util.find_spec('mcp'), 'Optional MCP SDK not installed')
 class CombinationMCPTests(unittest.IsolatedAsyncioTestCase):
     async def test_real_stdio_pair_planning_analysis_and_legacy_evaluation(self):

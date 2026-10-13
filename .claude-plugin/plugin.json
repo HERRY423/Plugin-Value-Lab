@@ -1,6 +1,6 @@
 {
   "name": "plugin-value-lab",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.5",
   "description": "Determine whether a plugin improves a specific task through paired comparisons, frozen plans, and recomputable results.",
   "author": {
     "name": "Local developer"

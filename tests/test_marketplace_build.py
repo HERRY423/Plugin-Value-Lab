@@ -28,7 +28,7 @@ class MarketplaceBuildTests(unittest.TestCase):
 
     def test_clean_checkout_checks_without_generating_or_needing_a_mirror(self):
         payload = sync(self.root, check=True)
-        self.assertIn('docs/METHODOLOGY.md', payload)
+        self.assertIn('docs/history/20261011/docs/METHODOLOGY.md', payload)
         self.assertFalse((self.root / 'plugins').exists())
         self.assertFalse((self.root / 'build').exists())
         codex = json.loads((self.root / '.agents/plugins/marketplace.json').read_bytes())
@@ -48,7 +48,7 @@ class MarketplaceBuildTests(unittest.TestCase):
 
     def test_changed_source_requires_rebuild_and_removed_source_does_not_linger(self):
         sync(self.root)
-        source = self.root / 'docs/METHODOLOGY.md'
+        source = self.root / 'docs/history/20261011/docs/METHODOLOGY.md'
         source.write_text(source.read_text(encoding='utf-8') + '\nNew revision\n', encoding='utf-8')
         with self.assertRaisesRegex(ValueError, 'stale'): sync(self.root, check=True)
         sync(self.root)
@@ -75,7 +75,10 @@ class MarketplaceBuildTests(unittest.TestCase):
         expected = marketplace_inventory(self.root, payload)
         notes = expected['INSTALL.zh-CN.md'].decode('utf-8')
         self.assertIn(json.loads(payload['plugin.json'])['version'], notes)
-        self.assertIn(f'plugins/{NAME}/docs/METHODOLOGY.md', notes)
+        self.assertIn(f'plugins/{NAME}/docs/history/20261011/docs/METHODOLOGY.md', notes)
+        import re
+        for target in re.findall(r'\]\(([^)]+)\)', notes):
+            self.assertIn(target, expected, f'Broken installation link: {target}')
         self.assertNotIn('0.6.0.zip', notes)
         output = Path(self.tmp.name) / 'market.zip'
         result = archive(output, MARKET, expected)

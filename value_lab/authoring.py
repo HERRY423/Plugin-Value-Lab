@@ -413,7 +413,7 @@ def compile_research_design(proposal, plugin, materials, output, *, layout='dire
     policy = suite['policy']
     card += '## 比较规则与运行条件（草案）\n\n'
     card += '比较目标：' + ('提高质量' if policy.get('objective', 'quality') == 'quality' else '保持质量并降低成本') + '。'
-    card += f"质量下限 {policy['quality_floor']}；最小质量增量 {policy['min_quality_delta']}；单例最大允许退步 {policy['max_case_regression']}；至少 {policy['min_clusters']} 个任务家族。"
+    card += f"质量下限 {policy['quality_floor']}；最小质量增量 {policy['min_quality_delta']}；单例最大允许退步 {policy['max_case_regression']}；任务族下限 {policy.get('min_clusters', '由冻结功效计划推导，未规划时为 3')}。功效计划要求更多族数时以较高门槛为准；未达到时最高为仅试用线索。"
     card += '质量目标要求严格正增量；效率目标要求质量不下降且完整成本严格降低，最小质量增量不适用。'
     card += f"人工时间暂按 {policy['human_hourly_usd']} 美元/小时换算；该数值是方案参数，不是已发生费用。\n\n"
     card += '当前条件声明：\n\n```json\n' + json.dumps(suite['conditions'], ensure_ascii=False, indent=2) + '\n```\n\n'

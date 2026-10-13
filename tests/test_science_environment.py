@@ -1,4 +1,5 @@
 """Dependency-byte drift and science-free artifact playback acceptance."""
+from tests.optional import available, requires
 from copy import deepcopy
 import json
 from pathlib import Path
@@ -36,6 +37,8 @@ class ScienceEnvironmentTests(unittest.TestCase):
         return [Distribution(self.root, 'pydeseq2', ['numpy>=1', 'optional; extra == "test"']),
                 Distribution(self.root, 'numpy')]
 
+    @requires("packaging")
+    @unittest.skipUnless(available("packaging"), "requires: packaging")
     def test_dependency_bytes_change_with_same_version_blocks(self):
         distributions = self.distributions()
         with patch('value_lab.science_environment.metadata.distributions', return_value=distributions):
@@ -66,6 +69,8 @@ class ScienceEnvironmentTests(unittest.TestCase):
             with self.assertRaises(ValidationError):
                 capture_environment(['pydeseq2'])
 
+    @requires("packaging")
+    @unittest.skipUnless(available("packaging"), "requires: packaging")
     def test_required_dependency_missing_and_unrelated_duplicate(self):
         distributions = self.distributions()
         unrelated = Distribution(self.root, 'unrelated')
@@ -75,6 +80,8 @@ class ScienceEnvironmentTests(unittest.TestCase):
             with self.assertRaisesRegex(ValidationError, 'dependency is missing'):
                 capture_environment(['pydeseq2'])
 
+    @requires("packaging")
+    @unittest.skipUnless(available("packaging"), "requires: packaging")
     def test_transitive_extras_are_resolved_but_doc_extras_are_not(self):
         distributions = [Distribution(self.root, 'root', ['child[compute]>=1']),
                          Distribution(self.root, 'child', ['numeric; extra == "compute"', 'absent; extra == "docs"']),
@@ -83,6 +90,8 @@ class ScienceEnvironmentTests(unittest.TestCase):
             lock = capture_environment(['root'])
         self.assertEqual(set(lock['distributions']), {'root', 'child', 'numeric'})
 
+    @requires("packaging")
+    @unittest.skipUnless(available("packaging"), "requires: packaging")
     def test_lock_tamper_and_thread_policy_drift(self):
         with patch('value_lab.science_environment.metadata.distributions', return_value=self.distributions()):
             lock = capture_environment(['pydeseq2'])

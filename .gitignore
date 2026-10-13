@@ -10,3 +10,6 @@ work/
 output/
 # Legacy generated mirror: source and evidence are maintained only at the root.
 /plugins/plugin-value-lab/
+
+# Local assistant logs may contain private data or credentials.
+.claude/logs/

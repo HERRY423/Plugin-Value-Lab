@@ -1,3 +1,5 @@
+> 状态：HISTORY_REFERENCE。归档于 2026-10-11；当前决策入口见 [README](../../../../README.md)。历史验收结果仅适用于所载版本。
+
 # Getting started / 从一项具体任务开始
 
 **配对、冻结、可复算地判断插件对一项具体任务有没有增益。**
@@ -25,4 +27,4 @@ Use Python 3.11+ from the unpacked project root. Follow the identical five comma
 
 Windows、macOS、Linux 均可用标准库分析所提供记录。本教程无需 API key、模型账户、WSL 或隔离引擎；随包合成记录不是真实插件收益证据。对它们执行冻结只演示一致性，不声称事前预注册。
 
-真实研究的费用、执行和隔离要求见[操作说明](OPERATIONS.md)。样本量与置信区间的方法见[方法学](METHODOLOGY.md#plan-task-counts-and-repetitions-before-collection)。其他能力统一从[高级指南](history/ADVANCED.md)进入。
+真实研究的费用、执行和隔离要求见[操作说明](OPERATIONS.md)。样本量与置信区间的方法见[方法学](METHODOLOGY.md#plan-task-counts-and-repetitions-before-collection)。其他能力统一从[高级指南](../../ADVANCED.md)进入。

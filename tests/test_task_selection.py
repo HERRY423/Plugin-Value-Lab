@@ -1,4 +1,5 @@
 """Adversarial selection tests. All records, including 'local' labels, are fixtures."""
+from tests.optional import available, requires
 from copy import deepcopy
 import importlib.util
 import json
@@ -369,6 +370,8 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual(plan["evidence_status"], "MINIMUM_IN_DECLARED_CATALOG")
 
 
+@requires('mcp')
+@unittest.skipUnless(available('mcp'), "requires: mcp")
 @unittest.skipUnless(importlib.util.find_spec("mcp"), "Optional MCP SDK not installed")
 class TaskSelectionMCPTests(unittest.IsolatedAsyncioTestCase):
     async def test_real_stdio_selection_and_default_unknown_file_access(self):

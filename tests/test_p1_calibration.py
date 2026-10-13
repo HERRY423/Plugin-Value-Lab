@@ -1,4 +1,5 @@
 """Computational calibration, not independent scientific validation."""
+from tests.optional import available, requires
 import csv
 import json
 from pathlib import Path
@@ -42,6 +43,8 @@ class ScientificCalibrationTests(unittest.TestCase):
         self.assertEqual(report['summary']['TN'], 0)
         self.assertGreater(report['summary']['UNKNOWN'], 0)
 
+    @requires('scipy')
+    @unittest.skipUnless(available('scipy'), "requires: scipy")
     def test_bh_independent_scipy_crosscheck_ties_extremes_and_order(self):
         from scipy.stats import false_discovery_control
         rng = random.Random(20260928)
@@ -58,6 +61,8 @@ class ScientificCalibrationTests(unittest.TestCase):
                 record = {'artifacts': {'result': {'path': path.name, 'sha256': sha(path)}}}
                 self.assertTrue(grade_artifact(rule, record, directory)[0])
 
+    @requires('numpy', 'scipy')
+    @unittest.skipUnless(available('numpy', 'scipy'), "requires: numpy, scipy")
     def test_paired_manual_reference_agrees_with_scipy_independent_implementation(self):
         import numpy as np
         from scipy.stats import permutation_test

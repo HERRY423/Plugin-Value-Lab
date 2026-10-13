@@ -1,3 +1,4 @@
+from tests.optional import available, requires
 from copy import deepcopy
 import unittest
 from pathlib import Path
@@ -20,6 +21,8 @@ def covariate_fixture():
 
 
 class CovariateTests(unittest.TestCase):
+    @requires('numpy')
+    @unittest.skipUnless(available('numpy'), "requires: numpy")
     def test_design_full_rank_with_residual_df(self):
         design, data = covariate_fixture()
         pb = aggregate(design, data)

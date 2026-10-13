@@ -1,76 +1,32 @@
-# Plugin Value Lab
+# Plugin Value Lab — 一页决策树
 
-**Determine whether a plugin improves a specific task through paired comparisons, frozen plans, and recomputable results.**
+判断插件是否改善**具体任务**：同任务配对、先冻结规则、从原始记录复算。**Version 1.0.0-rc.5.** 计算结果只适用于报告中的任务、模型和条件。
 
-Compare the same task with and without the plugin, fix the evaluation rules before collecting results, and recompute the difference from original records. Missing evidence remains unknown.
-
-**Version 1.0.0-rc.1.** Start in chat once PVL is installed and callable. Give the plugin name and one concrete task; the host handles plans and records.
-
-[中文](README.zh-CN.md) · [Getting started](docs/START.md) · [Advanced guide](docs/history/ADVANCED.md) · [Current evidence](docs/EVIDENCE.md)
-
-## Start with one question
-
-> Use Plugin Value Lab to determine whether [plugin] improves [specific task]. Check the available tools, propose a paired with/without comparison, and freeze the inputs, success criteria and run conditions before collecting results. Recompute the difference from original records and show the uncertainty, failures and missing evidence. Use existing records where suitable; follow existing authorization for new runs.
-
-For example: does a literature-search plugin find more verifiable primary papers for the same research question, with fewer unsupported claims?
-
-## One evaluation, three steps
-
-| Step | What it means |
-| --- | --- |
-| **Pair** | Compare with-plugin and no-plugin runs on the same tasks and authorized inputs, under comparable models and budgets, with independent records. |
-| **Freeze** | Fix cases, success criteria, conditions and the sampling plan before observation. Plan task counts and repetitions for a meaningful effect size. |
-| **Recompute** | Score original records using the frozen rules. Report differences, failures, costs and confidence intervals where the design supports them. |
-
-The host coordinates execution; PVL checks supplied plans and analyzes supplied records. A plugin name alone does not launch isolated sessions or recover historical logs. Alternating “use the plugin” and “do not use it” in one chat does not establish independent arms. Freezing already observed data is a retrospective check, not preregistration.
-
-## What you receive
-
-A task-level comparison: **with plugin → without plugin → difference → uncertainty → evidence**. Read it as an answer about the tested task, plugin, model and conditions.
-
-| Finding | Interpretation |
-| --- | --- |
-| A positive observed difference | A gain was observed under the reported conditions; uncertainty and evidence limits still apply. |
-| No difference or a regression | No added gain was observed, or performance worsened; retain the original failures. |
-| Incomplete or incomparable evidence | Benefit remains unestablished. Missing baselines and costs are unknown, not zero. |
-| Synthetic example | Demonstrates the calculation and report, not real plugin benefit. |
-
-Files and independent execution depend on host capabilities. Existing-record analysis can proceed locally. Paid native eval launches remain blocked until a reliable spend boundary is available; see [operations](docs/OPERATIONS.md).
-
-## Install
-
-Plugin installation does not install the Python package. Running Plugin Value Lab analyses, `doctor` checks, or the local stdio MCP server requires Python 3.11+.
-
-### 1. ChatGPT / Codex repo marketplace
-
-Add the repository marketplace:
-
-```bash
-codex plugin marketplace add HERRY423/Plugin-Value-Lab --ref main
+```text
+你现在有什么？
+├─ 只有插件名或想法 → 写清任务、成功标准和基线，先制定方案。
+│  └─ 打算采集新结果 → 先确定效应阈值、方差来源、独立任务族数和费用边界，再冻结。
+├─ 已有真实配对记录 → 检查完整性、条件可比性、失败和成本，再复算。
+│  ├─ 缺失/混杂/未完成 → 证据不足；保留 UNKNOWN。
+│  ├─ 回退或关键失败 → 保留负向结果，先调查原因。
+│  ├─ 正向差异但任务族低于计划 → 最高“仅试用线索”，不可升格为增益支持。
+│  └─ 达到计划与全部门槛 → 限定条件的本地信号；达到功效目标本身不证明有效。
+└─ 只有合成示例 → SIMULATION_ONLY；用于学习流程，不代表真实收益。
 ```
 
-Restart the ChatGPT desktop app, open the Plugins Directory, select **Plugin Value Lab Marketplace**, and install **Plugin Value Lab**. Repo marketplaces are for development, team distribution, and testing; they are separate from the universal public Plugins Directory.
+**功效与默认值。** 未填写 `min_clusters` 时，有冻结 `power_plan` 就按其所需族数与描述性下限 3 的较大值判断；没有功效计划时，3 仅是描述性下限。显式较低的 `min_clusters` 不能绕过功效计划；无法求得所需族数或设计不满足规划条件，也不能升级正向结论。重复次数不是独立任务族。v3 确认性规则继续有独立门槛。
 
-When the public submission is approved and published, search the universal Plugins Directory for **Plugin Value Lab** instead; one public listing is shared by supported ChatGPT and Codex surfaces.
+**工具证据公共池。** 文献检索已有 [30 个候选位点](examples/literature-pool/candidates.json)，含快照、答案草稿、合法变体与禁区；目前均为合成占位，专家与第三方托管待接入。真实评估保留集须达到 `max(30, 功效计划所需族数)`，同族变体不增加族数。接口与网关验收边界见 [实现状态记录](docs/history/20261012-POOL-GATEWAY.md)。
 
-### 2. Claude Code marketplace
+**降低取证成本（设计稿）。** [L0–L3 阶梯与统计设计](docs/history/20261012-EVIDENCE-LADDER-DESIGN.md)：静态适配 → 自有任务筛选 → 公共族先导 → 冻结确认；定义序贯停止、分层先验与人工校正评分。状态为 `DESIGN_FOR_REVIEW / NOT_IMPLEMENTED`，当前 v3 仍为固定样本，不提供序贯保证。
 
-```bash
-claude plugin marketplace add HERRY423/Plugin-Value-Lab
-claude plugin install plugin-value-lab@plugin-value-lab-marketplace
-```
+**把证据变成行动。** [决策层实现](docs/history/20261012-ACTION-DECISION.md) 接收研究者填写的误采用、漏用和时间损失，输出“采用(限域) / 带护栏试用 / 默认基线 / 不使用”，附范围、有效期和下一条补证据动作；支持多候选轮转、收缩展示与同时名次区间。收缩不会绕过独立确认，示例损失不代表真实偏好。
 
-Start a fresh session after installation:
+**在对话中开始：**“评估 [插件] 对 [具体任务] 是否有增益。先检查可用工具、基线和已有记录，提出配对方案并冻结条件；收集新记录遵守费用和数据授权，再报告差异、不确定性及失败。”
 
-```bash
-claude
-```
+**安装选择。** 本地标准库重算需 Python 3.11+；宿主使用先安装插件和所需 MCP 依赖。安装参考见 [history 状态索引](docs/history/INDEX.md)。宿主负责组织执行；一个插件名不会自动启动独立两臂或找回历史日志。
 
-## Developer appendix: local reproduction and file reports
-
-Ordinary users of the installed plugin do not need this section. It is for maintainers, local archival and troubleshooting.
-
-Use Python 3.11+ from the unpacked project root. These five commands process **synthetic records**, without calling a model or target plugin. To repeat them, consistently replace `work/first-run` with a fresh directory.
+**只想本地复现？** 以下五步处理随包合成记录，无模型调用。再次执行请把 `work/first-run` 全部换成新目录。
 
 ```sh
 python scripts/value_lab.py doctor
@@ -80,17 +36,18 @@ python scripts/value_lab.py usage-card examples/first-run/suite.json examples/fi
 python scripts/value_lab.py compare-studies examples/first-run/before.json examples/first-run/after.json --output work/first-run/comparison.json
 ```
 
-Start with `work/first-run/usage/USAGE.md` or `ENVELOPE.html`. Full scores are in `work/first-run/report/report.html`, `report.md` and `report.json`; the comparison is `work/first-run/comparison.json`. The expected tutorial verdict is `SIMULATION_ONLY`. `freeze` collects no sessions, and `evaluate` scores supplied records; your own study needs real observations first.
+阅读 `work/first-run/usage/USAGE.md` 与 `ENVELOPE.html`；完整字段在 `card.json`。预期 `SIMULATION_ONLY`。给已观察数据加锁仅检查一致性，不是事前注册。
 
-- [Local tutorial](docs/START.md) · [Research methods](docs/METHODOLOGY.md) · [Advanced guide](docs/history/ADVANCED.md)
-- [Current evidence](docs/EVIDENCE.md) · [Operations and troubleshooting](docs/OPERATIONS.md) · [Interface freeze](docs/FREEZE.md)
+**改了代码？** 快速层覆盖核心裁决、卡片、功效与本轮回归，超过 120 秒即失败；完整层发现全部测试。缺可选依赖的测试通过 `skipUnless` 显式跳过，`requires` 标注所需模块；跳过不代表通过该功能验收。
 
-[![CI](https://github.com/HERRY423/Plugin-Value-Lab/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/HERRY423/Plugin-Value-Lab/actions/workflows/ci.yml)
+```sh
+python scripts/run_tests.py fast
+python scripts/run_tests.py full
+python scripts/run_tests.py full --require-all
+```
 
-The badge reports the main branch, not unpushed changes. Source checks do not establish installed-host acceptance or scientific benefit.
+发布验收使用最后一条，拒绝任何 skip。可选依赖在 `pyproject.toml`：`dev`、`mcp`、`planning`、`registry`、`science`、`pseudobulk`；仅按任务需要安装。原生隔离、真实后端和工作流验收仍由 CI 独立任务执行。
 
-Project policies: [citation](CITATION.cff) · [maintenance and owner](CONTRIBUTING.md#minimum-maintenance-commitment) · [security reports](SECURITY.md) · [contributing](CONTRIBUTING.md) · [compatibility scope](docs/API-STABILITY.md#maintained-environments) · [data governance](docs/DATA-GOVERNANCE.md). Identifiable patient data must not enter ordinary records or prompts; de-identified derivatives still require data-owner approval.
+**凭据与日志。** Git 使用 Git Credential Manager（`credential.helper=manager`）。API 凭据使用提供方登录或操作系统凭据管理器，不放进仓库、命令行、示例卡或日志；本次未迁移或吊销 API 令牌。`.claude/logs/` 已加入忽略规则，日志应留在仓库外；忽略规则不会清除旧提交。历史泄露必须在提供方后台吊销后重新生成，不能靠删除日志替代。
 
-Maintainer: **@HERRY423**. Report vulnerabilities through the **[private GitHub channel](https://github.com/HERRY423/Plugin-Value-Lab/security/advisories/new)**; do not include exploit details or sensitive material in public issues. P0/P1 acknowledgement commitments are 1/2 working days, with scope and escalation in [SECURITY.md](SECURITY.md#serious-issue-response).
-
-The [v0.9.0 maintenance and paid-execution addendum](docs/history/MAINTENANCE-AND-PAID-BOUNDARY-20261003.md) records the release-specific policy. Paid native execution remains blocked; local accounting has `provider_cap_verified: false` and `paid_launch_authorized: false`.
+维护与安全规则、方法、旧版指南及历史验收统一见 [history 状态索引](docs/history/INDEX.md)；归档不撤销维护承诺或安全规则。漏洞请走 [私密报告渠道](https://github.com/HERRY423/Plugin-Value-Lab/security/advisories/new)。费用边界：父进程网关已接入发送前累计预留与超额拒绝；当前模型的保守包络仍超出单次 $0.10，实际付费保持阻断。网关限制不等于提供方账户侧上限。

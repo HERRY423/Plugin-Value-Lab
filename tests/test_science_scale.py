@@ -1,4 +1,5 @@
 """Out-of-core arithmetic, malformed inputs, exact identity and budget gates."""
+from tests.optional import available, requires
 from copy import deepcopy
 from pathlib import Path
 import shutil
@@ -46,6 +47,8 @@ class StorageTests(unittest.TestCase):
                     disk_preflight(root, 10, 1)
 
 
+@requires('anndata', 'h5py', 'numpy', 'scipy')
+@unittest.skipUnless(available('anndata', 'h5py', 'numpy', 'scipy'), "requires: anndata, h5py, numpy, scipy")
 class BackedTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

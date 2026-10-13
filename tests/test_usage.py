@@ -303,11 +303,11 @@ class UsageCardTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             paths = write_usage_card(card, directory)
             markdown = Path(paths["md"]).read_text(encoding="utf-8")
-            self.assertNotIn('<img src=', markdown)
+            self.assertNotRegex(markdown, r'(?<!\\)<img src=')
             self.assertNotIn('\n# false heading', markdown)
             self.assertNotIn('![remote](', markdown)
             self.assertNotIn('[click](', markdown)
-            self.assertIn('&lt;img', markdown)
+            self.assertIn(r'\<img', markdown)
             saved = json.loads(Path(paths["json"]).read_text(encoding="utf-8"))
             self.assertEqual(saved["plugin"]["name"], hostile)
 

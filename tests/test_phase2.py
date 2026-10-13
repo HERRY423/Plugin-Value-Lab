@@ -1,4 +1,5 @@
 """Manufactured records and identities exercise policy, not real scientific reviews."""
+from tests.optional import available, requires
 import importlib.util
 import contextlib
 import io
@@ -15,6 +16,8 @@ from value_lab.publication import build_public, verify_public, _heldout
 from value_lab.signatures import public_identity, sign, verify
 
 
+@requires('cryptography')
+@unittest.skipUnless(available('cryptography'), "requires: cryptography")
 @unittest.skipUnless(importlib.util.find_spec("cryptography"), "optional registry dependency")
 class PhaseTwoTests(unittest.TestCase):
     def setUp(self):
@@ -261,6 +264,8 @@ class PhaseTwoTests(unittest.TestCase):
         self.assertEqual(result["alerts"], [])
         self.assertTrue(all(c["status"] == "NOT_COMPARABLE" for c in result["longitudinal_contrasts"]))
 
+    @requires('jsonschema')
+    @unittest.skipUnless(available('jsonschema'), "requires: jsonschema")
     def test_signed_review_schema_roundtrip_and_tamper(self):
         from jsonschema import Draft202012Validator
         eid = self.study()

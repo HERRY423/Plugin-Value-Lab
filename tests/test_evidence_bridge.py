@@ -1,4 +1,5 @@
 """Bridge mutation tests use manufactured files and observations only."""
+from tests.optional import available, requires
 from copy import deepcopy
 import importlib.util
 import json
@@ -314,6 +315,8 @@ class BridgeTests(unittest.TestCase):
         self.assertIn("证据迁移与桥接", (self.root / "plan/PLAN.md").read_text(encoding="utf-8"))
 
 
+@requires('mcp')
+@unittest.skipUnless(available('mcp'), "requires: mcp")
 @unittest.skipUnless(importlib.util.find_spec("mcp"), "Optional MCP SDK not installed")
 class BridgeMCPTests(unittest.IsolatedAsyncioTestCase):
     async def test_actual_stdio_preparation_and_target_file_confirmation(self):

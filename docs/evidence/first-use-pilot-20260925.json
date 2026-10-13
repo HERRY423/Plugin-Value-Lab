@@ -18,7 +18,7 @@
   "failed_attempts": null,
   "abandoned": null,
   "feedback": null,
-  "protocol": "docs/START.md",
+  "protocol": "docs/history/20261011/docs/START.md",
   "protocol_sha256": "ae04d63c4cf633acdd0abadbf7f98e7e1b7fca72ac0e4231cc9a9b700e30824b",
   "maintainer_smoke": {
     "golden_commands_passed": 5,

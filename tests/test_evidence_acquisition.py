@@ -1,4 +1,5 @@
 """Manufactured fixtures only; no independent execution or efficiency evidence."""
+from tests.optional import available, requires
 from copy import deepcopy
 import importlib.util
 import json
@@ -329,6 +330,8 @@ class AcquisitionTests(unittest.TestCase):
         self.assertIn("下一批", (self.root / "plan/PLAN.md").read_text(encoding="utf-8"))
 
 
+@requires('mcp')
+@unittest.skipUnless(available('mcp'), "requires: mcp")
 @unittest.skipUnless(importlib.util.find_spec("mcp"), "Optional MCP SDK not installed")
 class AcquisitionMCPTests(unittest.IsolatedAsyncioTestCase):
     async def test_existing_stdio_tool_reaches_batch_protocol(self):

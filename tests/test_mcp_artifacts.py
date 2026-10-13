@@ -1,4 +1,5 @@
 """Real stdio acceptance for the host-authorized scientific file handoff."""
+from tests.optional import available, requires
 from copy import deepcopy
 from contextlib import asynccontextmanager
 import importlib.util
@@ -58,6 +59,8 @@ class MaterialBoundaryTests(unittest.TestCase):
             self.assertTrue(grade_artifact(rule, record, root, root)[0])
 
 
+@requires('mcp')
+@unittest.skipUnless(available('mcp'), "requires: mcp")
 @unittest.skipUnless(importlib.util.find_spec("mcp"), "Optional MCP SDK not installed")
 class MCPArtifactTests(unittest.IsolatedAsyncioTestCase):
     def setUp(self):

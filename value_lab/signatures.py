@@ -27,7 +27,8 @@ def public_identity(key):
 
 
 def _message(payload, context):
-    if context not in ("pvl-review-1", "pvl-public-card-1", "pvl-public-index-1"):
+    if context not in ("pvl-review-1", "pvl-public-card-1", "pvl-public-index-1",
+                       "pvl-literature-review-1", "pvl-holdout-custody-1"):
         raise ValidationError("Unknown signature domain")
     return (context + "\n" + suite_digest(payload)).encode("ascii")
 
@@ -88,7 +89,7 @@ def validate_trust(trust):
         if any(not isinstance(entry[k], str) or not entry[k].strip() for k in ("identity", "organization")):
             raise ValidationError("Trusted identity and organization are required")
         if (type(entry["revoked"]) is not bool or not isinstance(entry["roles"], list) or not entry["roles"]
-                or any(r not in ("publisher", "domain_reviewer", "reproducer") for r in entry["roles"])):
+                or any(r not in ("publisher", "domain_reviewer", "reproducer", "holdout_custodian") for r in entry["roles"])):
             raise ValidationError("Invalid trusted key roles/revocation")
     return trust
 

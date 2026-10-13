@@ -1,3 +1,4 @@
+from tests.optional import available, requires
 from copy import deepcopy
 import importlib.util
 from pathlib import Path
@@ -151,6 +152,8 @@ class ArtifactTests(unittest.TestCase):
         with self.assertRaises(ValidationError):
             validate_suite(suite)
 
+    @requires('anndata', 'numpy')
+    @unittest.skipUnless(available('anndata', 'numpy'), "requires: anndata, numpy")
     @unittest.skipUnless(importlib.util.find_spec("anndata"), "optional science dependency")
     def test_h5ad_reads_real_file_structure(self):
         import anndata

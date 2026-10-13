@@ -1,4 +1,5 @@
 """Manufactured checks of pilot-bound design and confirmatory decisions; no real study."""
+from tests.optional import available, requires
 from copy import deepcopy
 from datetime import datetime, timezone, timedelta
 import hashlib
@@ -61,6 +62,8 @@ def fixture(n=100, method='hoeffding', objective='quality'):
 
 
 class PlanningTests(unittest.TestCase):
+    @requires('scipy')
+    @unittest.skipUnless(available('scipy'), "requires: scipy")
     @unittest.skipUnless(SCIPY, 'optional planning dependency')
     def test_power_targets_practical_gain_not_zero(self):
         s = spec('paired_t')
@@ -74,6 +77,8 @@ class PlanningTests(unittest.TestCase):
         self.assertGreaterEqual(_t_power(row['required_families'], .1, row['family_mean_sd'], .05), .8)
         self.assertLess(_t_power(row['required_families']-1, .1, row['family_mean_sd'], .05), .8)
 
+    @requires('scipy')
+    @unittest.skipUnless(available('scipy'), "requires: scipy")
     @unittest.skipUnless(SCIPY, 'optional planning dependency')
     def test_one_sided_t_matches_direct_noncentral_reference(self):
         from scipy.stats import nct, t
@@ -94,6 +99,8 @@ class PlanningTests(unittest.TestCase):
         self.assertEqual(row['required_families'], expected)
         self.assertGreaterEqual(_bound_power(expected, .25, .05, 1), .8)
 
+    @requires('scipy')
+    @unittest.skipUnless(available('scipy'), "requires: scipy")
     @unittest.skipUnless(SCIPY, 'optional planning dependency')
     def test_efficiency_joint_error_and_power_budget(self):
         result = plan_sample_size(spec('paired_t', 'efficiency'))
@@ -120,6 +127,8 @@ class PlanningTests(unittest.TestCase):
             self.assertIsNone(result['recommended_design'])
             self.assertEqual(result['status'],'NO_FEASIBLE_DESIGN_IN_GRID')
 
+    @requires('scipy')
+    @unittest.skipUnless(available('scipy'), "requires: scipy")
     @unittest.skipUnless(SCIPY, 'optional planning dependency')
     def test_pilot_variance_recomputed_not_copied_from_result(self):
         s=spec('paired_t')
@@ -136,6 +145,8 @@ class PlanningTests(unittest.TestCase):
         s['variance_policy']['sd_floor']={key:0 for key in s['variance_policy']['sd_floor']}
         with self.assertRaisesRegex(ValidationError,'positive SD floor'): validate(s)
 
+    @requires('numpy', 'scipy')
+    @unittest.skipUnless(available('numpy', 'scipy'), "requires: numpy, scipy")
     @unittest.skipUnless(SCIPY, 'optional planning dependency')
     def test_independent_monte_carlo_at_practical_boundary_and_target(self):
         import numpy as np
@@ -153,6 +164,8 @@ class PlanningTests(unittest.TestCase):
         self.assertLess(abs(at_boundary-.05),.008)
         self.assertLess(abs(at_target-row['conditional_power']),.015)
 
+    @requires('jsonschema')
+    @unittest.skipUnless(available('jsonschema'), "requires: jsonschema")
     def test_schema_and_runtime_reject_invalid_contracts(self):
         import jsonschema
         schema=json.loads((ROOT/'schemas/confirmatory-plan.schema.json').read_text(encoding='utf-8'))
@@ -169,6 +182,8 @@ class PlanningTests(unittest.TestCase):
 
 
 class DecisionTests(unittest.TestCase):
+    @requires('scipy')
+    @unittest.skipUnless(available('scipy'), "requires: scipy")
     @unittest.skipUnless(SCIPY, 'optional planning dependency')
     def test_user_four_points_does_not_establish_five_points(self):
         bounds=lower_bound([-.06,.01,.05,.16],.05,'paired_t')
@@ -214,6 +229,8 @@ class DecisionTests(unittest.TestCase):
         self.assertFalse(report['confirmatory_analysis']['criteria']['legacy_cost_gate'])
         self.assertFalse(report['confirmatory_analysis']['simulated_criteria_met'])
 
+    @requires('scipy')
+    @unittest.skipUnless(available('scipy'), "requires: scipy")
     @unittest.skipUnless(SCIPY, 'optional planning dependency')
     def test_zero_variance_cannot_manufacture_t_certainty(self):
         self.assertEqual(lower_bound([.5]*100,.05,'paired_t')['status'],'UNAVAILABLE')

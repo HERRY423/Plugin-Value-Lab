@@ -1,4 +1,5 @@
 """Local fault/concurrency fixtures; no scientific execution or paid services."""
+from tests.optional import available, requires
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing
 import json
@@ -252,6 +253,8 @@ os._exit(74)
                 self.add("finish", {"attempt_id": "first", "status": "COLLECTED", "receipt": {"source": "fixture"}, "artifacts": artifacts})
         self.assertEqual(self.store.snapshot(), before)
 
+    @requires('jsonschema')
+    @unittest.skipUnless(available('jsonschema'), "requires: jsonschema")
     def test_request_schema_and_runtime_reject_extra_fields(self):
         import jsonschema
         schema = json.loads((ROOT / "schemas/decision-event.schema.json").read_bytes())

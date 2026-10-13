@@ -1,0 +1,654 @@
+{
+  "format": "pvl-literature-pool-public-1",
+  "id": "biomedical-literature-candidates-v1",
+  "status": {
+    "format": "pvl-literature-pool-1",
+    "candidate_families": 30,
+    "accepted_development_families": 0,
+    "pending_development_ids": [
+      "randomized-trial",
+      "systematic-review",
+      "cohort",
+      "case-control",
+      "diagnostic-accuracy",
+      "prognostic-validation",
+      "adverse-events",
+      "dose-response",
+      "pediatric",
+      "pregnancy",
+      "older-adults",
+      "rare-disease",
+      "qualitative",
+      "implementation",
+      "health-economics",
+      "guideline",
+      "retraction",
+      "preprint-version",
+      "negative-result",
+      "conflicting-evidence",
+      "multilingual",
+      "date-cutoff",
+      "duplicate-record",
+      "trial-registration",
+      "protocol-result",
+      "abstract-only",
+      "animal-human",
+      "invitro-invivo",
+      "biomarker-replication",
+      "dataset-paper"
+    ],
+    "attested_heldout_families": 0,
+    "library_target": 30,
+    "evaluation_family_target": null,
+    "custody": "PENDING",
+    "status": "AWAITING_EVIDENCE",
+    "scientific_validity": "NOT_ESTABLISHED",
+    "heldout_non_exposure": "NOT_VERIFIED",
+    "family_independence": "REQUIRES_DOMAIN_REVIEW",
+    "positive_verdict_ceiling": "SIMULATION_ONLY"
+  },
+  "development": [
+    {
+      "family_id": "randomized-trial",
+      "family_sha256": "0abd0819740a2e7addb06dabeae6175c09dc0ff1a33b323f05567c7941d6b42d",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「成人随机对照试验」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "randomized-trial-a",
+            "source_ref": "synthetic:randomized-trial/a",
+            "text": "虚构记录 A；本练习明确标记为符合「成人随机对照试验」。"
+          },
+          {
+            "id": "randomized-trial-b",
+            "source_ref": "synthetic:randomized-trial/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「成人随机对照试验」。"
+          }
+        ],
+        "sha256": "586e482102fd551526c9c44d5ed4b5c8a8948ffa9ab593fe751b69667f40c1de"
+      }
+    },
+    {
+      "family_id": "systematic-review",
+      "family_sha256": "dc5ee6e92521540488b56181866990379446440f317614f8b257c1d7dcec5518",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「系统综述与检索策略」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "systematic-review-a",
+            "source_ref": "synthetic:systematic-review/a",
+            "text": "虚构记录 A；本练习明确标记为符合「系统综述与检索策略」。"
+          },
+          {
+            "id": "systematic-review-b",
+            "source_ref": "synthetic:systematic-review/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「系统综述与检索策略」。"
+          }
+        ],
+        "sha256": "7dfbaf25d1f625d99ef58dbfcce0a1b764ff1d3f849add96b91d4d1f086662e4"
+      }
+    },
+    {
+      "family_id": "cohort",
+      "family_sha256": "ef7a418ece8b5784dbd1ca25b5192c501aea31a4c37dfa27b60f6e2ef8f3838b",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「前瞻性队列研究」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "cohort-a",
+            "source_ref": "synthetic:cohort/a",
+            "text": "虚构记录 A；本练习明确标记为符合「前瞻性队列研究」。"
+          },
+          {
+            "id": "cohort-b",
+            "source_ref": "synthetic:cohort/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「前瞻性队列研究」。"
+          }
+        ],
+        "sha256": "70ba3ea9bec199e068a5e8360d9deded5ddb39f8d098750d43c751a9cb556254"
+      }
+    },
+    {
+      "family_id": "case-control",
+      "family_sha256": "1f93c312db2fe1a662cd33efd2189e4b3f0304824e9af35c1e1ba8773a496f1e",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「病例对照研究」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "case-control-a",
+            "source_ref": "synthetic:case-control/a",
+            "text": "虚构记录 A；本练习明确标记为符合「病例对照研究」。"
+          },
+          {
+            "id": "case-control-b",
+            "source_ref": "synthetic:case-control/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「病例对照研究」。"
+          }
+        ],
+        "sha256": "e02a8625f5e08be6e597e771aa69ef7b18564f4312757f06823301158df34df9"
+      }
+    },
+    {
+      "family_id": "diagnostic-accuracy",
+      "family_sha256": "b9e6c6068672fc2fcef34b6af5a6b2224fb16be0c30fcde2731f318cec6bf6b2",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「诊断准确性研究」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "diagnostic-accuracy-a",
+            "source_ref": "synthetic:diagnostic-accuracy/a",
+            "text": "虚构记录 A；本练习明确标记为符合「诊断准确性研究」。"
+          },
+          {
+            "id": "diagnostic-accuracy-b",
+            "source_ref": "synthetic:diagnostic-accuracy/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「诊断准确性研究」。"
+          }
+        ],
+        "sha256": "06f03a24b1facfb48adf2bd9df647441a585e488d89f3c5a755dd58a2227a66d"
+      }
+    },
+    {
+      "family_id": "prognostic-validation",
+      "family_sha256": "f33ba0578384e028de5916a955bcea66a212786957d1eb2d00b7f494764782fe",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「预后模型外部验证」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "prognostic-validation-a",
+            "source_ref": "synthetic:prognostic-validation/a",
+            "text": "虚构记录 A；本练习明确标记为符合「预后模型外部验证」。"
+          },
+          {
+            "id": "prognostic-validation-b",
+            "source_ref": "synthetic:prognostic-validation/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「预后模型外部验证」。"
+          }
+        ],
+        "sha256": "6c9892f3bb47d0b8eb52fa265e4fbde4177554c9bd7c9d1803e5af419242cc8f"
+      }
+    },
+    {
+      "family_id": "adverse-events",
+      "family_sha256": "118c613af7bf76ad218d9b057b4bc1eeadf3b005cbb6cfa6a496cc0f584a429a",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「药物不良事件」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "adverse-events-a",
+            "source_ref": "synthetic:adverse-events/a",
+            "text": "虚构记录 A；本练习明确标记为符合「药物不良事件」。"
+          },
+          {
+            "id": "adverse-events-b",
+            "source_ref": "synthetic:adverse-events/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「药物不良事件」。"
+          }
+        ],
+        "sha256": "319f4d254e994e626227f79ce150a4cb26bd2c4e04a198dbbc76b0d1b7611174"
+      }
+    },
+    {
+      "family_id": "dose-response",
+      "family_sha256": "a28ade709537aa6e35da49b029bf2e31ff6dd92569f771116319c4b5e5c4d710",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「剂量反应证据」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "dose-response-a",
+            "source_ref": "synthetic:dose-response/a",
+            "text": "虚构记录 A；本练习明确标记为符合「剂量反应证据」。"
+          },
+          {
+            "id": "dose-response-b",
+            "source_ref": "synthetic:dose-response/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「剂量反应证据」。"
+          }
+        ],
+        "sha256": "a8391d8f03a3b06faabb341341a876e079cc25ae3adbf1ae074066b626834535"
+      }
+    },
+    {
+      "family_id": "pediatric",
+      "family_sha256": "6f822976ac3432a8893f56ce97ebc1231724d77cfb2797214ad6634ee4aa0c4a",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「儿科人群」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "pediatric-a",
+            "source_ref": "synthetic:pediatric/a",
+            "text": "虚构记录 A；本练习明确标记为符合「儿科人群」。"
+          },
+          {
+            "id": "pediatric-b",
+            "source_ref": "synthetic:pediatric/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「儿科人群」。"
+          }
+        ],
+        "sha256": "e8be99e180040fc1aea63f7ae6d9f53b2b2fc705c55c3e636c587dde57e6ac94"
+      }
+    },
+    {
+      "family_id": "pregnancy",
+      "family_sha256": "535c2710c4691b878cc173edc9ad29a424a04b22075b21fc41363ce88800f715",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「妊娠期人群」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "pregnancy-a",
+            "source_ref": "synthetic:pregnancy/a",
+            "text": "虚构记录 A；本练习明确标记为符合「妊娠期人群」。"
+          },
+          {
+            "id": "pregnancy-b",
+            "source_ref": "synthetic:pregnancy/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「妊娠期人群」。"
+          }
+        ],
+        "sha256": "f745f2dfbe4ba09ed583edfa381ebf39b5950fb8961fbffdb7ed4dbd356393f5"
+      }
+    },
+    {
+      "family_id": "older-adults",
+      "family_sha256": "d02309b559d683fd27aa4f23244e6c3328f8003138950a30a98ad8b71e9b33ec",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「老年多病共存」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "older-adults-a",
+            "source_ref": "synthetic:older-adults/a",
+            "text": "虚构记录 A；本练习明确标记为符合「老年多病共存」。"
+          },
+          {
+            "id": "older-adults-b",
+            "source_ref": "synthetic:older-adults/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「老年多病共存」。"
+          }
+        ],
+        "sha256": "f49e9da69d02bb31a7da345f7fe104577c6e220bc905417d3834822edfd4e75a"
+      }
+    },
+    {
+      "family_id": "rare-disease",
+      "family_sha256": "cffbf099c420a45dc8b15641b5c1524cb608949f5e387d3d5ee033cee263e2ed",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「罕见病自然史」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "rare-disease-a",
+            "source_ref": "synthetic:rare-disease/a",
+            "text": "虚构记录 A；本练习明确标记为符合「罕见病自然史」。"
+          },
+          {
+            "id": "rare-disease-b",
+            "source_ref": "synthetic:rare-disease/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「罕见病自然史」。"
+          }
+        ],
+        "sha256": "25798d7bdd57948144d26809bd53bcbd03df24710f8e61566121ab7ab2b75db7"
+      }
+    },
+    {
+      "family_id": "qualitative",
+      "family_sha256": "9c7d95c98b20f48f21feb8d60d8e972542a9ca9f83af57e1f3ea5bd03c09e88d",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「患者体验定性研究」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "qualitative-a",
+            "source_ref": "synthetic:qualitative/a",
+            "text": "虚构记录 A；本练习明确标记为符合「患者体验定性研究」。"
+          },
+          {
+            "id": "qualitative-b",
+            "source_ref": "synthetic:qualitative/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「患者体验定性研究」。"
+          }
+        ],
+        "sha256": "385cfcaa5f08b3fb344b506229c0a4b20f33e8921e483d9d05f25ae46d78037c"
+      }
+    },
+    {
+      "family_id": "implementation",
+      "family_sha256": "80cc06317689cade8c6ea91d652b25f2f43434ccd472f45d1230addf8a9c5a2c",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「实施科学研究」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "implementation-a",
+            "source_ref": "synthetic:implementation/a",
+            "text": "虚构记录 A；本练习明确标记为符合「实施科学研究」。"
+          },
+          {
+            "id": "implementation-b",
+            "source_ref": "synthetic:implementation/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「实施科学研究」。"
+          }
+        ],
+        "sha256": "674f1c8b973c69ccc56477d13fae5bc2b4d224a307325987c4ccee5a62660aaf"
+      }
+    },
+    {
+      "family_id": "health-economics",
+      "family_sha256": "24e53abf79ef0ce6d1d4995af325cdb4f54239bd06fc7589a73b194d3e99b493",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「卫生经济评价」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "health-economics-a",
+            "source_ref": "synthetic:health-economics/a",
+            "text": "虚构记录 A；本练习明确标记为符合「卫生经济评价」。"
+          },
+          {
+            "id": "health-economics-b",
+            "source_ref": "synthetic:health-economics/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「卫生经济评价」。"
+          }
+        ],
+        "sha256": "95467381c9584431761d92e897fea1d01192a532ba73c6cf6f638fceead8f129"
+      }
+    },
+    {
+      "family_id": "guideline",
+      "family_sha256": "57dbf1a575d9c1579e189a9090d62a14495eb2c7535c877bdf95f9b48327b3b5",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「临床指南版本」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "guideline-a",
+            "source_ref": "synthetic:guideline/a",
+            "text": "虚构记录 A；本练习明确标记为符合「临床指南版本」。"
+          },
+          {
+            "id": "guideline-b",
+            "source_ref": "synthetic:guideline/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「临床指南版本」。"
+          }
+        ],
+        "sha256": "f00404042c2f0b46d7edcc94ec48539674f1fb08bdc45a1831b220af5ecba50f"
+      }
+    },
+    {
+      "family_id": "retraction",
+      "family_sha256": "b10e127028e1cc68657e2d25ea465c8e1b70028535ef9191dd8307281b9546ab",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「撤稿与更正」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "retraction-a",
+            "source_ref": "synthetic:retraction/a",
+            "text": "虚构记录 A；本练习明确标记为符合「撤稿与更正」。"
+          },
+          {
+            "id": "retraction-b",
+            "source_ref": "synthetic:retraction/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「撤稿与更正」。"
+          }
+        ],
+        "sha256": "29b6024188d92a165c2e574ab3676226f53f2b7c56a917aa95b713ed8255919c"
+      }
+    },
+    {
+      "family_id": "preprint-version",
+      "family_sha256": "40cf3b8ec2727f15c1e7d93370dda702f7b9289665893f61585febd7097bb1fe",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「预印本与正式出版版本」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "preprint-version-a",
+            "source_ref": "synthetic:preprint-version/a",
+            "text": "虚构记录 A；本练习明确标记为符合「预印本与正式出版版本」。"
+          },
+          {
+            "id": "preprint-version-b",
+            "source_ref": "synthetic:preprint-version/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「预印本与正式出版版本」。"
+          }
+        ],
+        "sha256": "1b4b3b6802d3d586a8455e19b9af03555234de7e1ec80ba5e2f5391e12140085"
+      }
+    },
+    {
+      "family_id": "negative-result",
+      "family_sha256": "34abe7aedebc887f4566fe45e0cf8dc81c08d1f547227133ce01f0566de45845",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「阴性结果检索」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "negative-result-a",
+            "source_ref": "synthetic:negative-result/a",
+            "text": "虚构记录 A；本练习明确标记为符合「阴性结果检索」。"
+          },
+          {
+            "id": "negative-result-b",
+            "source_ref": "synthetic:negative-result/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「阴性结果检索」。"
+          }
+        ],
+        "sha256": "70c5782a6233aa8b537ed6f5a1947622ca1bac85cb2bc005cedc3dd3bd8af498"
+      }
+    },
+    {
+      "family_id": "conflicting-evidence",
+      "family_sha256": "3b7236b4ca8b09bf2716a23b45b4dc423c7f3a77aded87c1d3f29eb7bcd8acb2",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「冲突结果检索」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "conflicting-evidence-a",
+            "source_ref": "synthetic:conflicting-evidence/a",
+            "text": "虚构记录 A；本练习明确标记为符合「冲突结果检索」。"
+          },
+          {
+            "id": "conflicting-evidence-b",
+            "source_ref": "synthetic:conflicting-evidence/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「冲突结果检索」。"
+          }
+        ],
+        "sha256": "3396614113ebce8b98de684d975e4a48316a5b30b4b39c125155d096f4703077"
+      }
+    },
+    {
+      "family_id": "multilingual",
+      "family_sha256": "a044b506be1d7b7d8ef42ad991fc66338919cbbad431ab044bbf360b55f39804",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「多语种证据」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "multilingual-a",
+            "source_ref": "synthetic:multilingual/a",
+            "text": "虚构记录 A；本练习明确标记为符合「多语种证据」。"
+          },
+          {
+            "id": "multilingual-b",
+            "source_ref": "synthetic:multilingual/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「多语种证据」。"
+          }
+        ],
+        "sha256": "3f0938d1d65ca80889c88fa79c8b678680637f11092296f6154651b0569c9683"
+      }
+    },
+    {
+      "family_id": "date-cutoff",
+      "family_sha256": "3fe59fa0b2edd0017f21bebc5acae62ccf43fd53c1b5c7385b9ca84275b963f8",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「冻结日期前证据」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "date-cutoff-a",
+            "source_ref": "synthetic:date-cutoff/a",
+            "text": "虚构记录 A；本练习明确标记为符合「冻结日期前证据」。"
+          },
+          {
+            "id": "date-cutoff-b",
+            "source_ref": "synthetic:date-cutoff/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「冻结日期前证据」。"
+          }
+        ],
+        "sha256": "e390cf965be5013911685fc9ec1b9d101272f2e4aa889d0eb083f0f31b726ba3"
+      }
+    },
+    {
+      "family_id": "duplicate-record",
+      "family_sha256": "b5e2e7299ea23267900154c2f16f5485a6fd1c049fff831b745827c6b8e8f40a",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「跨数据库重复记录」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "duplicate-record-a",
+            "source_ref": "synthetic:duplicate-record/a",
+            "text": "虚构记录 A；本练习明确标记为符合「跨数据库重复记录」。"
+          },
+          {
+            "id": "duplicate-record-b",
+            "source_ref": "synthetic:duplicate-record/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「跨数据库重复记录」。"
+          }
+        ],
+        "sha256": "47a0945cc3f2efa990d9515d07bdef1fa166927eace4eaea12dfcd0cc339b13e"
+      }
+    },
+    {
+      "family_id": "trial-registration",
+      "family_sha256": "8634e1eb6fb1986a558ad9d7adbeef11d392d7746527fbaf328cc329e0540b79",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「试验注册与论文对应」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "trial-registration-a",
+            "source_ref": "synthetic:trial-registration/a",
+            "text": "虚构记录 A；本练习明确标记为符合「试验注册与论文对应」。"
+          },
+          {
+            "id": "trial-registration-b",
+            "source_ref": "synthetic:trial-registration/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「试验注册与论文对应」。"
+          }
+        ],
+        "sha256": "feded0288fbb0b32b157a41199964e93d08fe83c011c55befa05542e838ce527"
+      }
+    },
+    {
+      "family_id": "protocol-result",
+      "family_sha256": "f245dccd13581fd1db55de9b6e27380918db561ebe80d8144ba833faa41d92a8",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「方案与结果论文区分」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "protocol-result-a",
+            "source_ref": "synthetic:protocol-result/a",
+            "text": "虚构记录 A；本练习明确标记为符合「方案与结果论文区分」。"
+          },
+          {
+            "id": "protocol-result-b",
+            "source_ref": "synthetic:protocol-result/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「方案与结果论文区分」。"
+          }
+        ],
+        "sha256": "3366873d80f0f865074a9d64baf571659d22a311ca721d9bff9ecb87eda9fd0d"
+      }
+    },
+    {
+      "family_id": "abstract-only",
+      "family_sha256": "f9e67a0bd44fea298482582931a0a6b0d849999fccb198cff69c4fff78fa5b01",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「仅摘要可访问证据」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "abstract-only-a",
+            "source_ref": "synthetic:abstract-only/a",
+            "text": "虚构记录 A；本练习明确标记为符合「仅摘要可访问证据」。"
+          },
+          {
+            "id": "abstract-only-b",
+            "source_ref": "synthetic:abstract-only/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「仅摘要可访问证据」。"
+          }
+        ],
+        "sha256": "31b8938e576c0a2bcb5792a9190cf9d86807e7b58c1f2273377fac1d9c8d3966"
+      }
+    },
+    {
+      "family_id": "animal-human",
+      "family_sha256": "6eaedb36f4b447179a501197901438b875428018d149feea1610c88a3249f403",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「动物与人体研究区分」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "animal-human-a",
+            "source_ref": "synthetic:animal-human/a",
+            "text": "虚构记录 A；本练习明确标记为符合「动物与人体研究区分」。"
+          },
+          {
+            "id": "animal-human-b",
+            "source_ref": "synthetic:animal-human/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「动物与人体研究区分」。"
+          }
+        ],
+        "sha256": "e7f9c07c2996738f594fc1949dc68c887bed739048b12c5313dcec82a0510f43"
+      }
+    },
+    {
+      "family_id": "invitro-invivo",
+      "family_sha256": "c094dd07894cc8816a0f21b086b2b80422d8018072c593bce0628d0782ed434f",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「体外与体内证据区分」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "invitro-invivo-a",
+            "source_ref": "synthetic:invitro-invivo/a",
+            "text": "虚构记录 A；本练习明确标记为符合「体外与体内证据区分」。"
+          },
+          {
+            "id": "invitro-invivo-b",
+            "source_ref": "synthetic:invitro-invivo/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「体外与体内证据区分」。"
+          }
+        ],
+        "sha256": "92876225033d69b98ded99040ea7db6cbc17909abeff99578b9cc83f3f519ac0"
+      }
+    },
+    {
+      "family_id": "biomarker-replication",
+      "family_sha256": "d7cdaac59323c97c89bf61c7940a20ce3a921a2f1d06de9e5e1496767dc4a1d4",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「生物标志物独立复现」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "biomarker-replication-a",
+            "source_ref": "synthetic:biomarker-replication/a",
+            "text": "虚构记录 A；本练习明确标记为符合「生物标志物独立复现」。"
+          },
+          {
+            "id": "biomarker-replication-b",
+            "source_ref": "synthetic:biomarker-replication/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「生物标志物独立复现」。"
+          }
+        ],
+        "sha256": "774467f86ad05f644ef8d7acf6279af30896d34a612dd367c53b06cd0dd3a1ce"
+      }
+    },
+    {
+      "family_id": "dataset-paper",
+      "family_sha256": "03c3220d9cb5a1dda3f3e48f47259c8a859e5d17b52c475eff4f7c819a6f09b9",
+      "input_snapshot": {
+        "query": "合成教学练习：从这两条虚构记录中选出符合「数据集与方法论文对应」的记录。仅据快照筛选。",
+        "records": [
+          {
+            "id": "dataset-paper-a",
+            "source_ref": "synthetic:dataset-paper/a",
+            "text": "虚构记录 A；本练习明确标记为符合「数据集与方法论文对应」。"
+          },
+          {
+            "id": "dataset-paper-b",
+            "source_ref": "synthetic:dataset-paper/b",
+            "text": "虚构记录 B；本练习明确标记为不符合「数据集与方法论文对应」。"
+          }
+        ],
+        "sha256": "847801981196d35a9ac0df1b4ba56e55c8a7615d2345e1b4703d37d12d00b936"
+      }
+    }
+  ],
+  "heldout": [],
+  "custody_signature": null
+}

@@ -1,6 +1,6 @@
 # First-use usability trial / 非作者首次使用试跑
 
-This optional maintainer protocol is separate from measuring plugin benefit. Ask a person who did not build PVL to follow the [getting-started tutorial](../START.md) without a demonstration. Record package hash, OS/Python, first-open time, installation time, first-file time, time to explain a negative finding, every error, help request and intervention. Stop after 30 minutes if stuck; retain failures and abandonment. Report assisted completion separately. Maintainer/AI timings are not participant observations. Missing observations remain unknown.
+This optional maintainer protocol is separate from measuring plugin benefit. Ask a person who did not build PVL to follow the [getting-started tutorial](20261011/docs/START.md) without a demonstration. Record package hash, OS/Python, first-open time, installation time, first-file time, time to explain a negative finding, every error, help request and intervention. Stop after 30 minutes if stuck; retain failures and abandonment. Report assisted completion separately. Maintainer/AI timings are not participant observations. Missing observations remain unknown.
 
 For a real author pilot, retain the [handoff](../../examples/pseudobulk-author-pilot/HANDOFF.md) and [runbook](../../examples/pseudobulk-author-pilot/RUNBOOK.md). A generated usage card does not establish benefit.
 
@@ -28,4 +28,4 @@ For a real author pilot, retain the [handoff](../../examples/pseudobulk-author-p
 
 主要计时：“首次打开资料 → 首份目标文件生成”；另记“→ 理解问题”。同时报告包含与扣除明确暂停的时长、安装时间、帮助次数和全部尝试数；不以机器延迟代替人工耗时，不只报告成功者。单人完成只是一项可用性观察。
 
-完成教程后才读 [OPERATIONS](../OPERATIONS.md)。真实研究必须在观察前冻结；对已有合成数据重新冻结只是演示一致性，不伪称预注册。
+完成教程后才读 [OPERATIONS](20261011/docs/OPERATIONS.md)。真实研究必须在观察前冻结；对已有合成数据重新冻结只是演示一致性，不伪称预注册。

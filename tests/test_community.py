@@ -1,4 +1,5 @@
 """Regression coverage for missing or inconsistent distributable metadata."""
+from tests.optional import available, requires
 import json
 from pathlib import Path
 import shutil
@@ -12,6 +13,8 @@ from check_community import check, REQUIRED
 from distribution import inventory
 
 
+@requires("jsonschema", "yaml")
+@unittest.skipUnless(available("jsonschema", "yaml"), "requires: jsonschema, yaml")
 class CommunityTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -47,6 +50,8 @@ class CommunityTests(unittest.TestCase):
                     check(self.root)
                 p.write_bytes(original)
 
+    @requires('jsonschema')
+    @unittest.skipUnless(available('jsonschema'), "requires: jsonschema")
     def test_invalid_cff_field_rejected_by_upstream_schema(self):
         from jsonschema import ValidationError
         p = self.root / 'CITATION.cff'

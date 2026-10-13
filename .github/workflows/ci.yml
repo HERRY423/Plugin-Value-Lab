@@ -6,6 +6,15 @@ on:
 permissions:
   contents: read
 jobs:
+  fast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -S scripts/run_tests.py fast
   offline-contract:
     strategy:
       matrix:
@@ -61,7 +70,7 @@ jobs:
       - run: python scripts/build_marketplace.py --check
       - run: python scripts/check_feature_freeze.py
       - run: python scripts/check_community.py
-      - run: python scripts/check_release_tests.py
+      - run: python scripts/run_tests.py full --require-all
       - run: python scripts/validate_agent_plugin.py
       - run: python scripts/build_marketplace.py --package
       - run: python scripts/build_marketplace.py --check

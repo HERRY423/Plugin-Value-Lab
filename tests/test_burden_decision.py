@@ -1,4 +1,5 @@
 """Manufactured local-label fixtures exercise gates; no real use or benefit claim."""
+from tests.optional import available, requires
 from copy import deepcopy
 import importlib.util
 import json
@@ -333,6 +334,8 @@ class BurdenDecisionTests(unittest.TestCase):
         self.assertIn('共同选型开销只计一次',text)
         self.assertIn('不折算综合分',text)
 
+    @requires('jsonschema')
+    @unittest.skipUnless(available('jsonschema'), "requires: jsonschema")
     def test_schema_and_runtime_reject_hidden_weighted_score(self):
         import jsonschema
         schema=json.loads((ROOT/'schemas/burden-decision.schema.json').read_text())
@@ -357,6 +360,8 @@ class BurdenDecisionTests(unittest.TestCase):
 
 
 class BurdenMCPTests(unittest.IsolatedAsyncioTestCase):
+    @requires('mcp')
+    @unittest.skipUnless(available('mcp'), "requires: mcp")
     async def test_existing_six_tool_stdio_preparation(self):
         from mcp import ClientSession,StdioServerParameters
         from mcp.client.stdio import stdio_client

@@ -1,4 +1,5 @@
 """Pilot material checks. Manufactured sessions never count as real participants."""
+from tests.optional import available, requires
 from copy import deepcopy
 import importlib.util
 import json
@@ -84,6 +85,8 @@ class AuthorPilotTests(unittest.TestCase):
         with self.assertRaisesRegex(ValidationError, 'counts_layer'):
             self.run_prepare()
 
+    @requires('anndata', 'numpy')
+    @unittest.skipUnless(available('anndata', 'numpy'), "requires: anndata, numpy")
     def test_h5ad_adapter_uses_supplied_layer_and_never_rounds(self):
         import anndata
         import numpy as np

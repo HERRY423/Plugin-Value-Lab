@@ -6,11 +6,13 @@ evidence. A statistical candidate never replaces full task/scientific acceptance
 """
 from copy import deepcopy
 import math
+import random
 
 from .core import ValidationError, suite_digest
 from .task_selection import _keys, _id, _sha, _text, select_task_plan
 
 FORMAT = "pvl-risk-acquisition-1"
+FORMAT_V2 = "pvl-risk-acquisition-2"
 RULE = "epsilon_optimal_above_floor_v1"
 BOUND = "hoeffding_candidate_horizon_union_v1"
 ASSUMPTIONS = ("bounded_utility", "independent_units", "stationary_population", "predictable_assignment")
@@ -29,15 +31,19 @@ def _integer(x, low, high):
 def validate_protocol(protocol):
     _keys(protocol, ("format", "catalog_sha256", "task_sha256", "objective", "bound", "alpha", "epsilon", "quality_floor",
                      "allocation", "candidates", "baseline_id", "max_units_per_candidate", "batch_units", "runs_per_unit",
-                     "budget_micros", "max_total_units", "population", "utility_contract", "assumptions", "evidence_type"))
-    if protocol["format"] != FORMAT or protocol["objective"] != RULE or protocol["bound"] != BOUND:
+                     "budget_micros", "max_total_units", "population", "utility_contract", "assumptions", "evidence_type"),
+          ("decision_policy", "rotation_seed"))
+    v2 = protocol['format'] == FORMAT_V2
+    if protocol["format"] not in (FORMAT, FORMAT_V2) or protocol["objective"] != RULE or protocol["bound"] != BOUND:
         raise ValidationError("Unsupported risk contract")
+    if v2 != ('decision_policy' in protocol and 'rotation_seed' in protocol) or (not v2 and any(k in protocol for k in ('decision_policy', 'rotation_seed'))):
+        raise ValidationError('Version 2 requires frozen losses and rotation seed; version 1 remains unchanged')
     for key in ("catalog_sha256", "task_sha256"):
         _sha(protocol[key])
     _number(protocol["alpha"], 1e-8, 0.25)
     _number(protocol["epsilon"], 0, 1)
     _number(protocol["quality_floor"], 0, 1)
-    if protocol["allocation"] not in ("adaptive_frontier", "uniform_all"):
+    if protocol["allocation"] not in (("adaptive_frontier", "uniform_all", "round_robin") if v2 else ("adaptive_frontier", "uniform_all")):
         raise ValidationError("Choose a frozen adaptive or uniform allocation")
     _integer(protocol["max_units_per_candidate"], 1, 100000)
     _integer(protocol["batch_units"], 1, min(256, protocol["max_units_per_candidate"]))
@@ -52,7 +58,7 @@ def validate_protocol(protocol):
     _sha(protocol["population"]["distribution_sha256"])
     if not isinstance(protocol["utility_contract"], dict) or not protocol["utility_contract"]:
         raise ValidationError("Freeze a utility rubric; utility is not inferred from plugin counts")
-    _keys(protocol["assumptions"], ASSUMPTIONS)
+    _keys(protocol["assumptions"], (*ASSUMPTIONS, 'no_order_or_carryover') if v2 else ASSUMPTIONS)
     if any(x is not None and type(x) is not bool for x in protocol["assumptions"].values()):
         raise ValidationError("Sampling assumptions are true, false or unknown")
     candidates = protocol["candidates"]
@@ -71,6 +77,12 @@ def validate_protocol(protocol):
     _id(protocol["baseline_id"])
     if protocol["baseline_id"] not in ids:
         raise ValidationError("Retain an explicit baseline")
+    if v2:
+        _integer(protocol['rotation_seed'], 0, 2**32-1)
+        if protocol['allocation'] == 'round_robin' and len(ids) < 3:
+            raise ValidationError('Rotation requires at least three candidates including baseline')
+        from .action_decision import validate_policy
+        validate_policy(protocol['decision_policy'], ids, protocol['baseline_id'])
     return protocol
 
 
@@ -115,7 +127,7 @@ def allocation(protocol, stats):
     rows = intervals(protocol, stats)
     best_lower = max(r["lower"] for r in rows.values())
     ids = [c["id"] for c in protocol["candidates"] if
-           protocol["allocation"] == "uniform_all" or rows[c["id"]]["upper"] >= best_lower]
+           protocol["allocation"] in ("uniform_all", "round_robin") or rows[c["id"]]["upper"] >= best_lower]
     # The entire next block is fixed before its outcomes are seen. A stopped
     # candidate may re-enter if bounds change; there is no unchecked screen prune.
     ids = [i for i in ids if stats[i]["n"] < protocol["max_units_per_candidate"]]
@@ -138,15 +150,26 @@ def _next(protocol, stats, digest, history_hash, index, blocks, spent, started):
             "candidate_ids": ids, "unit_ids": [f"unit-{blocks + n + 1}" for n in range(units)],
             "planned_candidate_units": units * len(ids), "planned_runs": units * len(ids) * protocol["runs_per_unit"],
             "reserved_micros": reserve}
+    if protocol['allocation'] == 'round_robin':
+        orders = []
+        for offset, unit in enumerate(plan['unit_ids']):
+            cycle, position = divmod(blocks + offset, len(ids))
+            order = list(ids)
+            random.Random(suite_digest({'seed': protocol['rotation_seed'], 'cycle': cycle})).shuffle(order)
+            order = order[position:] + order[:position]
+            orders.append({'unit_id': unit, 'candidate_ids': order})
+        plan['execution_orders'] = orders
     return "NEXT_BLOCK", None, rows, plan
 
 
 def analyze(request):
-    _keys(request, ("protocol", "protocol_sha256", "batches"), ("assumption_violations",))
+    _keys(request, ("protocol", "protocol_sha256", "batches"), ("assumption_violations", "confirmation_studies"))
     violations = request.get("assumption_violations", [])
     if not isinstance(violations, list) or any(not isinstance(v, str) or not v.strip() for v in violations):
         raise ValidationError("Retain explicit sampling-assumption violation reasons")
     protocol = validate_protocol(request["protocol"])
+    if 'confirmation_studies' in request and (protocol['format'] != FORMAT_V2 or not isinstance(request['confirmation_studies'], list) or len(request['confirmation_studies']) > 32):
+        raise ValidationError('Independent confirmation bundles require version 2 and at most 32 studies')
     digest = suite_digest(protocol)
     if digest != request["protocol_sha256"]:
         raise ValidationError("Frozen risk protocol changed")
@@ -183,13 +206,18 @@ def analyze(request):
         cells, input_by_unit, block_cost, local = set(), {}, 0, []
         for record in records:
             _keys(record, ("candidate_id", "unit_id", "input_sha256", "session_id", "assessment_sha256",
-                           "utility_contract_sha256", "status", "utility", "cost_micros", "runs_started"))
+                           "utility_contract_sha256", "status", "utility", "cost_micros", "runs_started"),
+                  ('execution_position',) if protocol['allocation'] == 'round_robin' else ())
             _id(record["candidate_id"])
             _id(record["unit_id"])
             cell = (record["candidate_id"], record["unit_id"])
             if cell not in expected_cells or cell in cells:
                 raise ValidationError("Duplicate or unassigned observation")
             cells.add(cell)
+            if protocol['allocation'] == 'round_robin':
+                order = next(o['candidate_ids'] for o in expected['execution_orders'] if o['unit_id'] == record['unit_id'])
+                if type(record.get('execution_position')) is not int or record['execution_position'] != order.index(record['candidate_id']) + 1:
+                    raise ValidationError('Observed execution position differs from the frozen rotation')
             for name in ("input_sha256", "assessment_sha256", "utility_contract_sha256"):
                 _sha(record[name])
             if record["utility_contract_sha256"] != suite_digest(protocol["utility_contract"]):
@@ -257,7 +285,7 @@ def analyze(request):
     if violations:
         state, chosen, plan = "REVIEW_SAMPLING_ASSUMPTIONS", None, None
     synthetic = protocol["evidence_type"] == "synthetic"
-    return {"format": FORMAT, "state": state, "protocol_sha256": digest, "risk_identity": risk_identity(protocol),
+    result = {"format": protocol['format'], "state": state, "protocol_sha256": digest, "risk_identity": risk_identity(protocol),
             "history_sha256": history_hash, "evidence_status": "SIMULATION_ONLY" if synthetic else "SUBMITTED_OBSERVATIONS" if observations else "NO_OBSERVATIONS",
             "intervals": rows, "next_block": plan, "certified_candidate_id": chosen,
             "candidate_for_confirmation": chosen if not synthetic else None, "selected_plan_sha256": None,
@@ -282,9 +310,13 @@ def analyze(request):
                 "Budget/horizon stops without a certificate are abstentions, not successful efficient decisions.",
                 "Statistical candidates still require full-stage/integration confirmation and existing scientific gates.",
                 "No global plugin ranking, catalog-wide minimum, optimal allocation or real-world savings claim."]}
+    from .action_decision import selection_uncertainty, action_report
+    result['selection_uncertainty'] = selection_uncertainty(protocol, rows, assumptions and not violations and blocker is None)
+    result['action_decision'] = action_report(protocol, result)
+    return result
 
 
-def plan_risk_acquisition(selection, request, *, artifact_root=None, verifier_root=None):
+def plan_risk_acquisition(selection, request, *, artifact_root=None, verifier_root=None, now=None):
     base = select_task_plan(selection, artifact_root=artifact_root, verifier_root=verifier_root)
     result = analyze(request)
     protocol = request["protocol"]
@@ -303,4 +335,58 @@ def plan_risk_acquisition(selection, request, *, artifact_root=None, verifier_ro
     result.update(candidate_plans=[{"id": c["id"], "plan_sha256": c["plan_sha256"],
                                    "manifest": deepcopy(plans[c["plan_sha256"]]["manifest"])} for c in protocol["candidates"]],
                   required_reviews=base["required_reviews"])
+    from .action_decision import action_report, selection_uncertainty
+    confirmations = _confirmations(selection, request, artifact_root, verifier_root)
+    result['confirmation_checks'] = confirmations
+    result['action_decision'] = action_report(protocol, result, confirmations={k: v['supported'] for k, v in confirmations.items()}, now=now)
+    if result['state'] == 'REVIEW_TASK_APPLICABILITY':
+        result['selection_uncertainty'] = selection_uncertainty(protocol, result['intervals'], False)
     return result
+
+
+def _confirmations(selection, request, artifact_root, verifier_root):
+    """Recompute independent, prospective v3 bundles; never accept a passed flag."""
+    bundles = request.get('confirmation_studies', [])
+    if not bundles:
+        return {}
+    from .core import evaluate
+    from .value_metrics import positive_signal, requires_confirmation
+    protocol = request['protocol']
+    candidate_by_plan = {c['plan_sha256']: c['id'] for c in protocol['candidates']}
+    baseline_plan = next(c['plan_sha256'] for c in protocol['candidates'] if c['id'] == protocol['baseline_id'])
+    enriched = deepcopy(selection)
+    enriched['studies'] = bundles
+    checked = select_task_plan(enriched, artifact_root=artifact_root, verifier_root=verifier_root)
+    checked_studies = {s['suite_sha256']: s for s in checked['studies']}
+    risk_records = [r for b in request['batches'] for r in (b['result'] or [])]
+    sessions = {r['session_id'] for r in risk_records}
+    inputs = {r['input_sha256'] for r in risk_records}
+    units = {r['unit_id'] for r in risk_records}
+    results = {}
+    for bundle in bundles:
+        suite = bundle['suite']
+        arms = suite.get('task_selection', {}).get('arms', {})
+        ident = candidate_by_plan.get(arms.get('with'))
+        if ident is None or ident == protocol['baseline_id'] or ident in results or arms.get('without') != baseline_plan:
+            raise ValidationError('One independent confirmation per candidate against the frozen baseline')
+        from .artifacts import read_only_verification
+        with read_only_verification():
+            report = evaluate(suite, bundle['records'], bundle['lock'], bundle.get('cost_ledger'), artifact_root=artifact_root, verifier_root=verifier_root)
+        reasons = list(checked_studies[suite_digest(suite)].get('blockers', []))
+        if not requires_confirmation(report) or not positive_signal(report):
+            reasons.append('Frozen confirmatory v3 rule not supported')
+        if report['evidence_type'] == 'synthetic': reasons.append('Synthetic confirmation')
+        if protocol['utility_contract'].get('measure') != 'equal_family_quality' or suite['policy'].get('quality_weighting') != 'family':
+            reasons.append('Screening utility and confirmation family-quality estimands differ')
+        if len({c['cluster'] for c in suite['cases']}) < protocol['decision_policy']['confirmation_family_floor']:
+            reasons.append('Below positive independent-family floor')
+        plan = suite['policy'].get('power_plan', {})
+        if plan.get('version') != 3 or plan.get('alpha', 1) > protocol['alpha'] / (len(protocol['candidates'])-1):
+            reasons.append('Confirmation lacks frozen candidate multiplicity allocation')
+        if plan.get('rule', {}).get('objective') != 'quality' or plan.get('rule', {}).get('minimum_gain', -1) < protocol['decision_policy']['minimum_gain']:
+            reasons.append('Confirmation does not cover the action material-gain threshold')
+        if any(r.get('session_id') in sessions or r.get('input_sha256') in inputs or suite_digest(r.get('input_snapshot')) in inputs for r in bundle['records']) or any(c['cluster'] in units or c.get('input_sha256') in inputs for c in suite['cases']):
+            reasons.append('Screening/confirmation inputs or sessions overlap')
+        results[ident] = {'supported': not reasons, 'reasons': sorted(set(reasons)),
+                          'suite_sha256': suite_digest(suite), 'scope': 'Recomputed submitted records; provenance and human review remain required'}
+    return results

@@ -1,4 +1,5 @@
 """SDK transport interoperability; distinct from dependency-free replay checks."""
+from tests.optional import available, requires
 import importlib.util
 import json
 from pathlib import Path
@@ -10,6 +11,8 @@ from value_lab.replay import record_tools
 from test_offline_replay import TOOLS, EXCHANGES
 
 
+@requires('mcp')
+@unittest.skipUnless(available('mcp'), "requires: mcp")
 @unittest.skipUnless(importlib.util.find_spec('mcp'), 'MCP SDK required for transport acceptance')
 class OfflineMCPTests(unittest.IsolatedAsyncioTestCase):
     async def test_sdk_live_recording_then_dependency_free_playback(self):

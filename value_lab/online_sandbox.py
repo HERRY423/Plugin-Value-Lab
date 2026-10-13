@@ -46,7 +46,7 @@ def validate_config(config):
         raise ValidationError('Windows requires an immutable local image ID, not a mutable tag or automatic pull')
     g = config['gateway']
     required = {'endpoint', 'models', 'api_key_env', 'max_requests', 'max_output_tokens', 'request_timeout_seconds'}
-    if not isinstance(g, dict) or set(g) != required:
+    if not isinstance(g, dict) or not required <= set(g) or set(g) - required - {'budget'}:
         raise ValidationError('Gateway requires endpoint/models/api_key_env/max_requests/max_output_tokens/request_timeout_seconds')
     if not isinstance(g['endpoint'], str):
         raise ValidationError('Model endpoint must be a string')
@@ -72,6 +72,9 @@ def validate_config(config):
     for key, ceiling in [('max_requests', 1000), ('max_output_tokens', 100000), ('request_timeout_seconds', 120)]:
         if type(g[key]) is not int or not 1 <= g[key] <= ceiling:
             raise ValidationError('Invalid bounded gateway setting: ' + key)
+    if 'budget' in g:
+        from .gateway_budget import validate_budget_config
+        validate_budget_config(g['budget'])
     return config
 
 
@@ -185,8 +188,9 @@ def probe_backend(config, plugin, output, control, backend_path, targets, public
 
 
 class ModelGateway:
-    def __init__(self, config, secret, transport=None):
-        self.config = config
+    def __init__(self, config, secret, transport=None, *, invocation_id=None):
+        from copy import deepcopy
+        self.config = deepcopy(config)
         if not isinstance(secret, str) or not secret or any(c in secret for c in '\r\n'):
             raise ValidationError('Dedicated model credential unavailable or invalid')
         self._secret = secret
@@ -194,9 +198,24 @@ class ModelGateway:
         self.transport = transport or self._https
         self.requests, self.events = 0, []
         self.cancelled = threading.Event()
+        self._request_lock = threading.Lock()
+        self._dispatch_permit = None
+        self.budget = None
+        self.invocation_id = invocation_id
+        if 'budget' in config:
+            from .gateway_budget import GatewayBudget
+            if not isinstance(invocation_id, str) or not re.fullmatch('[a-f0-9]{64}', invocation_id):
+                raise ValidationError('Budgeted gateway requires the frozen session digest')
+            self.budget = GatewayBudget(self.config)
 
     def request(self, message, remaining):
-        if self._live_transport:
+        # Keep bridge sequence/one-use transport permits atomic within a gateway;
+        # the SQLite transaction covers other gateways/processes in the task.
+        with self._request_lock:
+            return self._request(message, remaining)
+
+    def _request(self, message, remaining):
+        if self._live_transport and self.budget is None:
             from .native import require_budget_boundary
             require_budget_boundary()
         # Treat even bridge messages as untrusted. A compromised sandbox cannot
@@ -225,10 +244,17 @@ class ModelGateway:
                     raise ValueError('output token ceiling exceeded')
         except (ValueError, TypeError) as exc:
             raise ValidationError('Invalid/budget-exceeding model request') from exc
+        reservation = None
+        if self.budget is not None:
+            reservation = self.budget.reserve(self.invocation_id + ':' + str(message['id']),
+                                              message['path'], body, message['beta'])
         self.requests += 1  # Reserve BEFORE transport; uncertain responses are never retried.
         event = {'id': self.requests, 'path': message['path'], 'body_sha256': hashlib.sha256(body).hexdigest(),
                  'request_bytes': len(body), 'state': 'UNKNOWN', 'settled_usd': None}
         self.events.append(event)
+        if reservation is not None:
+            event['budget_reservation'] = reservation
+            self._dispatch_permit = (message['path'], hashlib.sha256(body).hexdigest(), message['beta'])
         try:
             status, content_type, response = self.transport(message['path'], body, message['beta'],
                 min(remaining, self.config['request_timeout_seconds']))
@@ -243,13 +269,20 @@ class ModelGateway:
         except Exception:
             # Do not leak provider exceptions (URLs/headers/credentials) into logs.
             raise ValidationError('Model request failed or was refused; charge/response may be unknown; no retry') from None
+        finally:
+            # Do not settle from response usage: it is not an authenticated bill.
+            # Retain the entire reservation until explicit ledger reconciliation.
+            self._dispatch_permit = None
 
     def _https(self, path, body, beta, timeout):
-        # The internal broker is also callable without run_session. Do not let
-        # that path evade the paid-launch gate. A local reservation ledger alone
-        # cannot make this uncapped provider API safe.
-        from .native import require_budget_boundary
-        require_budget_boundary()
+        if self.budget is None:
+            from .native import require_budget_boundary
+            require_budget_boundary()
+        expected = (path, hashlib.sha256(body).hexdigest(), beta)
+        if self._dispatch_permit != expected:
+            raise ValidationError('HTTPS dispatch requires an exact committed reservation')
+        self._dispatch_permit = None  # Consume before DNS/TLS; never reuse on errors.
+        self.budget.check()
         started = time.monotonic()
         host = urlsplit(self.config['endpoint']).hostname
         addresses = socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)
@@ -494,9 +527,13 @@ def prepare_session(directory, plan_digest, plugin, invocation, output, *, refer
                   'gateway': config['gateway'], 'host_root_mounted': False, 'credentials_in_child': False,
                   'model_calls': 0, 'isolation_preflight': isolation,
                   'cost': {'native_estimate_ceiling_usd': ceiling, 'request_ceiling': config['gateway']['max_requests'],
-                           'can_overrun_in_flight': True, 'settled_usd': None},
+                           'can_overrun_in_flight': True, 'settled_usd': None,
+                           'gateway_budget_configured': 'budget' in config['gateway'],
+                           'provider_cap_verified': False,
+                           'budget_scope': 'Gateway reservations conditional on pinned rates/context; no provider account cap'},
                   'limitations': ['Provider RPC sends approved prompts to the selected model origin; no general network access.',
                                   'Request/token limits are not a guaranteed dollar spending cap.',
+                                  'When budget is configured, the parent durably reserves a conservative full-context envelope before dispatch; unsupported billable features are refused.',
                                   'Trusted runtime/images must contain no secrets. Native eval case sealing is not independently established.',
                                   'Buffered SSE transport is bounded to 8 MiB and the configured request timeout.',
                                   'No actual model call is made during preparation; runtime/SDK compatibility needs a separately authorized pilot.']}
@@ -512,9 +549,7 @@ def prepare_session(directory, plan_digest, plugin, invocation, output, *, refer
 
 def run_session(root, frozen, pin):
     from .native_session import _sources, finish_native_session
-    from .native import require_budget_boundary
-    # Network/request/token limits alone do not enforce dollars. Refuse before
-    # reading credentials, starting a child or contacting a model provider.
+    # Validate the durable budget before credentials, child launch or dispatch.
     if frozen.get('isolation_profile') != PROFILE:
         raise ValidationError('Legacy online masking plans cannot execute; prepare a networkless revision')
     config = validate_config(frozen['sandbox'])
@@ -533,8 +568,17 @@ def run_session(root, frozen, pin):
     if runtime_pin != frozen['runtime_pin']:
         raise ValidationError('Frozen runtime changed')
     _sources(frozen['evidence_plan'], frozen['evidence_plan_sha256'], frozen['plugin'], frozen['references'])
-    require_budget_boundary()
-    gateway = ModelGateway(config['gateway'], os.environ.get(config['gateway']['api_key_env']))
+    from .gateway_budget import GatewayBudget
+    budget = GatewayBudget(config['gateway'])
+    # The ledger must never be readable or writable through a guest mount.
+    ledger = budget.ledger.path
+    exposed = [root / n for n in ('control', 'public-plugin', 'native', 'retained')]
+    if not windows:
+        exposed.append(Path(config['runtime']).resolve())
+    if any(ledger == p.resolve() or p.resolve() in ledger.parents for p in exposed):
+        raise ValidationError('Budget ledger must stay outside guest mounts')
+    budget.preflight(config['gateway']['max_output_tokens'])
+    gateway = ModelGateway(config['gateway'], os.environ.get(config['gateway']['api_key_env']), invocation_id=pin)
     probe_backend(config, frozen['plugin'], root, root / 'control', frozen['backend'], frozen['probe_targets'], root / 'public-plugin')
     # Reserve the entire session exclusively before any model request.
     with (root / 'started.json').open('x', encoding='utf-8') as stream:

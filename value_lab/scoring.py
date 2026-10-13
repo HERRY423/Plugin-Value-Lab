@@ -251,7 +251,8 @@ def inspect_rules(suite, samples=None):
                     warnings.append(f"{case['id']}: 缺少 {endpoint} 结果判据；过程检查或决策通过不能填补该证据")
         cases.append({"id": case["id"], "rules": rules, "samples": sample_rows,
                       "success_requirements": requirements})
-    if len({c["cluster"] for c in suite["cases"]}) < suite["policy"]["min_clusters"]:
+    from .value_metrics import family_requirement
+    if not family_requirement(suite)['target_met']:
         warnings.append("任务类别数低于方案门槛；重复运行不能代替独立任务类别")
     prompts = {}
     for case in suite["cases"]:

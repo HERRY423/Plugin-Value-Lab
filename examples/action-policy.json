@@ -1,0 +1,61 @@
+{
+  "researcher_id": "EXAMPLE_NOT_REAL_PREFERENCES",
+  "loss_unit": "preference_points",
+  "false_adoption_cost": 100,
+  "missed_use_cost": 80,
+  "time_cost_per_hour": 1,
+  "scope": "合成演示中的冻结任务与版本；这些损失数值不是研究者的真实偏好",
+  "valid_from": "2026-10-01T00:00:00Z",
+  "valid_until": "2026-11-01T00:00:00Z",
+  "minimum_gain": 0.05,
+  "confirmation_family_floor": 30,
+  "candidates": {
+    "c1": {
+      "adopt_hours": 2,
+      "trial_hours": 1,
+      "evidence_hours": 1,
+      "trial_exposure": 0.5,
+      "trial_residual_harm": 0.1,
+      "guardrails": [
+        "逐项人工复核输出",
+        "只读操作，禁止写入外部系统",
+        "发现关键失败立即停止"
+      ],
+      "prohibited": false,
+      "prohibition_reason": null
+    },
+    "c2": {
+      "adopt_hours": 2,
+      "trial_hours": 1,
+      "evidence_hours": 1,
+      "trial_exposure": 0.5,
+      "trial_residual_harm": 0.1,
+      "guardrails": [
+        "逐项人工复核输出",
+        "只读操作，禁止写入外部系统",
+        "发现关键失败立即停止"
+      ],
+      "prohibited": false,
+      "prohibition_reason": null
+    },
+    "c3": {
+      "adopt_hours": 2,
+      "trial_hours": 1,
+      "evidence_hours": 1,
+      "trial_exposure": 0.5,
+      "trial_residual_harm": 0.1,
+      "guardrails": [
+        "逐项人工复核输出",
+        "只读操作，禁止写入外部系统",
+        "发现关键失败立即停止"
+      ],
+      "prohibited": false,
+      "prohibition_reason": null
+    }
+  },
+  "shrinkage": {
+    "target": 0.5,
+    "strength": 8,
+    "rationale": "Illustrative frozen regularization, not learned evidence"
+  }
+}

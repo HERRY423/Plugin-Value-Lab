@@ -1,4 +1,5 @@
 """Synthetic upgrade/recovery qualification; never host adoption evidence."""
+from tests.optional import available, requires
 from copy import deepcopy
 import hashlib
 import json
@@ -328,6 +329,8 @@ class ContextStreamTests(unittest.TestCase):
         for claims in ({}, {'anything':{}}):
             with self.assertRaises(ValidationError): resolve_requirements(r['capabilities'], claims)
 
+    @requires('jsonschema')
+    @unittest.skipUnless(available('jsonschema'), "requires: jsonschema")
     def test_schema_accepts_real_snapshot_rejects_hidden_capability_promotion(self):
         import jsonschema
         schema = json.loads((ROOT/'schemas/host-capabilities.schema.json').read_text())

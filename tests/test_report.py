@@ -123,7 +123,7 @@ class ReportTests(unittest.TestCase):
         report = example_report()
         report["cases"][0]["id"] = 'a|b\n| injected | [link](https://invalid.example)'
         markdown = self.render(report)["md"]
-        self.assertIn(r"a\|b<br>\| injected \| \[link\]", markdown)
+        self.assertIn(r"a\|b / \| injected \| \[link\]", markdown)
         self.assertNotIn("\n| injected |", markdown)
 
     def test_filters_retain_failures_and_regressions(self):

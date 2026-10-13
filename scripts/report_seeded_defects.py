@@ -229,7 +229,7 @@ def main():
                        access_interventions=results['access_interventions'])
     output.mkdir(parents=True)
     write_json(output/('detection-boundaries-20260926.json' if results.get('boundary_revision') else 'detection-validity-20260925.json'),summary)
-    (output/'DETECTION-VALIDITY.md').write_text(build_report(root,summary,results),encoding='utf-8')
+    (output/'docs/history/20261011/DETECTION-VALIDITY.md').write_text(build_report(root,summary,results),encoding='utf-8')
     print(json.dumps({'output':str(output),'metrics':summary['metrics']},ensure_ascii=False,indent=2))
 
 

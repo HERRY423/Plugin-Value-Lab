@@ -248,8 +248,8 @@ def _scope_assessments(suite, records, report, envelope, artifact_root, verifier
         runs = [r for c in cases for r in c['runs']]
         blockers = list(report['scope_integrity_blockers'])
         from .value_metrics import positive_signal, requires_confirmation
-        if requires_confirmation(report) and not positive_signal(report):
-            blockers.append('Prespecified whole-study confirmation is not supported; a favorable subset cannot override it')
+        if report.get('family_requirement', {}).get('target_met') is False or (requires_confirmation(report) and not positive_signal(report)):
+            blockers.append('Frozen whole-study family-count or confirmation requirement is not met; a favorable subset cannot override it')
         if report['evidence_type'] == 'synthetic':
             blockers.append('Synthetic evidence cannot support use')
         if envelope['missing_identity']:
@@ -434,7 +434,7 @@ def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_ro
     policy, summary = report["policy"], report["summary"]
     synthetic = report["evidence_type"] == "synthetic"
     eligible = summary["comparison_eligible"] and not report["blockers"]
-    non_regressed = report["verdict"] in {"PROMISING_LOCAL_SIGNAL", "NO_DEMONSTRATED_GAIN"}
+    non_regressed = report["verdict"] in {"PROMISING_LOCAL_SIGNAL", "NO_DEMONSTRATED_GAIN", "TRIAL_ONLY_SIGNAL"}
     can_describe = eligible and not synthetic and non_regressed
     from .value_metrics import positive_signal, requires_confirmation
     can_support = can_describe and positive_signal(report)
@@ -498,7 +498,7 @@ def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_ro
             reasons.append('必要的任务结果失败或尚未知，部分分数不能替代交付与正确性证据')
         if synthetic:
             reasons.append("包含合成演示，不能转化为实际使用建议")
-        elif requires_confirmation(report) and not positive_signal(report):
+        elif report.get('family_requirement', {}).get('target_met') is False or (requires_confirmation(report) and not positive_signal(report)):
             reasons.append('事前确认性规则尚未通过；局部均值信号不能作为正向使用建议')
         elif not eligible:
             reasons.append("整项比较存在证据阻断，先补足并复核全套材料")
@@ -528,7 +528,7 @@ def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_ro
     if synthetic:
         status = "TRIAL_GUIDANCE_ONLY"
         next_steps = ["先冻结真实任务、两组相同的授权输入及比较条件，再收集真实运行和完整成本。", "合成案例只用于演练记录和判读流程。"]
-    elif not can_describe or (requires_confirmation(report) and not positive_signal(report)):
+    elif not can_describe or report["verdict"] == "TRIAL_ONLY_SIGNAL" or (requires_confirmation(report) and not positive_signal(report)):
         status = "REVIEW_REQUIRED"
         next_steps = ["逐项复核阻断、失败、缺失和关键回退；保留原记录，以明确修订后的新实验重新比较。", "问题解决前，不依据单个高分案例作使用推广。"]
         if requires_confirmation(report):
@@ -571,6 +571,7 @@ def build_usage_card(suite, records, lock=None, cost_ledger=None, *, artifact_ro
             "evidence_level": "SIMULATION_ONLY" if synthetic else "SUBMITTED_PAIRED_OBSERVATIONS",
             "evaluation_recomputed": True, "comparison_eligible": eligible,
             "measured_verdict": report["measured_verdict"],
+            "family_requirement": copy.deepcopy(report["family_requirement"]),
             "provenance": copy.deepcopy(report["provenance"]),
             "verification_receipts": [
                 {"case_id": case["id"], "arm": run["arm"], "repetition": run["repetition"],
@@ -785,15 +786,8 @@ def check_usage_envelope(card, plugin_sha256, conditions):
 
 
 def _markdown(value):
-    """Render user-supplied text literally, without links, images or raw HTML."""
-    if value is None:
-        return "未知"
-    if isinstance(value, (dict, list)):
-        value = json.dumps(value, ensure_ascii=False, sort_keys=True)
-    text = html.escape(str(value), quote=True)
-    for character in ("\\", "`", "*", "_", "[", "]", "(", ")", "!", "|", "#", "~", "+", "-"):
-        text = text.replace(character, "\\" + character)
-    return " ".join(text.splitlines())
+    from .markdown_text import literal
+    return literal(value)
 
 
 def _envelope_cells(row):
@@ -837,7 +831,7 @@ def _envelope_markdown(card):
              "| " + " | ".join(_ENVELOPE_HEADERS) + " |", "| " + " | ".join(["---"] * len(_ENVELOPE_HEADERS)) + " |"]
     for row in env["rows"]:
         lines.append("| " + " | ".join(_markdown(c) for c in _envelope_cells(row)) + " |")
-    lines += ['', '整项研究结论：' + _markdown(card['verdict']) + '；局部范围结论不能覆盖整项研究结果。', '']
+    lines += ['', '整项研究结论：' + _markdown('仅试用线索' if card['verdict'] == 'TRIAL_ONLY_SIGNAL' else card['verdict']) + '；局部范围结论不能覆盖整项研究结果。', '']
     for scope in card.get('scope_assessments', []):
         lines += ['- 范围 ' + _markdown(scope['id']) + '：' + _markdown(_DECISIONS[scope['decision_code']][1])
                   + '；完整配对 ' + str(scope['resolved_pairs']) + '/' + str(scope['planned_pairs'])
@@ -898,20 +892,23 @@ table{{table-layout:fixed;min-width:1050px}}th:nth-child(1){{width:9%}}th:nth-ch
 
 
 def _render_markdown(card):
+    from .markdown_text import key_value_table
     plugin, scope, source = card["plugin"], card["scope"], card["source"]
     lines = ["# 插件使用卡", "", f"**{_markdown(plugin['name'])} · {_markdown(plugin['version'])}**", "",
              f"研究：{_markdown(card['study_id'])}", "",
              f"状态：{_markdown(_STATUSES[card['status']])}", "",
-             f"重新计算的结论：{_markdown(card['verdict'])}", "",
+             f"重新计算的结论：{_markdown('仅试用线索' if card['verdict'] == 'TRIAL_ONLY_SIGNAL' else card['verdict'])}", "",
              "仅对记录中的具体任务提供条件性参考。评分不会产生安装、权限或卸载操作。", "",
              *(_envelope_markdown(card) if "envelope" in card else []),
              "## 适用范围", "",
              f"- 决策范围：{_markdown(scope['decision_scope'])}",
              f"- 目标：{_markdown(scope['objective'])}",
-             f"- 固定条件：{_markdown(scope['conditions'])}",
+             "固定条件：\n\n" + key_value_table(scope['conditions']) + "\n",
              f"- 方案 SHA-256：{_markdown(scope['suite_sha256'])}",
              f"- 运行记录 SHA-256：{_markdown(scope['records_sha256'])}",
              f"- 条件 SHA-256：{_markdown(scope['conditions_sha256'])}", ""]
+    if source.get('family_requirement'):
+        lines += ['## 任务族与功效门槛', '', key_value_table(source['family_requirement']), '']
     for title, key, empty in [
         ("何时可优先试用", "use_when", "当前证据不能给出优先使用建议。"),
         ("何时基线可能已足够", "prefer_baseline_when", "尚无可支持的基线优先观察。"),
@@ -923,7 +920,7 @@ def _render_markdown(card):
                       f"任务：{_markdown(item['prompt'])}", "",
                       _markdown(item["reason"]), "",
                       f"质量差（启用 − 未启用）：{_markdown(item['quality_delta'])}；平均成本差（USD）：{_markdown(item['cost_delta_usd'])}。", "",
-                      f"运行计数：{_markdown(item['run_counts'])}", ""]
+                      "运行计数：\n\n" + key_value_table(item['run_counts']) + "\n", ""]
         if not card[key]:
             lines += [empty, ""]
     if plan := card.get("improvement_plan"):
@@ -948,8 +945,8 @@ def _render_markdown(card):
     lines += ["## 来源与完整性", "",
               f"- 证据类型：{_markdown(source['evidence_type'])}",
               f"- 证据层级：{_markdown(source['evidence_level'])}",
-              f"- 运行计数：{_markdown(source['run_counts'])}",
-              f"- 来源记录：{_markdown(source['provenance'])}", "",
+              "运行计数：\n\n" + key_value_table(source['run_counts']) + "\n",
+              "来源记录：\n\n" + key_value_table(source['provenance']) + "\n", "",
               "来源真实性未获独立验证。完整字段保存在同目录的 `card.json`。", ""]
     return "\n".join(lines)
 

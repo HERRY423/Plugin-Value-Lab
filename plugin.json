@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "plugin-value-lab",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.5",
   "description": "Determine whether a plugin improves a specific task through paired comparisons, frozen plans, and recomputable results.",
   "author": {
     "name": "Local developer"
@@ -19,6 +19,8 @@
         "shortDescription": "Does this plugin improve this task? Pair, freeze, recompute.",
         "longDescription": "Determine whether a plugin improves a specific task through paired comparisons, frozen plans, and recomputable results. Compare with-plugin and no-plugin records under matched conditions. Keep failures, uncertainty and missing evidence visible; scope conclusions to the tested task.",
         "developerName": "Local developer",
+        "logo": "./assets/plugin-value-lab.png",
+        "composerIcon": "./assets/plugin-value-lab.png",
         "category": "Productivity",
         "capabilities": [],
         "defaultPrompt": [

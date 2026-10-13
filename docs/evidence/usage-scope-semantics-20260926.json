@@ -43,7 +43,7 @@
     "value_lab/usage.py": "929a14670c814a7e205655c8ddd17fad0a444b3c198c06ee91841f643dcdeeda",
     "tests/test_usage_envelope.py": "6e3c1829b8fbed3509772bd459da8598ebc9c86e37b3303aa240b8df77f71274",
     "tests/test_author_diagnosis.py": "03ec92846620bbbe039f0f9a5f0f6fabd817c64ba8bcc6dc38eecfb467eb0ffb",
-    "docs/OPERATIONS.md": "2fb3c24f461619a51b2bf6fd7ea667e91a9e7313cef1d5bf1beaeaf4dcbcdfda",
+    "docs/history/20261011/docs/OPERATIONS.md": "2fb3c24f461619a51b2bf6fd7ea667e91a9e7313cef1d5bf1beaeaf4dcbcdfda",
     "docs/history/P2-REUSE-GUIDANCE.zh-CN.md": "95c9ce8459f54d08d11f701f652534ada72dc7748b91dabea308602393167ba6"
   },
   "test_log_sha256": "4d7e2b53ced87ea4c7602fdd492ffa0f0c9761d73f9acd8f8853bf31b9374e55",

@@ -7,8 +7,8 @@ from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-REQUIRED = ('CITATION.cff', 'SECURITY.md', 'CONTRIBUTING.md',
-            'docs/API-STABILITY.md', 'docs/DATA-GOVERNANCE.md')
+REQUIRED = ('CITATION.cff', 'docs/history/20261011/SECURITY.md', 'docs/history/20261011/CONTRIBUTING.md',
+            'docs/history/20261011/docs/API-STABILITY.md', 'docs/history/20261011/docs/DATA-GOVERNANCE.md')
 
 
 def check(root=ROOT):

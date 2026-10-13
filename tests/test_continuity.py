@@ -1,4 +1,5 @@
 """Manufactured cross-session/version/adapter controls; no live provider calls."""
+from tests.optional import available, requires
 from copy import deepcopy
 import json
 from pathlib import Path
@@ -346,6 +347,8 @@ class ContinuityTests(unittest.TestCase):
         self.assertEqual(report['compatible_recorded_decisions'], [])
         self.assertEqual(report['legacy_interpretations_without_lifecycle'], ['score1'])
 
+    @requires('jsonschema')
+    @unittest.skipUnless(available('jsonschema'), "requires: jsonschema")
     def test_environment_schema_accepts_bound_input_rejects_hidden_fields(self):
         from jsonschema import Draft202012Validator
         self.ready()

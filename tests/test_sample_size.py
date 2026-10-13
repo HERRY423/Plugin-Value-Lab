@@ -1,4 +1,5 @@
 """Prospective power, uncertainty and real public entry points; synthetic only."""
+from tests.optional import available, requires
 import copy
 import importlib.util
 import json
@@ -37,6 +38,8 @@ class SampleSizeTests(unittest.TestCase):
             self.assertGreaterEqual(row['conditional_power'], .8)
             self.assertLess(row['power_one_fewer_family'], .8)
 
+    @requires('scipy')
+    @unittest.skipUnless(available('scipy'), "requires: scipy")
     @unittest.skipUnless(SCIPY, 'optional planning dependency')
     def test_noncentral_t_matches_independent_statsmodels_reference(self):
         # Frozen values from statsmodels TTestPower(0.5, nobs=34, alpha=.05).
@@ -130,6 +133,8 @@ class SampleSizeTests(unittest.TestCase):
         s['policy']['power_plan']['minimum_detectable_delta'] = .2
         self.assertNotEqual(suite_digest(s), old_digest)
 
+    @requires('jsonschema')
+    @unittest.skipUnless(available('jsonschema'), "requires: jsonschema")
     def test_schema_and_runtime_agree_on_example_and_invalid_inputs(self):
         import jsonschema
         root = Path(__file__).resolve().parents[1]
@@ -170,6 +175,8 @@ class IntervalTests(unittest.TestCase):
              'cases': [{'id': str(i), 'cluster': str(i), 'delta': d} for i, d in enumerate([.1, .2, .3, .4])]}
         return s, r
 
+    @requires('scipy')
+    @unittest.skipUnless(available('scipy'), "requires: scipy")
     @unittest.skipUnless(SCIPY, 'optional planning dependency')
     def test_family_t_interval_reference_df_not_repeats(self):
         s, r = self.data('paired_t')
@@ -190,6 +197,8 @@ class IntervalTests(unittest.TestCase):
         self.assertAlmostEqual(result['bounded_interval']['low'], .2-half)
         self.assertGreater(result['bounded_interval']['high'], result['bounded_interval']['low'])
 
+    @requires('scipy')
+    @unittest.skipUnless(available('scipy'), "requires: scipy")
     @unittest.skipUnless(SCIPY, 'optional planning dependency')
     def test_zero_variance_and_unbalanced_tasks_refuse_t(self):
         s, r = self.data('paired_t')

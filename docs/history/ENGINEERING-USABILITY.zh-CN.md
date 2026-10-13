@@ -67,7 +67,7 @@ pvl check differential-expression.csv --rule bh --output work/bh-check --json
 
 已有目录不覆盖。运行中写 RUNNING，受控失败保留 failure.json 与 FAILED；完成后才写 COMPLETED。中断或进程崩溃可留下 RUNNING，必须视为未完成，检查后在新目录重试。预检阶段错误尚无结果目录，会直接返回修复提示。结果校验检查文件字节，不重跑分析；本地标记不提供身份认证，需要防篡改锚定时在独立位置保存 commitment。
 
-真实非作者首次使用、理解时间、求助次数和自然使用收益仍未测量；继续按 [START](../START.md) 收集真实回执。安装测试、合成数据、机器执行耗时均不代替这些证据。
+真实非作者首次使用、理解时间、求助次数和自然使用收益仍未测量；继续按 [START](20261011/docs/START.md) 收集真实回执。安装测试、合成数据、机器执行耗时均不代替这些证据。
 
 ## 本轮实际验证
 

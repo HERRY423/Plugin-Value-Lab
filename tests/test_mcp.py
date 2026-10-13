@@ -1,9 +1,12 @@
+from tests.optional import available, requires
 import importlib.util
 import sys
 import unittest
 from pathlib import Path
 
 
+@requires('mcp')
+@unittest.skipUnless(available('mcp'), "requires: mcp")
 @unittest.skipUnless(importlib.util.find_spec("mcp"), "Optional MCP SDK not installed")
 class MCPSmokeTests(unittest.IsolatedAsyncioTestCase):
     async def test_real_stdio_initialize_list_and_call(self):

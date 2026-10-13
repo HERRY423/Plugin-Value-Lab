@@ -104,7 +104,7 @@ MCP 使用同一个对象：把 [示例 JSON](../../examples/confirmatory-plan.j
 
 这里的总成本是**现金费用加按冻结时薪折价的人力工作**。现金需完整分类和不同结算引用；人力需实际时间区间与冻结折价，不能称为供应商结算现金。费用未知、估算、遗漏重试或审阅成本不能变成“零成本”。效率推断需要可归属具体运行的成本观察；把一张共同设置账单均摊到各族，不能使该账单成为独立样本。
 
-`cost_per_run_bound_usd` 和 `max_total_cost_usd` 是规划与分析的完整成本界限，**不是供应商执行费用硬上限**，不会解锁付费原生执行，也不会设置账户预算。新的执行继续遵守[运维费用门禁](../OPERATIONS.md#native-eval-budget-gate)。
+`cost_per_run_bound_usd` 和 `max_total_cost_usd` 是规划与分析的完整成本界限，**不是供应商执行费用硬上限**，不会解锁付费原生执行，也不会设置账户预算。新的执行继续遵守[运维费用门禁](20261011/docs/OPERATIONS.md#native-eval-budget-gate)。
 
 | `confirmatory_analysis.status` | 可支持的解释 |
 | --- | --- |
@@ -115,6 +115,6 @@ MCP 使用同一个对象：把 [示例 JSON](../../examples/confirmatory-plan.j
 
 `adoption_authorized` 与 `changes_legacy_verdict` 保持 false。旧 `verdict` 仍是描述性历史字段，不能单独代表 v3 通过；普通描述性结论、各任务失败与证据缺口继续保留。v2 的语义不变。当前交付的是本地方法与制造示例；没有因本文件新增真实先导、真实确认研究、独立评审或付费执行授权。
 
-实现与输入细节：[pilot.py](../../value_lab/pilot.py)、[confirmatory.py](../../value_lab/confirmatory.py)；一般统计范围见[方法学](../METHODOLOGY.md)。
+实现与输入细节：[pilot.py](../../value_lab/pilot.py)、[confirmatory.py](../../value_lab/confirmatory.py)；一般统计范围见[方法学](20261011/docs/METHODOLOGY.md)。
 
 Codex 采集已通过[确认性接入](CODEX-EXECUTION.zh-CN.md#7-从采集接入确认性评估)连接到本评估器：冻结 v3 规则，保留首次尝试与原始输出，按全部尝试对账费用，再通过同一 `core.evaluate()` 复算。该接入不改变上述统计、真实性和采用边界。

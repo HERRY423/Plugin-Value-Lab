@@ -1,8 +1,10 @@
+> 状态：HISTORY_REFERENCE。归档于 2026-10-11；当前决策入口见 [README](../../../README.md)。历史验收结果仅适用于所载版本。
+
 # DETECTION-VALIDITY：PVL 种子缺陷元验证
 
 ## 2026-09-29：事件级谱系和实际组件干预
 
-新增 [可追溯失败诊断](docs/history/TRACE-DIAGNOSTICS.zh-CN.md)：检查可连接到收集产物和精确匹配的真实 Write/tool_result 事件，达到有条件的 L2.5；缺少明确 Skill 父关联仍为 UNKNOWN。组件定位重新运行冻结流水线及对照，单独报告条件性替换效果。Grok 报告盲测与真人验证分开，真人仍待完成。这些新增观察不修改下面种子实验的历史分母，也不把事件行号或 mutation.diff 当作 L3 源码根因。
+新增 [可追溯失败诊断](../TRACE-DIAGNOSTICS.zh-CN.md)：检查可连接到收集产物和精确匹配的真实 Write/tool_result 事件，达到有条件的 L2.5；缺少明确 Skill 父关联仍为 UNKNOWN。组件定位重新运行冻结流水线及对照，单独报告条件性替换效果。Grok 报告盲测与真人验证分开，真人仍待完成。这些新增观察不修改下面种子实验的历史分母，也不把事件行号或 mutation.diff 当作 L3 源码根因。
 
 ## 2026-09-27：已暴露边界的修正复测
 
@@ -20,7 +22,7 @@
 
 首轮修订还保留了一次正常直接读取误报（24/24 报警、23/24 配对净检出、1/18 误报）：Windows 文本读取改变了换行符。最终只在保留原始文件并核验摘要后允许完整文本的换行规范化，不忽略空白、行号、缺行或前缀。首轮证据没有覆盖或删除。
 
-[逐类复测报告](docs/history/DETECTION-BOUNDARIES-20260927.md) · [机器明细](docs/evidence/detection-boundaries-20260927.json) · [工程验收及首轮记录](docs/evidence/detection-boundaries-acceptance-20260927.json)。最终完整测试 606 项通过、零跳过，含 15 项边界回归。版本仍为 0.6.0，无新 CLI/MCP/评分器类型。
+[逐类复测报告](../DETECTION-BOUNDARIES-20260927.md) · [机器明细](../../evidence/detection-boundaries-20260927.json) · [工程验收及首轮记录](../../evidence/detection-boundaries-acceptance-20260927.json)。最终完整测试 606 项通过、零跳过，含 15 项边界回归。版本仍为 0.6.0，无新 CLI/MCP/评分器类型。
 
 这些是公开、已见反例上的开发集修正；24/24 不能外推为真实缺陷覆盖率、独立科学有效性或作者收益。下面的历史实验与其结论原样保留。
 
@@ -99,8 +101,8 @@ python scripts/report_seeded_defects.py --input work/seeded-validity-new --outpu
 
 每次必须使用新目录，旧尝试不会覆盖。报告命令先核验全部文件清单、24 个变异和 48 份采集收据；不执行已收集的产物代码。
 
-- [机器摘要与逐项记录](docs/evidence/detection-validity-20260925.json)
-- [种子插件](examples/seeded-defects/plugin.py) · [受控宿主](examples/seeded-defects/host.py) · [执行器](scripts/validate_seeded_defects.py) · [报告器](scripts/report_seeded_defects.py)
+- [机器摘要与逐项记录](../../evidence/detection-validity-20260925.json)
+- [种子插件](../../../examples/seeded-defects/plugin.py) · [受控宿主](../../../examples/seeded-defects/host.py) · [执行器](../../../scripts/validate_seeded_defects.py) · [报告器](../../../scripts/report_seeded_defects.py)
 - 协议 SHA-256：`85ca760769ad73339380664146c491aed61094a81f8caed4c6f71510d1427719`
 - 本次原始证据目录：`C:/Test/pvl-seeded-validity-20260925-r1`。其中 SHA256SUMS.json、mutation.diff、oracle-witness.json、capture-pin.json、诊断和复测结果全部保留。
 

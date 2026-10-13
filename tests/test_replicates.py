@@ -1,4 +1,5 @@
 """Scientific contract attacks and independent numerical cross-checks."""
+from tests.optional import available, requires
 from copy import deepcopy
 import contextlib
 import io
@@ -65,6 +66,8 @@ class ReplicateTests(unittest.TestCase):
         self.assertEqual(null["decision"], "not_supported")
         self.assertEqual(null["p_value"], 1)
 
+    @requires('numpy', 'scipy')
+    @unittest.skipUnless(available('numpy', 'scipy'), "requires: numpy, scipy")
     def test_independent_scipy_oracle_for_both_designs(self):
         # Release dependencies include scipy; an unavailable oracle must fail acceptance.
         import numpy as np
@@ -86,6 +89,8 @@ class ReplicateTests(unittest.TestCase):
         self.assertEqual(result["results"][0]["p_value"], .125)
         self.assertEqual(result["results"][0]["decision"], "not_supported")
 
+    @requires('numpy', 'scipy')
+    @unittest.skipUnless(available('numpy', 'scipy'), "requires: numpy, scipy")
     def test_ties_null_and_reversed_contrasts_match_scipy(self):
         import numpy as np
         from scipy.stats import permutation_test

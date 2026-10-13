@@ -1,8 +1,8 @@
-> 归档于 2026-09-25；保留既有接口和实施历史，不代表当前主线或重新验收。当前入口见 [README](../../README.zh-CN.md) 与 [操作指南](../OPERATIONS.md)。
+> 归档于 2026-09-25；保留既有接口和实施历史，不代表当前主线或重新验收。当前入口见 [README](20261011/README.zh-CN.md) 与 [操作指南](20261011/docs/OPERATIONS.md)。
 
 # 一次可复查的插件增益评估
 
-本协议适用于 Plugin Value Lab 0.2.0-alpha.1。字段以 [CONTRACT.md](../../CONTRACT.md) 为准。报告是评估辅助材料，不能充当外部认证；日常任务可先按使用规划直接完成，只有明确的评估需要才进入本协议。
+本协议适用于 Plugin Value Lab 0.2.0-alpha.1。字段以 [CONTRACT.md](20261011/CONTRACT.md) 为准。报告是评估辅助材料，不能充当外部认证；日常任务可先按使用规划直接完成，只有明确的评估需要才进入本协议。
 
 ## 1. 写清楚要作出的决定
 
@@ -38,7 +38,7 @@ python scripts/value_lab.py freeze path/to/suite.json --lock path/to/lock.json
 
 成本分别记录 `model_usd`、`tool_usd` 和 `human_minutes`。未知金额使用 null。人工分钟只能由 `human_intervals` 的 UTC 起止记录支持；同一人的重叠间隔不能重复计费。空列表仅表示声明没有人工工时，不能证明实际没有工作。`duration_seconds` 是经过时间，不能据此填入人工时间。
 
-有 `human` 规则时，可用 `review-pack SUITE RECORDS --output DIR` 生成去除显式组别的复核包，再用 `apply-reviews SUITE RECORDS --mapping MAPPING --decisions DECISIONS --output NEW_RECORDS` 合并实际判断。只将 reviewer 目录交给评审者，操作者保留解盲映射。原文可能泄露组别，这不构成技术隔离或独立性认证；输出写入新记录文件，已存在的评审不能静默覆盖。完整示例见 [README](../../README.md)。
+有 `human` 规则时，可用 `review-pack SUITE RECORDS --output DIR` 生成去除显式组别的复核包，再用 `apply-reviews SUITE RECORDS --mapping MAPPING --decisions DECISIONS --output NEW_RECORDS` 合并实际判断。只将 reviewer 目录交给评审者，操作者保留解盲映射。原文可能泄露组别，这不构成技术隔离或独立性认证；输出写入新记录文件，已存在的评审不能静默覆盖。完整示例见 [README](20261011/README.md)。
 
 ## 5. 使用 Claude 原生执行时
 

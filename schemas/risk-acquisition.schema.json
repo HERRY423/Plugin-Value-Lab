@@ -54,6 +54,14 @@
         "minLength": 1,
         "maxLength": 4000
       }
+    },
+    "confirmation_studies": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "object"
+      },
+      "description": "Raw task-selection study bundles; runtime recomputes v3, independence and candidate alpha, never accepts passed flags."
     }
   },
   "$defs": {
@@ -84,7 +92,10 @@
       ],
       "properties": {
         "format": {
-          "const": "pvl-risk-acquisition-1"
+          "enum": [
+            "pvl-risk-acquisition-1",
+            "pvl-risk-acquisition-2"
+          ]
         },
         "catalog_sha256": {
           "type": "string",
@@ -102,7 +113,7 @@
         },
         "alpha": {
           "type": "number",
-          "minimum": 1e-8,
+          "minimum": 1e-08,
           "maximum": 0.25
         },
         "epsilon": {
@@ -118,7 +129,8 @@
         "allocation": {
           "enum": [
             "adaptive_frontier",
-            "uniform_all"
+            "uniform_all",
+            "round_robin"
           ]
         },
         "candidates": {
@@ -247,6 +259,12 @@
                 "boolean",
                 "null"
               ]
+            },
+            "no_order_or_carryover": {
+              "type": [
+                "boolean",
+                "null"
+              ]
             }
           }
         },
@@ -255,8 +273,71 @@
             "synthetic",
             "submitted_observations"
           ]
+        },
+        "decision_policy": {
+          "$ref": "#/$defs/decision_policy"
+        },
+        "rotation_seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "format": {
+                "const": "pvl-risk-acquisition-2"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "decision_policy",
+              "rotation_seed"
+            ],
+            "properties": {
+              "assumptions": {
+                "required": [
+                  "no_order_or_carryover"
+                ]
+              }
+            }
+          },
+          "else": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "decision_policy"
+                  ]
+                },
+                {
+                  "required": [
+                    "rotation_seed"
+                  ]
+                }
+              ]
+            },
+            "properties": {
+              "allocation": {
+                "enum": [
+                  "adaptive_frontier",
+                  "uniform_all"
+                ]
+              },
+              "assumptions": {
+                "not": {
+                  "required": [
+                    "no_order_or_carryover"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "plan": {
       "type": "object",
@@ -317,6 +398,32 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 10000000000000000
+        },
+        "execution_orders": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "unit_id",
+              "candidate_ids"
+            ],
+            "properties": {
+              "unit_id": {
+                "type": "string"
+              },
+              "candidate_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 3,
+                "maxItems": 32,
+                "uniqueItems": true
+              }
+            }
+          }
         }
       }
     },
@@ -387,8 +494,191 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 10000
+        },
+        "execution_position": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32
+        }
+      }
+    },
+    "decision_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "researcher_id",
+        "loss_unit",
+        "false_adoption_cost",
+        "missed_use_cost",
+        "time_cost_per_hour",
+        "scope",
+        "valid_from",
+        "valid_until",
+        "minimum_gain",
+        "confirmation_family_floor",
+        "candidates",
+        "shrinkage"
+      ],
+      "properties": {
+        "researcher_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "loss_unit": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "false_adoption_cost": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000.0
+        },
+        "missed_use_cost": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000.0
+        },
+        "time_cost_per_hour": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000.0
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "valid_from": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "valid_until": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "minimum_gain": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "confirmation_family_floor": {
+          "type": "integer",
+          "minimum": 30,
+          "maximum": 100000
+        },
+        "candidates": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "adopt_hours",
+              "trial_hours",
+              "evidence_hours",
+              "trial_exposure",
+              "trial_residual_harm",
+              "guardrails",
+              "prohibited",
+              "prohibition_reason"
+            ],
+            "properties": {
+              "adopt_hours": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000.0
+              },
+              "trial_hours": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000.0
+              },
+              "evidence_hours": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000.0
+              },
+              "trial_exposure": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "trial_residual_harm": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "guardrails": {
+                "type": "array",
+                "maxItems": 30,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4000
+                }
+              },
+              "prohibited": {
+                "type": "boolean"
+              },
+              "prohibition_reason": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "shrinkage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "target",
+            "strength",
+            "rationale"
+          ],
+          "properties": {
+            "target": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "strength": {
+              "type": "number",
+              "minimum": 1e-08,
+              "maximum": 100000
+            },
+            "rationale": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4000
+            }
+          }
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "protocol": {
+            "properties": {
+              "format": {
+                "const": "pvl-risk-acquisition-1"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "required": [
+            "confirmation_studies"
+          ]
+        }
+      }
+    }
+  ]
 }

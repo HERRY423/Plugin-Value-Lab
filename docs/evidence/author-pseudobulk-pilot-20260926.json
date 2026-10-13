@@ -32,8 +32,8 @@
     "examples/pseudobulk-author-pilot/STUDY-PLAN.md": "662e3f26dd7bd3cf6b2eae1e3d900f26354399247ed1123f1f4fe49d0c434a79",
     "examples/pseudobulk-author-pilot/BASELINE.md": "2a8c22ec8f06b260d28d490ecc9dd703f3c4d0495d9807be1b5999877e1903e1",
     "tests/test_author_pilot.py": "4b8028f59b6dd2378e0b03ded240913a03092b5e7c333f2d1348e8b0378bb017",
-    "docs/START.md": "c02cc2cf9bd32ac2ea4d5fa1f02e8983f3fb4402c6ea7f4e376ed137df0b385c",
-    "docs/OPERATIONS.md": "a6940b14e398eab037ff758b295db93d74ee761b1b9858eba62ec7f28da03beb"
+    "docs/history/20261011/docs/START.md": "c02cc2cf9bd32ac2ea4d5fa1f02e8983f3fb4402c6ea7f4e376ed137df0b385c",
+    "docs/history/20261011/docs/OPERATIONS.md": "a6940b14e398eab037ff758b295db93d74ee761b1b9858eba62ec7f28da03beb"
   },
   "test_log_sha256": "9a0877730d03aedcc061eb490b3e6128b69e47a399b06ad3d548534f67f87058",
   "limitations": [

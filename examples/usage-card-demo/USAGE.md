@@ -14,7 +14,16 @@
 
 - 决策范围：仅限本次提交的具体任务及固定条件；不会自动外推到同类或新任务。
 - 目标：quality
-- 固定条件：{&quot;budget&quot;: {&quot;max\_turns&quot;: 10}, &quot;environment&quot;: &quot;synthetic\-fixture\-v1&quot;, &quot;host&quot;: &quot;offline\-tutorial&quot;, &quot;model&quot;: &quot;SIMULATED\-NO\-MODEL&quot;, &quot;tools&quot;: \[\]}
+固定条件：
+
+| 字段 | 值 |
+| --- | --- |
+| model | SIMULATED\-NO\-MODEL |
+| host | offline\-tutorial |
+| tools | （空列表） |
+| environment | synthetic\-fixture\-v1 |
+| budget / max\_turns | 10 |
+
 - 方案 SHA-256：c4727c53139b2051495e911dea84e923fcda5f25e0cf1496fe2da9e5632fad42
 - 运行记录 SHA-256：a70687cbbc3fc226677b4bb2ebfb114dcb3f57630ed335ca6d14973a90a4eb77
 - 条件 SHA-256：eb9bd8566defb2dc67fee1852aa7d39c2d8a1034d43f3b6ee95b0c483265c5ec
@@ -37,7 +46,17 @@
 
 质量差（启用 − 未启用）：0.8333333333333334；平均成本差（USD）：\-0.9899999999999998。
 
-运行计数：{&quot;failed\_runs&quot;: 0, &quot;missing\_runs&quot;: 0, &quot;observed\_runs&quot;: 6, &quot;planned\_runs&quot;: 6, &quot;runs\_with\_issues&quot;: 0, &quot;skipped\_runs&quot;: 0}
+运行计数：
+
+| 字段 | 值 |
+| --- | --- |
+| planned\_runs | 6 |
+| observed\_runs | 6 |
+| failed\_runs | 0 |
+| missing\_runs | 0 |
+| skipped\_runs | 0 |
+| runs\_with\_issues | 0 |
+
 
 ### unrelated\-request
 
@@ -47,7 +66,17 @@
 
 质量差（启用 − 未启用）：0.0；平均成本差（USD）：\-0.9899999999999998。
 
-运行计数：{&quot;failed\_runs&quot;: 0, &quot;missing\_runs&quot;: 0, &quot;observed\_runs&quot;: 6, &quot;planned\_runs&quot;: 6, &quot;runs\_with\_issues&quot;: 0, &quot;skipped\_runs&quot;: 0}
+运行计数：
+
+| 字段 | 值 |
+| --- | --- |
+| planned\_runs | 6 |
+| observed\_runs | 6 |
+| failed\_runs | 0 |
+| missing\_runs | 0 |
+| skipped\_runs | 0 |
+| runs\_with\_issues | 0 |
+
 
 ### insufficient\-science
 
@@ -57,7 +86,17 @@
 
 质量差（启用 − 未启用）：0.6666666666666667；平均成本差（USD）：\-0.9899999999999998。
 
-运行计数：{&quot;failed\_runs&quot;: 0, &quot;missing\_runs&quot;: 0, &quot;observed\_runs&quot;: 6, &quot;planned\_runs&quot;: 6, &quot;runs\_with\_issues&quot;: 0, &quot;skipped\_runs&quot;: 0}
+运行计数：
+
+| 字段 | 值 |
+| --- | --- |
+| planned\_runs | 6 |
+| observed\_runs | 6 |
+| failed\_runs | 0 |
+| missing\_runs | 0 |
+| skipped\_runs | 0 |
+| runs\_with\_issues | 0 |
+
 
 ## 接下来怎么做
 
@@ -93,7 +132,30 @@
 
 - 证据类型：synthetic
 - 证据层级：SIMULATION\_ONLY
-- 运行计数：{&quot;failed\_runs&quot;: 0, &quot;missing\_runs&quot;: 0, &quot;observed\_runs&quot;: 18, &quot;planned\_runs&quot;: 18, &quot;runs\_with\_issues&quot;: 0, &quot;skipped\_runs&quot;: 0}
-- 来源记录：{&quot;engine&quot;: &quot;plugin\-value\-lab/0.2.0\-alpha.1&quot;, &quot;hash\_scope&quot;: &quot;Byte consistency only; no proof of execution, authorship, or preregistration time&quot;, &quot;local\_lock&quot;: {&quot;attestation&quot;: &quot;LOCAL\_CONSISTENCY\_ONLY&quot;, &quot;expected\_runs&quot;: 18, &quot;frozen\_at&quot;: &quot;2026\-09\-22T13:26:41.713459\+00:00&quot;, &quot;schema\_version&quot;: 1, &quot;suite\_sha256&quot;: &quot;c4727c53139b2051495e911dea84e923fcda5f25e0cf1496fe2da9e5632fad42&quot;}, &quot;records\_sha256&quot;: &quot;a70687cbbc3fc226677b4bb2ebfb114dcb3f57630ed335ca6d14973a90a4eb77&quot;, &quot;suite\_sha256&quot;: &quot;c4727c53139b2051495e911dea84e923fcda5f25e0cf1496fe2da9e5632fad42&quot;}
+运行计数：
+
+| 字段 | 值 |
+| --- | --- |
+| planned\_runs | 18 |
+| observed\_runs | 18 |
+| failed\_runs | 0 |
+| missing\_runs | 0 |
+| skipped\_runs | 0 |
+| runs\_with\_issues | 0 |
+
+来源记录：
+
+| 字段 | 值 |
+| --- | --- |
+| suite\_sha256 | c4727c53139b2051495e911dea84e923fcda5f25e0cf1496fe2da9e5632fad42 |
+| records\_sha256 | a70687cbbc3fc226677b4bb2ebfb114dcb3f57630ed335ca6d14973a90a4eb77 |
+| engine | plugin\-value\-lab/0.2.0\-alpha.1 |
+| local\_lock / schema\_version | 1 |
+| local\_lock / suite\_sha256 | c4727c53139b2051495e911dea84e923fcda5f25e0cf1496fe2da9e5632fad42 |
+| local\_lock / frozen\_at | 2026\-09\-22T13:26:41.713459\+00:00 |
+| local\_lock / expected\_runs | 18 |
+| local\_lock / attestation | LOCAL\_CONSISTENCY\_ONLY |
+| hash\_scope | Byte consistency only; no proof of execution, authorship, or preregistration time |
+
 
 来源真实性未获独立验证。完整字段保存在同目录的 `card.json`。

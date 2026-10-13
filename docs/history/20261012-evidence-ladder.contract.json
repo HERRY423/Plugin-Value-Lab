@@ -1,0 +1,149 @@
+{
+  "format": "pvl-evidence-ladder-design-contract-1",
+  "date": "2026-10-12",
+  "design_only": true,
+  "implementation_status": "NOT_IMPLEMENTED",
+  "user_acceptance": "NOT_RECORDED",
+  "execution_authorized_by_this_file": false,
+  "document": "20261012-EVIDENCE-LADDER-DESIGN.md",
+  "scope": {
+    "evidence_stage_namespace": ["L0", "L1", "L2", "L3"],
+    "distinct_from_parrhesia_review_level": true,
+    "current_confirmatory_version": 3,
+    "current_stopping_rule": "fixed_sample",
+    "proposed_confirmatory_version": 4,
+    "existing_fixed_sample_studies_may_switch_after_observation": false
+  },
+  "stage_contracts": [
+    {
+      "stage": "L0",
+      "checks": ["declared_capability", "permissions", "data_egress", "license", "version"],
+      "model_calls": 0,
+      "allowed_decisions": ["STATIC_FIT", "STATIC_BLOCKED", "NEEDS_INFORMATION"],
+      "positive_claim_ceiling": "STATIC_FIT_ONLY",
+      "next_action": "Resolve missing or incompatible requirements, otherwise freeze a bounded L1 screen."
+    },
+    {
+      "stage": "L1",
+      "researcher_tasks": {"minimum": 3, "default": 4, "maximum": 5},
+      "arms": 2,
+      "repetitions": 2,
+      "generation_attempt_slots": {"minimum": 12, "default": 16, "maximum": 20},
+      "failures_count_as_attempts": true,
+      "judge_calls_and_retries_count_in_cash_budget": true,
+      "allowed_decisions": ["SAFETY_HOLD", "STOP_HARM", "STOP_LOCAL_LOW_VALUE", "SCREEN_INCONCLUSIVE", "ADVANCE_PILOT"],
+      "positive_claim_ceiling": "SCREENING_ONLY",
+      "next_action": "Stop, repair or propose an independent public-development-pool pilot."
+    },
+    {
+      "stage": "L2",
+      "suggested_pilot_families": {"initial": 6, "batch_increment": 3, "maximum": 12},
+      "pilot_sizes_are_not_power_calculations": true,
+      "split": "development",
+      "positive_claim_ceiling": "TRIAL_ONLY_SIGNAL",
+      "next_action": "Estimate planning inputs and freeze a disjoint L3 design only if resources and evidence permit."
+    },
+    {
+      "stage": "L3",
+      "positive_family_floor": 30,
+      "effective_floor_rule": "max(30, prospectively_frozen_coverage_floor, inherited_plan_commitment)",
+      "maximum_families_requires_sequential_power_plan": true,
+      "positive_stop_requires_complete_family_floor": true,
+      "positive_claim_ceiling": "SCOPED_ADOPTION_SUPPORTED",
+      "human_acceptance_required_for_adoption": true,
+      "next_action": "Present scoped evidence for the researcher's accept, limit, defer or reject decision."
+    }
+  ],
+  "method_profiles": [
+    {
+      "id": "bounded_hoeffding_union_cs_v1_proposed",
+      "status": "DESIGN_ONLY",
+      "target_guarantee": "FINITE_SAMPLE_ANYTIME",
+      "sampling_contract": "iid_family_stream",
+      "unit": "complete_paired_family",
+      "quality_difference_range": [-1, 1],
+      "alpha_at_n": "6 * endpoint_alpha / (pi_squared * n_squared)",
+      "half_width": "sqrt(2 * log(2 / alpha_at_n) / n)",
+      "claims_efficiency_improvement": false
+    },
+    {
+      "id": "bounded_mixture_betting_v1_proposed",
+      "status": "DESIGN_ONLY",
+      "target_guarantee": "FINITE_SAMPLE_ANYTIME",
+      "sampling_contract": "iid_family_stream",
+      "null": "conditional_mean_of_X_leq_m",
+      "factor": "1 + (c / m) * (X - m)",
+      "conditions": ["0 < m < 1", "0 <= X <= 1", "0 <= c < 1", "nonnegative_mixture_weights_sum_to_one", "predictable_bets", "mixture_weights_fixed_before_collection", "conservative_numerics"],
+      "threshold": "1 / allocated_one_sided_alpha",
+      "readiness_requires": ["A07", "A08", "A09", "A17"]
+    },
+    {
+      "id": "finite_pool_wor_adapter_proposed",
+      "status": "UNSUPPORTED_UNTIL_QUALIFIED",
+      "sampling_contract": "finite_pool_wor",
+      "target": "fixed_finite_pool_mean",
+      "iid_adapter_allowed": false
+    },
+    {
+      "id": "hierarchical_prior_planning_proposed",
+      "status": "DESIGN_ONLY",
+      "target_guarantee": "BAYES_MODEL_BASED",
+      "standalone_adoption_authority": false,
+      "may_inform": ["L2_planning", "pre_frozen_mixture_weights", "past_only_predictable_bets"],
+      "historical_families_count_toward_current_positive_floor": false
+    },
+    {
+      "id": "fixed_time_ppi_proposed",
+      "status": "DESIGN_ONLY",
+      "target_guarantee": "FIXED_TIME",
+      "estimator": "lambda * mean_U(g) + mean_L(D - lambda*g)",
+      "assumptions": ["independent_L_and_U", "same_target_family_distribution", "frozen_predictor_and_lambda", "family_level_units"],
+      "interval_options": ["bounded_terms_with_alpha_allocation", "separately_labeled_asymptotic_path"],
+      "optional_stopping_allowed": false
+    },
+    {
+      "id": "random_label_bounded_correction_proposed",
+      "status": "DESIGN_ONLY",
+      "target_guarantee": "FINITE_SAMPLE_ANYTIME",
+      "sampling_contract": "iid_family_stream",
+      "score": "Z = g + A/pi * (D-g)",
+      "range_bound": "B = 1 + 2/pi_min; Z in [-B,B]",
+      "requirements": ["pi_min > 0", "pi <= 1", "random_label_selection_before_human_label", "frozen_prediction_before_label", "no_selected_label_nonresponse", "human_family_floor_and_type_coverage", "budget_for_entire_next_block"],
+      "initial_label_policy": "constant_pi_frozen_before_collection",
+      "unlabeled_population_count_is_not_human_label_count": true
+    }
+  ],
+  "required_plan_fields": {
+    "identity": ["study_id", "revision", "predecessor", "plan_hash", "external_freeze_witness", "confirmation_not_started"],
+    "target": ["estimand", "objective", "sampling_contract", "family_definition", "source_groups", "strata_weights", "run_matrix", "randomization"],
+    "inference": ["method_id", "alpha_total", "alpha_allocations", "decision_thresholds", "minimum_positive_families", "maximum_families", "sequential_power_plan_ref"],
+    "labeling": ["rubric_version", "judge_version", "label_policy", "pi_min", "minimum_human_labeled_families", "human_type_coverage", "missingness_policy"],
+    "resources": ["task_budget_id", "cash_ledger", "per_request_cap", "remaining_cumulative_budget", "pending_reservations", "human_time_cap"],
+    "state": ["completed_prefix", "pending_blocks", "event_sequence", "cumulative_inference_state", "stop_reason", "human_decision"]
+  },
+  "resource_contract": {
+    "per_request_cap_usd": 0.1,
+    "task_cumulative_cap_usd": 1.0,
+    "shared_budget_consumers": ["generation", "judge", "retry", "external_service"],
+    "used_budget": "settled + unreleased_reservations + unknown_outcomes",
+    "new_session_resets_budget": false,
+    "provider_account_cap_verified": false,
+    "current_gateway_execution": "BLOCKED_BY_CONSERVATIVE_PER_REQUEST_ENVELOPE",
+    "unknown_spend_may_be_treated_as_zero": false
+  },
+  "decision_examples": [
+    {"id": "D01", "stage": "L1", "attempts": 16, "positive_mean": true, "critical_failure": false, "expected_ceiling": "SCREENING_ONLY"},
+    {"id": "D02", "stage": "L2", "complete_real_families": 12, "strong_positive_signal": true, "expected_ceiling": "TRIAL_ONLY_SIGNAL"},
+    {"id": "D03", "stage": "L3", "synthetic_families": 30, "expected_ceiling": "SIMULATION_ONLY"},
+    {"id": "D04", "stage": "L3", "complete_real_families": 29, "minimum_positive_families": 30, "statistical_threshold_crossed": true, "expected_ceiling": "TRIAL_ONLY_SIGNAL"},
+    {"id": "D05", "stage": "L3", "complete_real_families": 40, "minimum_positive_families": 30, "maximum_families": 80, "all_other_frozen_gates_met": true, "expected_decision": "SCOPED_ADOPTION_SUPPORTED", "example_sizes_are_not_power_calculations": true},
+    {"id": "D06", "stage": "L3", "complete_real_families": 40, "minimum_positive_families": 45, "statistical_threshold_crossed": true, "expected_ceiling": "TRIAL_ONLY_SIGNAL"},
+    {"id": "D07", "stage": "L3", "objective": "efficiency", "quality_gate_met": true, "cost_gate_met": false, "expected_adoption_support": false},
+    {"id": "D08", "stage": "L3", "selected_human_label_missing": true, "expected_state": "PENDING_LABEL", "expected_adoption_support": false},
+    {"id": "D09", "stage": "L3", "budget_exhausted": true, "all_frozen_gates_met": false, "expected_decision": "STOP_BUDGET", "expected_evidence": "INSUFFICIENT"},
+    {"id": "D10", "stage": "L3", "rubric_changed_midstream": true, "expected_confirmatory_validity": false}
+  ],
+  "acceptance_requirements": ["A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08", "A09", "A10", "A11", "A12", "A13", "A14", "A15", "A16", "A17", "A18"],
+  "acceptance_status": "NOT_RUN",
+  "future_test_layers": {"fast_timeout_seconds": 120, "optional_dependencies": "skipUnless plus requires", "enabled_feature_release_checks_allow_skips": false, "power_and_coverage_simulations": "separate_prospectively_frozen_qualification_job"}
+}

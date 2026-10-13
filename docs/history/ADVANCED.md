@@ -1,12 +1,12 @@
 # Advanced guide / 高级指南
 
-PVL 的核心始终是：**配对、冻结、可复算地判断插件对一项具体任务有没有增益。** 先完成[一次单插件比较](../../README.zh-CN.md)；仅在研究问题需要时使用以下能力。
+PVL 的核心始终是：**配对、冻结、可复算地判断插件对一项具体任务有没有增益。** 先完成[一次单插件比较](20261011/README.zh-CN.md)；仅在研究问题需要时使用以下能力。
 
 The core remains one paired plugin comparison with a frozen plan and recomputable results. The optional capabilities below support specific follow-up questions. They do not relax the core evidence requirements. Detailed topic documents retain their original language and scope.
 
 ## Research design / 研究设计
 
-- [Methods and sample-size planning](../METHODOLOGY.md)：围绕目标效应量，规划独立任务族、任务数和每臂重复次数；报告适用条件下的置信区间。规划假设不是实测方差，重复不能冒充独立任务。
+- [Methods and sample-size planning](20261011/docs/METHODOLOGY.md)：围绕目标效应量，规划独立任务族、任务数和每臂重复次数；报告适用条件下的置信区间。规划假设不是实测方差，重复不能冒充独立任务。
 - [Conversational study authoring](RESEARCH-AUTHORING.zh-CN.md)：将具体问题转为可审阅案例、成功标准和冻结方案。
 - [Component comparisons](COMPONENT-METHODOLOGY.zh-CN.md) and [metamorphic checks](METAMORPHIC-GRADERS.zh-CN.md)：定位阶段差异及有限的计算性质，不替代完整任务比较或科学真值。
 
@@ -26,11 +26,11 @@ The core remains one paired plugin comparison with a frozen plan and recomputabl
 
 ## Execution and integration / 执行与集成
 
-- [Operations](../OPERATIONS.md)：费用硬边界、Windows/WSL 与 HPC 验收、失败恢复；未结算费用保持未知。当前付费原生启动仍受预算门禁阻断。
+- [Operations](20261011/docs/OPERATIONS.md)：费用硬边界、Windows/WSL 与 HPC 验收、失败恢复；未结算费用保持未知。当前付费原生启动仍受预算门禁阻断。
 - [Controlled artifact handoff](ARTIFACTS.md#controlled-mcp-file-handoff-080)：经授权读取真实文件并核对摘要；默认不开放文件访问，MCP 不执行验证程序。
 - [CLI / Python SDK](ENGINEERING-USABILITY.zh-CN.md) · [Workflow examples](../../examples/workflow-integration/README.md) · [Community workflows and RO-Crate](../../examples/community/README.md).
 - [Online isolation](ONLINE-ISOLATION.zh-CN.md) · [Environment locks and replay](ENVIRONMENT-RECORDING.zh-CN.md) · [Evidence dependency rechecks](EVIDENCE-DEPENDENCIES.zh-CN.md).
 - [Official Claude eval comparison](RESEARCH-EXECUTION.zh-CN.md)：原生 WITH 通过线与配对增益判断分别解释；退出成功不等于新增收益。
 - [First-use usability protocol](FIRST-USE-TRIAL.md)：非作者计时与求助记录；维护者／AI 冒烟不能代替真实参与者。
 
-这些文档保留能力与细节，不代表它们都经过真实宿主或外部研究验证。验收范围见[当前证据](../EVIDENCE.md)，接口边界见[冻结说明](../FREEZE.md)。
+这些文档保留能力与细节，不代表它们都经过真实宿主或外部研究验证。验收范围见[当前证据](20261011/docs/EVIDENCE.md)，接口边界见[冻结说明](20261011/docs/FREEZE.md)。

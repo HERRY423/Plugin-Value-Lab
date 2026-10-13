@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 GOLDEN = ['doctor', 'freeze', 'evaluate', 'usage-card', 'compare-studies']
 FREEZE_FORMAT = 'pvl-feature-freeze-2'
-MAINLINE_DOCUMENT_LIMIT = 13  # Explicit community/governance request, 2026-10-03.
+MAINLINE_DOCUMENT_LIMIT = 1  # Owner-requested single decision page, 2026-10-11.
 
 # Explicit expression fields, never AST repr/_fields: interpreter metadata and
 # empty-field display defaults are not part of this project's interface schema.
@@ -170,7 +170,7 @@ def documentation_issues(root=ROOT):
                   if p.relative_to(root / 'docs').parts[0] != 'history'])
     if len(docs) > MAINLINE_DOCUMENT_LIMIT:
         issues.append(f'Mainline documents: {len(docs)} exceeds {MAINLINE_DOCUMENT_LIMIT}')
-    for name in ('README.md', 'README.zh-CN.md'):
+    for name in ('README.md',):
         commands = re.findall(r'^python scripts/value_lab.py ([a-z-]+)\b', (root / name).read_text(encoding='utf-8'), re.M)
         if commands != GOLDEN:
             issues.append(f'{name}: expected exactly the five golden commands in order')

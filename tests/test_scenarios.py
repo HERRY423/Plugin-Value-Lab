@@ -1,3 +1,4 @@
+from tests.optional import available, requires
 from copy import deepcopy
 import json
 import importlib.util
@@ -153,6 +154,8 @@ class ScenarioTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
         self.assertFalse((self.root / "agent/sufficient.json").exists())
 
+    @requires('jsonschema')
+    @unittest.skipUnless(available('jsonschema'), "requires: jsonschema")
     @unittest.skipUnless(importlib.util.find_spec("jsonschema"), "optional schema dependency")
     def test_exchange_schema_accepts_public_contract_only(self):
         from jsonschema import Draft202012Validator, ValidationError as SchemaError

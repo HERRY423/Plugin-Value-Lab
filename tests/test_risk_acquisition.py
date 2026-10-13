@@ -1,4 +1,5 @@
 """Risk-bound algebra, prospective history, abstentions and matched comparisons."""
+from tests.optional import available, requires
 from copy import deepcopy
 import json
 import os
@@ -240,6 +241,8 @@ class RiskAcquisitionTests(unittest.TestCase):
         self.assertFalse(result["execution_authorized"])
         self.assertEqual(result["utility_evidence_basis"], "SUBMITTED_UTILITY_WITH_HASH_BINDINGS_NOT_INDEPENDENTLY_REGRADED")
 
+    @requires('jsonschema')
+    @unittest.skipUnless(available('jsonschema'), "requires: jsonschema")
     def test_schema_accepts_complete_history_and_rejects_hidden_control(self):
         import jsonschema
         self.advance()
@@ -372,6 +375,8 @@ class RiskWorkflowTests(unittest.TestCase):
 
 
 class RiskMCPTests(unittest.IsolatedAsyncioTestCase):
+    @requires('mcp')
+    @unittest.skipUnless(available('mcp'), "requires: mcp")
     async def test_six_tool_stdio_server_supports_new_context(self):
         from mcp import ClientSession, StdioServerParameters
         from mcp.client.stdio import stdio_client

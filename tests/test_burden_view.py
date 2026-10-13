@@ -1,4 +1,5 @@
 """Burden tradeoffs must never silently change original candidate selection."""
+from tests.optional import available, requires
 from copy import deepcopy
 import importlib.util
 import json
@@ -191,6 +192,8 @@ class BurdenTests(unittest.TestCase):
         self.assertEqual(self.view()['frontier']['status'], 'NOT_ASSESSED')
         self.assertEqual(self.view()['comparisons'], [])
 
+    @requires('jsonschema')
+    @unittest.skipUnless(available('jsonschema'), "requires: jsonschema")
     def test_render_and_schema(self):
         self.request = example.request('tradeoff')
         with tempfile.TemporaryDirectory() as tmp:
@@ -208,6 +211,8 @@ class BurdenTests(unittest.TestCase):
             jsonschema.validate(self.request['plugin_combination'], schema)
 
 
+@requires('mcp')
+@unittest.skipUnless(available('mcp'), "requires: mcp")
 @unittest.skipUnless(importlib.util.find_spec('mcp'), 'Optional MCP SDK not installed')
 class BurdenMCPTests(unittest.IsolatedAsyncioTestCase):
     async def test_existing_stdio_tool_returns_burden_without_selection_change(self):

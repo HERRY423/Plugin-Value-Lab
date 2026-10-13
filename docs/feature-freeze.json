@@ -13,7 +13,7 @@
     "usage-card",
     "compare-studies"
   ],
-  "mainline_document_limit": 13,
+  "mainline_document_limit": 1,
   "surface": {
     "global_options": [
       {
@@ -3459,6 +3459,7 @@
     "runtime_modules": [
       "value_lab/__init__.py",
       "value_lab/__main__.py",
+      "value_lab/action_decision.py",
       "value_lab/adapter_qualification.py",
       "value_lab/antigravity_context.py",
       "value_lab/artifacts.py",
@@ -3499,8 +3500,10 @@
       "value_lab/evidence_bridge.py",
       "value_lab/evidence_crate.py",
       "value_lab/evidence_dependencies.py",
+      "value_lab/evidence_pool.py",
       "value_lab/exchange.py",
       "value_lab/execution.py",
+      "value_lab/gateway_budget.py",
       "value_lab/guidance.py",
       "value_lab/host_capabilities.py",
       "value_lab/hosts.py",
@@ -3508,6 +3511,7 @@
       "value_lab/interpretation_history.py",
       "value_lab/live_recording.py",
       "value_lab/longitudinal.py",
+      "value_lab/markdown_text.py",
       "value_lab/metamorphic.py",
       "value_lab/methodology.py",
       "value_lab/native.py",
@@ -5303,7 +5307,7 @@
     "date": "2026-10-03",
     "owner_request": "Correct contradictory current-version prose, remove maintained distribution duplicates, and provide an English methodology for international laboratories.",
     "classification": "EXPLICIT_DOCUMENTATION_AND_BUILD_SCOPE",
-    "added_mainline_document": "docs/METHODOLOGY.md",
+    "added_mainline_document": "docs/history/20261011/docs/METHODOLOGY.md",
     "mainline_document_limit": 9,
     "distribution": "Canonical root for source catalogs; ignored build/marketplace and dist outputs generated from one inventory.",
     "preserved": [
@@ -5315,13 +5319,13 @@
   },
   "community_infrastructure_scope_change": {
     "date": "2026-10-03",
-    "owner_request": "Add CITATION.cff, SECURITY.md, CONTRIBUTING.md, an API stability/deprecation policy, and data governance including patient-data handling.",
+    "owner_request": "Add CITATION.cff, docs/history/20261011/SECURITY.md, docs/history/20261011/CONTRIBUTING.md, an API stability/deprecation policy, and data governance including patient-data handling.",
     "classification": "EXPLICIT_COMMUNITY_DOCUMENTATION_SCOPE",
     "added_mainline_documents": [
-      "SECURITY.md",
-      "CONTRIBUTING.md",
-      "docs/API-STABILITY.md",
-      "docs/DATA-GOVERNANCE.md"
+      "docs/history/20261011/SECURITY.md",
+      "docs/history/20261011/CONTRIBUTING.md",
+      "docs/history/20261011/docs/API-STABILITY.md",
+      "docs/history/20261011/docs/DATA-GOVERNANCE.md"
     ],
     "mainline_document_limit": 13,
     "added_schemas": [
@@ -5431,5 +5435,22 @@
     ],
     "golden_commands_preserved": true,
     "public_cli_and_mcp_signatures_unchanged": true
+  },
+  "literature_pool_gateway_scope_change": {
+    "date": "2026-10-12",
+    "authorization": "User requested a shared literature-search family pool and cumulative gateway reservations; user chose to defer expert and custodian appointment.",
+    "added_runtime_modules": [
+      "value_lab/evidence_pool.py",
+      "value_lab/gateway_budget.py"
+    ],
+    "boundary": "Offline candidate scaffolding and signed intake; conditional gateway admission, no expert impersonation, custody deployment, live payment, account budget increase or publication. Core CLI/MCP signatures preserved."
+  },
+  "action_decision_scope_change": {
+    "date": "2026-10-12",
+    "authorization": "User requested four actionable decisions, researcher-supplied false-adoption/missed-use/time losses, shrinkage, multiplicity-corrected rank intervals and 3+ candidate rotation.",
+    "added_runtime_modules": [
+      "value_lab/action_decision.py"
+    ],
+    "boundary": "Opt-in risk protocol v2 and existing plan-use/plan_plugin_use entry; existing v1 calculation preserved. No execution, paid calls or publication. Shrinkage is descriptive regularization; adoption requires independently recomputed confirmation."
   }
 }

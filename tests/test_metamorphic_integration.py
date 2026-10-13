@@ -1,4 +1,5 @@
 """Full evaluator, private scenarios, portable schema and report integration."""
+from tests.optional import available, requires
 from copy import deepcopy
 import json
 from pathlib import Path
@@ -88,6 +89,8 @@ class MetamorphicIntegrationTests(unittest.TestCase):
         self.assertNotIn('<script>', rendered)
         self.assertIn('&lt;script&gt;', rendered)
 
+    @requires('jsonschema')
+    @unittest.skipUnless(available('jsonschema'), "requires: jsonschema")
     def test_json_schema_matches_examples_and_rejects_extra_fields(self):
         import jsonschema
         path = Path(__file__).resolve().parents[1] / 'schemas/science/metamorphic-design.schema.json'

@@ -496,7 +496,7 @@ def main(argv=None):
                 if requires_confirmation(report):
                     from .ci_gate import gate_code
                     return gate_code(report)
-                return 0 if report["verdict"] == "PROMISING_LOCAL_SIGNAL" else (2 if report["verdict"] in ("SIMULATION_ONLY", "INSUFFICIENT_EVIDENCE") else 1)
+                return 0 if report["verdict"] == "PROMISING_LOCAL_SIGNAL" else (2 if report["verdict"] in ("SIMULATION_ONLY", "INSUFFICIENT_EVIDENCE", "TRIAL_ONLY_SIGNAL") else 1)
         elif args.command == "pseudobulk-reference":
             from .pseudobulk import create_reference
             _emit(create_reference(args.design, args.data, args.output,

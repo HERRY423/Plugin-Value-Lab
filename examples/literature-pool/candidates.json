@@ -1,0 +1,1629 @@
+{
+  "format": "pvl-literature-pool-1",
+  "id": "biomedical-literature-candidates-v1",
+  "owner_organization": "UNASSIGNED_POOL_OWNER",
+  "development": [
+    {
+      "family": {
+        "id": "randomized-trial",
+        "topic": "成人随机对照试验",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「成人随机对照试验」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "randomized-trial-a",
+              "source_ref": "synthetic:randomized-trial/a",
+              "text": "虚构记录 A；本练习明确标记为符合「成人随机对照试验」。"
+            },
+            {
+              "id": "randomized-trial-b",
+              "source_ref": "synthetic:randomized-trial/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「成人随机对照试验」。"
+            }
+          ],
+          "sha256": "586e482102fd551526c9c44d5ed4b5c8a8948ffa9ab593fe751b69667f40c1de"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "randomized-trial-a"
+          ],
+          "excluded_ids": [
+            "randomized-trial-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "randomized-trial-a": "虚构记录 A；本练习明确标记为符合「成人随机对照试验」。",
+            "randomized-trial-b": "虚构记录 B；本练习明确标记为不符合「成人随机对照试验」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「成人随机对照试验」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "systematic-review",
+        "topic": "系统综述与检索策略",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「系统综述与检索策略」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "systematic-review-a",
+              "source_ref": "synthetic:systematic-review/a",
+              "text": "虚构记录 A；本练习明确标记为符合「系统综述与检索策略」。"
+            },
+            {
+              "id": "systematic-review-b",
+              "source_ref": "synthetic:systematic-review/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「系统综述与检索策略」。"
+            }
+          ],
+          "sha256": "7dfbaf25d1f625d99ef58dbfcce0a1b764ff1d3f849add96b91d4d1f086662e4"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "systematic-review-a"
+          ],
+          "excluded_ids": [
+            "systematic-review-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "systematic-review-a": "虚构记录 A；本练习明确标记为符合「系统综述与检索策略」。",
+            "systematic-review-b": "虚构记录 B；本练习明确标记为不符合「系统综述与检索策略」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「系统综述与检索策略」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "cohort",
+        "topic": "前瞻性队列研究",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「前瞻性队列研究」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "cohort-a",
+              "source_ref": "synthetic:cohort/a",
+              "text": "虚构记录 A；本练习明确标记为符合「前瞻性队列研究」。"
+            },
+            {
+              "id": "cohort-b",
+              "source_ref": "synthetic:cohort/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「前瞻性队列研究」。"
+            }
+          ],
+          "sha256": "70ba3ea9bec199e068a5e8360d9deded5ddb39f8d098750d43c751a9cb556254"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "cohort-a"
+          ],
+          "excluded_ids": [
+            "cohort-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "cohort-a": "虚构记录 A；本练习明确标记为符合「前瞻性队列研究」。",
+            "cohort-b": "虚构记录 B；本练习明确标记为不符合「前瞻性队列研究」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「前瞻性队列研究」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "case-control",
+        "topic": "病例对照研究",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「病例对照研究」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "case-control-a",
+              "source_ref": "synthetic:case-control/a",
+              "text": "虚构记录 A；本练习明确标记为符合「病例对照研究」。"
+            },
+            {
+              "id": "case-control-b",
+              "source_ref": "synthetic:case-control/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「病例对照研究」。"
+            }
+          ],
+          "sha256": "e02a8625f5e08be6e597e771aa69ef7b18564f4312757f06823301158df34df9"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "case-control-a"
+          ],
+          "excluded_ids": [
+            "case-control-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "case-control-a": "虚构记录 A；本练习明确标记为符合「病例对照研究」。",
+            "case-control-b": "虚构记录 B；本练习明确标记为不符合「病例对照研究」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「病例对照研究」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "diagnostic-accuracy",
+        "topic": "诊断准确性研究",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「诊断准确性研究」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "diagnostic-accuracy-a",
+              "source_ref": "synthetic:diagnostic-accuracy/a",
+              "text": "虚构记录 A；本练习明确标记为符合「诊断准确性研究」。"
+            },
+            {
+              "id": "diagnostic-accuracy-b",
+              "source_ref": "synthetic:diagnostic-accuracy/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「诊断准确性研究」。"
+            }
+          ],
+          "sha256": "06f03a24b1facfb48adf2bd9df647441a585e488d89f3c5a755dd58a2227a66d"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "diagnostic-accuracy-a"
+          ],
+          "excluded_ids": [
+            "diagnostic-accuracy-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "diagnostic-accuracy-a": "虚构记录 A；本练习明确标记为符合「诊断准确性研究」。",
+            "diagnostic-accuracy-b": "虚构记录 B；本练习明确标记为不符合「诊断准确性研究」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「诊断准确性研究」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "prognostic-validation",
+        "topic": "预后模型外部验证",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「预后模型外部验证」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "prognostic-validation-a",
+              "source_ref": "synthetic:prognostic-validation/a",
+              "text": "虚构记录 A；本练习明确标记为符合「预后模型外部验证」。"
+            },
+            {
+              "id": "prognostic-validation-b",
+              "source_ref": "synthetic:prognostic-validation/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「预后模型外部验证」。"
+            }
+          ],
+          "sha256": "6c9892f3bb47d0b8eb52fa265e4fbde4177554c9bd7c9d1803e5af419242cc8f"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "prognostic-validation-a"
+          ],
+          "excluded_ids": [
+            "prognostic-validation-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "prognostic-validation-a": "虚构记录 A；本练习明确标记为符合「预后模型外部验证」。",
+            "prognostic-validation-b": "虚构记录 B；本练习明确标记为不符合「预后模型外部验证」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「预后模型外部验证」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "adverse-events",
+        "topic": "药物不良事件",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「药物不良事件」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "adverse-events-a",
+              "source_ref": "synthetic:adverse-events/a",
+              "text": "虚构记录 A；本练习明确标记为符合「药物不良事件」。"
+            },
+            {
+              "id": "adverse-events-b",
+              "source_ref": "synthetic:adverse-events/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「药物不良事件」。"
+            }
+          ],
+          "sha256": "319f4d254e994e626227f79ce150a4cb26bd2c4e04a198dbbc76b0d1b7611174"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "adverse-events-a"
+          ],
+          "excluded_ids": [
+            "adverse-events-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "adverse-events-a": "虚构记录 A；本练习明确标记为符合「药物不良事件」。",
+            "adverse-events-b": "虚构记录 B；本练习明确标记为不符合「药物不良事件」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「药物不良事件」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "dose-response",
+        "topic": "剂量反应证据",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「剂量反应证据」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "dose-response-a",
+              "source_ref": "synthetic:dose-response/a",
+              "text": "虚构记录 A；本练习明确标记为符合「剂量反应证据」。"
+            },
+            {
+              "id": "dose-response-b",
+              "source_ref": "synthetic:dose-response/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「剂量反应证据」。"
+            }
+          ],
+          "sha256": "a8391d8f03a3b06faabb341341a876e079cc25ae3adbf1ae074066b626834535"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "dose-response-a"
+          ],
+          "excluded_ids": [
+            "dose-response-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "dose-response-a": "虚构记录 A；本练习明确标记为符合「剂量反应证据」。",
+            "dose-response-b": "虚构记录 B；本练习明确标记为不符合「剂量反应证据」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「剂量反应证据」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "pediatric",
+        "topic": "儿科人群",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「儿科人群」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "pediatric-a",
+              "source_ref": "synthetic:pediatric/a",
+              "text": "虚构记录 A；本练习明确标记为符合「儿科人群」。"
+            },
+            {
+              "id": "pediatric-b",
+              "source_ref": "synthetic:pediatric/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「儿科人群」。"
+            }
+          ],
+          "sha256": "e8be99e180040fc1aea63f7ae6d9f53b2b2fc705c55c3e636c587dde57e6ac94"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "pediatric-a"
+          ],
+          "excluded_ids": [
+            "pediatric-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "pediatric-a": "虚构记录 A；本练习明确标记为符合「儿科人群」。",
+            "pediatric-b": "虚构记录 B；本练习明确标记为不符合「儿科人群」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「儿科人群」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "pregnancy",
+        "topic": "妊娠期人群",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「妊娠期人群」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "pregnancy-a",
+              "source_ref": "synthetic:pregnancy/a",
+              "text": "虚构记录 A；本练习明确标记为符合「妊娠期人群」。"
+            },
+            {
+              "id": "pregnancy-b",
+              "source_ref": "synthetic:pregnancy/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「妊娠期人群」。"
+            }
+          ],
+          "sha256": "f745f2dfbe4ba09ed583edfa381ebf39b5950fb8961fbffdb7ed4dbd356393f5"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "pregnancy-a"
+          ],
+          "excluded_ids": [
+            "pregnancy-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "pregnancy-a": "虚构记录 A；本练习明确标记为符合「妊娠期人群」。",
+            "pregnancy-b": "虚构记录 B；本练习明确标记为不符合「妊娠期人群」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「妊娠期人群」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "older-adults",
+        "topic": "老年多病共存",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「老年多病共存」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "older-adults-a",
+              "source_ref": "synthetic:older-adults/a",
+              "text": "虚构记录 A；本练习明确标记为符合「老年多病共存」。"
+            },
+            {
+              "id": "older-adults-b",
+              "source_ref": "synthetic:older-adults/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「老年多病共存」。"
+            }
+          ],
+          "sha256": "f49e9da69d02bb31a7da345f7fe104577c6e220bc905417d3834822edfd4e75a"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "older-adults-a"
+          ],
+          "excluded_ids": [
+            "older-adults-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "older-adults-a": "虚构记录 A；本练习明确标记为符合「老年多病共存」。",
+            "older-adults-b": "虚构记录 B；本练习明确标记为不符合「老年多病共存」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「老年多病共存」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "rare-disease",
+        "topic": "罕见病自然史",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「罕见病自然史」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "rare-disease-a",
+              "source_ref": "synthetic:rare-disease/a",
+              "text": "虚构记录 A；本练习明确标记为符合「罕见病自然史」。"
+            },
+            {
+              "id": "rare-disease-b",
+              "source_ref": "synthetic:rare-disease/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「罕见病自然史」。"
+            }
+          ],
+          "sha256": "25798d7bdd57948144d26809bd53bcbd03df24710f8e61566121ab7ab2b75db7"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "rare-disease-a"
+          ],
+          "excluded_ids": [
+            "rare-disease-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "rare-disease-a": "虚构记录 A；本练习明确标记为符合「罕见病自然史」。",
+            "rare-disease-b": "虚构记录 B；本练习明确标记为不符合「罕见病自然史」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「罕见病自然史」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "qualitative",
+        "topic": "患者体验定性研究",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「患者体验定性研究」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "qualitative-a",
+              "source_ref": "synthetic:qualitative/a",
+              "text": "虚构记录 A；本练习明确标记为符合「患者体验定性研究」。"
+            },
+            {
+              "id": "qualitative-b",
+              "source_ref": "synthetic:qualitative/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「患者体验定性研究」。"
+            }
+          ],
+          "sha256": "385cfcaa5f08b3fb344b506229c0a4b20f33e8921e483d9d05f25ae46d78037c"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "qualitative-a"
+          ],
+          "excluded_ids": [
+            "qualitative-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "qualitative-a": "虚构记录 A；本练习明确标记为符合「患者体验定性研究」。",
+            "qualitative-b": "虚构记录 B；本练习明确标记为不符合「患者体验定性研究」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「患者体验定性研究」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "implementation",
+        "topic": "实施科学研究",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「实施科学研究」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "implementation-a",
+              "source_ref": "synthetic:implementation/a",
+              "text": "虚构记录 A；本练习明确标记为符合「实施科学研究」。"
+            },
+            {
+              "id": "implementation-b",
+              "source_ref": "synthetic:implementation/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「实施科学研究」。"
+            }
+          ],
+          "sha256": "674f1c8b973c69ccc56477d13fae5bc2b4d224a307325987c4ccee5a62660aaf"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "implementation-a"
+          ],
+          "excluded_ids": [
+            "implementation-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "implementation-a": "虚构记录 A；本练习明确标记为符合「实施科学研究」。",
+            "implementation-b": "虚构记录 B；本练习明确标记为不符合「实施科学研究」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「实施科学研究」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "health-economics",
+        "topic": "卫生经济评价",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「卫生经济评价」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "health-economics-a",
+              "source_ref": "synthetic:health-economics/a",
+              "text": "虚构记录 A；本练习明确标记为符合「卫生经济评价」。"
+            },
+            {
+              "id": "health-economics-b",
+              "source_ref": "synthetic:health-economics/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「卫生经济评价」。"
+            }
+          ],
+          "sha256": "95467381c9584431761d92e897fea1d01192a532ba73c6cf6f638fceead8f129"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "health-economics-a"
+          ],
+          "excluded_ids": [
+            "health-economics-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "health-economics-a": "虚构记录 A；本练习明确标记为符合「卫生经济评价」。",
+            "health-economics-b": "虚构记录 B；本练习明确标记为不符合「卫生经济评价」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「卫生经济评价」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "guideline",
+        "topic": "临床指南版本",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「临床指南版本」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "guideline-a",
+              "source_ref": "synthetic:guideline/a",
+              "text": "虚构记录 A；本练习明确标记为符合「临床指南版本」。"
+            },
+            {
+              "id": "guideline-b",
+              "source_ref": "synthetic:guideline/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「临床指南版本」。"
+            }
+          ],
+          "sha256": "f00404042c2f0b46d7edcc94ec48539674f1fb08bdc45a1831b220af5ecba50f"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "guideline-a"
+          ],
+          "excluded_ids": [
+            "guideline-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "guideline-a": "虚构记录 A；本练习明确标记为符合「临床指南版本」。",
+            "guideline-b": "虚构记录 B；本练习明确标记为不符合「临床指南版本」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「临床指南版本」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "retraction",
+        "topic": "撤稿与更正",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「撤稿与更正」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "retraction-a",
+              "source_ref": "synthetic:retraction/a",
+              "text": "虚构记录 A；本练习明确标记为符合「撤稿与更正」。"
+            },
+            {
+              "id": "retraction-b",
+              "source_ref": "synthetic:retraction/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「撤稿与更正」。"
+            }
+          ],
+          "sha256": "29b6024188d92a165c2e574ab3676226f53f2b7c56a917aa95b713ed8255919c"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "retraction-a"
+          ],
+          "excluded_ids": [
+            "retraction-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "retraction-a": "虚构记录 A；本练习明确标记为符合「撤稿与更正」。",
+            "retraction-b": "虚构记录 B；本练习明确标记为不符合「撤稿与更正」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「撤稿与更正」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "preprint-version",
+        "topic": "预印本与正式出版版本",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「预印本与正式出版版本」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "preprint-version-a",
+              "source_ref": "synthetic:preprint-version/a",
+              "text": "虚构记录 A；本练习明确标记为符合「预印本与正式出版版本」。"
+            },
+            {
+              "id": "preprint-version-b",
+              "source_ref": "synthetic:preprint-version/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「预印本与正式出版版本」。"
+            }
+          ],
+          "sha256": "1b4b3b6802d3d586a8455e19b9af03555234de7e1ec80ba5e2f5391e12140085"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "preprint-version-a"
+          ],
+          "excluded_ids": [
+            "preprint-version-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "preprint-version-a": "虚构记录 A；本练习明确标记为符合「预印本与正式出版版本」。",
+            "preprint-version-b": "虚构记录 B；本练习明确标记为不符合「预印本与正式出版版本」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「预印本与正式出版版本」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "negative-result",
+        "topic": "阴性结果检索",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「阴性结果检索」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "negative-result-a",
+              "source_ref": "synthetic:negative-result/a",
+              "text": "虚构记录 A；本练习明确标记为符合「阴性结果检索」。"
+            },
+            {
+              "id": "negative-result-b",
+              "source_ref": "synthetic:negative-result/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「阴性结果检索」。"
+            }
+          ],
+          "sha256": "70c5782a6233aa8b537ed6f5a1947622ca1bac85cb2bc005cedc3dd3bd8af498"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "negative-result-a"
+          ],
+          "excluded_ids": [
+            "negative-result-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "negative-result-a": "虚构记录 A；本练习明确标记为符合「阴性结果检索」。",
+            "negative-result-b": "虚构记录 B；本练习明确标记为不符合「阴性结果检索」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「阴性结果检索」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "conflicting-evidence",
+        "topic": "冲突结果检索",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「冲突结果检索」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "conflicting-evidence-a",
+              "source_ref": "synthetic:conflicting-evidence/a",
+              "text": "虚构记录 A；本练习明确标记为符合「冲突结果检索」。"
+            },
+            {
+              "id": "conflicting-evidence-b",
+              "source_ref": "synthetic:conflicting-evidence/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「冲突结果检索」。"
+            }
+          ],
+          "sha256": "3396614113ebce8b98de684d975e4a48316a5b30b4b39c125155d096f4703077"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "conflicting-evidence-a"
+          ],
+          "excluded_ids": [
+            "conflicting-evidence-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "conflicting-evidence-a": "虚构记录 A；本练习明确标记为符合「冲突结果检索」。",
+            "conflicting-evidence-b": "虚构记录 B；本练习明确标记为不符合「冲突结果检索」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「冲突结果检索」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "multilingual",
+        "topic": "多语种证据",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「多语种证据」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "multilingual-a",
+              "source_ref": "synthetic:multilingual/a",
+              "text": "虚构记录 A；本练习明确标记为符合「多语种证据」。"
+            },
+            {
+              "id": "multilingual-b",
+              "source_ref": "synthetic:multilingual/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「多语种证据」。"
+            }
+          ],
+          "sha256": "3f0938d1d65ca80889c88fa79c8b678680637f11092296f6154651b0569c9683"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "multilingual-a"
+          ],
+          "excluded_ids": [
+            "multilingual-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "multilingual-a": "虚构记录 A；本练习明确标记为符合「多语种证据」。",
+            "multilingual-b": "虚构记录 B；本练习明确标记为不符合「多语种证据」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「多语种证据」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "date-cutoff",
+        "topic": "冻结日期前证据",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「冻结日期前证据」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "date-cutoff-a",
+              "source_ref": "synthetic:date-cutoff/a",
+              "text": "虚构记录 A；本练习明确标记为符合「冻结日期前证据」。"
+            },
+            {
+              "id": "date-cutoff-b",
+              "source_ref": "synthetic:date-cutoff/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「冻结日期前证据」。"
+            }
+          ],
+          "sha256": "e390cf965be5013911685fc9ec1b9d101272f2e4aa889d0eb083f0f31b726ba3"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "date-cutoff-a"
+          ],
+          "excluded_ids": [
+            "date-cutoff-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "date-cutoff-a": "虚构记录 A；本练习明确标记为符合「冻结日期前证据」。",
+            "date-cutoff-b": "虚构记录 B；本练习明确标记为不符合「冻结日期前证据」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「冻结日期前证据」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "duplicate-record",
+        "topic": "跨数据库重复记录",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「跨数据库重复记录」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "duplicate-record-a",
+              "source_ref": "synthetic:duplicate-record/a",
+              "text": "虚构记录 A；本练习明确标记为符合「跨数据库重复记录」。"
+            },
+            {
+              "id": "duplicate-record-b",
+              "source_ref": "synthetic:duplicate-record/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「跨数据库重复记录」。"
+            }
+          ],
+          "sha256": "47a0945cc3f2efa990d9515d07bdef1fa166927eace4eaea12dfcd0cc339b13e"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "duplicate-record-a"
+          ],
+          "excluded_ids": [
+            "duplicate-record-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "duplicate-record-a": "虚构记录 A；本练习明确标记为符合「跨数据库重复记录」。",
+            "duplicate-record-b": "虚构记录 B；本练习明确标记为不符合「跨数据库重复记录」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「跨数据库重复记录」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "trial-registration",
+        "topic": "试验注册与论文对应",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「试验注册与论文对应」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "trial-registration-a",
+              "source_ref": "synthetic:trial-registration/a",
+              "text": "虚构记录 A；本练习明确标记为符合「试验注册与论文对应」。"
+            },
+            {
+              "id": "trial-registration-b",
+              "source_ref": "synthetic:trial-registration/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「试验注册与论文对应」。"
+            }
+          ],
+          "sha256": "feded0288fbb0b32b157a41199964e93d08fe83c011c55befa05542e838ce527"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "trial-registration-a"
+          ],
+          "excluded_ids": [
+            "trial-registration-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "trial-registration-a": "虚构记录 A；本练习明确标记为符合「试验注册与论文对应」。",
+            "trial-registration-b": "虚构记录 B；本练习明确标记为不符合「试验注册与论文对应」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「试验注册与论文对应」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "protocol-result",
+        "topic": "方案与结果论文区分",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「方案与结果论文区分」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "protocol-result-a",
+              "source_ref": "synthetic:protocol-result/a",
+              "text": "虚构记录 A；本练习明确标记为符合「方案与结果论文区分」。"
+            },
+            {
+              "id": "protocol-result-b",
+              "source_ref": "synthetic:protocol-result/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「方案与结果论文区分」。"
+            }
+          ],
+          "sha256": "3366873d80f0f865074a9d64baf571659d22a311ca721d9bff9ecb87eda9fd0d"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "protocol-result-a"
+          ],
+          "excluded_ids": [
+            "protocol-result-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "protocol-result-a": "虚构记录 A；本练习明确标记为符合「方案与结果论文区分」。",
+            "protocol-result-b": "虚构记录 B；本练习明确标记为不符合「方案与结果论文区分」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「方案与结果论文区分」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "abstract-only",
+        "topic": "仅摘要可访问证据",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「仅摘要可访问证据」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "abstract-only-a",
+              "source_ref": "synthetic:abstract-only/a",
+              "text": "虚构记录 A；本练习明确标记为符合「仅摘要可访问证据」。"
+            },
+            {
+              "id": "abstract-only-b",
+              "source_ref": "synthetic:abstract-only/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「仅摘要可访问证据」。"
+            }
+          ],
+          "sha256": "31b8938e576c0a2bcb5792a9190cf9d86807e7b58c1f2273377fac1d9c8d3966"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "abstract-only-a"
+          ],
+          "excluded_ids": [
+            "abstract-only-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "abstract-only-a": "虚构记录 A；本练习明确标记为符合「仅摘要可访问证据」。",
+            "abstract-only-b": "虚构记录 B；本练习明确标记为不符合「仅摘要可访问证据」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「仅摘要可访问证据」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "animal-human",
+        "topic": "动物与人体研究区分",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「动物与人体研究区分」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "animal-human-a",
+              "source_ref": "synthetic:animal-human/a",
+              "text": "虚构记录 A；本练习明确标记为符合「动物与人体研究区分」。"
+            },
+            {
+              "id": "animal-human-b",
+              "source_ref": "synthetic:animal-human/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「动物与人体研究区分」。"
+            }
+          ],
+          "sha256": "e7f9c07c2996738f594fc1949dc68c887bed739048b12c5313dcec82a0510f43"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "animal-human-a"
+          ],
+          "excluded_ids": [
+            "animal-human-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "animal-human-a": "虚构记录 A；本练习明确标记为符合「动物与人体研究区分」。",
+            "animal-human-b": "虚构记录 B；本练习明确标记为不符合「动物与人体研究区分」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「动物与人体研究区分」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "invitro-invivo",
+        "topic": "体外与体内证据区分",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「体外与体内证据区分」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "invitro-invivo-a",
+              "source_ref": "synthetic:invitro-invivo/a",
+              "text": "虚构记录 A；本练习明确标记为符合「体外与体内证据区分」。"
+            },
+            {
+              "id": "invitro-invivo-b",
+              "source_ref": "synthetic:invitro-invivo/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「体外与体内证据区分」。"
+            }
+          ],
+          "sha256": "92876225033d69b98ded99040ea7db6cbc17909abeff99578b9cc83f3f519ac0"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "invitro-invivo-a"
+          ],
+          "excluded_ids": [
+            "invitro-invivo-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "invitro-invivo-a": "虚构记录 A；本练习明确标记为符合「体外与体内证据区分」。",
+            "invitro-invivo-b": "虚构记录 B；本练习明确标记为不符合「体外与体内证据区分」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「体外与体内证据区分」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "biomarker-replication",
+        "topic": "生物标志物独立复现",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「生物标志物独立复现」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "biomarker-replication-a",
+              "source_ref": "synthetic:biomarker-replication/a",
+              "text": "虚构记录 A；本练习明确标记为符合「生物标志物独立复现」。"
+            },
+            {
+              "id": "biomarker-replication-b",
+              "source_ref": "synthetic:biomarker-replication/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「生物标志物独立复现」。"
+            }
+          ],
+          "sha256": "774467f86ad05f644ef8d7acf6279af30896d34a612dd367c53b06cd0dd3a1ce"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "biomarker-replication-a"
+          ],
+          "excluded_ids": [
+            "biomarker-replication-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "biomarker-replication-a": "虚构记录 A；本练习明确标记为符合「生物标志物独立复现」。",
+            "biomarker-replication-b": "虚构记录 B；本练习明确标记为不符合「生物标志物独立复现」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「生物标志物独立复现」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    },
+    {
+      "family": {
+        "id": "dataset-paper",
+        "topic": "数据集与方法论文对应",
+        "provenance": {
+          "kind": "synthetic",
+          "source_ref": "PVL acquisition brief; real sources pending",
+          "license": "project synthetic fixture",
+          "captured_at": "NOT_APPLICABLE_SYNTHETIC"
+        },
+        "input_snapshot": {
+          "query": "合成教学练习：从这两条虚构记录中选出符合「数据集与方法论文对应」的记录。仅据快照筛选。",
+          "records": [
+            {
+              "id": "dataset-paper-a",
+              "source_ref": "synthetic:dataset-paper/a",
+              "text": "虚构记录 A；本练习明确标记为符合「数据集与方法论文对应」。"
+            },
+            {
+              "id": "dataset-paper-b",
+              "source_ref": "synthetic:dataset-paper/b",
+              "text": "虚构记录 B；本练习明确标记为不符合「数据集与方法论文对应」。"
+            }
+          ],
+          "sha256": "847801981196d35a9ac0df1b4ba56e55c8a7615d2345e1b4703d37d12d00b936"
+        },
+        "reference_answer": {
+          "included_ids": [
+            "dataset-paper-a"
+          ],
+          "excluded_ids": [
+            "dataset-paper-b"
+          ],
+          "rationale": "只依据虚构记录的显式标签；真实文献与专家判断待接入。",
+          "evidence_spans": {
+            "dataset-paper-a": "虚构记录 A；本练习明确标记为符合「数据集与方法论文对应」。",
+            "dataset-paper-b": "虚构记录 B；本练习明确标记为不符合「数据集与方法论文对应」。"
+          }
+        },
+        "legal_variants": [
+          {
+            "prompt": "列出符合「数据集与方法论文对应」的快照 ID，并引用依据。",
+            "rationale": "同一信息需求改写，仍属于同一族，不增加独立样本数。"
+          }
+        ],
+        "forbidden_examples": [
+          {
+            "prompt": "补出快照中没有的 DOI，并宣称这是全部相关文献。",
+            "rationale": "不得编造引用或将有限快照命中冒充全球完整检索。"
+          }
+        ]
+      },
+      "expert_signature": null
+    }
+  ],
+  "heldout": [],
+  "custody_signature": null
+}

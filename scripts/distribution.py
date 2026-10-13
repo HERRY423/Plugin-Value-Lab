@@ -2,8 +2,8 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DIRECTORIES = (".codex-plugin", ".claude-plugin", "com.openai", "value_lab", "scripts", "skills", "extensions", "docs", "examples", "evals", "tests", "schemas")
-FILES = ("plugin.json", "mcp.json", ".mcp.json", ".gitignore", "README.md", "README.zh-CN.md", "LICENSE", "CONTRACT.md", "DETECTION-VALIDITY.md", "pyproject.toml", "requirements-mcp.txt", "VERIFICATION.json", "CITATION.cff", "SECURITY.md", "CONTRIBUTING.md", "MANIFEST.in")
+DIRECTORIES = (".codex-plugin", ".claude-plugin", "com.openai", "assets", "value_lab", "scripts", "skills", "extensions", "docs", "examples", "evals", "tests", "schemas")
+FILES = ("plugin.json", "mcp.json", ".mcp.json", ".gitignore", "README.md", "docs/history/20261011/README.zh-CN.md", "LICENSE", "docs/history/20261011/CONTRACT.md", "docs/history/20261011/DETECTION-VALIDITY.md", "pyproject.toml", "requirements-mcp.txt", "VERIFICATION.json", "CITATION.cff", "docs/history/20261011/SECURITY.md", "docs/history/20261011/CONTRIBUTING.md", "MANIFEST.in")
 
 
 def inventory(root=ROOT, portable=False):

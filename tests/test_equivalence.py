@@ -1,3 +1,4 @@
+from tests.optional import available, requires
 from copy import deepcopy
 from pathlib import Path
 import tempfile
@@ -29,6 +30,8 @@ class EquivalenceTests(unittest.TestCase):
     def assess(self):
         return assess(self.design, self.actual, self.truth)
 
+    @requires("scipy")
+    @unittest.skipUnless(available("scipy"), "requires: scipy")
     def test_paired_tost_tabulated_df2_quantile(self):
         passed, receipt = self.assess()
         self.assertTrue(passed)
@@ -37,12 +40,16 @@ class EquivalenceTests(unittest.TestCase):
         self.assertAlmostEqual(row['confidence_interval'][1], 2.91998558 * .01 / 3**.5, places=8)
         self.assertLess(row['p_tost'], .05)
 
+    @requires("scipy")
+    @unittest.skipUnless(available("scipy"), "requires: scipy")
     def test_perfect_correlation_offset_is_rejected(self):
         self.actual['values'] = [[11], [12], [13]]
         passed, receipt = self.assess()
         self.assertFalse(passed)
         self.assertFalse(receipt['features'][0]['individual_agreement_passed'])
 
+    @requires("scipy")
+    @unittest.skipUnless(available("scipy"), "requires: scipy")
     def test_cancellation_cannot_hide_large_individual_errors(self):
         # Mean equivalence has ample power under intentionally large mean bounds,
         # but the separately fixed individual agreement guard must reject.
@@ -52,6 +59,8 @@ class EquivalenceTests(unittest.TestCase):
         self.assertTrue(receipt['features'][0]['mean_equivalence'])
         self.assertFalse(passed)
 
+    @requires("scipy")
+    @unittest.skipUnless(available("scipy"), "requires: scipy")
     def test_insufficient_power_is_not_reported_as_proven_difference(self):
         self.actual['values'] = [[.9], [2], [3.1]]
         passed, receipt = self.assess()
@@ -59,12 +68,16 @@ class EquivalenceTests(unittest.TestCase):
         self.assertEqual(receipt['features'][0]['status'], 'EQUIVALENCE_NOT_ESTABLISHED')
         self.assertIn('not proof of a difference', receipt['claim_limit'])
 
+    @requires("scipy")
+    @unittest.skipUnless(available("scipy"), "requires: scipy")
     def test_identical_constant_differences_are_not_fake_t_significance(self):
         self.actual = deepcopy(self.truth)
         passed, receipt = self.assess()
         self.assertIsNone(passed)
         self.assertIsNone(receipt['features'][0]['p_tost'])
 
+    @requires("scipy")
+    @unittest.skipUnless(available("scipy"), "requires: scipy")
     def test_identity_order_independent_complete_family_bonferroni(self):
         self.design['features']['other'] = deepcopy(self.design['features']['effect'])
         self.actual = {'unit_ids': ['d3', 'd1', 'd2'], 'features': ['other', 'effect'],
@@ -101,6 +114,10 @@ class EquivalenceTests(unittest.TestCase):
             with self.assertRaises(OSError):
                 self.assess()
 
+    @requires('jsonschema')
+    @unittest.skipUnless(available('jsonschema'), "requires: jsonschema")
+    @requires("scipy")
+    @unittest.skipUnless(available("scipy"), "requires: scipy")
     def test_schema_example_and_report_escape(self):
         import jsonschema
         from value_lab.core import load_json
@@ -139,6 +156,8 @@ class EquivalenceTests(unittest.TestCase):
             materials = replay_contract(suite, [], verifier_root=root)['materials']
             self.assertEqual({m['kind'] for m in materials if m['status'] == 'BYTES_MATCH'}, {'design', 'truth'})
 
+    @requires("scipy")
+    @unittest.skipUnless(available("scipy"), "requires: scipy")
     def test_artifact_evaluator_pinned_reference_and_missing_or_malformed(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

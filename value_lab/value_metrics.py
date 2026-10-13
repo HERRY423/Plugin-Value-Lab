@@ -85,6 +85,8 @@ def requires_confirmation(report):
 
 def positive_signal(report):
     """An opted-in confirmatory rule governs downstream positive guidance."""
+    if report.get('family_requirement', {}).get('target_met') is False:
+        return False
     confirmation = report.get('confirmatory_analysis')
     if requires_confirmation(report):
         if not isinstance(confirmation, dict) or not isinstance(confirmation.get('rule'), dict):
@@ -101,6 +103,23 @@ def positive_signal(report):
                 and isinstance(confirmation.get('criteria'), dict) and required <= set(confirmation['criteria'])
                 and all(v is True for v in confirmation['criteria'].values()) and confirmation.get('reasons') == [])
     return report['verdict'] == 'PROMISING_LOCAL_SIGNAL'
+
+
+def family_requirement(suite):
+    """Derive the family floor from frozen assumptions, never observed effects."""
+    plan = power_plan(suite)
+    required = plan.get('required_families')
+    configured = suite['policy'].get('min_clusters')
+    minimum = max(configured or 3, required or 0)
+    planned = suite['policy'].get('power_plan') is not None
+    status = plan.get('current_design_status', plan.get('status'))
+    met = (plan['planned_families'] >= minimum and
+           (not planned or (required is not None and status == 'PLANNING_TARGET_MET')))
+    return {'configured_min_clusters': configured, 'effective_min_clusters': minimum,
+            'required_families': required, 'submitted_families': plan['planned_families'],
+            'power_planned': planned, 'target_met': met,
+            'basis': 'FROZEN_POWER_PLAN' if planned else 'DESCRIPTIVE_FLOOR_NOT_POWER',
+            'positive_verdict_ceiling': 'PROMISING_LOCAL_SIGNAL' if met else 'TRIAL_ONLY_SIGNAL'}
 
 
 def decision_review(report):

@@ -1,3 +1,4 @@
+from tests.optional import available, requires
 from copy import deepcopy
 import json
 from pathlib import Path
@@ -148,6 +149,8 @@ class CorpusTests(unittest.TestCase):
         self.assertIn("放行不足证据", rendered)
         self.assertIn("缺失上下界", rendered)
 
+    @requires('jsonschema')
+    @unittest.skipUnless(available('jsonschema'), "requires: jsonschema")
     def test_exchange_schemas_match_templates_and_seed(self):
         from jsonschema import Draft202012Validator, FormatChecker
         repo = Path(__file__).resolve().parents[1]

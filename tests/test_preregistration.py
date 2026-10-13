@@ -1,12 +1,16 @@
 """Cryptographic trust-boundary unit tests; generated keys are test-only."""
+from tests.optional import available, requires
 import copy
 import unittest
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+if available("cryptography"):
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from value_lab.signatures import sign, public_identity
 from value_lab.preregistration import verify_reviewer
 from value_lab.core import ValidationError
 
 
+@requires('cryptography')
+@unittest.skipUnless(available('cryptography'), "requires: cryptography")
 class ReviewSignatureTests(unittest.TestCase):
     def setUp(self):
         self.key = Ed25519PrivateKey.generate()

@@ -152,7 +152,7 @@ def validate_suite(suite):
         raise ValidationError("require_cost_saving must be boolean")
     if "require_cost_categories" in policy and type(policy["require_cost_categories"]) is not bool:
         raise ValidationError("require_cost_categories must be boolean")
-    if type(policy.get("min_clusters")) is not int or policy["min_clusters"] < 2:
+    if "min_clusters" in policy and (type(policy["min_clusters"]) is not int or policy["min_clusters"] < 2):
         raise ValidationError("min_clusters must be an integer >= 2")
     from .value_metrics import validate_power_plan
     validate_power_plan(policy)
@@ -581,8 +581,12 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
     if policy.get("require_settled_costs") and (not cost_analysis["complete_category_coverage"] or
                                                not cost_analysis["cash_evidence"]["settlement_references_complete"]):
         blockers.append("Settled-cost policy requires complete categories and unique settlement references; estimates cannot pass")
-    if clusters < policy["min_clusters"]:
-        blockers.append(f"Only {clusters} task families; protocol requires {policy['min_clusters']}")
+    from .value_metrics import family_requirement
+    family_gate = family_requirement(suite)
+    if clusters < policy.get("min_clusters", 3):
+        blockers.append(f"Only {clusters} task families; protocol requires {policy.get('min_clusters', 3)}")
+    if not family_gate['target_met']:
+        warnings.append('仅试用线索：独立任务族未达到冻结功效计划或最低族数；重复运行不能补足任务族。')
     if not any(c["kind"] == "negative" for c in suite["cases"]):
         warnings.append("No negative-control case: over-triggering has not been assessed")
     if not any(c["kind"] == "abstention" for c in suite["cases"]):
@@ -603,11 +607,11 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
     elif critical_failures or regression or methodology["violations"]:
         verdict = "REGRESSION_DETECTED"
     elif quality_ok and cost_ok and task_success_ok:
-        verdict = "PROMISING_LOCAL_SIGNAL"
+        verdict = "PROMISING_LOCAL_SIGNAL" if family_gate['target_met'] else "TRIAL_ONLY_SIGNAL"
     else:
         verdict = "NO_DEMONSTRATED_GAIN"
     measured_verdict = verdict
-    cost_analysis["saving_claim_eligible"] = (not blockers and not synthetic and cost_analysis["complete_category_coverage"])
+    cost_analysis["saving_claim_eligible"] = (not blockers and not synthetic and family_gate["target_met"] and cost_analysis["complete_category_coverage"])
     cost_analysis["settled_saving_claim_eligible"] = (cost_analysis["saving_claim_eligible"] and
         cost_analysis["cash_evidence"]["settlement_references_complete"] and cost_delta is not None and cost_delta < -1e-12)
     cost_analysis["saving_claim_basis"] = ("SETTLEMENT_REFERENCED_CASH_PLUS_TIMER_VALUED_LABOR"
@@ -624,7 +628,7 @@ def evaluate(suite, records, lock=None, cost_ledger=None, *, artifact_root=None,
     report = {
         "schema_version": 1, "study_id": suite["id"], "plugin": suite["plugin"],
         "evidence_type": "synthetic" if synthetic else suite["evidence_type"], "verdict": verdict,
-        "measured_verdict": measured_verdict,
+        "measured_verdict": measured_verdict, "family_requirement": family_gate,
         "summary": {"with_score": with_score, "without_score": without_score,
                     "quality_delta": quality_delta, "expected_runs": len(expected),
                     "observed_runs": len(indexed), "submitted_records": len(records),

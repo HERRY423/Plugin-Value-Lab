@@ -143,7 +143,7 @@ def plan_plugin_use(context, now=None, *, artifact_root=None, verifier_root=None
                     'limitations': burden.get('limits', ['冻结的是内容，不是独立见证的注册时间；不授权执行或付费。'])}
         if "risk_acquisition" in context:
             from .risk_acquisition import plan_risk_acquisition
-            risk = plan_risk_acquisition(context["task_selection"], context["risk_acquisition"], artifact_root=artifact_root, verifier_root=verifier_root)
+            risk = plan_risk_acquisition(context["task_selection"], context["risk_acquisition"], artifact_root=artifact_root, verifier_root=verifier_root, now=now)
             labels = {"NEXT_BLOCK": "按预设错误风险安排下一批实验", "CERTIFIED_CANDIDATE": "候选达到预设风险与效用条件，仍需完整任务确认",
                       "CERTIFIED_NO_ACCEPTABLE_CANDIDATE": "在预设风险条件下，当前候选均未达到效用下限",
                       "STOP_BUDGET_UNRESOLVED": "预算已到，证据不足以选择；不计为效率收益",
@@ -458,6 +458,31 @@ def write_plan(plan, output_dir):
                      + str(block["reserved_micros"]) + " USD micros。") if block else "无；先处理停止或复核原因。"
         lines += ["", "下一批：" + _md(next_text), "", "统计候选：" + _md(str(risk["candidate_for_confirmation"] or "未作选择")),
                   "候选仅限冻结效用与总体，不是全目录最小插件组合或科学采用结论。"]
+        uncertainty = risk['selection_uncertainty']
+        lines += ['', '### 名次不确定性与收缩', '',
+                  '名次区间来自同时覆盖所有冻结候选与查看次数的效用界限；并列允许跨多个名次。收缩估计不参与证据升级。', '',
+                  '| 候选 | 原始均值 | 收缩均值 | 名次区间 |', '| --- | --- | --- | --- |']
+        for row in uncertainty['candidates']:
+            lines.append('| ' + ' | '.join(_md(str(v)) for v in (row['candidate_id'], row['raw_mean'], row['shrunk_mean'], row['rank_interval'])) + ' |')
+        actions = risk['action_decision']
+        lines += ['', '### 研究者行动', '']
+        if actions['status'] == 'LOSSES_REQUIRED':
+            lines += [_md(actions['action'] + '：' + actions['reason']), _md(actions['validity']), _md(actions['next_evidence']['action'])]
+        for row in actions['candidates']:
+            lines += ['', '**' + _md(row['candidate_id'] + '：' + row['action']) + '**', '',
+                      _md(row['reason']), '范围：' + _md(row['scope']),
+                      '有效至：' + _md(row['valid_until']) + '；版本、输入范围、损失或护栏改变即失效。',
+                      '下一条补证据：' + _md(row['next_evidence']['action']),
+                      '最大后悔值（相对当前允许行动）：' + _md(str(row['worst_regret']) + ' ' + row['loss_unit']),
+                      '最坏状态损失：' + _md(str(row['worst_state_loss']) + ' ' + row['loss_unit']) + '；零后悔不等于零损失。']
+            if row['guardrails']:
+                lines += ['护栏：' + _md('；'.join(row['guardrails']))]
+        if actions['status'] != 'LOSSES_REQUIRED' and actions['next_evidence']:
+            lines += ['', '优先补证据候选：' + _md(actions['next_evidence']['candidate_id']),
+                      '补证据优先级采用可消除后悔的上限减时间损失，不是已估计的信息价值；执行前仍须预算核验。']
+        if block and block.get('execution_orders'):
+            lines += ['', '轮转顺序（每个单位使用独立会话）：']
+            lines.extend(_md(o['unit_id'] + '：' + ' → '.join(o['candidate_ids'])) for o in block['execution_orders'])
     if 'combination' in plan:
         result = plan['combination']
         lines += ['', '## 最小有效插件组合', '']

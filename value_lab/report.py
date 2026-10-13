@@ -16,6 +16,7 @@ from typing import Any
 _ARM_LABELS = {"with": "启用插件", "without": "未启用插件"}
 _VERDICTS = {
     "PROMISING_LOCAL_SIGNAL": "检测到本地增益信号",
+    "TRIAL_ONLY_SIGNAL": "仅试用线索",
     "NO_DEMONSTRATED_GAIN": "尚未证明存在增益",
     "REGRESSION_DETECTED": "检测到回退",
     "INSUFFICIENT_EVIDENCE": "证据不足",
@@ -93,11 +94,8 @@ def _mapping(value: Any) -> dict[str, Any]:
 
 
 def _markdown(value: Any) -> str:
-    """Escape HTML and Markdown syntax before placing evidence in a table."""
-    text = html.escape(_text(value), quote=False)
-    for character in ("\\", "`", "*", "_", "[", "]", "|", "#", "~"):
-        text = text.replace(character, "\\" + character)
-    return text.replace("\r\n", "\n").replace("\r", "\n").replace("\n", "<br>")
+    from .markdown_text import literal
+    return literal(value)
 
 
 def _evidence_label(report: dict[str, Any]) -> str:
@@ -540,6 +538,7 @@ def _scope_summary(report):
 
 
 def _render_markdown(report: dict[str, Any]) -> str:
+    from .markdown_text import key_value_table
     summary = _mapping(report.get("summary"))
     plugin = _mapping(report.get("plugin"))
     native = report.get("evidence_type") == "unverified_native"
@@ -593,7 +592,7 @@ def _render_markdown(report: dict[str, Any]) -> str:
     ]:
         lines += [f"## {title}", ""]
         if isinstance(value, dict) and value:
-            lines += [f"- {_markdown(_LABELS.get(str(key), str(key)))}：{_markdown(item)}" for key, item in value.items()]
+            lines += [key_value_table(value)]
         else:
             lines += [f"- {_markdown(item)}" for item in _items(value)] or [empty]
         lines += [""]
@@ -630,7 +629,7 @@ def _render_markdown(report: dict[str, Any]) -> str:
     lines += ["", "## 来源", ""]
     provenance = report.get("provenance")
     if isinstance(provenance, dict) and provenance:
-        lines += [f"- {_markdown(_LABELS.get(str(key), str(key)))}：{_markdown(value)}" for key, value in provenance.items()]
+        lines += [key_value_table(provenance)]
     else:
         lines += [_markdown(provenance) if provenance is not None else "未提供来源信息。"]
     lines += ["", "方案锁用于一致性核验，不构成独立见证的预注册。外部来源不自动表示独立评审、因果归因或科学认证。", "",

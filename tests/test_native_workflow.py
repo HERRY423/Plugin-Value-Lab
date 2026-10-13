@@ -282,10 +282,11 @@ class SessionTests(unittest.TestCase):
         def launch(*args, **kwargs):
             return {'exit_code': 2, 'timed_out': False, 'duration_seconds': .01}
         with patch('value_lab.native_session.sys.platform', 'linux'), \
-             patch('value_lab.native.require_budget_boundary'), \
+             patch('value_lab.gateway_budget.GatewayBudget') as budget, \
              patch.dict(os.environ, {'PVL_MODEL_API_KEY': 'synthetic-test-key'}), \
              patch('value_lab.online_sandbox.probe_backend', return_value={'passed': True}), \
              patch('value_lab.online_sandbox.run_exchange', side_effect=launch) as run:
+            budget.return_value.ledger.path = self.root / 'parent-only-budget.sqlite'
             observed = run_native_session(self.output, result['session_sha256'], execute=True)
             self.assertEqual(observed['status'], 'NATIVE_RESULT_MISSING')
             self.assertIsNone(observed['settled_usd'])
@@ -310,10 +311,11 @@ class SessionTests(unittest.TestCase):
                 'cases': [{'name': 'numeric', 'arms': {'with': [{'error': 'timeout', 'tracePath': str(self.output / 'retained/missing.jsonl')}], 'without': []}}]})
             return {'exit_code': 2, 'timed_out': False, 'duration_seconds': .01}
         with patch('value_lab.native_session.sys.platform', 'linux'), \
-             patch('value_lab.native.require_budget_boundary'), \
+             patch('value_lab.gateway_budget.GatewayBudget') as budget, \
              patch.dict(os.environ, {'PVL_MODEL_API_KEY': 'synthetic-test-key'}), \
              patch('value_lab.online_sandbox.probe_backend', return_value={'passed': True}), \
              patch('value_lab.online_sandbox.run_exchange', side_effect=launch):
+            budget.return_value.ledger.path = self.root / 'parent-only-budget.sqlite'
             observed = run_native_session(self.output, result['session_sha256'], execute=True)
         self.assertEqual(observed['status'], 'COLLECTED')
         report = load_json(self.output / 'collected/diagnosis.json')

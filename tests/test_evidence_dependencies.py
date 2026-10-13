@@ -1,4 +1,5 @@
 """Manufactured scope/invalidation fixtures, never evidence of real benefit."""
+from tests.optional import available, requires
 from copy import deepcopy
 import json
 from pathlib import Path
@@ -269,6 +270,8 @@ class EvidenceDependencyTests(unittest.TestCase):
         self.assertEqual(replay.returncode, 0, replay.stderr)
         self.assertTrue(json.loads(replay.stdout)["replayed"])
 
+    @requires('jsonschema')
+    @unittest.skipUnless(available('jsonschema'), "requires: jsonschema")
     def test_schema_accepts_fixture_and_rejects_extra_fields(self):
         import jsonschema
         schema = json.loads((Path(__file__).resolve().parents[1] / "schemas/evidence-dependencies.schema.json").read_text(encoding="utf-8"))

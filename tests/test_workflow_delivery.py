@@ -1,4 +1,5 @@
 """Workflow boundary tests: real evaluator decisions, tampering and unsigned mappings."""
+from tests.optional import available, requires
 from copy import deepcopy
 import json
 from pathlib import Path
@@ -133,6 +134,8 @@ class WorkflowDeliveryTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.crate()
 
+    @requires('cryptography')
+    @unittest.skipUnless(available('cryptography'), "requires: cryptography")
     def test_stale_signed_review_is_rejected_and_original_bytes_retained(self):
         from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
         from value_lab.signatures import sign

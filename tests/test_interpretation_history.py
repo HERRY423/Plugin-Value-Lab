@@ -1,4 +1,5 @@
 """Four identities and revision lifecycle, using manufactured evidence only."""
+from tests.optional import available, requires
 from copy import deepcopy
 import base64
 import hashlib
@@ -254,6 +255,8 @@ with patch("value_lab.decision_store.recovery_view", side_effect=lambda state: o
             self.store.record_recheck(report, card, ["first"], "j1", key="import", expected_sequence=before["sequence"])
         self.assertEqual(self.store.snapshot(), before)
 
+    @requires('jsonschema')
+    @unittest.skipUnless(available('jsonschema'), "requires: jsonschema")
     def test_four_event_schemas_match_runtime_and_reject_extra_fields(self):
         import jsonschema
         schema = json.loads((fixtures.ROOT / "schemas/decision-event.schema.json").read_bytes())
