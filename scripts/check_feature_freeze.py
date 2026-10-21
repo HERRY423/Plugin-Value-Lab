@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 GOLDEN = ['doctor', 'freeze', 'evaluate', 'usage-card', 'compare-studies']
 FREEZE_FORMAT = 'pvl-feature-freeze-2'
-MAINLINE_DOCUMENT_LIMIT = 2  # Owner-requested Chinese/English README pair, 2026-10-13.
+MAINLINE_DOCUMENT_LIMIT = 3  # README pair + owner-requested data governance one-pager.
 
 # Explicit expression fields, never AST repr/_fields: interpreter metadata and
 # empty-field display defaults are not part of this project's interface schema.

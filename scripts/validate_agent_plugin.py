@@ -31,7 +31,7 @@ def validate(root):
     package_version = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
     python_version = re.sub(r"-alpha\.", "a", manifest["version"])
     python_version = re.sub(r"-beta\.", "b", python_version)
-    python_version = re.sub(r"-rc\.", "rc", python_version)
+    python_version = re.sub(r"-rc\.?", "rc", python_version)
     runtime = (root / "value_lab/__init__.py").read_text(encoding="utf-8")
     if package_version != python_version or not re.search(r'^__version__ = "' + re.escape(manifest["version"]) + r'"$', runtime, re.M):
         raise ValueError("Python package/runtime and plugin version drift")

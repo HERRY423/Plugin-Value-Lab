@@ -59,9 +59,29 @@ def main():
         plan = json.loads((directory / "research/research-plan.json").read_text(encoding="utf-8"))
         assert plan["evidence_type"] == "synthetic"
         assert not plan["resource_plan"]["execution_authorized"]
+        collaboration_check = subprocess.run([sys.executable, "-c", """
+from pathlib import Path
+from value_lab.collaboration import dispatch
+from value_lab.core import demo_suite
+root=Path('collaboration-check').resolve()
+root.mkdir()
+who={'id':'wheel-agent','kind':'agent'}
+opened=dispatch(root,'study','open',{'inputs':{'suite':demo_suite(),'records':[],'lock':None,'cost_ledger':None}},
+                who=who,key='open',expected_sequence=0)
+run=dispatch(root,'study','execute',{'attempt_id':'run','reason':'Isolated wheel engineering check'},
+             who=who,key='execute',expected_sequence=opened['sequence'])
+assert run['execution_performed'] and run['result']['new_observations']==0
+bundle=dispatch(root,'study','export',{'directory':'bundle'},who=who)
+restored=dispatch(root,'recovered','restore',{'directory':'bundle','checkpoint':bundle['checkpoint']},who=who)
+assert not restored['execution_performed'] and restored['result_sha256']==run['result_sha256']
+assert not restored['status']['human_acceptance_verified']
+print('collaboration-ready')
+"""], cwd=directory, env=env, capture_output=True, text=True, encoding="utf-8", check=True)
+        assert "collaboration-ready" in collaboration_check.stdout
         print(json.dumps({"wheel": wheel.name, "isolated_wheel_demo": "passed", "source_tree_import": False,
                           "isolated_plan_and_usage_card": "passed", "workbench_assets_and_server": "passed",
                           "isolated_research_context_and_plan": "passed",
+                          "isolated_collaboration_execution_and_recovery": "passed",
                           "real_model_calls": 0, "verdict": report["verdict"]}, indent=2))
 
 

@@ -46,23 +46,16 @@ def validate_config(config):
         raise ValidationError('Windows requires an immutable local image ID, not a mutable tag or automatic pull')
     g = config['gateway']
     required = {'endpoint', 'models', 'api_key_env', 'max_requests', 'max_output_tokens', 'request_timeout_seconds'}
-    if not isinstance(g, dict) or not required <= set(g) or set(g) - required - {'budget'}:
+    if not isinstance(g, dict) or not required <= set(g) or set(g) - required - {'budget', 'protocol', 'network_scope', 'allowed_addresses', 'auth'}:
         raise ValidationError('Gateway requires endpoint/models/api_key_env/max_requests/max_output_tokens/request_timeout_seconds')
     if not isinstance(g['endpoint'], str):
         raise ValidationError('Model endpoint must be a string')
-    endpoint = urlsplit(g['endpoint'])
-    if (endpoint.scheme != 'https' or not endpoint.hostname or endpoint.username or endpoint.password
-            or endpoint.port not in (None, 443) or endpoint.path not in ('', '/') or endpoint.query or endpoint.fragment
-            or not re.fullmatch(r'[A-Za-z0-9.-]+', endpoint.hostname) or '.' not in endpoint.hostname):
-        raise ValidationError('Gateway endpoint must be one HTTPS origin on port 443')
-    try:
-        address = ipaddress.ip_address(endpoint.hostname)
-    except ValueError:
-        address = None
-    if address is not None and not address.is_global:
-        raise ValidationError('Private/loopback model endpoints are not supported')
-    if endpoint.hostname.endswith(('.localhost', '.local', '.internal')):
-        raise ValidationError('Private model endpoint is not supported')
+    from .model_endpoint import validate_endpoint
+    validate_endpoint(g)
+    if g.get('protocol', 'anthropic_messages') not in ('anthropic_messages', 'openai_chat'):
+        raise ValidationError('Unsupported gateway protocol')
+    if g.get('auth', 'api_key') not in ('api_key', 'none') or (g.get('auth') == 'none' and g.get('network_scope', 'public') == 'public'):
+        raise ValidationError('Only explicitly local/intranet endpoints may omit API authentication')
     if (not isinstance(g['models'], list) or not g['models'] or len(g['models']) > 8
             or any(not isinstance(m, str) or not re.fullmatch(r'[A-Za-z0-9._:/-]{1,150}', m) for m in g['models'])
             or len(set(g['models'])) != len(g['models'])):
@@ -191,7 +184,11 @@ class ModelGateway:
     def __init__(self, config, secret, transport=None, *, invocation_id=None):
         from copy import deepcopy
         self.config = deepcopy(config)
-        if not isinstance(secret, str) or not secret or any(c in secret for c in '\r\n'):
+        self._config_sha256 = suite_digest(self.config)
+        from .model_endpoint import validate_endpoint
+        validate_endpoint(self.config)
+        no_auth = config.get('auth') == 'none' and config.get('network_scope') in ('local', 'intranet')
+        if not no_auth and (not isinstance(secret, str) or not secret or any(c in secret for c in '\r\n')):
             raise ValidationError('Dedicated model credential unavailable or invalid')
         self._secret = secret
         self._live_transport = transport is None
@@ -215,6 +212,8 @@ class ModelGateway:
             return self._request(message, remaining)
 
     def _request(self, message, remaining):
+        if suite_digest(self.config) != self._config_sha256:
+            raise ValidationError('Frozen gateway configuration changed')
         if self._live_transport and self.budget is None:
             from .native import require_budget_boundary
             require_budget_boundary()
@@ -226,7 +225,9 @@ class ModelGateway:
             raise ValidationError('Invalid model broker frame')
         if message['kind'] != 'request' or type(message['id']) is not int or message['id'] != self.requests + 1:
             raise ValidationError('Non-sequential/replayed model request')
-        if message['path'] not in ('/v1/messages', '/v1/messages?beta=true', '/v1/messages/count_tokens', '/v1/messages/count_tokens?beta=true'):
+        paths = (('/v1/chat/completions',) if self.config.get('protocol') == 'openai_chat' else
+                 ('/v1/messages', '/v1/messages?beta=true', '/v1/messages/count_tokens', '/v1/messages/count_tokens?beta=true'))
+        if message['path'] not in paths:
             raise ValidationError('Model API path is not allowed')
         if self.requests >= self.config['max_requests']:
             raise ValidationError('Frozen model request ceiling exhausted')
@@ -275,6 +276,8 @@ class ModelGateway:
             self._dispatch_permit = None
 
     def _https(self, path, body, beta, timeout):
+        if suite_digest(self.config) != self._config_sha256:
+            raise ValidationError('Frozen gateway configuration changed')
         if self.budget is None:
             from .native import require_budget_boundary
             require_budget_boundary()
@@ -284,10 +287,17 @@ class ModelGateway:
         self._dispatch_permit = None  # Consume before DNS/TLS; never reuse on errors.
         self.budget.check()
         started = time.monotonic()
-        host = urlsplit(self.config['endpoint']).hostname
-        addresses = socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)
-        if not addresses or any(not ipaddress.ip_address(row[4][0]).is_global for row in addresses):
-            raise ValidationError('Endpoint DNS includes a non-public address')
+        from .model_endpoint import validate_endpoint, allowed_address
+        endpoint = validate_endpoint(self.config)
+        host = endpoint.hostname
+        port = endpoint.port or (443 if endpoint.scheme == 'https' else 80)
+        scope = self.config.get('network_scope', 'public')
+        pins = {str(ipaddress.ip_address(a)) for a in self.config.get('allowed_addresses', [])}
+        addresses = socket.getaddrinfo(host, port, type=socket.SOCK_STREAM)
+        if not addresses or any(not allowed_address(ipaddress.ip_address(row[4][0]), scope)
+                                or (scope != 'public' and str(ipaddress.ip_address(row[4][0])) not in pins)
+                                for row in addresses):
+            raise ValidationError('Endpoint DNS violates frozen address scope/pins')
         # Pin the validated address at connect, retaining TLS hostname validation.
         address = addresses[0][4][0]
         def remaining():
@@ -295,18 +305,24 @@ class ModelGateway:
             if self.cancelled.is_set() or left <= 0:
                 raise TimeoutError()
             return left
-        connection = http.client.HTTPSConnection(host, timeout=remaining(), context=ssl.create_default_context())
+        connection = (http.client.HTTPSConnection(host, port=port, timeout=remaining(), context=ssl.create_default_context())
+                      if endpoint.scheme == 'https' else http.client.HTTPConnection(host, port=port, timeout=remaining()))
         def connect():
-            raw = socket.create_connection((address, 443), remaining())
+            raw = socket.create_connection((address, port), remaining())
             try:
                 raw.settimeout(remaining())
-                connection.sock = connection._context.wrap_socket(raw, server_hostname=host)
+                connection.sock = connection._context.wrap_socket(raw, server_hostname=host) if endpoint.scheme == 'https' else raw
             except Exception:
                 raw.close()
                 raise
         connection.connect = connect
         try:
-            headers = {'content-type': 'application/json', 'anthropic-version': '2023-06-01', 'x-api-key': self._secret}
+            headers = {'content-type': 'application/json'}
+            if self.config.get('protocol', 'anthropic_messages') == 'anthropic_messages':
+                headers['anthropic-version'] = '2023-06-01'
+            if self.config.get('auth', 'api_key') != 'none':
+                headers['authorization' if self.config.get('protocol') == 'openai_chat' else 'x-api-key'] = (
+                    'Bearer ' + self._secret if self.config.get('protocol') == 'openai_chat' else self._secret)
             if beta:
                 headers['anthropic-beta'] = beta
             remaining()
@@ -457,6 +473,8 @@ def prepare_session(directory, plan_digest, plugin, invocation, output, *, refer
     if sandbox is None:
         raise ValidationError('Explicit --sandbox config required; online host-root masking has been retired')
     config = json.loads(json.dumps(validate_config(sandbox)))
+    if config['gateway'].get('protocol', 'anthropic_messages') != 'anthropic_messages':
+        raise ValidationError('This native Claude bridge requires anthropic_messages; use a lab chat adapter for openai_chat')
     windows = config['backend'] == 'windows-hyperv'
     if (windows and sys.platform != 'win32') or (not windows and sys.platform != 'linux'):
         raise ValidationError('Selected backend does not match this OS: Windows uses Hyper-V, Linux uses bubblewrap')
@@ -553,6 +571,8 @@ def run_session(root, frozen, pin):
     if frozen.get('isolation_profile') != PROFILE:
         raise ValidationError('Legacy online masking plans cannot execute; prepare a networkless revision')
     config = validate_config(frozen['sandbox'])
+    if config['gateway'].get('protocol', 'anthropic_messages') != 'anthropic_messages':
+        raise ValidationError('This native Claude bridge requires anthropic_messages')
     windows = config['backend'] == 'windows-hyperv'
     if (windows and sys.platform != 'win32') or (not windows and sys.platform != 'linux') or (root / 'started.json').exists():
         raise ValidationError('Frozen backend mismatch or already attempted; no automatic retry')

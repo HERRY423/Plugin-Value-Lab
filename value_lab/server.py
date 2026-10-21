@@ -41,9 +41,15 @@ def _material_root(allowed, requested, name):
     return selected
 
 
-def create_server(*, enable_extensions=False, artifact_root=None, verifier_root=None):
+def create_server(*, enable_extensions=False, artifact_root=None, verifier_root=None,
+                  collaboration_root=None, collaboration_actor="agent"):
     artifacts = _configured_root(artifact_root)
     verifiers = _configured_root(verifier_root)
+    collaboration = _configured_root(collaboration_root)
+    if collaboration is not None and any(root is not None and (
+            collaboration.is_relative_to(root) or root.is_relative_to(collaboration))
+            for root in (artifacts, verifiers)):
+        raise ValidationError("MCP collaboration writes must be separate from read-only artifact/scorer directories")
     if artifacts is not None and verifiers is not None and (
             artifacts.is_relative_to(verifiers) or verifiers.is_relative_to(artifacts)):
         raise ValidationError("MCP artifact and scorer directories must be separate and non-overlapping")
@@ -60,8 +66,9 @@ def create_server(*, enable_extensions=False, artifact_root=None, verifier_root=
     except ImportError as exc:
         raise ValidationError('MCP SDK missing from this Python. Install with the host Python: python -m pip install "mcp==1.28.1"; then restart the plugin connection. See docs/history/INSTALL.zh-CN.md.') from exc
     mcp = FastMCP("Plugin Value Lab", instructions=(
-        "Compare paired runs, locate failures and plan a bounded repair/retest for plugin authors. Registration is optional. "
-        "All tools are local and read-only. "
+        "Compare paired runs, locate failures and plan a bounded repair/retest for plugin authors. Registration is optional. " +
+        ("Analysis tools are local and read-only. Opt-in collaboration writes only to the host-authorized directory. "
+         if collaboration is not None else "All tools are local and read-only. ") +
         "Artifact checks read hash-bound files only under host-configured PVL_ARTIFACT_ROOT and PVL_VERIFIER_ROOT. "
         "Executable graders stay unresolved over MCP. "
         "No tool runs a model, certifies external value or publishes results. Synthetic data remain synthetic."
@@ -155,10 +162,34 @@ def create_server(*, enable_extensions=False, artifact_root=None, verifier_root=
 
     if enable_extensions:
         mcp.tool()(research_direction_advisor)
+    if collaboration is not None:
+        @mcp.tool()
+        def collaborate_plugin_task(task_id: str, action: str, arguments: dict | None = None,
+                                    key: str | None = None, expected_sequence: int | None = None) -> dict:
+            """Execute, review, correct, hand off and recover a local PVL evaluation.
+
+            Actions: open(inputs); status; result (full retained report); execute(attempt_id,reason);
+            review(review_id,attempt_id,result_sha256,verdict,notes);
+            correct(review_id,inputs,reason); handoff(handoff_id,recipient,note);
+            receive(handoff_id); cancel_handoff(handoff_id,reason);
+            resolve(attempt_id,reason); export(directory); restore(directory,checkpoint).
+            Inputs contain suite, records, lock, cost_ledger and optional artifact_files
+            (relative paths to base64 bytes, total inputs at most 8 MiB). Writes need a stable key
+            and the last read sequence. Agent identity is fixed by the host and cannot
+            claim to be a human. Execute only evaluates submitted records: no new
+            scientific/model execution, file graders, payment or host acceptance.
+            Restore never executes and requires a separately retained checkpoint.
+            """
+            from .collaboration import dispatch
+            return dispatch(collaboration, task_id, action, arguments,
+                            who={"id": collaboration_actor, "kind": "agent"},
+                            key=key, expected_sequence=expected_sequence)
     return mcp
 
 
 def serve(*, enable_extensions=False):
     create_server(enable_extensions=enable_extensions,
                   artifact_root=os.environ.get("PVL_ARTIFACT_ROOT"),
-                  verifier_root=os.environ.get("PVL_VERIFIER_ROOT")).run(transport="stdio")
+                  verifier_root=os.environ.get("PVL_VERIFIER_ROOT"),
+                  collaboration_root=os.environ.get("PVL_COLLABORATION_ROOT"),
+                  collaboration_actor=os.environ.get("PVL_COLLABORATION_ACTOR", "agent")).run(transport="stdio")

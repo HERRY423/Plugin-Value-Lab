@@ -1,0 +1,15 @@
+{
+  "endpoint": "http://127.0.0.1:8080",
+  "protocol": "openai_chat",
+  "network_scope": "local",
+  "allowed_addresses": ["127.0.0.1"],
+  "per_request_micros": 100000,
+  "total_micros": 1000000,
+  "tariffs": [
+    {"id": "replace-with-lab-rate-id", "model": "replace-with-exact-model-id",
+     "context_tokens": 8192, "max_output_tokens": 1024,
+     "input_micros_per_token": 0, "output_micros_per_token": 0,
+     "source": "TEMPLATE_ONLY: verify actual server limits and zero API fee before use",
+     "expires_at": "2020-01-01T00:00:00+00:00"}
+  ]
+}

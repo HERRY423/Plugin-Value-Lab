@@ -142,7 +142,7 @@ class RequestBudget:
         with self._transaction() as db:
             return self._status(db)
 
-    def reserve(self, key, request_sha256, operation, upper_micros):
+    def reserve(self, key, request_sha256, operation, upper_micros, *, allow_zero=False):
         """Commit reservation before dispatch. A replay NEVER grants dispatch."""
         _text(key, 'idempotency key')
         _text(operation, 'operation')
@@ -158,7 +158,7 @@ class RequestBudget:
             state = self._status(db)
             if state['status'] != 'ACCOUNTING_READY':
                 raise ValidationError(state['status'] + ': admission denied')
-            if not 0 < upper_micros <= state['per_request_micros']:
+            if not (0 <= upper_micros <= state['per_request_micros'] and (upper_micros > 0 or allow_zero is True)):
                 raise ValidationError('PER_REQUEST_CAP_EXCEEDED')
             if upper_micros > state['remaining_micros']:
                 raise ValidationError('TASK_BUDGET_EXHAUSTED')

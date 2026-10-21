@@ -1,0 +1,14 @@
+[
+  {
+    "id": "your-plugin",
+    "version": "UNKNOWN",
+    "sha256": "UNKNOWN",
+    "checks": {
+      "declaration": {"status": "UNKNOWN", "evidence_ref": null},
+      "permissions": {"status": "UNKNOWN", "evidence_ref": null},
+      "egress": {"status": "UNKNOWN", "evidence_ref": null},
+      "license": {"status": "UNKNOWN", "evidence_ref": null},
+      "identity": {"status": "UNKNOWN", "evidence_ref": null}
+    }
+  }
+]

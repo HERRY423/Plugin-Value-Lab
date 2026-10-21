@@ -20,6 +20,10 @@ def main():
     if args.sandbox:
         try:
             gateway = validate_config(load_json(args.sandbox))['gateway']
+            if 'policy' in gateway.get('budget', {}):
+                result.pop('tariff', None)
+                result['policy'] = gateway['budget']['policy']
+                result['tariff_sha256'] = gateway['budget']['tariff_sha256']
             budget = GatewayBudget(gateway)
             result['ledger'] = budget.ledger.status()
             budget.preflight(gateway['max_output_tokens'])

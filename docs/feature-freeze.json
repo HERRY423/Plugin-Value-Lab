@@ -2,8 +2,8 @@
   "format": "pvl-feature-freeze-2",
   "status": "FROZEN",
   "started": "2026-09-25",
-  "planned_review": "2026-11-06",
-  "duration_days": 42,
+  "planned_review": "AFTER_ONE_EXTERNAL_LAB_COMPLETES_L1",
+  "duration_days": null,
   "version_series": "0.6.x",
   "automatic_unfreeze": false,
   "golden_commands": [
@@ -13,11 +13,14 @@
     "usage-card",
     "compare-studies"
   ],
-  "mainline_document_limit": 2,
+  "mainline_document_limit": 3,
   "bilingual_readme_scope_change": {
     "date": "2026-10-13",
     "authorization": "Owner requested README improvements and an English version.",
-    "documents": ["README.md", "README.en.md"],
+    "documents": [
+      "README.md",
+      "README.en.md"
+    ],
     "scope": "One decision guide in two languages; runtime surface and five golden commands remain frozen."
   },
   "surface": {
@@ -3054,6 +3057,120 @@
         },
         "async": false
       },
+      "collaborate_plugin_task": {
+        "parameters": [
+          {
+            "name": "task_id",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "Name",
+              "id": "str"
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          },
+          {
+            "name": "action",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "Name",
+              "id": "str"
+            },
+            "default": {
+              "present": false,
+              "value": null
+            }
+          },
+          {
+            "name": "arguments",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "dict"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            }
+          },
+          {
+            "name": "key",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "str"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            }
+          },
+          {
+            "name": "expected_sequence",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "annotation": {
+              "node": "BinOp",
+              "left": {
+                "node": "Name",
+                "id": "int"
+              },
+              "op": {
+                "node": "BitOr"
+              },
+              "right": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            },
+            "default": {
+              "present": true,
+              "value": {
+                "node": "Constant",
+                "type": "NoneType",
+                "value": null
+              }
+            }
+          }
+        ],
+        "returns": {
+          "node": "Name",
+          "id": "dict"
+        },
+        "async": false
+      },
       "evaluate_plugin_value": {
         "parameters": [
           {
@@ -3486,6 +3603,8 @@
       "value_lab/codex_context.py",
       "value_lab/codex_evidence.py",
       "value_lab/codex_study.py",
+      "value_lab/collaboration.py",
+      "value_lab/collaboration_state.py",
       "value_lab/comparison.py",
       "value_lab/component_localization.py",
       "value_lab/component_studies.py",
@@ -3515,11 +3634,13 @@
       "value_lab/hosts.py",
       "value_lab/interpretation.py",
       "value_lab/interpretation_history.py",
+      "value_lab/lab_gateway.py",
       "value_lab/live_recording.py",
       "value_lab/longitudinal.py",
       "value_lab/markdown_text.py",
       "value_lab/metamorphic.py",
       "value_lab/methodology.py",
+      "value_lab/model_endpoint.py",
       "value_lab/native.py",
       "value_lab/native_analysis.py",
       "value_lab/native_evidence.py",
@@ -3557,6 +3678,7 @@
       "value_lab/science_execution.py",
       "value_lab/science_storage.py",
       "value_lab/scoring.py",
+      "value_lab/screening.py",
       "value_lab/sdk.py",
       "value_lab/server.py",
       "value_lab/signatures.py",
@@ -3685,6 +3807,172 @@
         }
       ],
       "commands": {
+        "screen": [
+          {
+            "name": "frozen",
+            "flags": [
+              "--frozen"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "help",
+            "flags": [
+              "--help",
+              "-h"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "json",
+            "flags": [
+              "--json"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "output",
+            "flags": [
+              "--output"
+            ],
+            "required": true,
+            "choices": null
+          },
+          {
+            "name": "plugins",
+            "flags": [
+              "--plugins"
+            ],
+            "required": true,
+            "choices": null
+          },
+          {
+            "name": "results",
+            "flags": [
+              "--results"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "settings",
+            "flags": [
+              "--settings"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "tasks",
+            "flags": [
+              "--tasks"
+            ],
+            "required": true,
+            "choices": null
+          }
+        ],
+        "freeze-models": [
+          {
+            "name": "api_key_env",
+            "flags": [
+              "--api-key-env"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "help",
+            "flags": [
+              "--help",
+              "-h"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "history",
+            "flags": [
+              "--history"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "history_ref",
+            "flags": [
+              "--history-ref"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "json",
+            "flags": [
+              "--json"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "ledger",
+            "flags": [
+              "--ledger"
+            ],
+            "required": true,
+            "choices": null
+          },
+          {
+            "name": "max_output_tokens",
+            "flags": [
+              "--max-output-tokens"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "max_requests",
+            "flags": [
+              "--max-requests"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "no_auth",
+            "flags": [
+              "--no-auth"
+            ],
+            "required": false,
+            "choices": null
+          },
+          {
+            "name": "output",
+            "flags": [
+              "--output"
+            ],
+            "required": true,
+            "choices": null
+          },
+          {
+            "name": "policy",
+            "flags": [
+              "--policy"
+            ],
+            "required": true,
+            "choices": null
+          },
+          {
+            "name": "task_id",
+            "flags": [
+              "--task-id"
+            ],
+            "required": true,
+            "choices": null
+          }
+        ],
         "demo": [
           {
             "name": "help",
@@ -5458,5 +5746,91 @@
       "value_lab/action_decision.py"
     ],
     "boundary": "Opt-in risk protocol v2 and existing plan-use/plan_plugin_use entry; existing v1 calculation preserved. No execution, paid calls or publication. Shrinkage is descriptive regularization; adoption requires independently recomputed confirmation."
+  },
+  "collaboration_loop_scope_change": {
+    "date": "2026-10-20",
+    "authorization": "Owner explicitly requested implementation of researcher-agent execution, review, correction, handoff and recovery with actual verification and preserved human/native-host acceptance gates.",
+    "scope": "Two collaboration modules and one host-opt-in MCP tool; default six tools and five golden commands unchanged. Local retained-record evaluation only; no new model execution, paid calls, authenticated human acceptance or release claim.",
+    "guide": "docs/history/20261020-COLLABORATION.md"
+  },
+  "screening_lab_models_scope_change": {
+    "date": "2026-10-20",
+    "authorization": "Owner requested one-command L0/L1 screening and laboratory-owned budgets/accounts/local or intranet models, with a multi-model tariff whitelist and $0.10 retained as a default rather than a hard limit.",
+    "added_runtime_modules": [
+      "value_lab/screening.py",
+      "value_lab/lab_gateway.py",
+      "value_lab/model_endpoint.py"
+    ],
+    "scope": "pvl screen and pvl freeze-models; frozen local screening, trusted lab adapters/import, shared accounting, per-model rate snapshots and explicitly pinned local/intranet text endpoints.",
+    "boundary": "No paid calls, real-host acceptance, benefit claim, sequential L2/L3 implementation, automatic external publication or changes to AgentMuxer account limits.",
+    "guide": "docs/history/20261020-SCREENING-LAB-MODELS.md"
+  },
+  "feature_development_policy": {
+    "effective_date": "2026-10-20",
+    "status": "NO_NEW_PRODUCT_FEATURES",
+    "authorization": "Owner explicitly requested stopping feature additions and making one external laboratory completing L1 the v1.0 usage acceptance gate.",
+    "allowed_work": [
+      "existing-path correctness and security fixes",
+      "installation and recovery blockers",
+      "documentation clarification",
+      "support and evidence review for one external laboratory L1"
+    ],
+    "prohibited_work": [
+      "new runtime modules",
+      "new model or host adapters",
+      "new statistical methods or metrics",
+      "new product interfaces"
+    ],
+    "unfreeze_requires": "Explicit subsequent owner decision; no automatic unfreeze on date or milestone",
+    "governance_document": "docs/DATA-GOVERNANCE.md",
+    "documentation_exception": "One active data governance page alongside the two READMEs; not a product feature expansion"
+  },
+  "v1_release_gate": {
+    "criterion": "ONE_EXTERNAL_LAB_COMPLETES_L1",
+    "required_labs": 1,
+    "records": [],
+    "completion_definition": "A non-author laboratory operator completes all frozen 3–5 tasks, two arms and two attempts per arm; preserves failures and unknowns; issues a use card; laboratory confirms completion and release owner verifies scope/version/support.",
+    "accepted_outcomes": [
+      "STOP",
+      "INSUFFICIENT_EVIDENCE",
+      "ADVANCE_PILOT"
+    ],
+    "raw_evidence_location": "Within the institution; only manually approved minimal attestation and summary may leave",
+    "record_contract": {
+      "index_entry": [
+        "completion_record",
+        "sha256"
+      ],
+      "approved_completion_fields": [
+        "lab_code",
+        "external_operator",
+        "lab_confirmed_complete",
+        "release_owner_accepted",
+        "export_approved",
+        "lab_attestation_ref",
+        "release_review_ref",
+        "tested_version",
+        "tested_source_sha256",
+        "use_card_ref",
+        "outcome",
+        "task_ids",
+        "attempts"
+      ],
+      "attempt_fields": [
+        "task_id",
+        "repeat",
+        "arm",
+        "status"
+      ]
+    },
+    "not_a_substitute": [
+      "more features or modules",
+      "test counts",
+      "author or synthetic demonstrations",
+      "a positive result without a completed external workflow"
+    ],
+    "existing_correctness_and_security_checks_retained": true,
+    "automatic_release": false,
+    "automatic_unfreeze": false
   }
 }

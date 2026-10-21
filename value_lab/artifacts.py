@@ -150,7 +150,10 @@ def _builtin(path, spec, verifier_root=None):
     kind = spec["kind"]
     if kind == "json_fields":
         obj = load_json(path)
-        for dotted, expected in spec["expected"].items():
+        # Canonical JSON persistence may reorder object keys. The first failure
+        # and its report digest must not depend on that incidental ordering.
+        for dotted in sorted(spec["expected"]):
+            expected = spec["expected"][dotted]
             value = obj
             for key in dotted.split("."):
                 value = value[int(key)] if isinstance(value, list) else value[key]

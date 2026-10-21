@@ -1,0 +1,6 @@
+[
+  {"id": "T1", "kind": "positive", "input": "UNKNOWN", "rubric": "UNKNOWN", "baseline": "UNKNOWN"},
+  {"id": "T2", "kind": "failure", "input": "UNKNOWN", "rubric": "UNKNOWN", "baseline": "UNKNOWN"},
+  {"id": "T3", "kind": "boundary", "input": "UNKNOWN", "rubric": "UNKNOWN", "baseline": "UNKNOWN"},
+  {"id": "T4", "kind": "positive", "input": "UNKNOWN", "rubric": "UNKNOWN", "baseline": "UNKNOWN"}
+]

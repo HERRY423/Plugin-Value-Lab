@@ -2,13 +2,19 @@
 
 # Plugin Value Lab
 
+**Feature development is frozen. The v1.0 usage acceptance gate is one external laboratory completing L1; verified records: 0/1.** Module counts, test totals and author-run demonstrations do not satisfy this gate. Existing correctness, safety and release checks remain required.
+
+A non-author lab operator must complete 3–5 real tasks, two arms and two attempts per arm (12–20 attempts) under a frozen version, scoring rule and budget, retaining failures and unknowns and producing a use card. Stop, insufficient evidence and advance to pilot are all valid completed-screening outcomes; positive benefit is not required. An incomplete matrix or early safety stop remains recorded but does not count as completed L1. Never continue unsafe execution to meet the gate. Document author support; author execution cannot substitute for external operation.
+
+Raw evidence stays within the institution. Only an approved minimal completion attestation, summary and use card may be shared. The lab confirms completion and the release owner verifies external operation and the tested version. No model supplies their acceptance. This is evidence of one completed external workflow, not general benefit, regulatory approval or clinical validity. Passing the gate does not automatically publish or unfreeze development. Until an explicit owner decision, work is limited to existing-path correctness, security, installation/recovery fixes, documentation and support for this trial. See the [one-page data governance policy](docs/DATA-GOVERNANCE.md).
+
 **Does this plugin actually improve your task?**
 
 [中文](README.md) · English
 
-Plugin Value Lab helps you decide whether a plugin is worth using for a **specific task**, through paired comparisons, frozen plans, and recomputable records. Compare runs with and without a plugin while keeping failures, costs, uncertainty, and missing evidence visible. **Version 1.0.0-rc.5.** This is a release candidate.
+Plugin Value Lab helps you decide whether a plugin is worth using for a **specific task**, through paired comparisons, frozen plans, and recomputable records. Compare runs with and without a plugin while keeping failures, costs, uncertainty, and missing evidence visible. **Version 1.0.0-rc7.** This is a release candidate.
 
-[Download rc5](https://github.com/HERRY423/Plugin-Value-Lab/releases/tag/v1.0.0rc5) · [Five-step quickstart](#five-step-quickstart-no-model-calls) · [Methods and implementation records](docs/history/INDEX.md)
+[Download rc7](https://github.com/HERRY423/Plugin-Value-Lab/releases/tag/v1.0.0-rc7) · [Five-step quickstart](#five-step-quickstart-no-model-calls) · [Methods and implementation records](docs/history/INDEX.md)
 
 ## When to use it
 
@@ -20,6 +26,8 @@ Plugin Value Lab helps you decide whether a plugin is worth using for a **specif
 | How to explain a result to colleagues | Produce a usage card, HTML report, and machine-readable records with scope, validity window, and next steps |
 
 The host orchestrates task execution. Supplying a plugin name alone does not start independent experimental arms or recover historical logs. Results apply only to the tasks, models, and conditions represented in the records.
+
+The source checkout now includes an opt-in [local collaboration workflow](docs/history/20261020-COLLABORATION.md): actual reevaluation of retained records, result-bound review, corrected revisions, acknowledged handoffs and checkpoint recovery. The host must explicitly enable MCP writes; the six default analysis tools remain unchanged. This workflow is included in rc7. Human collaboration, desktop-host acceptance and measured benefit still require separate validation.
 
 ## Install in Codex
 
@@ -34,12 +42,12 @@ On the Codex plugins page, choose **Add plugin marketplace** and enter:
 | Field | Value |
 | --- | --- |
 | Source | `HERRY423/Plugin-Value-Lab` |
-| Git reference | `v1.0.0rc5` to pin rc5; use `main` for subsequent source updates |
+| Git reference | `v1.0.0-rc7` to pin rc7; use `main` for subsequent source updates |
 | Sparse paths | Leave blank |
 
 Then select and install **Plugin Value Lab** from the marketplace. The repository includes the balance icon and its manifest configuration.
 
-Alternatively, download `plugin-value-lab-marketplace-1.0.0-rc.5.zip` from the [Release](https://github.com/HERRY423/Plugin-Value-Lab/releases/tag/v1.0.0rc5), extract it, and add the marketplace from a local folder. Select the **root containing `.agents/plugins/marketplace.json`** and preserve the full directory structure. The Python wheel is a separate CLI/library distribution; installing it does not register the plugin in Codex.
+Alternatively, download `plugin-value-lab-marketplace-1.0.0-rc7.zip` from the [Release](https://github.com/HERRY423/Plugin-Value-Lab/releases/tag/v1.0.0-rc7), extract it, and add the marketplace from a local folder. Select the **root containing `.agents/plugins/marketplace.json`** and preserve the full directory structure. The Python wheel is a separate CLI/library distribution; installing it does not register the plugin in Codex.
 
 After installation, try this prompt:
 
@@ -82,12 +90,12 @@ What do you have?
 | --- | --- |
 | [Action decision layer](docs/history/20261012-ACTION-DECISION.md) | Implements four recommendations: scoped adoption, guarded trial, baseline by default, and avoid. Includes multi-candidate rotation, shrinkage displays, and simultaneous rank intervals. Shrinkage cannot replace independent confirmation; example losses are not user preferences. |
 | [Public evidence pool and gateway](docs/history/20261012-POOL-GATEWAY.md) | All [30 candidate slots](examples/literature-pool/candidates.json) are synthetic placeholders. Expert review and third-party custody are pending. A real held-out set needs at least `max(30, families required by the power plan)` independent families; variants within a family do not increase this count. |
-| [L0–L3 evidence ladder](docs/history/20261012-EVIDENCE-LADDER-DESIGN.md) | **Design only, not implemented** (`DESIGN_FOR_REVIEW / NOT_IMPLEMENTED`). Current v3 rules use a fixed sample and do not provide the design's sequential-stopping guarantees. |
+| [One-command L0/L1 screening and lab model policies](docs/history/20261020-SCREENING-LAB-MODELS.md) | `pvl screen` takes a plugin list and 3–5 tasks and returns stop / insufficient evidence / advance to pilot with a use card. Run a lab adapter or import frozen paired records. New L2/L3 sequential designs remain unimplemented; v3 remains fixed-sample. |
 
 ## Data, costs, and security
 
 - The local example makes no model calls. Real runs require explicit data permissions, a provider, and a budget. Keep sensitive data out of public examples and reports.
-- The parent-process gateway reserves cumulative costs before sending requests and rejects over-budget calls. The conservative envelope in the rc5 tariff configuration exceeds the $0.10 per-call limit, so actual paid calls remain blocked; expired configurations are also rejected. Gateway limits are separate from provider account limits.
+- The parent gateway reserves costs before dispatch. `pvl freeze-models` freezes lab-selected budgets, individual rates for multiple models, and lab-owned API / local / intranet endpoints. $0.10 per request and $1 per task are defaults. The expired legacy tariff remains blocked. Unknown costs, expired rates and unpriced features remain blocking; gateway limits are separate from provider account limits.
 - Use provider login or an operating-system credential manager. Keep credentials out of repositories, command lines, cards, and logs. Ignore rules do not remove secrets from existing commits; revoke and replace exposed credentials at the provider.
 - Report vulnerabilities through the [private reporting channel](https://github.com/HERRY423/Plugin-Value-Lab/security/advisories/new). See the [security policy](docs/history/20261011/SECURITY.md) and [data governance](docs/history/20261011/docs/DATA-GOVERNANCE.md).
 
@@ -103,6 +111,6 @@ The fast tier covers core decisions, cards, power planning, and selected regress
 
 Optional dependencies are listed in [pyproject.toml](pyproject.toml): `dev`, `mcp`, `planning`, `registry`, `science`, and `pseudobulk`. Install only what your task requires. Native isolation, real backends, and workflows have separate CI checks. Passing engineering tests does not establish real plugin benefit or scientific validity.
 
-[Contributing](docs/history/20261011/CONTRIBUTING.md) · [API stability](docs/history/20261011/docs/API-STABILITY.md) · [rc5 release notes](docs/history/RELEASE-v1.0.0rc5.md) · [Historical documentation index](docs/history/INDEX.md)
+[Contributing](docs/history/20261011/CONTRIBUTING.md) · [API stability](docs/history/20261011/docs/API-STABILITY.md) · [rc7 release notes](docs/history/RELEASE-v1.0.0-rc7.md) · [Historical documentation index](docs/history/INDEX.md)
 
 Some linked implementation records are in Chinese. Archiving documents does not revoke maintenance or security policies. Licensed under [Apache-2.0](LICENSE); citation metadata is available in [CITATION.cff](CITATION.cff).

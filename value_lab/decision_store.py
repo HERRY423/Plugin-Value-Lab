@@ -17,6 +17,7 @@ import sqlite3
 from .core import ValidationError, suite_digest, validate_suite
 from .delivery import publish_bundle, read_bundle
 from . import interpretation_history as explanations
+from . import collaboration_state as collaboration
 
 LEGACY_FORMAT = "pvl-decision-store-1"
 FORMAT = "pvl-decision-store-2"
@@ -56,9 +57,17 @@ def _observations(state, ids):
         for ident in sorted(ids)})
 
 
-def _apply(state, event):
+def _apply(state, event, *, _local_bridge=False):
     """Validate transitions identically on write and on recovery."""
     kind, p = event["kind"], event["payload"]
+    if event["format"] == collaboration.FORMAT:
+        state = collaboration.apply_revision(state, kind, p,
+            lambda current, action, payload: _apply(current, {"format": FORMAT, "kind": action, "payload": payload},
+                                                    _local_bridge=True))
+        state["sequence"] += 1
+        return state
+    _require(_local_bridge or state is None or "collaboration" not in state,
+             "Collaboration tasks require version-bound collaboration events")
     if event["format"] == explanations.FORMAT:
         _require(state is not None and isinstance(kind, str) and kind in explanations.FIELDS,
                  "Unsupported explanation event or uninitialized study")
@@ -254,8 +263,13 @@ def recovery_view(state):
         if judgment["implementation"] is None:
             next_steps.append({"action": "VERIFY_JUDGMENT_IMPLEMENTATION", "judgment_id": jid})
     result.update(lifecycle)
+    if "collaboration" in state:
+        result["collaboration_status"] = collaboration.view(state)
+        next_steps = [{"action": "COLLABORATION_ACTION",
+                       "required_action": result["collaboration_status"]["next_action"]}]
     result.update(missing_evidence=missing, next_steps=next_steps, costs=costs,
-                  recovery_contract={"new_events": FORMAT, "legacy_history_present": state["format"] == LEGACY_FORMAT,
+                  recovery_contract={"new_events": collaboration.FORMAT if "collaboration" in state else FORMAT,
+                      "legacy_history_present": state["format"] == LEGACY_FORMAT,
                       "explanation_events": explanations.FORMAT,
                       "legacy_interpretations_without_observation_binding": [i["interpretation_id"] for i in state["interpretations"] if "observations_sha256" not in i],
                       "legacy_records_upgraded": False},
@@ -347,7 +361,7 @@ class DecisionStore:
         for seq, key, encoded, digest in db.execute("SELECT seq, request_key, event, digest FROM events ORDER BY seq"):
             event = json.loads(encoded)
             _require(isinstance(event, dict) and set(event) == {"format", "request_key", "parent", "kind", "payload"}, "Invalid event envelope")
-            _require(event["format"] in (LEGACY_FORMAT, FORMAT, explanations.FORMAT) and event["parent"] == previous and event["request_key"] == key
+            _require(event["format"] in (LEGACY_FORMAT, FORMAT, explanations.FORMAT, collaboration.FORMAT) and event["parent"] == previous and event["request_key"] == key
                      and suite_digest(event) == digest and seq == (state["sequence"] + 1 if state else 1), "Damaged or unsupported event history")
             state = _apply(state, event)
             for blob in event["payload"].get("artifacts", {}).values():
@@ -394,7 +408,7 @@ class DecisionStore:
         state, parent, keys, blobs = None, None, set(), {}
         for event in events:
             _require(isinstance(event, dict) and set(event) == {"format", "request_key", "parent", "kind", "payload"}
-                     and event["format"] in (LEGACY_FORMAT, FORMAT, explanations.FORMAT) and event["parent"] == parent
+                     and event["format"] in (LEGACY_FORMAT, FORMAT, explanations.FORMAT, collaboration.FORMAT) and event["parent"] == parent
                      and _text(event["request_key"]) and event["request_key"] not in keys, "Invalid recovery event chain")
             keys.add(event["request_key"])
             state = _apply(state, event)
@@ -413,6 +427,7 @@ class DecisionStore:
         for field in ("plan_sha256", "sequence", "attempts", "interpretations"):
             _require(submitted.get(field) == state[field], "Recovery presentation disagrees with event history")
         _require(submitted.get("explanations") == state.get("explanations"), "Explanation history disagrees with event history")
+        _require(submitted.get("collaboration") == state.get("collaboration"), "Collaboration history disagrees with event history")
         if checkpoint is not None:
             seq = checkpoint.get("sequence") if isinstance(checkpoint, dict) else None
             _require(type(seq) is int and 1 <= seq <= len(events), "Recovery bundle predates the retained checkpoint")
@@ -443,12 +458,12 @@ class DecisionStore:
             payload.setdefault("artifacts", {})
         blobs = {}
         if files is not None:
-            _require(kind in ("finish", "interpret", "judge", "present") and isinstance(files, dict), "Only evidence events carry files")
+            _require(kind in ("finish", "interpret", "judge", "present", "collab_finish") and isinstance(files, dict), "Only evidence events carry files")
             _require(all(_id(name) and isinstance(data, bytes) and len(data) <= MAX_BYTES for name, data in files.items()), "Invalid artifact name/bytes/size")
             payload["artifacts"] = {name: _sha(data) for name, data in files.items()}
             blobs = {_sha(data): data for data in files.values()}
         _json(payload)
-        with self._connect(create=kind == "initialize", write=True) as db:
+        with self._connect(create=kind in ("initialize", "collab_open"), write=True) as db:
             state, parent = self._read(db)
             old = db.execute("SELECT event FROM events WHERE request_key=?", (key,)).fetchone()
             if old:
@@ -456,7 +471,7 @@ class DecisionStore:
                 _require(original["kind"] == kind and original["payload"] == payload, "Idempotency key reused with changed request")
                 return {**recovery_view(state), "replayed": True}
             _require(expected_sequence == (state["sequence"] if state else 0), "Stale decision sequence; read current state")
-            event = {"format": explanations.FORMAT if kind in explanations.FIELDS else FORMAT,
+            event = {"format": collaboration.FORMAT if kind in collaboration.FIELDS else explanations.FORMAT if kind in explanations.FIELDS else FORMAT,
                      "request_key": key, "parent": parent, "kind": kind, "payload": payload}
             state = _apply(state, event)
             for digest, data in blobs.items():
@@ -515,6 +530,8 @@ class DecisionStore:
                 message = "确认判断实现身份：" + step["judgment_id"]
             elif action == "REVIEW_UNKNOWN_CHECK":
                 message = "复核判断 " + step["judgment_id"] + " 中仍未知的检查：" + step["check"]
+            elif action == "COLLABORATION_ACTION":
+                message = "继续协作流程：" + step["required_action"] + "；当前责任人、版本和结果摘要见 HANDOFF.md。"
             else:
                 message = "累计费用已超过登记预算，需要核对超支记录；当前不应启动新尝试。"
             lines.append("- " + _markdown(message))
@@ -535,6 +552,57 @@ class DecisionStore:
             statuses = ", ".join(k + ": " + v["status"] for k, v in judgment["result"]["checks"].items())
             lines.append("| " + " | ".join(_markdown(v) for v in (jid, judgment["observation_sha256"], judgment["judgment_sha256"], statuses)) + " |")
         files["RECOVERY.md"] = ("\n".join(lines) + "\n").encode()
+        if "collaboration" in view:
+            c = view["collaboration"]
+            status = view["collaboration_status"]
+            latest = status["latest_attempt"]
+            if latest and "result" in view["attempts"][latest]["artifacts"]:
+                digest = view["attempts"][latest]["artifacts"]["result"]
+                files["RESULT.json"] = files[digest + ".blob"]
+            handoff = ["# PVL collaboration handoff", "",
+                       "Stage: " + status["stage"], "Next action: " + status["next_action"],
+                       "Owner (declared): " + _markdown(c["owner"]),
+                       "Revision: " + status["revision"],
+                       "Input digest: " + status["inputs_sha256"],
+                       "Latest review: " + _markdown(status["latest_review"]),
+                       "Pending handoff: " + _markdown(status["pending_handoff"]), "",
+                       "## Continue", "",
+                       "Use value_lab.collaboration with this bundle and a separately retained checkpoint.",
+                       "Restore to one authoritative local writer. Retire the previous writable copy.",
+                       "Restore does not execute. Unresolved work requires an explicit resolve action before retry.",
+                       "Receive the exact handoff before continuing as its recipient.", "",
+                       "## Evidence boundaries", "",
+                       "Actor identity is DECLARED_NOT_AUTHENTICATED; this is not access control.",
+                       "Human acceptance: NOT_VERIFIED. Native host acceptance: NOT_RUN.",
+                       "Local evaluation of submitted records adds no model runs or scientific observations.",
+                       "A post-review correction remains post hoc; it does not change original registration.",
+                       "All inputs, failures, reviews and revisions are retained in decision.json and events.json.",
+                       "RESULT.json is the current full result; hash-named .blob files retain historical results.",
+                       "Small submitted artifacts travel with the inputs; unsubmitted file references remain unresolved.", "",
+                       "## Required real acceptance", "",
+                       "- A real researcher must review a retained result and perform the handoff.",
+                       "- A real agent host must load the opt-in tool and complete its own workflow.",
+                       "- A non-author must recover the bundle on their own environment.",
+                       "- Measure actual collaboration burden and errors against the previous workflow."]
+            files["HANDOFF.md"] = ("\n".join(handoff) + "\n").encode("utf-8")
+            pending = c["pending_handoff"]
+            if pending:
+                files["RECEIVE.request.json"] = (_json({
+                    "task_id": "REPLACE_WITH_LOCAL_TASK_ID", "action": "receive",
+                    "arguments": {"handoff_id": pending["id"]},
+                    "key": "receive-" + str(view["sequence"]),
+                    "expected_sequence": view["sequence"]}) + "\n").encode()
+            if status["latest_attempt"]:
+                attempt = view["attempts"][status["latest_attempt"]]
+                if "result" in attempt["artifacts"]:
+                    files["REVIEW.template.json"] = (_json({
+                        "task_id": "REPLACE_WITH_LOCAL_TASK_ID", "action": "review",
+                        "arguments": {"review_id": "review-" + str(view["sequence"]),
+                            "attempt_id": status["latest_attempt"],
+                            "result_sha256": attempt["artifacts"]["result"],
+                            "verdict": "request_changes", "notes": ""},
+                        "key": "review-" + str(view["sequence"]),
+                        "expected_sequence": view["sequence"] + (1 if pending else 0)}) + "\n").encode()
         return publish_bundle(output, files, resume=resume)
 
 

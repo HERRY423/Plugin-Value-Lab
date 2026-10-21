@@ -29,6 +29,25 @@ def parser():
     p.add_argument('--version', action='version', version=__version__)
     p.add_argument('--json', action='store_true', help='One JSON object on stdout; progress stays on stderr')
     sub = p.add_subparsers(dest='command', required=True)
+    screen = sub.add_parser('screen', help='L0 + L1: stop, insufficient evidence or advance to pilot; write a use card')
+    screen.add_argument('--plugins', required=True, type=Path)
+    screen.add_argument('--tasks', required=True, type=Path)
+    screen.add_argument('--output', required=True, type=Path)
+    screen.add_argument('--settings', type=Path)
+    screen.add_argument('--results', type=Path)
+    screen.add_argument('--frozen', type=Path)
+    screen.add_argument('--json', action='store_true', default=argparse.SUPPRESS)
+    models = sub.add_parser('freeze-models', help='Freeze lab model whitelist/rates and shared budget; no model calls')
+    for name in ('policy', 'ledger', 'output'):
+        models.add_argument('--' + name, required=True, type=Path)
+    models.add_argument('--task-id', required=True)
+    models.add_argument('--history', type=Path)
+    models.add_argument('--history-ref')
+    models.add_argument('--api-key-env', default='PVL_MODEL_KEY')
+    models.add_argument('--no-auth', action='store_true')
+    models.add_argument('--max-output-tokens', type=int, default=1000)
+    models.add_argument('--max-requests', type=int, default=100)
+    models.add_argument('--json', action='store_true', default=argparse.SUPPRESS)
     for name, help_text in [('demo', 'Run a zero-dependency synthetic example'), ('doctor', 'Check only local feature dependencies'),
                              ('inspect', 'Show h5ad shape, columns and matrices without loading counts'),
                              ('aggregate', 'Aggregate donor-paired raw counts from h5ad'),
@@ -93,7 +112,16 @@ def main(argv=None):
     try:
         args = parser().parse_args(argv)
         json_output = args.json
-        if args.command == 'demo':
+        if args.command == 'freeze-models':
+            from .lab_gateway import freeze_models
+            result = freeze_models(args.policy, args.ledger, args.task_id, args.output, history_path=args.history,
+                history_ref=args.history_ref, api_key_env=args.api_key_env, no_auth=args.no_auth,
+                max_output_tokens=args.max_output_tokens, max_requests=args.max_requests)
+        elif args.command == 'screen':
+            from .screening import screen
+            result = screen(args.plugins, args.tasks, args.output, settings_path=args.settings,
+                            results_path=args.results, frozen_path=args.frozen)
+        elif args.command == 'demo':
             result = sdk.demo(args.output)
         elif args.command == 'doctor':
             result = sdk.doctor()
@@ -109,6 +137,9 @@ def main(argv=None):
         data = result.to_dict() if isinstance(result, sdk.RunResult) else result
         if json_output:
             print(json.dumps(data, ensure_ascii=True, allow_nan=False))
+        elif args.command == 'screen':
+            print(data['decision'])
+            print('使用卡：' + data['use_card'])
         elif isinstance(result, sdk.RunResult):
             print(f'{result.status}' + (' (verified reuse)' if result.reused else ''))
             print(f'Report: {result.report}')

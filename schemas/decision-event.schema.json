@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "PVL local decision append request",
-  "description": "Input to DecisionStore.append / local append CLI. Artifact digests may be supplied only for bytes already retained; --artifact supplies new bytes atomically. This schema does not verify transitions, spending or scientific validity. New writes use pvl-decision-store-2; v1 histories are read without rewriting. Runtime checks enforce retry ancestry, reconciliation identity and unchanged observations for rescore. Explanation events judge/decide/review/present use format 3; v1/v2 events retain their original semantics. Current guidance is a lifecycle projection, not an authority or scientific validity claim.",
+  "description": "Legacy/explanation input to DecisionStore.append / local append CLI. Artifact digests may be supplied only for bytes already retained; --artifact supplies new bytes atomically. This schema does not verify transitions, spending or scientific validity. These writes use pvl-decision-store-2; v1 histories are read without rewriting. Runtime checks enforce retry ancestry, reconciliation identity and unchanged observations for rescore. Explanation events judge/decide/review/present use format 3; v1/v2 events retain their original semantics. Current guidance is a lifecycle projection, not an authority or scientific validity claim. Opt-in collaboration uses format 4 through value_lab.collaboration / collaborate_plugin_task, with its dedicated runtime action contract; it is outside this legacy append schema.",
   "oneOf": [
     {
       "type": "object",

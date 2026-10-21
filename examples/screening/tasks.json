@@ -1,0 +1,5 @@
+[
+  {"id": "ordinary", "kind": "positive", "input": "UNKNOWN", "baseline": "UNKNOWN", "rubric": "UNKNOWN"},
+  {"id": "failure", "kind": "failure", "input": "UNKNOWN", "baseline": "UNKNOWN", "rubric": "UNKNOWN"},
+  {"id": "boundary", "kind": "boundary", "input": "UNKNOWN", "baseline": "UNKNOWN", "rubric": "UNKNOWN"}
+]

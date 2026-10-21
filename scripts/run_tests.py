@@ -11,7 +11,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tests"))
 FAST = ('core', 'core_adversarial', 'usage', 'report', 'value_metrics',
-        'maintenance_regressions', 'sample_size', 'confirmatory', 'evidence_pool', 'gateway_budget', 'action_decision')
+        'maintenance_regressions', 'sample_size', 'confirmatory', 'evidence_pool', 'gateway_budget', 'action_decision',
+        'screening', 'lab_gateway', 'request_budget')
 
 
 def main():

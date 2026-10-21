@@ -2,8 +2,11 @@
 
 当前唯一决策入口：[README](../../README.md)。
 
+当前政策：[机构内数据治理说明](../DATA-GOVERNANCE.md)。v1.0 需 1 个外部实验室完成 L1；在此之前停止新增产品功能，历史设计和待办不构成继续开发授权。
+
 | 文档 | 状态 | 用途 |
 | --- | --- | --- |
+| [rc7 发布说明](RELEASE-v1.0.0-rc7.md) | RELEASE_CANDIDATE | 首个外部实验室 L1 试用包、筛选与机构内数据治理；外部完成仍为 0/1 |
 | [行动决策与多候选比较](20261012-ACTION-DECISION.md) | ENGINEERING_IMPLEMENTED / REAL_BENEFIT_NOT_ESTABLISHED | 四种行动、研究者损失、固定收缩、同时名次区间与 3–32 候选轮转；新增 v2，保留 v1 |
 | [P1 证据阶梯与统计设计](20261012-EVIDENCE-LADDER-DESIGN.md) / [设计契约](20261012-evidence-ladder.contract.json) | DESIGN_FOR_REVIEW / NOT_IMPLEMENTED | L0–L3 下一步行动、序贯与功效下限、分层先验、人工校正评分、18 项验收；不是当前引擎能力 |
 | [公共池与网关实现记录](20261012-POOL-GATEWAY.md) | ENGINEERING_IMPLEMENTED / EVIDENCE_PENDING | 30 个合成候选位点；签名与托管接入；网关累计预留，实际付费仍受上界限制 |

@@ -1,0 +1,117 @@
+{
+  "lab_code": "UNKNOWN",
+  "external_operator": null,
+  "lab_confirmed_complete": null,
+  "release_owner_accepted": null,
+  "export_approved": null,
+  "lab_attestation_ref": "UNKNOWN",
+  "release_review_ref": "UNKNOWN",
+  "tested_version": "UNKNOWN",
+  "tested_source_sha256": null,
+  "use_card_ref": "UNKNOWN",
+  "outcome": null,
+  "task_ids": [
+    "T1",
+    "T2",
+    "T3",
+    "T4"
+  ],
+  "attempts": [
+    {
+      "task_id": "T1",
+      "repeat": 0,
+      "arm": "with",
+      "status": "not_run"
+    },
+    {
+      "task_id": "T1",
+      "repeat": 0,
+      "arm": "without",
+      "status": "not_run"
+    },
+    {
+      "task_id": "T1",
+      "repeat": 1,
+      "arm": "with",
+      "status": "not_run"
+    },
+    {
+      "task_id": "T1",
+      "repeat": 1,
+      "arm": "without",
+      "status": "not_run"
+    },
+    {
+      "task_id": "T2",
+      "repeat": 0,
+      "arm": "with",
+      "status": "not_run"
+    },
+    {
+      "task_id": "T2",
+      "repeat": 0,
+      "arm": "without",
+      "status": "not_run"
+    },
+    {
+      "task_id": "T2",
+      "repeat": 1,
+      "arm": "with",
+      "status": "not_run"
+    },
+    {
+      "task_id": "T2",
+      "repeat": 1,
+      "arm": "without",
+      "status": "not_run"
+    },
+    {
+      "task_id": "T3",
+      "repeat": 0,
+      "arm": "with",
+      "status": "not_run"
+    },
+    {
+      "task_id": "T3",
+      "repeat": 0,
+      "arm": "without",
+      "status": "not_run"
+    },
+    {
+      "task_id": "T3",
+      "repeat": 1,
+      "arm": "with",
+      "status": "not_run"
+    },
+    {
+      "task_id": "T3",
+      "repeat": 1,
+      "arm": "without",
+      "status": "not_run"
+    },
+    {
+      "task_id": "T4",
+      "repeat": 0,
+      "arm": "with",
+      "status": "not_run"
+    },
+    {
+      "task_id": "T4",
+      "repeat": 0,
+      "arm": "without",
+      "status": "not_run"
+    },
+    {
+      "task_id": "T4",
+      "repeat": 1,
+      "arm": "with",
+      "status": "not_run"
+    },
+    {
+      "task_id": "T4",
+      "repeat": 1,
+      "arm": "without",
+      "status": "not_run"
+    }
+  ]
+}
