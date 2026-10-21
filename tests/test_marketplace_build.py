@@ -89,9 +89,14 @@ class MarketplaceBuildTests(unittest.TestCase):
             self.assertIn(plugin_root + '/plugin.json', z.namelist())
             for name, data in payload.items():
                 if name.startswith(('docs/', 'skills/')):
-                    members = [n for n in z.namelist() if n.endswith('/' + name)]
+                    # The full relative path is the identity: historical docs
+                    # and standalone trial copies may share a filename suffix.
+                    members = [n for n in z.namelist()
+                               if n == plugin_root + '/' + name]
                     self.assertEqual(members, [plugin_root + '/' + name])
                     self.assertEqual(z.read(members[0]), data)
+            self.assertEqual(z.read(plugin_root + '/examples/first-lab-l1/docs/DATA-GOVERNANCE.md'),
+                             z.read(plugin_root + '/docs/DATA-GOVERNANCE.md'))
             self.assertFalse(any('/work/' in n or '/build/' in n for n in z.namelist()))
 
 
