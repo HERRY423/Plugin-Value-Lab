@@ -81,6 +81,20 @@ class CommunityTests(unittest.TestCase):
             with self.subTest(mutation=mutation), self.assertRaises(ValueError):
                 external_l1_gate(self.root, '1.0.0')
 
+    def test_root_alias_is_normalized_but_outside_records_stay_blocked(self):
+        self.completion_fixture()
+        alias = self.root / '..' / self.root.name
+        self.assertEqual(external_l1_gate(alias, '1.0.0')['recorded_labs'], 1)
+        with tempfile.TemporaryDirectory(dir=self.root.parent) as outside:
+            outside = Path(outside)
+            shutil.copyfile(self.root / 'completion.json', outside / 'completion.json')
+            config = self.root / 'docs/feature-freeze.json'
+            policy = json.loads(config.read_text(encoding='utf-8'))
+            policy['v1_release_gate']['records'][0]['completion_record'] = '../' + outside.name + '/completion.json'
+            config.write_text(json.dumps(policy), encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'outside release tree'):
+                external_l1_gate(alias, '1.0.0')
+
     def test_citation_version_drift_rejected(self):
         p = self.root / 'CITATION.cff'
         text = p.read_text(encoding='utf-8')

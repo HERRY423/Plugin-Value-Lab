@@ -19,6 +19,7 @@ def external_l1_gate(root, version):
     Only approved, non-sensitive completion records belong in the source tree.
     Hashes bind those records; they do not authenticate a lab or raw results.
     """
+    root = Path(root).resolve()
     policy = json.loads((root / 'docs/feature-freeze.json').read_text(encoding='utf-8'))
     gate = policy.get('v1_release_gate', {})
     if gate.get('criterion') != 'ONE_EXTERNAL_LAB_COMPLETES_L1' or gate.get('required_labs') != 1:
