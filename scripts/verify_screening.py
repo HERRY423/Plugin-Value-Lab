@@ -28,7 +28,9 @@ def main():
              for i, kind in enumerate(('positive', 'failure', 'boundary'))]
     write(root / 'plugins.json', plugins)
     write(root / 'tasks.json', tasks)
-    unknown = screen(root / 'plugins.json', root / 'tasks.json', root / 'insufficient')
+    write(root / 'fixture-settings.json', {'evidence_type': 'synthetic'})
+    unknown = screen(root / 'plugins.json', root / 'tasks.json', root / 'insufficient',
+                     settings_path=root / 'fixture-settings.json')
     adapter = root / 'offline_adapter.py'
     adapter.write_text('''import json,sys
 r=json.load(sys.stdin)
@@ -39,7 +41,7 @@ cost_micros=0, cost_ref='OFFLINE_ZERO_API_COST', correction_seconds=0)))
     ledger = root / 'fixture-budget.sqlite'
     RequestBudget.create(ledger, 'offline-fixture-only', 100000, 1000000,
                          history=[], coverage_ref='new offline synthetic demonstration with no prior calls')
-    write(root / 'settings.json', {'runner': {'argv': [sys.executable, str(adapter)],
+    write(root / 'settings.json', {'evidence_type': 'synthetic', 'runner': {'argv': [sys.executable, str(adapter)],
         'files': [str(adapter)], 'timeout_seconds': 5, 'upper_micros': 0, 'bound_ref': 'OFFLINE_FIXTURE_ONLY',
         'ledger': str(ledger), 'task_id': 'offline-fixture-only'}})
     advance = screen(root / 'plugins.json', root / 'tasks.json', root / 'advance', settings_path=root / 'settings.json')
@@ -56,6 +58,8 @@ cost_micros=0, cost_ref='OFFLINE_ZERO_API_COST', correction_seconds=0)))
                'cards': [r['use_card'] for r in (unknown, advance, stop)]}
     assert summary['statuses'] == ['INSUFFICIENT_EVIDENCE', 'ADVANCE_PILOT', 'STOP']
     assert summary['actual_local_adapter_processes'] == 12
+    for result, source in ((unknown, 'none'), (advance, 'adapter'), (stop, 'import')):
+        assert result['evidence_type'] == 'synthetic' and result['record_source'] == source
     write(root / 'verification.json', summary)
     print(json.dumps(summary, ensure_ascii=True, indent=2))
 

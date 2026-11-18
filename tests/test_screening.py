@@ -48,6 +48,48 @@ class ScreeningTests(unittest.TestCase):
         self.assertAlmostEqual(gain['mean_task_delta'], .2)
         self.assertEqual(evaluate(self.plan, observations(self.plan, 0))['status'], 'STOP')
 
+    def test_minimum_gain_includes_exact_threshold_at_different_baselines(self):
+        for baseline, score, expected in (
+            (.5, .55, 'ADVANCE_PILOT'),
+            (.8, .85, 'ADVANCE_PILOT'),
+            (.8, .8499999999999999, 'STOP'),
+            (.8, .8500000000000001, 'ADVANCE_PILOT'),
+        ):
+            with self.subTest(baseline=baseline, score=score):
+                rows = observations(self.plan)
+                for row in rows:
+                    row['score'] = score if row['arm'] == 'with' else baseline
+                result = evaluate(self.plan, rows)
+                self.assertEqual(result['status'], expected)
+                if score in (.55, .85):
+                    self.assertEqual(result['mean_task_delta'], .05)
+
+    def test_maximum_task_regression_includes_exact_threshold(self):
+        for score, expected in (
+            (.49999999999999994, 'STOP'),
+            (.5, 'ADVANCE_PILOT'),
+            (.5000000000000001, 'ADVANCE_PILOT'),
+        ):
+            with self.subTest(score=score):
+                rows = observations(self.plan)
+                for row in rows:
+                    if row['task_id'] == 't0':
+                        row['score'] = score if row['arm'] == 'with' else .55
+                result = evaluate(self.plan, rows)
+                self.assertEqual(result['status'], expected)
+                if score == .5:
+                    self.assertEqual(result['task_deltas']['t0'], -.05)
+
+    def test_minimum_gain_at_threshold_after_averaging_repeats_and_tasks(self):
+        scores = {'t0': (.82, .84), 't1': (.84, .86), 't2': (.86, .88)}
+        rows = observations(self.plan)
+        for row in rows:
+            row['score'] = scores[row['task_id']][row['repeat']] if row['arm'] == 'with' else .8
+        result = evaluate(self.plan, rows)
+        self.assertEqual(result['status'], 'ADVANCE_PILOT')
+        self.assertEqual(result['task_deltas'], {'t0': .03, 't1': .05, 't2': .07})
+        self.assertEqual(result['mean_task_delta'], .05)
+
     def test_static_block_missing_and_failed_without_evidence(self):
         for state, ref, expected in [('fail', 'verified-ref', 'STOP'), ('fail', None, 'INSUFFICIENT_EVIDENCE'),
                                      ('UNKNOWN', 'ref', 'INSUFFICIENT_EVIDENCE')]:
@@ -98,15 +140,40 @@ class ScreeningTests(unittest.TestCase):
         self.assertEqual(json.loads(result.stdout)['status'], 'INSUFFICIENT_EVIDENCE')
         frozen = self.root / 'first/frozen-plan.json'
         plan = load_json(frozen)
+        self.assertNotIn('evidence_type', plan['settings'])  # Legacy plan digest stays valid.
         bundle = self.save('results.json', {'plan_sha256': plan['plan_sha256'], 'runs': observations(plan)})
         result = screen(plugins, tasks, self.root / 'second', results_path=bundle, frozen_path=frozen)
         self.assertEqual(result['status'], 'ADVANCE_PILOT')
         self.assertIn('进入先导', Path(result['use_card']).read_text(encoding='utf-8'))
+        self.assertEqual((result['evidence_type'], result['record_source']), ('unknown', 'import'))
         with self.assertRaises(ValidationError): screen(plugins, tasks, self.root / 'second')
         self.tasks[0]['rubric'] = 'changed'
         self.save('tasks.json', self.tasks)
         with self.assertRaisesRegex(ValidationError, 'mismatch'):
             screen(plugins, tasks, self.root / 'third', results_path=bundle, frozen_path=frozen)
+
+    def test_standalone_result_binds_evidence_type_across_import(self):
+        plugins, tasks = self.save('plugins.json', self.plugins), self.save('tasks.json', self.tasks)
+        settings = self.save('settings.json', {'evidence_type': 'synthetic'})
+        initial = screen(plugins, tasks, self.root / 'frozen', settings_path=settings)
+        self.assertEqual((initial['evidence_type'], initial['record_source']), ('synthetic', 'none'))
+        frozen = initial['frozen_plan']
+        plan = load_json(frozen)
+        self.assertNotEqual(plan['plan_sha256'], self.plan['plan_sha256'])
+        bundle = {'plan_sha256': plan['plan_sha256'], 'runs': observations(plan)}
+        screen(plugins, tasks, self.root / 'imported', frozen_path=frozen,
+               results_path=self.save('paired.json', bundle))
+        for name in ('result.json', 'runs.json'):
+            stored = load_json(self.root / 'imported' / name)
+            self.assertEqual((stored['evidence_type'], stored['record_source']), ('synthetic', 'import'))
+        card = (self.root / 'imported/use-card.md').read_text(encoding='utf-8')
+        for label in ('`synthetic`', '`import`'):
+            self.assertIn(label, card)
+        bundle['evidence_type'] = 'external'
+        with self.assertRaisesRegex(ValidationError, 'evidence_type'):
+            screen(plugins, tasks, self.root / 'conflict', frozen_path=frozen,
+                   results_path=self.save('changed.json', bundle))
+        self.assertFalse((self.root / 'conflict').exists())
 
     def runner_settings(self, body, upper=0):
         adapter = self.root / 'adapter.py'
@@ -124,11 +191,13 @@ print(json.dumps(dict(status='completed', score=.8 if r['arm']=='with' else .5,
 critical_failure=False, evidence_ref='synthetic', scoring_ref='fixture',
 cost_micros=0, cost_ref='offline-fixture', correction_seconds=0)))
 ''')
+        settings['evidence_type'] = 'synthetic'
         plugins, tasks = self.save('plugins.json', self.plugins), self.save('tasks.json', self.tasks)
         config = self.save('settings.json', settings)
         result = screen(plugins, tasks, self.root / 'run', settings_path=config)
         self.assertEqual(result['status'], 'ADVANCE_PILOT')
         self.assertEqual(result['observed_runs'], 12)
+        self.assertEqual((result['evidence_type'], result['record_source']), ('synthetic', 'adapter'))
         again = screen(plugins, tasks, self.root / 'replay', settings_path=config)
         self.assertEqual(again['observed_runs'], 0)
         self.assertEqual(again['status'], 'INSUFFICIENT_EVIDENCE')
@@ -146,7 +215,8 @@ cost_micros=0, cost_ref='offline-fixture', correction_seconds=0)))
     def test_input_and_budget_validation(self):
         for tasks in (self.tasks[:2], self.tasks * 2):
             with self.assertRaises(ValidationError): prepare(self.plugins, tasks)
-        for settings in ({'min_gain': float('nan')}, {'per_request_micros': True}, {'repeats': 3}, {'extra': 1}):
+        for settings in ({'min_gain': float('nan')}, {'per_request_micros': True}, {'repeats': 3}, {'extra': 1},
+                         {'evidence_type': 'verified'}):
             with self.assertRaises(ValidationError): prepare(self.plugins, self.tasks, settings)
         plan = prepare(self.plugins, self.tasks, {'per_request_micros': 500000, 'total_micros': 5000000})
         self.assertEqual(plan['settings']['per_request_micros'], 500000)

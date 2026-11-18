@@ -1,6 +1,6 @@
 # 第一个外部实验室｜L1 试用包
 
-**先做一次不调用模型的安装演练，再用实验室自己的 4 个任务做 L1。** 本包只负责冻结、导入与使用卡；不会自动安装被测插件、连接模型或启动付费任务。默认采用“已有机构内宿主执行，人工记录，PVL 导入”的路径，无须开发适配器。从 rc7 Release 下载 `PVL-first-lab-L1-v1.0.0-rc7.zip` 并解压；以 `PACKAGE-MANIFEST.json` 的提交与 wheel 哈希识别。源码目录是模板，完整安装包另附 wheel 和校验清单。
+**先做一次不调用模型的安装演练，再用实验室自己的 4 个任务做 L1。** 本包只负责冻结、导入与使用卡；不会自动安装被测插件、连接模型或启动付费任务。默认采用“已有机构内宿主执行，人工记录，PVL 导入”的路径，无须开发适配器。从 rc8 Release 下载 `PVL-first-lab-L1-v1.0.0-rc8.zip` 并解压；以 `PACKAGE-MANIFEST.json` 的提交与 wheel 哈希识别。源码目录是模板，完整安装包另附 wheel 和校验清单。
 
 ## 1. 最短安装与演练（Windows PowerShell）
 
@@ -11,7 +11,7 @@
 ```powershell
 python check_package.py
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install --no-index --no-deps --find-links wheels plugin-value-lab==1.0.0rc7
+.\.venv\Scripts\python.exe -m pip install --no-index --no-deps --find-links wheels plugin-value-lab==1.0.0rc8
 .\.venv\Scripts\python.exe -I rehearsal.py --output rehearsal-01
 ```
 
@@ -30,6 +30,8 @@ Copy-Item templates work -Recurse
 `work/settings.json` 默认每次 $0.10、总计 $1，实验室可在**冻结前**调整；费用单位为 USD micros。使用内网模型不代表费用自动为零。付费执行还须由实验室使用既有网关或提供方控制保证上限；导入命令本身不会拦截外部宿主的费用或网络。人工执行上限在 study-setup 中规定，`max_seconds` 仅适用于自动适配器，不是导入记录的耗时保证。
 
 ## 3. 冻结并生成空白配对表
+
+使用 rc8 时，在冻结前按实际情况填写 `work/settings.json` 的可选字段 `evidence_type`。合成演练用 `synthetic`，本地采集用 `local`，独立外部采集用 `external`，未核实可省略或填 `unknown`。它记录实验室声明。对外提交仍由负责人核实操作者、原始依据和批准。rc7 的试用包请用随包脚本和设置模板。
 
 ```powershell
 .\.venv\Scripts\pvl.exe screen --plugins work/plugins.json --tasks work/tasks.json --settings work/settings.json --output work/frozen-01
@@ -53,6 +55,8 @@ Copy-Item templates work -Recurse
 ```
 
 读取 `work/review-01/use-card.md` 和 result.json，逐项完成 [验收清单](ACCEPTANCE.md)。修正录入错误需保留旧文件和原因，再以新输出目录导入；不会重跑模型。“停止”不是命令失败；退出码 0 表示成功生成业务判定。输入错误则看终端提示。
+
+在 rc8 上核对结果及使用卡中的 `evidence_type` 与冻结声明一致，通过这里导入时 `record_source` 为 `import`。按实际首次尝试统计 completed / failed / not_run，在 `work/study-setup.md` 汇总实验室人时和作者支持人时。
 
 ## v1.0 正式版门槛与功能冻结
 

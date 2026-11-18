@@ -5,6 +5,7 @@ PVL reserves its declared transport bound before launch; receipts are assertions
 not authenticated provider invoices. No runner is inferred or downloaded.
 """
 from copy import deepcopy
+from fractions import Fraction
 import json
 import math
 from pathlib import Path
@@ -33,6 +34,13 @@ def _number(value, low=0, high=10**12):
     return type(value) in (int, float) and math.isfinite(value) and low <= value <= high
 
 
+def _evidence_type(settings):
+    kind = settings.get('evidence_type', 'unknown')
+    if kind not in ('synthetic', 'local', 'external', 'unknown'):
+        raise ValidationError('Invalid screening evidence_type')
+    return kind
+
+
 def _save(path, value):
     with Path(path).open('x', encoding='utf-8') as stream:
         json.dump(value, stream, ensure_ascii=False, indent=2, allow_nan=False)
@@ -49,8 +57,9 @@ def prepare(plugins, tasks, settings=None):
         if any(not _text(i) for i in ids) or len(set(ids)) != len(ids):
             raise ValidationError('Unique nonempty ' + kind + ' IDs required')
     settings = deepcopy({} if settings is None else settings)
-    if not isinstance(settings, dict) or set(settings) - set(DEFAULTS) - {'runner', 'model_policy'}:
+    if not isinstance(settings, dict) or set(settings) - set(DEFAULTS) - {'runner', 'model_policy', 'evidence_type'}:
         raise ValidationError('Unknown screening setting')
+    _evidence_type(settings)
     settings = {**DEFAULTS, **settings}
     if type(settings['repeats']) is not int or settings['repeats'] != 2:
         raise ValidationError('L1 freezes two repeats (12–20 attempts)')
@@ -133,6 +142,7 @@ def schedule(plan):
 def evaluate(plan, rows, execution_reason=None):
     blocked, missing = static_check(plan)
     result = {'format': 'pvl-screen-result-1', 'plan_sha256': plan['plan_sha256'],
+              'evidence_type': _evidence_type(plan['settings']), 'record_source': 'unknown' if rows else 'none',
               'status': 'INSUFFICIENT_EVIDENCE', 'level': 'L0', 'reasons': [],
               'missing': missing, 'observed_runs': len(rows), 'expected_runs': len(schedule(plan)),
               'claim_level': '描述性观察', 'adoption_supported': False,
@@ -189,19 +199,24 @@ def evaluate(plan, rows, execution_reason=None):
         return result
     if missing:
         return result
-    for task in plan['tasks']:
-        differences = [indexed[(task['id'], r, 'with')]['score'] - indexed[(task['id'], r, 'without')]['score']
-                       for r in range(plan['settings']['repeats'])]
-        result['task_deltas'][task['id']] = sum(differences) / len(differences)
-    average = sum(result['task_deltas'].values()) / len(plan['tasks'])
-    result['mean_task_delta'] = average
     settings = plan['settings']
+    # Compare the decimal scores retained in JSON exactly, including after averaging.
+    scores = {key: Fraction(str(row['score'])) for key, row in indexed.items()}
+    task_deltas = {}
+    for task in plan['tasks']:
+        task_id = task['id']
+        differences = [scores[task_id, r, 'with'] - scores[task_id, r, 'without']
+                       for r in range(settings['repeats'])]
+        task_deltas[task_id] = sum(differences) / len(differences)
+    average = sum(task_deltas.values()) / len(task_deltas)
+    result['task_deltas'] = {task_id: float(delta) for task_id, delta in task_deltas.items()}
+    result['mean_task_delta'] = float(average)
     correction = sum(r['correction_seconds'] for r in indexed.values() if r['arm'] == 'with')
     if correction > settings['max_correction_seconds']:
         result.update(status='STOP', reasons=['人工修正耗时超过冻结的本地实用上限'])
-    elif min(result['task_deltas'].values()) < -settings['max_regression']:
+    elif min(task_deltas.values()) < -Fraction(str(settings['max_regression'])):
         result.update(status='STOP', reasons=['至少一个任务的质量下降超过冻结上限'])
-    elif average < settings['min_gain']:
+    elif average < Fraction(str(settings['min_gain'])):
         result.update(status='STOP', reasons=['完整筛查未达到冻结的本地继续投入阈值；不代表总体无效'])
     else:
         result.update(status='ADVANCE_PILOT', reasons=['完整 L1 记录达到预设本地筛选规则；仅支持规划独立先导'])
@@ -274,16 +289,20 @@ def screen(plugins_path, tasks_path, output, *, settings_path=None, results_path
             raise ValidationError('Resume imports results only; it never relaunches unknown attempts')
     else:
         plan = prepare(plugins, tasks, load_json(settings_path) if settings_path else None)
+    evidence_type = _evidence_type(plan['settings'])
+    if results_path:
+        bundle = load_json(results_path)
+        if (not isinstance(bundle, dict) or bundle.get('plan_sha256') != plan['plan_sha256']
+                or not isinstance(bundle.get('runs'), list)):
+            raise ValidationError('Results must bind the frozen plan and contain runs')
+        if bundle.get('evidence_type', evidence_type) != evidence_type:
+            raise ValidationError('Imported evidence_type differs from frozen plan')
     output.mkdir(parents=True)
     _save(output / 'frozen-plan.json', plan)
     _save(output / 'schedule.json', schedule(plan))
     blocked, missing = static_check(plan)
     reason = None
     if results_path:
-        bundle = load_json(results_path)
-        if (not isinstance(bundle, dict) or bundle.get('plan_sha256') != plan['plan_sha256']
-                or not isinstance(bundle.get('runs'), list)):
-            raise ValidationError('Results must bind the frozen plan and contain runs')
         rows = bundle['runs']
     elif blocked or missing:
         rows = []
@@ -292,8 +311,13 @@ def screen(plugins_path, tasks_path, output, *, settings_path=None, results_path
             rows, reason = _run(plan, output)
         except (ValidationError, OSError):
             rows, reason = [], '执行账本或适配器无法核对；未获得可用配对记录'
-    _save(output / 'runs.json', {'plan_sha256': plan['plan_sha256'], 'runs': rows})
+    record_source = 'none'
+    if rows:
+        record_source = 'import' if results_path else 'adapter'
+    _save(output / 'runs.json', {'plan_sha256': plan['plan_sha256'], 'evidence_type': evidence_type,
+                                'record_source': record_source, 'runs': rows})
     result = evaluate(plan, rows, reason)
+    result['record_source'] = record_source
     result['decision'] = LABELS[result['status']]
     result['use_card'] = str(output / 'use-card.md')
     result['frozen_plan'] = str(output / 'frozen-plan.json')
@@ -304,6 +328,7 @@ def screen(plugins_path, tasks_path, output, *, settings_path=None, results_path
     details = result['reasons'] + result['missing']
     card = [f"# 插件使用卡：{result['decision']}", '',
             '插件组合：' + '、'.join(p['id'] for p in plugins),
+            f"证据类型（方案声明）：`{evidence_type}`。本次记录来源：`{result['record_source']}`。",
             f"当前阶段：{result['level']}；范围：本清单作为一个组合、当前 {len(tasks)} 个任务。",
             f"已回答：是否满足本地筛选规则；运行记录 {len(rows)}/{result['expected_runs']}。",
             '尚未回答：真实增益、跨任务泛化及采用价值。', '',

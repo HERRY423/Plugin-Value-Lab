@@ -6,9 +6,9 @@
 
 中文 · [English](README.en.md)
 
-Plugin Value Lab 用配对比较、冻结方案和可复算记录，帮助你判断插件是否值得在**具体任务**中使用。比较有插件与无插件的表现，同时保留失败、成本、不确定性和缺失证据。**Version 1.0.0-rc7.** 当前为候选发布版。
+Plugin Value Lab 用配对比较、冻结方案和可复算记录，帮助你判断插件是否值得在**具体任务**中使用。比较有插件与无插件的表现，同时保留失败、成本、不确定性和缺失证据。**Version 1.0.0-rc8.** 当前为候选发布版。
 
-[下载 rc7](https://github.com/HERRY423/Plugin-Value-Lab/releases/tag/v1.0.0-rc7) · [五步体验](#五步体验无需模型调用) · [方法与实现记录](docs/history/INDEX.md)
+[下载 rc8](https://github.com/HERRY423/Plugin-Value-Lab/releases/tag/v1.0.0-rc8) · [五步体验](#五步体验无需模型调用) · [方法与实现记录](docs/history/INDEX.md)
 
 ## v1.0 正式版门槛与功能冻结
 
@@ -21,6 +21,8 @@ Plugin Value Lab 用配对比较、冻结方案和可复算记录，帮助你判
 冻结期间只修复现有路径的正确性、安全、安装/恢复问题，澄清文档并支持这一轮试用；不新增模块、模型/宿主适配、分析方法、指标或界面。该里程碑完成后仍须用户明确决定是否解冻。数据处理和可导出范围见[一页数据治理说明](docs/DATA-GOVERNANCE.md)。
 
 首个实验室的[试用步骤、4 个任务模板和完成清单](examples/first-lab-l1/README.md)已整理；离线安装包需连同 wheel 与哈希清单使用。本地合成演练不计为外部 L1，也未向任何实验室发送邀请或材料。
+
+完成 L1 后，可用同一批获准记录比较常规专家复核与增加 PVL 后的决策质量、工时和费用。研究方案和三张空表供实验室协调人使用。[评审者配对盲评方案](examples/research/paired-decision-review/README.md)
 
 ## 适合什么场景
 
@@ -48,12 +50,12 @@ python -m pip install -r requirements-mcp.txt
 | 字段 | 内容 |
 | --- | --- |
 | 来源 | `HERRY423/Plugin-Value-Lab` |
-| Git 引用 | `v1.0.0-rc7`（固定到 rc7）；需要后续源码更新时使用 `main` |
+| Git 引用 | `v1.0.0-rc8`（固定到 rc8）；需要后续源码更新时使用 `main` |
 | 稀疏路径 | 留空 |
 
 添加后，在市场中选择并安装 **Plugin Value Lab**。仓库已包含天平图标及对应清单配置。
 
-也可以在 [Release](https://github.com/HERRY423/Plugin-Value-Lab/releases/tag/v1.0.0-rc7) 下载 `plugin-value-lab-marketplace-1.0.0-rc7.zip`，解压后通过本地文件夹添加市场，选择**包含 `.agents/plugins/marketplace.json` 的根目录**。保留完整目录结构。Python wheel 是单独的命令行/库分发，安装 wheel 不会自动向 Codex 注册插件。
+也可以在 [Release](https://github.com/HERRY423/Plugin-Value-Lab/releases/tag/v1.0.0-rc8) 下载 `plugin-value-lab-marketplace-1.0.0-rc8.zip`，解压后通过本地文件夹添加市场，选择**包含 `.agents/plugins/marketplace.json` 的根目录**。保留完整目录结构。Python wheel 是单独的命令行/库分发，安装 wheel 不会自动向 Codex 注册插件。
 
 安装后可以这样开始对话：
 
@@ -116,6 +118,6 @@ python scripts/run_tests.py full --require-all
 
 可选依赖见 [pyproject.toml](pyproject.toml)：`dev`、`mcp`、`planning`、`registry`、`science`、`pseudobulk`，按任务需要安装。原生隔离、真实后端和工作流有各自的 CI 检查；工程测试通过不代表插件真实增益或科学有效性已经得到验证。
 
-[贡献指南](docs/history/20261011/CONTRIBUTING.md) · [API 稳定性](docs/history/20261011/docs/API-STABILITY.md) · [rc7 发布说明](docs/history/RELEASE-v1.0.0-rc7.md) · [历史文档索引](docs/history/INDEX.md)
+[贡献指南](docs/history/20261011/CONTRIBUTING.md) · [API 稳定性](docs/history/20261011/docs/API-STABILITY.md) · [rc8 发布说明](docs/history/RELEASE-v1.0.0-rc8.md) · [历史文档索引](docs/history/INDEX.md)
 
 文档归档不撤销维护与安全规则。项目使用 [Apache-2.0 许可证](LICENSE)；引用元数据见 [CITATION.cff](CITATION.cff)。

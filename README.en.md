@@ -12,9 +12,9 @@ Raw evidence stays within the institution. Only an approved minimal completion a
 
 [中文](README.md) · English
 
-Plugin Value Lab helps you decide whether a plugin is worth using for a **specific task**, through paired comparisons, frozen plans, and recomputable records. Compare runs with and without a plugin while keeping failures, costs, uncertainty, and missing evidence visible. **Version 1.0.0-rc7.** This is a release candidate.
+Plugin Value Lab helps you decide whether a plugin is worth using for a **specific task**, through paired comparisons, frozen plans, and recomputable records. Compare runs with and without a plugin while keeping failures, costs, uncertainty, and missing evidence visible. **Version 1.0.0-rc8.** This is a release candidate.
 
-[Download rc7](https://github.com/HERRY423/Plugin-Value-Lab/releases/tag/v1.0.0-rc7) · [Five-step quickstart](#five-step-quickstart-no-model-calls) · [Methods and implementation records](docs/history/INDEX.md)
+[Download rc8](https://github.com/HERRY423/Plugin-Value-Lab/releases/tag/v1.0.0-rc8) · [Five-step quickstart](#five-step-quickstart-no-model-calls) · [Methods and implementation records](docs/history/INDEX.md)
 
 ## When to use it
 
@@ -42,12 +42,12 @@ On the Codex plugins page, choose **Add plugin marketplace** and enter:
 | Field | Value |
 | --- | --- |
 | Source | `HERRY423/Plugin-Value-Lab` |
-| Git reference | `v1.0.0-rc7` to pin rc7; use `main` for subsequent source updates |
+| Git reference | `v1.0.0-rc8` to pin rc8; use `main` for subsequent source updates |
 | Sparse paths | Leave blank |
 
 Then select and install **Plugin Value Lab** from the marketplace. The repository includes the balance icon and its manifest configuration.
 
-Alternatively, download `plugin-value-lab-marketplace-1.0.0-rc7.zip` from the [Release](https://github.com/HERRY423/Plugin-Value-Lab/releases/tag/v1.0.0-rc7), extract it, and add the marketplace from a local folder. Select the **root containing `.agents/plugins/marketplace.json`** and preserve the full directory structure. The Python wheel is a separate CLI/library distribution; installing it does not register the plugin in Codex.
+Alternatively, download `plugin-value-lab-marketplace-1.0.0-rc8.zip` from the [Release](https://github.com/HERRY423/Plugin-Value-Lab/releases/tag/v1.0.0-rc8), extract it, and add the marketplace from a local folder. Select the **root containing `.agents/plugins/marketplace.json`** and preserve the full directory structure. The Python wheel is a separate CLI/library distribution; installing it does not register the plugin in Codex.
 
 After installation, try this prompt:
 
@@ -111,6 +111,6 @@ The fast tier covers core decisions, cards, power planning, and selected regress
 
 Optional dependencies are listed in [pyproject.toml](pyproject.toml): `dev`, `mcp`, `planning`, `registry`, `science`, and `pseudobulk`. Install only what your task requires. Native isolation, real backends, and workflows have separate CI checks. Passing engineering tests does not establish real plugin benefit or scientific validity.
 
-[Contributing](docs/history/20261011/CONTRIBUTING.md) · [API stability](docs/history/20261011/docs/API-STABILITY.md) · [rc7 release notes](docs/history/RELEASE-v1.0.0-rc7.md) · [Historical documentation index](docs/history/INDEX.md)
+[Contributing](docs/history/20261011/CONTRIBUTING.md) · [API stability](docs/history/20261011/docs/API-STABILITY.md) · [rc8 release notes](docs/history/RELEASE-v1.0.0-rc8.md) · [Historical documentation index](docs/history/INDEX.md)
 
 Some linked implementation records are in Chinese. Archiving documents does not revoke maintenance or security policies. Licensed under [Apache-2.0](LICENSE); citation metadata is available in [CITATION.cff](CITATION.cff).

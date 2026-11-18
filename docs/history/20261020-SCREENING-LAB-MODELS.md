@@ -14,11 +14,17 @@ pvl screen --plugins plugins.json --tasks tasks.json --settings lab-screen.json 
 
 最小输入示例见 `examples/screening/`。省略 settings 时采用单次 $0.10、任务 $1、600 秒；没有适配器或已收集的配对记录，就返回证据不足，列明下一步，不虚构测试通过。
 
+从 rc8 起可在 settings 中冻结可选的 `evidence_type`。`synthetic` 表示合成演练，`local` 和 `external` 分别表示提交者声明的本地与外部证据，省略或填 `unknown` 表示来源待核。旧方案保留原摘要。rc7 的试用包请用随包说明和 wheel。
+
+`result.json`、`runs.json` 和使用卡均携带证据类型，以及本次取得记录的途径 `record_source`（`adapter` 为运行适配器、`import` 为导入、`none` 为没有记录）。运行适配器也可以生成模拟数据。导入时沿用冻结方案的类型，显式冲突会报错。外部身份及原始记录仍由实验室与发布负责人核对。
+
 L0 检查声明、权限、出口、许可、版本身份。每项 `pass/fail/UNKNOWN` 必须附 `evidence_ref`；这是实验室提供的检查记录，PVL 不把字符串或哈希当成真实性验证。已核实不适配→停止；缺字段→证据不足。
 
 L1 要求 3–5 个任务，覆盖 positive、failure、boundary，各有输入、baseline 和 rubric。每任务有/无插件各两次，合计 12–20 次；执行顺序、阈值与适配器文件在调用前冻结。保留失败、未知与额外/重复记录，不填补缺失分数。已核实关键失败立即停止；未核实风险停止执行并判证据不足。完整配对才按每任务等权均值、逐任务退化上限和人工修正时间判定。达到阈值只允许进入独立先导，不提供采用结论或总体显著性。
 
 ## 实验室自己的执行适配器
+
+rc8 按已解析 JSON 数值的十进制表示比较 L1 分数、均值及阈值。平均增益等于 `min_gain` 时满足增益条件，单任务退步等于 `max_regression` 时仍在上限内。
 
 `lab-screen.json` 可包含以下 `runner`（其余为可选阈值/预算）：
 

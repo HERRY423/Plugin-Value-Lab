@@ -6,6 +6,7 @@
 
 | 文档 | 状态 | 用途 |
 | --- | --- | --- |
+| [rc8 发布说明](RELEASE-v1.0.0-rc8.md) | RELEASE_CANDIDATE | L1 阈值与证据来源修复、试用包与独立配对盲评方案 |
 | [rc7 发布说明](RELEASE-v1.0.0-rc7.md) | RELEASE_CANDIDATE | 首个外部实验室 L1 试用包、筛选与机构内数据治理；外部完成仍为 0/1 |
 | [行动决策与多候选比较](20261012-ACTION-DECISION.md) | ENGINEERING_IMPLEMENTED / REAL_BENEFIT_NOT_ESTABLISHED | 四种行动、研究者损失、固定收缩、同时名次区间与 3–32 候选轮转；新增 v2，保留 v1 |
 | [P1 证据阶梯与统计设计](20261012-EVIDENCE-LADDER-DESIGN.md) / [设计契约](20261012-evidence-ladder.contract.json) | DESIGN_FOR_REVIEW / NOT_IMPLEMENTED | L0–L3 下一步行动、序贯与功效下限、分层先验、人工校正评分、18 项验收；不是当前引擎能力 |

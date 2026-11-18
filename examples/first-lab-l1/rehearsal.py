@@ -31,6 +31,7 @@ def main():
               'baseline': 'SYNTHETIC_NO_MODEL_OR_PLUGIN'} for i, kind in enumerate(('positive', 'failure', 'boundary', 'positive'))]
     save(root / 'plugins.json', plugins)
     save(root / 'tasks.json', tasks)
+    save(root / 'settings.json', {'evidence_type': 'synthetic'})
     commands = []
     def cli(*parts):
         command = [sys.executable, '-I', '-m', 'value_lab.easy_cli', 'screen', '--plugins', str(root / 'plugins.json'),
@@ -40,8 +41,9 @@ def main():
         if process.returncode != 0:
             raise RuntimeError(process.stderr or process.stdout)
         return json.loads(process.stdout)
-    initial = cli('--output', root / 'frozen')
+    initial = cli('--settings', root / 'settings.json', '--output', root / 'frozen')
     assert initial['status'] == 'INSUFFICIENT_EVIDENCE' and initial['observed_runs'] == 0
+    assert (initial['evidence_type'], initial['record_source']) == ('synthetic', 'none')
     helper = Path(__file__).resolve().parent / 'make_record.py'
     subprocess.run([sys.executable, '-I', str(helper), str(root / 'frozen/frozen-plan.json'), str(root / 'paired.json')], check=True)
     paired = json.loads((root / 'paired.json').read_text(encoding='utf-8'))
@@ -64,6 +66,8 @@ def main():
     save(root / 'synthetic-unknown-cost.json', paired)
     unknown = cli('--frozen', root / 'frozen/frozen-plan.json', '--results', root / 'synthetic-unknown-cost.json', '--output', root / 'unknown-cost')
     assert unknown['status'] == 'INSUFFICIENT_EVIDENCE' and unknown['total_cost_micros'] is None
+    for imported in (unfilled, complete, unknown):
+        assert (imported['evidence_type'], imported['record_source']) == ('synthetic', 'import')
     report = {'status': 'REHEARSAL_PASS', 'evidence': 'LOCAL_SYNTHETIC_INSTALLED_WHEEL_ONLY',
               'python_version': sys.version.split()[0], 'source_tree_import': False,
               'model_calls': 0, 'api_cost_micros': 0, 'real_plugin_runs': 0,
