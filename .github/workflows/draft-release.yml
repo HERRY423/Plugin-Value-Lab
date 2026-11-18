@@ -1,5 +1,7 @@
-name: Prepare a draft for an existing version tag
+name: Package a version tag
 on:
+  push:
+    tags: [v1.0.0-rc8]
   workflow_dispatch:
     inputs:
       tag:
@@ -7,32 +9,66 @@ on:
         required: true
         type: string
 permissions:
+  actions: read
   contents: write
 jobs:
   draft:
     runs-on: ubuntu-latest
     env:
-      RELEASE_TAG: ${{ inputs.tag }}
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ inputs.tag || github.ref_name }}
           fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
       - name: Check existing tag and version
         run: |
           git show-ref --verify "refs/tags/$RELEASE_TAG"
+          test "$(git rev-parse "refs/tags/$RELEASE_TAG^{commit}")" = "$(git rev-parse HEAD)"
           python -c "import json,os,tomllib; tag=os.environ['RELEASE_TAG'].removeprefix('v'); assert tag in (json.load(open('plugin.json'))['version'],tomllib.load(open('pyproject.toml','rb'))['project']['version'])"
-      - run: python -m pip install ".[dev,mcp,science,registry]" wheel "setuptools>=68" nbclient ipykernel
-      - run: python scripts/run_tests.py full --require-all
+      - name: Check exact-commit main CI for rc8 publication
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          release_sha=$(git rev-parse HEAD)
+          passed=$(gh run list --workflow ci.yml --commit "$release_sha" --branch main --event push --limit 10 \
+            --json headSha,status,conclusion \
+            --jq '[.[] | select(.status == "completed" and .conclusion == "success")] | length')
+          test "$passed" -ge 1
+      - run: python -m pip install ".[dev,mcp,science,registry]" build wheel "setuptools>=68" nbclient ipykernel
+      - run: python scripts/run_tests.py full --require-all --report "$RUNNER_TEMP/full.json"
       - run: python scripts/check_feature_freeze.py
       - run: python scripts/check_community.py
       - run: python scripts/build_marketplace.py --package
       - run: python scripts/build_marketplace.py --check
       - run: python -m pip wheel . --no-deps --no-build-isolation --wheel-dir dist
-      - name: Create reviewable draft; never publish automatically
+      - name: Package and check rc8 lab kit and source distribution
+        if: env.RELEASE_TAG == 'v1.0.0-rc8'
+        run: |
+          python -m build --no-isolation --sdist --outdir dist
+          python scripts/prepare_rc_assets.py --dist dist --tag "$RELEASE_TAG" --test-report "$RUNNER_TEMP/full.json"
+      - name: Create reviewable release draft
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$RELEASE_TAG" dist/* --verify-tag --draft --title "Plugin Value Lab $RELEASE_TAG" --notes-file "docs/history/RELEASE-$RELEASE_TAG.md"
+        run: |
+          options=(--draft)
+          if [[ "$RELEASE_TAG" == *rc* ]]; then
+            options+=(--prerelease)
+          fi
+          gh release create "$RELEASE_TAG" dist/* --verify-tag "${options[@]}" --title "Plugin Value Lab $RELEASE_TAG" \
+            --notes-file "docs/history/RELEASE-$RELEASE_TAG.md"
+      - name: Verify uploaded checksums and publish rc8 prerelease
+        if: github.event_name == 'push' && github.ref == 'refs/tags/v1.0.0-rc8'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          upload_dir=$(mktemp -d)
+          gh release download "$RELEASE_TAG" --pattern '*' --dir "$upload_dir"
+          cmp dist/SHA256SUMS.txt "$upload_dir/SHA256SUMS.txt"
+          (cd "$upload_dir" && sha256sum --check SHA256SUMS.txt)
+          gh release edit "$RELEASE_TAG" --draft=false --prerelease --latest=false
